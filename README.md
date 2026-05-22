@@ -152,7 +152,7 @@ https://<你的用户名>.github.io/daily-paper-reader
 scripts/bootstrap_local.sh
 ```
 
-这个脚本会自动创建 `.venv`、安装 `requirements.txt`、按需从 `.env.example` 生成 `.env`，然后启动本地后端。启动完成后访问：
+这个脚本会自动创建 `.venv`、按需从 `.env.example` 生成 `.env`，然后启动本地后端。默认使用快速部署模式，不会下载 `torch` 等重依赖。启动完成后访问：
 
 ```text
 http://127.0.0.1:8000
@@ -168,6 +168,12 @@ scripts/local_debug.sh
 
 ```bash
 python src/local_debug_server.py --host 127.0.0.1 --port 8000
+```
+
+如果要一次性安装完整运行依赖，可以使用：
+
+```bash
+DPR_INSTALL_MODE=full scripts/bootstrap_local.sh
 ```
 
 如果需要跳过依赖安装，可以使用：

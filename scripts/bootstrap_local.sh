@@ -8,6 +8,7 @@ HOST="${DPR_LOCAL_HOST:-127.0.0.1}"
 PORT="${DPR_LOCAL_PORT:-8000}"
 VENV_DIR="${DPR_LOCAL_VENV:-.venv}"
 PYTHON_BIN="${PYTHON:-python3}"
+INSTALL_MODE="${DPR_INSTALL_MODE:-minimal}"
 SKIP_INSTALL="${DPR_SKIP_INSTALL:-0}"
 
 log() {
@@ -31,10 +32,13 @@ source "$VENV_DIR/bin/activate"
 
 log "使用 Python：$(python -c 'import sys; print(sys.executable)')"
 
-if [ "$SKIP_INSTALL" != "1" ]; then
-  log "安装/更新依赖：requirements.txt"
+if [ "$SKIP_INSTALL" != "1" ] && [ "$INSTALL_MODE" = "full" ]; then
+  log "安装/更新完整依赖：requirements.txt"
   python -m pip install --upgrade pip
   python -m pip install -r requirements.txt
+elif [ "$SKIP_INSTALL" != "1" ]; then
+  log "快速部署模式：跳过完整依赖安装"
+  log "如需运行真实抓取/重排流程，请执行：DPR_INSTALL_MODE=full scripts/bootstrap_local.sh"
 else
   log "跳过依赖安装：DPR_SKIP_INSTALL=1"
 fi
