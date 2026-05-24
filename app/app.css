@@ -563,7 +563,7 @@ body.close #paper-chat-container .input-area {
 #dpr-workflow-panel {
   width: min(880px, calc(100vw - 24px));
   max-height: min(720px, calc(100vh - 24px));
-  background: #f1fbf3;
+  background: #fff;
   border-radius: 12px;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25);
   overflow: hidden;
@@ -3053,7 +3053,7 @@ article.markdown-section {
   height: min(720px, 85vh);
   max-height: 85vh;
   zoom: 1.2;
-  background: #fff;
+  background: #f1fbf3;
   border-radius: 18px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   display: flex;
