@@ -1,6 +1,215 @@
 {
-  "generated_at": "2026-03-06T19:11:18.471356+00:00",
-  "updated_date": "20260306",
+  "generated_at": "2026-06-23T13:52:49.298228+00:00",
+  "updated_date": "20260614-20260623",
   "carryover_days": 9,
-  "items": []
+  "tag_states": {
+    "rl": {
+      "updated_date": "20260614-20260623",
+      "carryover_days": 9,
+      "items": [
+        {
+          "id": "biorxiv-10-64898-2026-06-11-731523-v1",
+          "source": "biorxiv",
+          "title": "Trustworthy agentic genomics through versioned skill libraries",
+          "abstract": "Genomics is adopting autonomous AI agents that interpret genomes from natural-language instructions faster than it is building the means to trust them. We report the first large-scale controlled evaluation of where, in an agentic genomic pipeline, correctness must reside for the system to be trustworthy at clinical scale. Using pharmacogenomics, a domain where errors are measurable and sometimes lethal, we benchmarked nine frontier large language models across 44,550 scored evaluations on 110 pharmacogenomic cases, and tested model interpretation of real star-allele diplotypes from more than 7,000 individuals in three ancestrally diverse populations. Trustworthiness proved to be a property of pipeline architecture, not of the model. Letting the model reason was stochastic and unsafe, and grounding it in the correct guidelines by retrieval paradoxically increased lethal-class errors. Encoding the validated decision logic as a versioned skill and executing it as code made the pharmacogenomic mapping exact, auditable and identical across models, confining all residual error to a single input-interpretation step. On individual genomes, unguarded model interpretation degraded along an ancestry gradient; execution removes this gradient from the clinical mapping, relocating it to the auditable completeness of the input caller. This establishes a generalisable, auditable architecture for trustworthy agentic genome interpretation at scale.\n\nHighlightsO_LICorrectness must be executed, not reasoned or retrieved, to be trustworthy\nC_LIO_LIRetrieval raises phenotype accuracy yet increases lethal-class errors; skills do not\nC_LIO_LIExecution makes the clinical mapping exact and model-invariant; error stays at input\nC_LIO_LIA deterministic input caller is the predicted route to all-correct emitted answers\nC_LI\n\nIn briefCorpas and colleagues show that trustworthy agentic genome interpretation comes not from making language models reason correctly about biology, but from confining them to interpreting input while versioned, validated skills do the reasoning as executed code. Across nine large language models and 110 pharmacogenomics cases, executing the skill makes the clinical mapping deterministic, auditable and model-invariant.\n\nSignificanceGenomics is adopting autonomous, language-model-mediated agents faster than it is building the standards needed to trust them. On a pharmacogenomic benchmark with lethal-class consequences, we show that an agents trustworthiness is not a property of the model but of how the agent is constrained: correctness must be moved out of the stochastic model into a versioned skill executed as code, with the model confined to interpreting heterogeneous input. This gives the field a transferable architecture for trustworthy agentic genome interpretation, a predicted route to deploying it so that every emitted answer is correct (execute the validated skill, call the input deterministically, and abstain on the irreducible residual), and a way to develop genomic skills as validated, executable, versioned units rather than prompts. Following a validation framework described elsewhere, we use clinical-grade to mean determinism, auditability, traceability to versioned components and population-invariant performance, all achieved under skill-constrained execution. We distinguish two senses of population performance: the executed clinical mapping is population-invariant by construction, verified across European, Latin American and East African origin individuals, whereas the models interpretation of real, ancestrally diverse diplotypes is not, degrading along an ancestry gradient, which is precisely why the mapping must be executed rather than reasoned. We do not claim full clinical validation, which would additionally require non-canonical inputs, real-world genomic and clinical data, human comparators and multi-site concordance.",
+          "authors": [
+            "Corpas, M.",
+            "Iacoangeli, A.",
+            "Bourdenx, M.",
+            "Aldraimli, M.",
+            "Skene, N.",
+            "Fatumo, S.",
+            "Guio, H."
+          ],
+          "primary_category": "genomics",
+          "categories": [
+            "genomics"
+          ],
+          "published": "2026-06-15T00:00:00+00:00",
+          "link": "https://www.biorxiv.org/content/10.64898/2026.06.11.731523v1.full.pdf",
+          "tags": [
+            "keyword:rl",
+            "query:rl"
+          ],
+          "llm_score": 8.0,
+          "llm_evidence_en": "Autonomous AI agents for genomics task automation",
+          "llm_evidence_cn": "自主AI智能体用于基因组学任务自动化",
+          "llm_evidence": "自主AI智能体用于基因组学任务自动化",
+          "canonical_evidence": "自主AI智能体用于基因组学任务自动化",
+          "llm_tldr_en": "Evaluates trustworthiness of agentic genomics pipelines using nine LLMs on pharmacogenomic cases; finds correctness depends on pipeline architecture, not model alone.",
+          "llm_tldr_cn": "基因组学领域正采用自主AI智能体从自然语言指令解释基因组，但可信度评估滞后。本文首次在大规模受控实验中评测了九个前沿大语言模型在110个药物基因组学案例上的表现，涉及44,550次评分评估。结果表明，可信度取决于流水线架构而非模型本身，让模型直接推理反而不如结构化输出可靠。该研究为构建可信的LLM智能体系统提供了关键设计原则，对任务自动化具有指导意义。",
+          "llm_tldr": "基因组学领域正采用自主AI智能体从自然语言指令解释基因组，但可信度评估滞后。本文首次在大规模受控实验中评测了九个前沿大语言模型在110个药物基因组学案例上的表现，涉及44,550次评分评估。结果表明，可信度取决于流水线架构而非模型本身，让模型直接推理反而不如结构化输出可靠。该研究为构建可信的LLM智能体系统提供了关键设计原则，对任务自动化具有指导意义。",
+          "llm_tags": [
+            "query:rl"
+          ],
+          "matched_query_tag": "query:rl",
+          "matched_query_text": "large language model agents for task automation",
+          "matched_requirement_id": "req-4",
+          "selection_source": "carryover_cache",
+          "paper_id": "biorxiv-10-64898-2026-06-11-731523-v1",
+          "carry_days": 1
+        },
+        {
+          "id": "2606.20014v1",
+          "source": "arxiv",
+          "title": "Hierarchical Control in Multi-Agent Games: LLM-based Planning and RL Execution",
+          "abstract": "Reinforcement learning (RL) has achieved strong performance in sequential decision-making, yet scaling to complex multi-agent environments remains challenging due to sparse rewards, large state-action spaces, and the difficulty of learning coordinated strategies. We propose a hierarchical architecture where a pretrained large language model (LLM) acts as a centralized strategic controller that selects among specialized RL skill policies for a team of agents, while RL policies handle reactive low-level execution. We evaluate this hybrid system in a competitive 2v2 King of the Hill environment against behavior tree (BT) and \\emph{``Flat''} RL (end-to-end training without skill decomposition) baselines. The LLM+RL system achieves task performance statistically equivalent to hand-crafted BT (46.4\\% vs 51.5\\% win rate, $p=0.103$) while both significantly outperform Flat RL trained without skill decomposition. A user study ($n=15$) reveals that 60\\% of participants perceive LLM+RL agents as the most human-like ($p=0.027$), citing behavioral adaptability and tactical variability. These results demonstrate that pretrained LLM reasoning can effectively orchestrate pretrained RL skills, achieving competitive multi-agent coordination and superior perceived believability without manual rule engineering.",
+          "authors": [
+            "Jannik Hösch",
+            "Alessandro Sestini",
+            "Florian Fuchs",
+            "Amir Baghi",
+            "Joakim Bergdahl",
+            "Konrad Tollmar",
+            "Jean-Philippe Barrette-LaPierre",
+            "Linus Gisslén"
+          ],
+          "primary_category": "cs.LG",
+          "categories": [
+            "cs.LG",
+            "cs.AI"
+          ],
+          "published": "2026-06-18T09:47:06+00:00",
+          "link": "https://arxiv.org/pdf/2606.20014v1",
+          "tags": [
+            "keyword:rl",
+            "query:rl"
+          ],
+          "llm_score": 8.0,
+          "llm_evidence_en": "hierarchical LLM planning with RL execution for multi-agent task automation in games",
+          "llm_evidence_cn": "层次化LLM规划与RL执行用于多代理游戏任务自动化",
+          "llm_evidence": "层次化LLM规划与RL执行用于多代理游戏任务自动化",
+          "canonical_evidence": "层次化LLM规划与RL执行用于多代理游戏任务自动化",
+          "llm_tldr_en": "Hierarchical LLM+RL architecture: LLM selects skill policies, RL handles execution, achieving effective multi-agent coordination.",
+          "llm_tldr_cn": "多智能体强化学习面临稀疏奖励和大状态空间的挑战。本文提出层次化架构，利用预训练大语言模型作为中央战略控制器，为智能体团队选择专门的RL技能策略，而RL策略负责反应式底层执行。在2v2 King of the Hill环境中，该系统优于行为树和端到端RL基线，展示了LLM与RL结合在多代理任务自动化中的潜力。",
+          "llm_tldr": "多智能体强化学习面临稀疏奖励和大状态空间的挑战。本文提出层次化架构，利用预训练大语言模型作为中央战略控制器，为智能体团队选择专门的RL技能策略，而RL策略负责反应式底层执行。在2v2 King of the Hill环境中，该系统优于行为树和端到端RL基线，展示了LLM与RL结合在多代理任务自动化中的潜力。",
+          "llm_tags": [
+            "query:rl"
+          ],
+          "matched_query_tag": "query:rl",
+          "matched_query_text": "large language model agents for task automation",
+          "matched_requirement_id": "req-4",
+          "selection_source": "carryover_cache",
+          "paper_id": "2606.20014v1",
+          "carry_days": 1
+        },
+        {
+          "id": "2606.23112v1",
+          "source": "arxiv",
+          "title": "Self-Evolution for Multi-Turn Tool-Calling Agents via Divergence-Point Preference Learning",
+          "abstract": "Multi-turn tool-using agents must coordinate long-horizon tool sequences while tracking dialogue state and policy constraints. Existing approaches often separate inference-time orchestration from parameter-level learning, leaving tool selection weakly structured and preference updates vulnerable to train--deployment prompt mismatch. For within-benchmark self-improvement, ToolGraph combines schema-derived topology, transition weights estimated from successful rollouts, and history-aware controls for write prerequisites and repeated-search loops. We then construct 161 preference pairs by locating divergence points via state-based matching and prefix-based alignment, filtered through action-correctness annotations, and train DPO under the same ToolGraph context used at inference. Across 375 tau2-bench tasks, ToolGraph raises the weighted average reward from 0.304 to 0.338 (+11.2% relative), while ToolGraph+DPO reaches 0.355 (+16.8% over the baseline), with the DPO gain concentrated in airline and retail. Fine-grained diagnostics further show that roughly half of telecom trajectories exhaust the step budget before action execution and that chosen reward positivity is the most useful checkpoint signal across our 16 evaluated DPO configurations.",
+          "authors": [
+            "Jiaqiang Tang"
+          ],
+          "primary_category": "cs.LG",
+          "categories": [
+            "cs.LG",
+            "cs.AI",
+            "cs.CL"
+          ],
+          "published": "2026-06-22T09:56:44+00:00",
+          "link": "https://arxiv.org/pdf/2606.23112v1",
+          "tags": [
+            "keyword:rl",
+            "query:rl"
+          ],
+          "llm_score": 8.0,
+          "llm_evidence_en": "Multi-turn tool-calling agents with RLHF preference learning",
+          "llm_evidence_cn": "多轮工具调用智能体通过分歧点偏好学习进行自我进化",
+          "llm_evidence": "多轮工具调用智能体通过分歧点偏好学习进行自我进化",
+          "canonical_evidence": "多轮工具调用智能体通过分歧点偏好学习进行自我进化",
+          "llm_tldr_en": "Proposes divergence-point preference learning with DPO for multi-turn tool-calling agents, improving tool selection and policy constraint adherence.",
+          "llm_tldr_cn": "针对多轮工具使用智能体在工具序列协调和对话状态跟踪上的挑战，提出了ToolGraph框架。结合模式拓扑、成功路径权重和历史感知控制，通过状态匹配和前缀对齐构建偏好对，并利用DPO进行参数级学习。该方法在基准内自我改进中显著提升了工具选择的正确性和约束遵守度。",
+          "llm_tldr": "针对多轮工具使用智能体在工具序列协调和对话状态跟踪上的挑战，提出了ToolGraph框架。结合模式拓扑、成功路径权重和历史感知控制，通过状态匹配和前缀对齐构建偏好对，并利用DPO进行参数级学习。该方法在基准内自我改进中显著提升了工具选择的正确性和约束遵守度。",
+          "llm_tags": [
+            "query:rl"
+          ],
+          "matched_query_tag": "query:rl",
+          "matched_query_text": "reinforcement learning for multi turn dialogue systems",
+          "matched_requirement_id": "req-6",
+          "selection_source": "carryover_cache",
+          "paper_id": "2606.23112v1",
+          "carry_days": 1
+        },
+        {
+          "id": "2606.19750v1",
+          "source": "arxiv",
+          "title": "Manifold Bandits: Bayesian Curriculum Learning over the Latent Geometry of Large Language Models",
+          "abstract": "Reinforcement learning (RL) is a central approach for improving reasoning capabilities in large language models (LLMs), where training efficiency depends critically on how problems are sampled during optimization. Existing adaptive curriculum learning methods typically prioritize prompts of intermediate difficulty, treating problem selection as a standard bandit problem with independent arms and overlooking the structured, heterogeneous nature of the task space. In this work, we frame problem sampling as a manifold-structured bandit problem with endogenous non-stationarity: problems are related through the model's latent representation space, and sampling decisions can steer how learning signals evolve across that space. To operationalize this perspective, we introduce Bayesian Manifold Curriculum (BMC), a structure-aware framework that organizes problems into a hierarchical task tree and applies Bayesian learning to guide sampling. Empirically, we find that different sampling strategies induce non-trivial tradeoffs between productivity (learning signal), diversity (coverage of the task manifold), and utility (evaluation relevance). These results show that prioritizing difficulty alone is insufficient for strong downstream performance, highlighting the importance of incorporating structure and type-awareness into problem sampling.",
+          "authors": [
+            "Darrien McKenzie",
+            "Nicklas Hansen",
+            "Xiaolong Wang"
+          ],
+          "primary_category": "cs.LG",
+          "categories": [
+            "cs.LG",
+            "cs.AI",
+            "cs.CL"
+          ],
+          "published": "2026-06-18T03:31:19+00:00",
+          "link": "https://arxiv.org/pdf/2606.19750v1",
+          "tags": [
+            "keyword:rl",
+            "query:rl"
+          ],
+          "llm_score": 8.0,
+          "llm_evidence_en": "Bayesian curriculum learning using RL bandit formulation for LLM reasoning improvement",
+          "llm_evidence_cn": "使用RL赌博机框架进行贝叶斯课程学习以提升LLM推理",
+          "llm_evidence": "使用RL赌博机框架进行贝叶斯课程学习以提升LLM推理",
+          "canonical_evidence": "使用RL赌博机框架进行贝叶斯课程学习以提升LLM推理",
+          "llm_tldr_en": "Frames problem sampling for RL training of LLMs as a manifold-structured bandit problem, leveraging latent geometry for adaptive curriculum learning.",
+          "llm_tldr_cn": "针对强化学习训练大语言模型时问题采样效率低下的问题，该文将问题采样建模为流形结构下的非平稳赌博机问题，利用模型潜在表示空间的几何结构自适应调整课程难度，从而更有效地引导学习信号在任务空间中的传播，提升推理能力。",
+          "llm_tldr": "针对强化学习训练大语言模型时问题采样效率低下的问题，该文将问题采样建模为流形结构下的非平稳赌博机问题，利用模型潜在表示空间的几何结构自适应调整课程难度，从而更有效地引导学习信号在任务空间中的传播，提升推理能力。",
+          "llm_tags": [
+            "query:rl"
+          ],
+          "matched_query_tag": "query:rl",
+          "matched_query_text": "application of reinforcement learning in large language model reasoning",
+          "matched_requirement_id": "req-7",
+          "selection_source": "carryover_cache",
+          "paper_id": "2606.19750v1",
+          "carry_days": 1
+        },
+        {
+          "id": "2606.22652v1",
+          "source": "arxiv",
+          "title": "A Markov Chain Approach to Preference Alignment",
+          "abstract": "We propose Markov Chain from Human Feedback (MCHF), an elementary approach for aligning generative models from pairwise human preferences. Unlike Reinforcement Learning from Human Feedback (RLHF), which reduces comparisons to a scalar reward, and Nash Learning from Human Feedback (NLHF), which preserves pairwise utilities through a KL-regularized minimax optimization, MCHF uses pairwise preferences directly to define a transition mechanism over model outputs. Given a pairwise utility $U(x,y)$, which quantifies human preference for $y$ over $x$, and a reference probability distribution $μ_{\\mathsf{ref}}$, we define a Markov kernel $\\mathsf{P}(x, dy)\\propto \\exp(U(x,y))μ_{\\mathsf{ref}}(dy)$, and take the Markov chain starting from $μ_{\\mathsf{ref}}$ as an iterative alignment procedure. We show that MCHF converges geometrically fast to the stationary distribution, with a convergence rate governed by the seminorm $\\|U\\|_\\oplus=\\inf_{g,f\\in L^\\infty(μ_{\\mathsf{ref}})}\\|U-g\\oplus f\\|_\\infty$, which quantifies the non-transitive structure of the pairwise utility. We further show that a mirror-descent algorithm for NLHF satisfies an analogous structure-adaptive convergence guarantee. Finally, through a perturbation analysis, we prove that when $\\|U\\|_\\oplus$ is small, MCHF and NLHF agree up to first order around an RLHF solution, which yields a unified view of reward-based, game-theoretic, and Markovian approaches to alignment. In particular, for two natural algorithms that converge to the MCHF/NLHF equilibria, we show that the first step of MCHF and NLHF recovers the RLHF solution based on the column-sum reward $\\hat{f}(y)=\\int μ_{\\mathsf{ref}}(dx) U(x, y)$, and starting from the second iteration, both algorithms incorporate the same linear functional of the residual $U-(-\\hat f)\\oplus \\hat f$, which captures the non-transitive structure of the pairwise utility $U$.",
+          "authors": [
+            "Takuya Koriyama",
+            "Tengyuan Liang"
+          ],
+          "primary_category": "cs.LG",
+          "categories": [
+            "cs.LG",
+            "stat.ML"
+          ],
+          "published": "2026-06-21T19:56:56+00:00",
+          "link": "https://arxiv.org/pdf/2606.22652v1",
+          "tags": [
+            "keyword:rl",
+            "query:rl"
+          ],
+          "llm_score": 8.0,
+          "llm_evidence_en": "alternative alignment method using Markov chain from preferences, conceptually equivalent to RLHF",
+          "llm_evidence_cn": "使用基于偏好的马尔可夫链的对齐方法，概念上等价于RLHF",
+          "llm_evidence": "使用基于偏好的马尔可夫链的对齐方法，概念上等价于RLHF",
+          "canonical_evidence": "使用基于偏好的马尔可夫链的对齐方法，概念上等价于RLHF",
+          "llm_tldr_en": "MCHF aligns generative models using pairwise preferences directly via a Markov kernel, offering an alternative to RLHF without reward modeling.",
+          "llm_tldr_cn": "该文提出马尔可夫链从人类反馈（MCHF）方法，直接利用成对偏好定义转移核，迭代对齐生成模型，避免了RLHF中奖励建模的复杂性和纳什学习中的极小极大优化，提供了一种更简洁的对齐范式。",
+          "llm_tldr": "该文提出马尔可夫链从人类反馈（MCHF）方法，直接利用成对偏好定义转移核，迭代对齐生成模型，避免了RLHF中奖励建模的复杂性和纳什学习中的极小极大优化，提供了一种更简洁的对齐范式。",
+          "llm_tags": [
+            "query:rl"
+          ],
+          "matched_query_tag": "query:rl",
+          "matched_query_text": "reinforcement learning from human feedback for llm alignment",
+          "matched_requirement_id": "req-5",
+          "selection_source": "carryover_cache",
+          "paper_id": "2606.22652v1",
+          "carry_days": 1
+        }
+      ]
+    }
+  }
 }

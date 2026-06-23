@@ -1,0 +1,1211 @@
+Title: Causal Reward World Models: Zero-shot Reward Design for Automated Skill Generation
+
+URL Source: https://arxiv.org/pdf/2606.23280v1
+
+Published Time: Tue, 23 Jun 2026 03:12:51 GMT
+
+Number of Pages: 22
+
+Markdown Content:
+> JOURNAL OF L ATEX CLASS FILES, VOL. 14, NO. 8, JUNE 2026 1
+
+# Causal Reward World Models: Zero-shot Reward Design for Automated Skill Generation 
+
+Yang Yang, Yuchuang Tong, Member, IEEE , Zhengtao Zhang, Member, IEEE , Xu Ding, Member, IEEE , Ning Yang, Member, IEEE , Yifan Zhang, Member, IEEE , Haipeng Li, Member, IEEE , Kehu Yang, Member, IEEE , and Miao Xin, Member, IEEE 
+
+Abstract —Automated Reward Design (ARD) aims to replace manual reward engineering in reinforcement learning with language-driven reward function synthesis. However, existing approaches based on large language models (LLMs) remain inherently correlation-driven, relying on iterative environmental feedback to refine reward hypotheses for each specific task. This paradigm not only results in inefficient reasoning but also makes LLMs susceptible to semantically plausible yet causally spurious reward components, leading to ineffective optimization. To address these limitations, we propose the Causal Reward World Model (CRWM), which explicitly models the causal topological relationships between candidate reward components and task-targeted physical variables through offline pre-training on multi-task interaction data. Based on a coarse-to-fine pre-training strategy, we introduce a Joint Optimization Module that integrates Explicit Mechanism Decoupling with Confidence-Aware Soft Fusion to refine coarse structural priors using micro-level trajectories, thereby constructing robust and interpretable causal skeleton. During inference, LLMs leverage CRWM as a task-irrelevant causal prior to constrain the reward generation, enabling zero-shot reward function design. Our work opens up a new white-box paradigm for the ARD problem. Extensive experiments on complex continuous control benchmarks demon-strate that CRWM generates executable reward functions without feedback-driven reward refinement, significantly reducing the design latency for acquiring new robotic skills while matching or surpassing state-of-the-art performance, and further exhibits strong generalization capabilities across unseen tasks and diverse robotic embodiments. 
+
+Index Terms —Automated Reward Design, Causal Reward World Model, Zero-Shot Reward Generation, Reinforcement Learning 
+
+I. I NTRODUCTION 
+
+# ENDOWING robots with the capability for autonomous skill acquisition remains a longstanding objective within the field of embodied artificial intelligence. In this context, the design of reward functions has always been a challenging issue in the automatic generation of skills based on reinforcement learning (RL) [1], [2]. Recently, LLMs have given rise to the 
+
+> Manuscript received June 19, 2026. This work has been supported by the program of the National Natural Science Foundation of China (No. 61906195) and the independent deployment project of the National Key Laboratory of Cognition and Decision Intelligence for Complex Systems, Institution of Automation, Chinese Academy of Sciences. We thank CASBOT for providing access to the robotic platform used in this work. ( Corresponding author: Miao Xin. e-mail: miao.xin.cv@outlook.com )Yang Yang, Yuchuang Tong, Zhengtao Zhang, Ning Yang, Yifan Zhang, and Haipeng Li are with the Institute of Automation, Chinese Academy of Sciences, Beijing 100049, China. Xu Ding is with the Intelligent Manufac-turing Institute, HFUT, Hefei 230051, China, and the School of Electrical Engineering and Automation, Anhui University, Hefei 230061, China. Miao Xin and Kehu Yang are with the School of Artificial Intelligence, China University of Mining and Technology (Beijing), Beijing 100083, China.
+
+emergence of Automated Reward Design (ARD) paradigms, demonstrating significant potential in synthesizing executable reward functions through semantic reasoning [3], [4]. Given a task description, these methods prompt an LLM to gener-ate candidate reward components and iteratively refine them through environmental feedback until a satisfactory reward function is obtained. By utilizing the extensive knowledge and reasoning capabilities of LLMs, these approaches mitigate the reliance on human expertise in reward engineering [5], [6]. However, current LLM-based reward design methods pre-dominantly rely on trial-and-error to select candidate reward functions. During the optimization process, LLMs identify factors potentially correlated with the task as candidate re-ward components, yet such candidate components may exhibit spurious correlations with the task objectives [7], [8]. For example, in the ShadowHandLiftUnderarm task (Fig. 1(a)), the agent aims to learn the skill of grasping and lifting a pot with both hands. An unguided LLM may introduce velocity ,i.e., the instantaneous lifting speed of the pot, as a reward component. Although this term is semantically related to “lifting”, it provides a high-frequency but causally ambiguous signal during continuous physical interaction, which induces severe gradient noise and leads to Optimization Collapse. In the ShadowHandScissors task (Fig. 1(b)), the LLM treats 
+
+scissors_open as a reward component. However, the agent exploits this signal by maintaining the scissors slightly open, allowing it to accumulate rewards without achieving the genuine goal. This is actually a form of Specification Gam-ing [9], [10]. These examples show that semantically plausible reward components can obscure the true task objective when they are not aligned with the valid causal topology. In the absence of reliable prior knowledge to guide the search, certain approaches resort to evolutionary strategies [3], i.e., utilizing “trial-evaluation-mutation-feedback” loops to filter out spuri-ously correlated factors. However, the inherent limitations of LLMs in causal attribution and counterfactual reasoning often undermine the efficacy of these methods, preventing consistent performance gains [11]. More importantly, due to the underutilization of inter-task reward relationships, existing methodologies are constrained to designing and optimizing reward functions on a case-by-case basis. Indeed, within identical dynamical systems, reward components across distinct tasks often exhibit shared causal structures [12], [13]. Zhang et al. [14] further prove that both the reward functions and their underlying causal structures are theoretically identifiable. These studies imply that by precisely capturing the causal relationships among       
+
+> arXiv:2606.23280v1 [cs.RO] 22 Jun 2026 JOURNAL OF L ATEX CLASS FILES, VOL. 14, NO. 8, JUNE 2026 2
+> (a) Optimization Collapse (b) Specification Gaming
+> Fig. 1. Consequences of causal confounding in LLM-driven Automated Reward Design. The bottom-left panels illustrate reward-component causal graphs, where green nodes represent valid causal factors and red nodes indicate spurious correlates. The right panels compare reward and Success Rate (SR) curves between baseline rewards with spurious correlates (red) and causally pruned rewards (green). (a) Optimization Collapse in ShadowHandLiftUnderarm .(b) Specification Gaming in ShadowHandScissors .
+
+reward components and task objectives, it becomes possible to infer the consequences of reward functions without exten-sive empirical training, thereby mitigating the influence of confounding variables on both the design process and final outcomes. Consequently, an interesting question is raised: Is it feasible to extract causal mappings between tasks and rewards through multi-task pre-training, thereby enabling evolutionary iteration-free reward function design? 
+
+In this paper, we propose the Causal Reward World Model (CRWM), which serves as a causal kernel of world models dedicated to the automatic reward design. The core objective of CRWM is to model the causal topological re-lationships between candidate reward components and task-targeted physical variables [12]. We posit that a meticulously constructed offline pre-training on multi-task interaction data can mitigate the influence of spurious correlations, thereby facilitating the construction of robust causal graphs. Lever-aging the reliable prior knowledge provided by the CRWM, LLMs can avoid the reliance on evolutionary search during the reward function reasoning, thereby achieving zero-shot reward design. Furthermore, thanks to the task-irrelevant uni-versality of CRWM, it enables a “ train-once, infer-anywhere ”paradigm for reasoning about other reward functions within the similar dynamical systems. This significantly mitigates the computational overhead of reward function inference and reduces the latency in acquiring new skills. As a result, we introduce a novel paradigm for the ARD, transitioning from conventional correlation-based, task-wise inference to the pre-training of a universal reward world model that captures the causal relationships between reward components and skill objectives. To construct the CRWM, we adopt a coarse-to-fine pre-training methodology for the causal discovery. We first gen-erate a coarse-grained structural prior based on a causal foundation model, which is subsequently optimized using micro-level trajectories of structural variables [15], [16]. To robustly extract the causal skeleton from offline trajectories of structural variables, we further propose the Explicit Mecha-nism Decoupling (EMD) with Confidence-Aware Soft Fusion, which together constitute a joint optimization module. By in-tegrating interventional data across multiple tasks, this module simultaneously accounts for state-dependent transient physical interactions during reconstruction and eliminates the structural hallucinations inherent in the coarse-grained structural prior, thereby distilling it into a refined causal skeleton. When de-ployed for reward function design, the CRWM constrains the reward generation by exposing spurious correlations, guiding the LLMs to achieve efficient and reliable reasoning [17]. Extensive experiments across complex continuous control tasks demonstrate that our approach effectively mitigates the systemic bottlenecks responsible for Optimization Collapse and Specification Gaming. Remarkably, our approach achieves zero-shot reward generation by generating executable reward functions for unseen tasks in a single pass without feedback-driven reward refinement. This capability bypasses the com-putationally expensive evolutionary trial-and-error loops, while yielding task performance that rivals state-of-the-art results. In summary, our main contributions are as follows: 1) We propose the Causal Reward World Model (CRWM), a novel paradigm for automatic reward function design. Leveraging the explicitly constructed causal graphs, this approach not only enables zero-shot reward function generation but also provides strong interpretability. 2) We introduce a coarse-to-fine pre-training methodology. Employing the proposed EMD with Confidence-Aware Soft Fusion, the CRWM leverages micro-level trajecto-ries to refine coarse-grained structural priors, ultimately yielding robust and reliable causal representations. 3) The proposed CRWM-based deconfounded LLM rea-soning significantly reduces the cost of reward design while simultaneously improving zero-shot performance. Experiments show that our zero-shot method matches state-of-the-art iteration-based ARD methods on unseen Dexterity tasks and transfers across different robotic embodiments and environments. Codes will be available after review at https://yy12136.github.io/CRWM. JOURNAL OF L ATEX CLASS FILES, VOL. 14, NO. 8, JUNE 2026 3
+
+II. R ELATED WORK 
+
+Automated Reward Design. Automated Reward Design (ARD) remains a central challenge in reinforcement learning-based skill acquisition. Traditional approaches often rely on hand-crafted reward shaping [18], [19] or inverse reinforce-ment learning from expert demonstrations [20], which require substantial human expertise or high-quality data. Recent LLM-based methods have advanced ARD by prompting LLMs to generate executable reward functions from task descrip-tions [3], [4], [21]. Despite reducing manual engineering, existing methods usually depend on iterative environmental feedback to evaluate, mutate, and refine candidate rewards. Since LLMs tend to reason over semantic associations instead of causal relationships, they may introduce semantically plau-sible but causally irrelevant reward components [22]. These spurious correlates can trigger Optimization Collapse and Specification Gaming, making reward generation costly and unstable [23], [24]. This motivates reward generation methods guided by explicit causal knowledge. 
+
+Causal Discovery. Causal discovery identifies directed causal relationships among observed variables, enabling rea-soning beyond pure correlation. Continuous optimization methods have advanced data-driven causal graph learning [25], [26], yet purely data-driven discovery remains challenging in high-dimensional physical systems, where dense interac-tions, incomplete observations, and limited interventions can cause severe identifiability issues [27], [28]. To reduce the search space, prior-guided methods use dynamic Bayesian networks [29] or LLMs [8], [30] to obtain initial topologi-cal knowledge. However, such knowledge should be treated as a coarse structural prior rather than a reliable causal prior, as it may contain biased causal effects and structural hallucinations [8], [11], [30]. Moreover, fitting static causal graphs to structural-variable trajectories can obscure transient physical interactions, such as brief contacts or sudden friction changes [25], [27], [29]. These limitations motivate more robust mechanisms for deriving reliable causal structures from offline structural-variable trajectories. 
+
+World Models for Reward Design. World models learn structured representations of environment dynamics for pre-diction, planning, and decision-making [31]–[33]. In robotics and embodied control, they capture action-conditioned state evolution to improve sample efficiency and long-horizon rea-soning. However, most world models focus on future obser-vations or state transitions, with limited emphasis on causal relationships among reward-relevant variables. This limits their use for automated reward design, where the key challenge is not only predicting what may happen, but also determining which reward components causally contribute to task success. Although causality has been explored in state representation learning [34] and model alignment [35], causal world models for reward design remain underexplored [36]. CRWM fills this gap by modeling reward-relevant causal relationships as causal priors for LLM-based reward generation. III. P RELIMINARIES 
+
+In this section, we introduce the key notations used through-out this work. We first introduce Structural Causal Models (SCMs), and then formulate the Automated Reward Design problem. 
+
+Structural Causal Models. To formalize causal relation-ships among reward-relevant variables, we adopt the frame-work of Structural Causal Models (SCMs) [37]. We assume that the task-relevant physical quantities are represented by a set of d structural variables V = {v1, v 2, . . . , v d}, where each variable corresponds to a physically meaningful reward component, such as object position, velocity, or contact force. The causal topology over these variables is parameterized by an adjacency matrix M ∈ Rd×d, where a non-zero entry M i,j 
+
+indicates a direct causal edge from vj to vi. The temporal evolution of each variable is described by: 
+
+vit+1 := ψi(P a (vi)t, U it ), (1) where Vt denotes the variables at time t, and P a (vi)t ⊆ V t
+
+denotes the causal parents of vi identified by {vj | M i,j ̸ = 0 }.Here, U it denotes exogenous noise that accounts for unmodeled environmental stochasticity. 
+
+Automated Reward Design. We consider an episodic environment governed by a Markov Decision Process (MDP) 
+
+M = ⟨S , A, T ⟩ , where S denotes the continuous state space, A denotes the action space, and T (st+1 |st, a t) de-notes the transition dynamics. We formulate ARD as P =
+
+⟨M , R, π M, F⟩ . Here, R denotes the space of permissible parameterized reward functions, and πM : R → Π represents an RL algorithm that optimizes a reward r ∈ R and outputs a policy π ∈ Π. The function F : Π → R denotes the non-differentiable fitness score, such as the objective task success rate. The goal of modern LLM-based ARD [3], [23] is to generate a reward function r∗ that maximizes the fitness score of the policy trained under this reward: 
+
+r∗ = arg max  
+
+> r∈R
+
+F(πM(r)) . (2) Since evaluating F requires costly environment interactions, existing ARD methods usually rely on iterative trial-and-error to evaluate and refine candidate rewards [3], [23]. This motivates constructing reusable structural guidance that can support zero-shot reward generation before costly feedback-driven refinement. IV. METHODS 
+
+The goal of our method is to construct a reusable reward-relevant causal prior that reduces the need for task-specific feedback-driven reward refinement in LLM-based ARD. As illustrated in Fig. 2, our framework distills the CRWM from multi-task offline data and uses it to guide zero-shot reward generation for unseen tasks. Given the structural variables V defined in Section III, we define the Causal Reward World Model (CRWM) as the final causal skeleton distilled from offline physical-interaction data. During distillation, we optimize a learnable causal skeleton 
+
+Minv over the variable set V and introduce a state-dependent transient component, later parameterized as Mtrans (st−1; θ),to account for short-lived physical interactions in micro-level trajectories, such as brief contacts or collisions. After convergence, the optimized skeleton M ∗ 
+
+> inv
+
+is retained as the JOURNAL OF L ATEX CLASS FILES, VOL. 14, NO. 8, JUNE 2026 4                       
+
+> Fig. 2. Overview of the CRWM framework. The pipeline consists of three synergistic phases: (1) Structural Prior Extraction: The offline interventional dataset ( Dof f ) is split into macroscopic ( Dmacro ) and microscopic ( Dmicro ) streams. A pre-trained causal foundation model (LimiX) processes Dmacro to extract the initial, coarse structural prior ⟨Mprior , M conf ⟩. (2) Joint Optimization Module: The EMD module constructs the instantaneous topology Minst
+> by combining a learnable causal skeleton Minv (blue stream) with state-dependent transient physical interactions Mtrans (orange stream). Subsequently, the Joint Optimization Module uses Dmicro and Confidence-Aware Soft Fusion to refine the coarse structural prior, absorb transient signals, and distill the final CRWM ( M∗
+> inv ). (3) Causal-ARD: The final CRWM is combined with unseen task information and used as a causal prior for LLM-based reward generation. Through explicit Causal Pruning, the LLM generates executable zero-shot reward functions.
+
+CRWM and used as an explicit causal prior for downstream LLM-based reward generation. The framework consists of three synergistic phases. First, Section IV-A extracts an initial coarse structural prior from macro-level interventional data using a pre-trained causal foundation model. Second, Section IV-B introduces a Joint Op-timization Module that integrates Explicit Mechanism Decou-pling (EMD) with Confidence-Aware Soft Fusion to refine this coarse prior with dense micro-level trajectories, thereby distilling the optimized skeleton M ∗ 
+
+> inv
+
+as the CRWM. Finally, Section IV-C introduces Causal-ARD , which serializes the distilled CRWM into a causal topology prompt and guides the LLM to perform explicit Causal Pruning during code generation, enabling executable zero-shot reward generation without task-specific environmental feedback. 
+
+A. Structural Prior Extraction via Causal Foundation Models 
+
+We first obtain a coarse structural prior as the initialization for CRWM distillation. This stage addresses the difficulty of learning a reward-relevant causal skeleton directly from high-dimensional physical trajectories, where dense continuous variables, limited interventions, and redundant observations can lead to spurious causal discovery. Moreover, a task-relevant structural prior cannot be inferred from variable names or semantic associations alone; it requires interventional evidence showing how perturbations of primitive reward com-ponents affect final task performance. This motivates a hierar-chical data collection pipeline that records both macro-level reward-component interventions and micro-level structural-variable trajectories. 
+
+Hierarchical Data Collection. To provide the causal foun-dation model with interventional data for extracting a task-relevant structural prior, we construct the offline dataset Dof f 
+
+(Fig. 3). Instead of randomly exploring the raw state space, we use ARD frameworks (Eureka and URDP [3], [23]) to extract k ∈ [3 , 8] physically meaningful reward compo-nents {r1, . . . , r k}, such as target distance, joint velocity, and contact force. For cross-task causal learning, we normalize semantically equivalent task-specific components into d shared structural variables V = {v1, . . . , v d}, such as object position, velocity, and contact force, through the Task-Specific Name Normalization and Global Atomic Reward Component Pool 
+
+(see App. B-B). We then uniformly sample N weight vectors 
+
+ω(n) (App. B-C) to form diverse reward functions and probe their effects on task performance. Training and executing the resulting policies serves as interventional manipulations of reward-component weights, in the spirit of Pearl’s do -operations [38].                       
+
+> Fig. 3. Illustration of the Hierarchical Data Collection Pipeline. Lever-aging systematically perturbing reward-component weights ω∈Rkand executing RL training, we obtain two levels of interventional data from one collection procedure. Left (Blue): The macro-level dataset Dmacro records the final fitness scores F(n)evaluated across different weight configurations
+> ω(n).Right (Orange): The micro-level dataset Dmicro logs the dense, per-step trajectories of structural variables across Nrollouts. Each state st∈Rd
+> explicitly captures the instantaneous values of the specific physical variables underlying the reward components, such as position, velocity, and contact force.
+
+The resulting dataset contains two complementary levels of interventional data for different stages of our frame-work, aggregated across all pre-training tasks: 1) Dmacro =
+
+{(ω(n), F (n))}Nn=1 , which records the final fitness scores F (n)
+
+under N reward weight configurations ω(n) and provides task-level evidence on how reward-component weights af-fect task success. 2) Dmicro = {(s(n)0 , s (n)1 , . . . , s (n) 
+
+> T
+
+)}Nn=1 ,JOURNAL OF L ATEX CLASS FILES, VOL. 14, NO. 8, JUNE 2026 5
+
+which records per-step transitions among structural variables. Here, s(n) 
+
+> t
+
+∈ Rd captures the instantaneous values of the 
+
+d physical variables underlying the reward components, in-stead of the raw, less interpretable observations ot. This fine-grained dataset is preserved for modeling transient physical interactions and calibrating the coarse structural prior in the subsequent Joint Optimization Module. See Supplementary Material, Sec. S-C for an example. 
+
+Structural Prior Extraction. Given the macroscopic dataset Dmacro , we use the pre-trained causal foundation model LimiX [39] to estimate causal relationships among reward components. LimiX outputs a continuous-valued raw causal effects matrix Mraw ∈ Rd×d, where M i,j raw denotes the estimated effect score from variable vj to variable vi. From 
+
+Mraw , we derive the coarse structural prior ⟨Mprior , M conf ⟩:
+
+Mprior preserves the directed topology encoded by Mraw ,including initial edge existence and directions, while Mconf ∈
+
+[0 , 1] d×d encodes normalized effect magnitudes for the subse-quent Soft Fusion module. For i, j ∈ { 1, . . . , d }, Mconf is computed as 
+
+M i,j conf = |M i,j raw |
+
+max 1≤p,q ≤d |M p,q raw | + ϵ , (3) where p and q index all entries in Mraw , and ϵ ensures numeri-cal stability. Thus, larger absolute causal effects indicate higher structural confidence. The benefit of this coarse structural prior over unguided purely data-driven discovery is shown in the ablation studies (Section V-E). Although this process provides useful structural initial-ization, the coarse structural prior can still contain biased causal effects and structural hallucinations, as illustrated in the bottom-left panel of Fig. 4. These errors arise because the causal foundation model only receives macro-level interven-tion outcomes, without observing micro-level trajectories that reveal state-dependent transient interactions. Imposing Mprior 
+
+as a hard constraint can therefore bias the final CRWM and degrade subsequent reward generation. Thus, we calibrate this coarse prior with micro-level structural-variable trajectories through the Joint Optimization Module introduced next. 
+
+B. Joint Optimization Module for CRWM Distillation 
+
+The goal of this stage is to distill the final CRWM skeleton 
+
+M ∗ 
+
+> inv
+
+by refining the coarse structural prior with micro-level trajectories. This stage addresses two issues left by Section IV-A. First, a single static topology can confuse persistent reward-relevant relations with state-dependent tran-sient physical interactions, such as contact-induced effects that appear only under specific physical states. Fig. 4 illustrates this limitation: the coarse structural prior incorrectly retains the transient correlate ball_velocity while missing the contact-dependent impact_penalty relation. A simplified analysis of this static-topology limitation is provided in the Supplementary Material, Sec. S-B. Following the Independent Causal Mechanisms (ICM) principle [37], we therefore model reward-relevant transitions using a learnable causal skeleton together with state-dependent transient interactions. Second, as discussed in Section IV-A, the coarse structural prior Mprior 
+
+may contain structural hallucinations and biased causal effects, so directly enforcing it can bias the final CRWM. To address these coupled challenges, we propose a joint continuous optimization framework that accounts for state-dependent transient physical interactions while calibrating the coarse structural prior. This module optimizes the learnable causal skeleton Minv and obtains its converged form M ∗
+
+> inv
+
+as the final CRWM. The CRWM distillation is driven by the unified objective: 
+
+min   
+
+> Minv ,θ
+
+L = E(st−1,s t)∼D micro 
+
+h
+
+LM SE 
+
+
+
+st, M inst (st−1)st−1
+
+i 
+
++ λh (Minv ) + Lsof t .
+
+(4) Here, Minv denotes the learnable causal skeleton whose converged form M ∗ 
+
+> inv
+
+is retained as the CRWM, and θ param-eterizes the state-dependent transient component introduced by EMD. The reconstruction term compares each transition pair (st−1, s t) ∼ D micro with the locally linear prediction 
+
+Minst (st−1)st−1, where Minst (st−1) is the state-dependent instantaneous topology constructed below. The coefficient λ
+
+weights the acyclicity regularization h(Minv ) (App. B-C), and Lsof t denotes the Confidence-Aware Soft Fusion loss for calibrating the coarse structural prior. Since Minv is retained as the reward-relevant causal skele-ton for reward generation, we regularize it as a directed acyclic structure to avoid circular dependencies in the causal prior provided to the LLM. This acyclicity constraint is applied only to Minv , rather than the full time-lagged physical dynamics, because feedback loops and inertial couplings are handled through the state-dependent instantaneous topology during reconstruction. Specifically, we impose the DAGMA acyclicity constraint [40] on Minv :
+
+h(Minv ) = − log det( αI − Minv ⊙ Minv ) + d log α, (5) where α > 0 is the DAGMA scalar hyperparameter, I is the identity matrix, d = |V| is the number of structural variables, and ⊙ denotes the Hadamard product. Following the standard DAGMA setting, we set α = 1 . The effect of this acyclicity regularization is further examined in Supplementary Material, Sec. S-D. The objective in Eq. 4 is implemented by two mod-ules introduced below: EMD constructs the state-dependent instantaneous topology Minst (st−1), while Confidence-Aware Soft Fusion defines Lsof t to calibrate the coarse structural prior. 
+
+Explicit Mechanism Decoupling (EMD). EMD constructs the state-dependent instantaneous topology Minst (st−1) used in the reconstruction term of Eq. 4. Instead of using a single static topology for all structural-variable transitions, EMD con-structs a state-dependent instantaneous topology by combining the learnable causal skeleton with state-dependent transient physical interactions. Specifically, Minv ∈ Rd×d denotes the learnable causal skeleton retained for reward generation, and Mtrans (st−1; θ) ∈ Rd×d denotes the transient compo-nent parameterized by an MLP, where st−1 is the previous structural-variable state and θ denotes the MLP parameters. The instantaneous topology is constructed as 
+
+Minst (st−1) = Minv ⊙
+
+
+
+1d×d + Mtrans (st−1; θ)
+
+
+
+, (6) JOURNAL OF L ATEX CLASS FILES, VOL. 14, NO. 8, JUNE 2026 6
+
+where 1d×d is an all-ones matrix, and ⊙ denotes the Hadamard product. This multiplicative form allows Mtrans (st−1; θ) to adjust candidate-edge strengths across physical states while anchoring the optimization to Minv .By constructing Minst (st−1) at each step, EMD allows 
+
+Mtrans (st−1; θ) to account for short-lived variations during reconstruction, while Minv remains the skeleton retained for reward generation. Since Minst (st−1) is multiplicatively gated by Minv , the transient component cannot freely introduce unrelated edges outside the learnable skeleton. This design helps stabilize the extracted reward-relevant skeleton while ac-counting for state-dependent transient interactions in Dmicro .The effect of this decoupled formulation over static causal modeling is analyzed in the Supplementary Material, Sec. S-B, and the overall contribution of EMD is evaluated in Section V-E (CRWM w.o. EMD). 
+
+Confidence-Aware Soft Fusion. While EMD accounts for state-dependent transient physical interactions in the re-construction term, a reliable causal skeleton also requires calibrating the coarse structural prior Mprior . Using Mprior 
+
+as a rigid structural mask would force the optimization to inherit its structural hallucinations and biased causal effects. We therefore define the Confidence-Aware Soft Fusion loss as 
+
+Lsof t = γ∥Mconf ⊙ (Minv − Mprior )∥2 
+
+> F
+
+, (7) where γ controls the loss strength, Mconf is the structural confidence matrix, and ∥ · ∥ F denotes the Frobenius norm. The setting of γ is discussed in App. B-C, with its sensitivity analysis shown in Fig. 15. This term penalizes deviations from the coarse structural prior in a confidence-aware manner, imposing stronger reg-ularization on high-confidence edges while keeping low-confidence edges more flexible. Together with the recon-struction term in Eq. 4, Soft Fusion softly calibrates the coarse structural prior using micro-level structural-variable trajectories. Thus, Soft Fusion allows Minv to deviate from unreliable parts of Mprior while retaining high-confidence structural guidance. The qualitative changes before and after joint optimization are illustrated in Fig. 4, and the contribution of Soft Fusion is evaluated in Section V-E (CRWM w.o. Soft-Fusion). Since standard unconstrained optimizers cannot directly enforce the equality constraint h(Minv ) = 0 , we solve Eq. 4 using the Augmented Lagrangian Method (ALM) [41]. This optimization balances transition reconstruction, DAG acyclic-ity, and confidence-aware prior calibration. Upon convergence, the optimized causal skeleton is extracted as M ∗ 
+
+> inv
+
+, which is retained as the final CRWM. A visualization of the extracted CRWM is provided in Fig. 11. 
+
+C. Causal Automated Reward Design (Causal-ARD) 
+
+After CRWM distillation, the optimized skeleton M ∗ 
+
+> inv
+
+must be converted into a form that can guide executable reward synthesis. Causal-ARD addresses this interface problem by translating the continuous CRWM matrix into a structured causal topology prompt and using it to guide LLM-based reward code generation. This stage connects the learned causal           
+
+> Fig. 4. Joint Optimization for CRWM Distillation. The top panel shows a physical trajectory in the ShadowHandCatchUnderarm task, where ball-hand contact induces a state-dependent transient physical interaction. The bottom-left panel shows the coarse structural prior Mprior before joint optimization, which contains biased causal effects, a hallucinated ball_velocity node, and a missing contact-related impact_penalty relation. The bottom-right panel shows the final CRWM after joint optimization, where the hallucinated node is removed and the contact-related relation is included when supported by transition data. Overall, EMD accounts for state-dependent transient phys-ical interactions during reconstruction, while Confidence-Aware Soft Fusion calibrates the coarse structural prior using observed transitions and structural confidence.
+
+structure with zero-shot reward generation: the CRWM pro-vides reward-relevant causal links, while Causal-ARD uses these links to prune spurious reward terms. 
+
+Causal Graph to Prompt Translation. Since LLMs are better suited to structured text than continuous numerical matrices due to tokenization inefficiencies and spatial reason-ing limits [42], [43], Causal-ARD employs a deterministic serialization protocol. To extract active causal edges, we apply one-dimensional 2-means clustering to the absolute edge causal effects W = {| M ∗,i,j inv |} di,j =1 , where j and i denote the source and target nodes, respectively. This partitions W into noise and signal clusters by minimizing intra-cluster variance. We set the extraction threshold as the midpoint of their centroids, τ = μnoise +μsignal  
+
+> 2
+
+, where μnoise and μsignal are the corresponding cluster means, separating dominant causal effects from numerical noise. The extracted active edges are serialized into explicit topological triplets, i.e., source , target ,and causal effect , as illustrated in Fig. 5. These triplets are embedded into the system instructions to construct the Causal Topology Prompt , with the full prompt provided in App. B-A. 
+
+Causal Pruning. Conditioned on the Causal Topology Prompt , the LLM generates the reward function under ex-plicit causal constraints. The prompt identifies reward-relevant causal links and spurious correlates that should not contribute to the reward. During code generation, the LLM performs causal pruning by assigning zero coefficients to reward terms associated with identified spurious correlates. As highlighted by the red annotations in Fig. 5, the reward component of an identified spurious node is set to zero, preventing spurious correlates from entering the generated reward code. 
+
+Executable Output of Causal-ARD. Ultimately, for an JOURNAL OF L ATEX CLASS FILES, VOL. 14, NO. 8, JUNE 2026 7     
+
+> Fig. 5. Translation of the CRWM into explicit topological triplets. The extracted causal edges from the CRWM are serialized into a structured tabular format with source ,target , and causal effect . These triplets are embedded into the causal topology prompt to guide explicit causal pruning during zero-shot reward generation.
+
+unseen target task, the LLM receives a structured input context consisting of (1) the textual task description, (2) the raw observation space, and (3) the Causal Topology Prompt. No-tably, reward components whose required embodiment-specific variables are absent from the observation space, such as finger-related variables in ManiSkill2 or real-world tasks, are not used by the LLM during reward design. Guided by this causal prior, the LLM generates a Python reward function in a single pass. By producing executable code for the unseen environ-ment without iterative trial-and-error, this zero-shot process avoids computationally expensive evolutionary RL loops. The generated reward function can be directly executed by the underlying RL algorithm, as validated in Section V-D. The overall procedure, including CRWM distillation and Causal-ARD, is summarized in Alg. 1. V. EXPERIMENTS 
+
+In this section, we evaluate the efficacy of the CRWM through extensive experiments on zero-shot task performance, computational efficiency, and generalization across diverse environments and robotic morphologies. We further demon-strate its practical feasibility by zero-shot synthesizing reward functions for real-world robotic tasks and validating their alignment offline. To isolate architectural gains from under-lying semantic capabilities, all LLM-driven methods, includ-ing ours and the baselines, use the same foundation model, 
+
+deepseek-v3-2-251201 [44] (see Supplementary Mate-rial, Sec. S-F-A for results with other open-source LLMs). We also use the pre-trained causal foundation model LimiX [39] across all experiments, with comparisons to alternative causal models provided in Supplementary Material, Sec. S-F-B. 
+
+A. Experimental Setup 
+
+Dexterity (Isaac Gym) [45]: We evaluate our approach on 20 tasks from the Shadow Hand manipulation suite [3] (detailed in Supplementary Material, Sec. S-A). These tasks feature high-dimensional state-action spaces and dense tran-sient physical interactions. The abundance of redundant kine-matic variables provides a testbed to evaluate the zero-shot task performance of the CRWM by assessing its causal pruning against spurious correlates. 
+
+Algorithm 1 CRWM distillation and Causal-ARD 
+
+Input: An interventional dataset Dof f = {D macro , Dmicro },a task description T , observation nodes V, a causal foundation model Mf , and an LLM MLLM 
+
+Output: A zero-shot reward function represented in Python code R∗ 
+
+> 1:
+
+Extract the structural prior and confidence: 
+
+Mprior , M conf ← M f (V, Dmacro ) 
+
+> 2:
+
+Initialize the invariant skeleton Minv ∈ Rd×d and the transient modulator parameters θ 
+
+> 3:
+
+while not converged do  
+
+> 4:
+
+Sample transition batches (st−1, s t) ∼ D micro  
+
+> 5:
+
+Construct the instantaneous topology: Minst (st−1) ←
+
+Minv ⊙
+
+
+
+1d×d + Mtrans (st−1; θ)
+
+ 
+
+> 6:
+
+Compute the reconstruction loss: LM SE ← ∥st −
+
+Minst (st−1)st−1∥22 
+
+> 7:
+
+Compute the joint objective:  
+
+> 8:
+
+Ltotal ← L M SE + λh (Minv ) + γ∥Mconf ⊙ (Minv −
+
+Mprior )∥2 
+
+> F
+> 9:
+
+Update Minv and θ via ∇L total using the ALM  
+
+> 10:
+
+end while  
+
+> 11:
+
+Extract the invariant skeleton: M ∗ 
+
+> inv
+
+← Minv  
+
+> 12:
+
+Compute an adaptive threshold τ via 1D 2-means cluster-ing on {| M ∗,i,j inv |}  
+
+> 13:
+
+Extract the active causal triplets: E ← { (vi, v j , M ∗,i,j inv ) ||M ∗,i,j inv | ≥ τ } 
+
+> 14:
+
+Serialize E to construct the causal topology prompt 
+
+Pcausal  
+
+> 15:
+
+Causal reward generation: R∗ ← M LLM (T , V, Pcausal ) 
+
+> 16:
+
+return R∗
+
+ManiSkill2: To validate generalization across diverse envi-ronments, we utilize the ManiSkill2 benchmark [46] (detailed in Supplementary Material, Sec. S-A). This suite of robotic manipulation tasks serves to verify that the zero-shot task performance enabled by the CRWM remains consistent across varying task and robotic morphologies. 
+
+B. Baselines 
+
+Zero-Shot LLM (ZS-LLM): A purely semantic baseline. Following established protocols [3], we prompt the LLM with raw environment source code and task descriptions to synthesize reward functions in a single pass. This represents foundation model capabilities relying solely on semantic cor-relations, without explicit causal guidance or environmental feedback. 
+
+Eureka [3]: An evolutionary ARD framework utilizing LLMs to heuristically mutate and refine reward functions through computationally intensive trial-and-error interactions and environmental feedback. 
+
+URDP [23]: A bi-level optimization framework integrat-ing LLM-driven structural refinement with uncertainty-aware Bayesian optimization. Although highly sample-efficient com-pared to Eureka, this posterior-correction method fundamen-tally lacks explicit causal mechanism decoupling. JOURNAL OF L ATEX CLASS FILES, VOL. 14, NO. 8, JUNE 2026 8CRWM ZS-LLM URDP Eureka    
+
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> SR
+> 0.90
+> 0.01
+> 0.89 0.89
+> 0
+> 1
+> 2
+> 3
+> 4
+> ESI
+> 00
+> 44
+> ESI
+
+(a) ShadowHandKettle CRWM ZS-LLM URDP Eureka   
+
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> SR
+> 0.65
+> 0.01
+> 0.65
+> 0.50
+> 0
+> 1
+> 2
+> 3
+> 4
+> ESI
+> 00
+> 3
+> 4
+
+(b) ShadowHandCatchAbreast CRWM ZS-LLM URDP Eureka    
+
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> SR
+> 0.92
+> 0.00
+> 0.92 0.90
+> 0
+> 1
+> 2
+> 3
+> 4
+> ESI
+> 00
+> 2
+> 4
+
+(c) ShadowHandCatchOver2Underarm CRWM ZS-LLM URDP Eureka   
+
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> SR
+> 0.96
+> 0.27
+> 0.96 0.95
+> 0
+> 1
+> 2
+> 3
+> 4
+> ESI
+> 00
+> 1
+> 4
+
+(d) ShadowHandDoorCloseOutward CRWM ZS-LLM URDP Eureka   
+
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> SR
+> 0.85
+> 0.38
+> 0.85
+> 0.57
+> 0
+> 1
+> 2
+> 3
+> 4
+> ESI
+> 00
+> 3
+> 4
+
+(e) ShadowHandPen CRWM ZS-LLM URDP Eureka   
+
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> SR
+> 0.87
+> 0.00
+> 0.87
+> 0.78
+> 0
+> 1
+> 2
+> 3
+> 4
+> ESI
+> 00
+> 3
+> 4
+
+(f) ShadowHandLiftunderarm 
+
+Fig. 6. Zero-shot task performance across 6 unseen dexterous manipulation tasks. The bar charts, corresponding to the left y-axis, represent the final SR of the generated reward functions. The solid black line, corresponding to the right y-axis, denotes the ESI required to achieve the reported performance. For readability, “CRWM” denotes our full zero-shot reward generation pipeline, where reward generation is guided by the CRWM. Across all unseen tasks, this pipeline achieves performance comparable to state-of-the-art iterative methods with zero evolutionary iterations (ESI = 0 ), avoiding the costly trial-and-error loops required by Eureka and URDP. In contrast, the unguided ZS-LLM baseline exhibits inferior performance, particularly on dynamic and long-horizon tasks. 
+
+C. Evaluation Metrics 
+
+We evaluate the automated reward design pipelines across two metrics to quantify both task performance and computa-tional footprint. (i) Success Rate (SR): The primary indicator of task mastery and policy robustness. To ensure a fair comparison with the baseline methods, the SR for ManiSkill2 tasks is calculated utilizing the last 50% of test episodes from each evaluation rollout, whereas full test results are aggregated for the Dexterity suite. (ii) Evolutionary Search Iterations (ESI): The number of feedback-driven reward refinement rounds after the initial generation batch. For zero-shot methods, all candidate reward functions are generated before environment evaluation. Evaluating this fixed candidate set to report task performance does not increase ESI, since the evaluation results are not used to mutate rewards, update prompts, or trigger another generation round. 
+
+D. Results 
+
+To evaluate the zero-shot task performance enabled by the CRWM, we conduct experiments on 20 Dexterity continuous control tasks. We use a 14/6 task split, where 14 tasks serve as the pre-training set for distilling the CRWM and the remaining 6 unseen tasks form the zero-shot evaluation suite. This split tests whether reward-relevant structures distilled from pre-training tasks can support reward generation on held-out tasks without task-specific feedback. On these unseen tasks, we compare our full zero-shot reward generation pipeline against the semantic baseline ZS-LLM and iterative ARD frameworks, Eureka and URDP. In this pipeline, Causal-ARD generates reward functions guided by the CRWM; for consistency with Fig. 6, we denote the full pipeline as CRWM in the ex-perimental plots. During evaluation, each round prompts the LLM to generate 16 candidate reward functions in parallel. Both CRWM and ZS-LLM operate in the zero-shot setting (ESI = 0 ), generating executable reward functions without subsequent physical trial-and-error, whereas the reported ESI for Eureka and URDP denotes the evolutionary iterations required to reach their converged SR. The offline pre-training cost for constructing the CRWM is reported separately in App. B-D. Fig. 6 compares task performance and computational cost across the 6 unseen tasks using a dual-axis design. Bars on the left y-axis report the final SR ( ↑) achieved by the generated rewards, while lines on the right y-axis indicate the ESI ( ↓) required to reach that performance. CRWM achieves state-of-the-art-level task performance in a single reward-generation pass with no evolutionary iterations (ESI = 0 ). This comparison yields three key insights as follows. 
+
+Causal Priors Improve Zero-Shot LLM Reward Gener-ation. The weak performance of ZS-LLM shows that semantic reasoning alone is insufficient for reliable reward generation in physical control tasks. Without explicit causal guidance, ZS-LLM often introduces semantically plausible but causally irrelevant reward terms, leading to near-zero SRs on chal-lenging unseen tasks such as ShadowHandLiftUnderarm and JOURNAL OF L ATEX CLASS FILES, VOL. 14, NO. 8, JUNE 2026 9Kettle CatchAbreast CatchOver2Underarm DoorCloseOutward Pen LiftUnderarm              
+
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> SR
+> 0.88
+> 0.65
+> 0.92 0.95
+> 0.85 0.87
+> 0.03
+> 0.36
+> 0.50
+> 0.31
+> 0.44
+> 0.54
+> 0.38
+> 0.01 0.01
+> 0.50
+> 0.65
+> 0.52
+> 0.15
+> 0.63
+> 0.00
+> 0.64
+> 0.40 0.45
+> 0.01 0.01 0.00
+> 0.29 0.23
+> 0.00
+> CRWM CRWM w.o.Prior CRWM w.o.EMD CRWM w.o.Soft-Fusion Causal-ARD w. LLM-Prior
+> Fig. 7. Ablation studies across 6 unseen zero-shot tasks. Performance drops when key CRWM components are removed or when the learned topology is replaced by an LLM-inferred semantic prior.
+
+ShadowHandKettle . In contrast, the CRWM-guided reward generation uses the causal topology to prune spurious reward components before policy training, providing necessary causal guidance for robust zero-shot reward generation.. 
+
+SOTA-Level Zero-Shot Performance. Across the six un-seen dexterous manipulation tasks, the CRWM-guided reward generation achieves performance comparable to iterative ARD baselines. For example, it attains SRs of 0.92 and 0.87 on the challenging Catch Over 2 Underarm and Lift Underarm 
+
+tasks, respectively. These results outperform the multi-iteration Eureka baseline and match URDP, which requires up to 3 evolutionary search iterations to converge. Notably, this is achieved in a zero-shot setting, without feedback-driven reward refinement or additional generation rounds. 
+
+Zero-Shot Efficiency on Unseen Tasks. Fig. 6 also high-lights the computational efficiency of our method on the unseen evaluation suite. Iterative ARD baselines require re-peated evolutionary search to reach their converged SR, with URDP requiring 1–4 ESIs and Eureka requiring 4 ESIs across the evaluated tasks. Each ESI trains and evaluates candi-date reward functions through large-scale RL environment interactions, which is time-consuming in continuous control tasks and takes approximately one hour on eight NVIDIA A800 GPUs in our setting. In contrast, the CRWM-guided reward generation achieves competitive task performance with ESI = 0, generating executable rewards for unseen tasks without feedback-driven refinement. 
+
+E. Ablation Experiments 
+
+M construction, we evaluate three ablated variants across the unseen zero-shot tasks (Fig. 7). Each variant is used within the same Causal-ARD pipeline to measure its impact on task per-formance: 1) CRWM w.o. Prior : removes the coarse structural prior, relying only on offline transition data. 2) CRWM w.o. EMD : removes the state-dependent interaction term, reducing the model to a single static structure. 3) CRWM w.o. Soft-Fusion : replaces the soft regularization with a rigid structural mask. 4) Causal-ARD w. LLM-Prior : uses the same Causal-ARD reward generation procedure as CRWM, but replaces the CRWM topology with a semantic causal topology inferred by the LLM from the target task description and observation space. 
+
+Necessity of the Structural Prior. The CRWM w.o. Prior 
+
+variant consistently underperforms across all unseen tasks, indicating that offline transition data alone is insufficient for stable structure estimation. Without structural guidance, the model tends to converge to suboptimal solutions in the high-dimensional space, causing the average SR to drop from 0.85 
+
+to 0.36 , with the largest drop exceeding 0.7. These results show that the structural prior provides essential guidance for learning a reliable causal structure. 
+
+Effect of EMD. Removing EMD leads to noticeably unsta-ble performance, with the CRWM w.o. EMD variant struggling to maintain consistent results across tasks. Without EMD, the model relies on a single static structure to explain all transitions, reducing its ability to capture data variations. As a result, the average SR drops from 0.85 to 0.35 , with the largest drop exceeding 0.8. This suggests that EMD improves the stability of the learned structure. 
+
+Soft Fusion Enables Adaptive Use of the Prior. When the structural prior is imposed as a rigid constraint, the CRWM w.o. Soft-Fusion variant shows clear performance degradation across multiple tasks. In this setting, the model becomes less adaptive to observed transitions, leading to suboptimal structure estimation. Empirically, the average SR drops from 
+
+0.85 to 0.38 , with the largest drop reaching around 0.75 . These results indicate that Soft Fusion enables flexible integration between the prior structure and data, which is important for strong performance. 
+
+LLM-Inferred Priors Are Not Sufficient. The Causal-ARD w. LLM-Prior variant performs substantially worse than CRWM across unseen tasks. Although it uses the same Causal-ARD reward generation procedure, its causal topology is inferred only from the target task description and observation space, without offline interventional data or micro-level tra-jectories. Thus, the inferred semantic topology can be incom-plete or misleading, causing causal pruning to remove useful reward terms or retain spurious correlations. Empirically, its average SR drops from 0.85 to 0.09 , with the largest drop exceeding 0.9. This indicates that the main performance gain comes from the CRWM itself: pairing the same Causal-ARD procedure with an LLM-inferred topology leads to substantial performance degradation. JOURNAL OF L ATEX CLASS FILES, VOL. 14, NO. 8, JUNE 2026 10 CRWM ZS-LLM URDP Eureka   
+
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> SR
+> 0.89
+> 0.52
+> 0.89 0.84
+> 0
+> 1
+> 2
+> 3
+> 4
+> 5
+> 6
+> ESI
+> 00
+> 1
+> 6
+
+(a) PickCube CRWM ZS-LLM URDP Eureka    
+
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> SR
+> 0.80
+> 0.29
+> 0.80 0.79
+> 0
+> 1
+> 2
+> 3
+> 4
+> 5
+> ESI
+> 00
+> 1
+> 5
+
+(b) TurnFaucet CRWM ZS-LLM URDP Eureka   
+
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> SR
+> 0.64
+> 0.02
+> 0.64
+> 0.52
+> 0
+> 1
+> 2
+> 3
+> 4
+> 5
+> ESI
+> 00
+> 1
+> 5
+
+(c) OpenCabinetDrawer   
+
+> Fig. 8. Cross-domain generalization in ManiSkill2. CRWM is applied to three unseen tasks with different robot embodiments and physics environments. It achieves strong success rates in a zero-shot setting, without requiring iterative environment interaction.
+
+F. Cross-Embodiment and Cross-Environment Generalization 
+
+We evaluate the cross-embodiment and cross-environment generalization ability of the CRWM. Unlike the 14/6 split for unseen-task evaluation within Dexterity, this experiment uses the CRWM constructed from the full 20-task Dexterity suite. The goal is to examine whether structural variables and causal relations learned from Dexterity can transfer to a different manipulation benchmark. Specifically, we apply the CRWM to three ManiSkill2 manipulation tasks whose reward-related variables are represented by existing CRWM structural variables, as detailed under Compositional Coverage 
+
+in App. B-B. This setting introduces a clear domain shift from a high-DoF multi-fingered ShadowHand to single-arm manipulators in a different physics engine. The CRWM is applied to these new environments without interaction data or task-specific adaptation. As shown in Fig. 8, it achieves strong zero-shot performance (ESI = 0 ) across all tasks, with success rates of 0.64 on PickCube, 0.89 on OpenCabinetDoor, and 0.80 on TurnFaucet. In comparison, iterative methods such as Eureka require multiple rounds of environment interaction, up to 6 ESIs, to reach similar performance and still remain less consistent. These results indicate that the CRWM captures transferable causal structure across tasks and robot embodiments, enabling effective reward construction under substantial domain shifts without iterative interaction. 
+
+G. Sim-to-Real Experiments 
+
+We conduct real-world experiments to evaluate whether reward functions guided by the CRWM remain effective on physical hardware under the zero-shot setting. This experiment focuses on reward alignment rather than downstream policy optimization. We use the CASBOT W1 mobile manipula-tor [47] and adopt Offline Trajectory Evaluation [48] to avoid dynamics gaps and hardware risks from direct sim-to-real deployment. Human-teleoperated kinematic trajectories are fed into the generated reward functions to assess alignment inde-pendently of RL optimization and sim-to-real discrepancies. To quantify zero-shot alignment, we collect a balanced human-teleoperated trajectory dataset across three tasks: Pick-Cube, LiftUnderarm, and Scissors (Fig. 9). Each task con-tains 25 successful and 25 failed trajectories, yielding 625 successful-failed trajectory pairs for comparison. Since re-ward functions differ in scale, their absolute values are not directly comparable. We evaluate alignment using Pairwise Distinguishability Accuracy , equivalent to the Area Under the ROC Curve (AUC) [49]. For each successful-failed pair, a well-aligned reward function should assign a higher time-normalized mean reward ¯R(τ ) to the successful trajectory.   
+
+> Fig. 9. Real-world manipulation tasks. PickCube: picking up a black cube. LiftUnderarm: lifting a pot. Scissors: open scissors.
+
+As shown in Table I, the ZS-LLM baseline achieves limited distinguishability (average AUC ≈ 53.9%). In contrast, reward functions generated under the CRWM guidance achieve high alignment accuracy across all tasks (average AUC ≈ 96.5%). These results show that CRWM supports zero-shot reward generation that remains valid on physical hardware.             
+
+> TABLE I ZERO -SHOT REWARD ALIGNMENT ACCURACY (AUC) ON REAL -WORLD TRAJECTORIES .
+> Method PickCube LiftUnderarm Scissors
+> ZS-LLM (AUC % ↑)62.5% 47.9% 51.3%
+> CRWM (AUC % ↑)99.6% 95.3% 94.5%
+
+VI. D ISCUSSION 
+
+Fig. 1 in Section I illustrates two common issues observed in our initial study: Optimization Collapse and Specification JOURNAL OF L ATEX CLASS FILES, VOL. 14, NO. 8, JUNE 2026 11 
+
+Fig. 10. Real-world examples of Optimization Collapse and Specification Gaming. Top (blue box): Optimization Collapse, where the baseline reward (red curve) fails to provide useful learning signals, while the CRWM (green curve) continues to reflect task progress. Bottom (orange box): Specification Gaming, where the baseline reward saturates prematurely despite incomplete task execution, whereas the CRWM remains aligned with the task outcome. 
+
+Gaming. To examine whether these issues are isolated cases or broader ARD limitations, we conduct a quantitative analysis. Table II reports the frequency of these issues across reward functions generated by baselines (Eureka and URDP) over 20 dexterous manipulation tasks. The results show that reward functions without explicit causal structure frequently exhibit these patterns: 
+
+Optimization Collapse: A considerable portion of base-line rewards ( 21 .2% for Eureka and 12 .6% for URDP) fail to provide useful learning signals, causing both cumulative reward and SR to remain near zero during training. The red curves in the blue boxes of Fig. 10 illustrate this behavior, with additional examples in Supplementary Material, Fig. S-1. 
+
+Specification Gaming: A non-negligible fraction of base-line rewards ( 10 .4% for Eureka and 4.7% for URDP) are affected by spurious correlations, leading agents to exploit misaligned rewards and achieve high reward values while failing the task. The red curves in the orange boxes of Fig. 10 show this behavior, with more examples in Supplementary Ma-terial, Fig. S-1. In contrast, CRWM-guided rewards show con-sistent alignment between reward signals and task outcomes, as indicated by the green curves in Fig. 10 and Supplementary Material, Fig. S-1, suggesting that causal structure improves reward alignment in LLM-based ARD. 
+
+TABLE II 
+
+STATISTICAL PREVALENCE OF REWARD FAILURE MODES . THE TABLE REPORTS THE PERCENTAGE OF GENERATED REWARD FUNCTIONS THAT FALL INTO OPTIMIZATION COLLAPSE AND SPECIFICATION GAMING ACROSS ALL 20 DEXTERITY TASKS FOR THE BASELINE ARD PARADIGMS 
+
+(E UREKA AND URDP). 
+
+Method Optimization Collapse (%) ↓ Specification Gaming (%) ↓
+
+Eureka 21.2% 10.4% URDP 12.6% 4.7% 
+
+VII. C ONCLUSION 
+
+In this work, we present Causal Reward World Models (CRWM) for zero-shot automated reward design. Instead of re-lying on iterative reward refinement, CRWM distills a reusable reward-relevant causal skeleton from offline multi-task data and uses it as an explicit structural prior for LLM-based reward generation. By accounting for state-dependent transient inter-actions during distillation, CRWM guides the LLM to prune spurious reward terms and synthesize executable rewards in a single pass. Experiments across unseen tasks, different em-bodiments, and real-world settings show that CRWM-guided rewards achieve strong performance without deployment-time evolutionary search. These results suggest that incorporating reward-relevant causal structure is a promising direction for improving the robustness and efficiency of automated reward design. REFERENCES [1] D. Amodei, C. Olah, J. Steinhardt, P. F. Christiano, J. Schulman, and D. Man´ e, “Concrete problems in ai safety,” ArXiv , vol. abs/1606.06565, 2016. [2] W. Yu, N. Gileadi, C. Fu, S. Kirmani, K.-H. Lee, M. G. Arenas, H.-T. L. Chiang, T. Erez, L. Hasenclever, J. Humplik, B. Ichter, T. Xiao, P. Xu, A. Zeng, T. Zhang, N. Heess, D. Sadigh, J. Tan, Y. Tassa, and F. Xia, “Language to rewards for robotic skill synthesis,” in Proceedings of The 7th Conference on Robot Learning , vol. 229, 06–09 Nov 2023, pp. 374–404. [3] Y. J. Ma, W. Liang, G. Wang, D.-A. Huang, O. Bastani, D. Jayaraman, Y. Zhu, L. Fan, and A. Anandkumar, “Eureka: Human-level reward design via coding large language models,” in International Conference on Learning Representations , 2023. [4] T. Xie, S. Zhao, C. H. Wu, Y. Liu, Q. Luo, V. Zhong, Y. Yang, and T. Yu, “Text2reward: Reward shaping with language models for reinforcement learning,” in International Conference on Learning Representations ,2023. [5] Y. Cao, H. Zhao, Y. Cheng, T. Shu, Y. Chen, G. Liu, G. Liang, J. Zhao, J. Yan, and Y. Li, “Survey on large language model-enhanced reinforce-ment learning: Concept, taxonomy, and methods,” IEEE Transactions on Neural Networks and Learning Systems , vol. 36, no. 6, pp. 9737–9757, 2024. [6] W. Huang, F. Xia, T. Xiao, H. Chan, J. Liang, P. Florence, A. Zeng, J. Tompson, I. Mordatch, Y. Chebotar, P. Sermanet, T. Jackson, N. Brown, L. Luu, S. Levine, K. Hausman, and brian ichter, “Inner monologue: Embodied reasoning through planning with language mod-els,” in 6th Annual Conference on Robot Learning , 2022. [7] Y. Zheng, J. Qin, P. Wei, Z. Chen, and L. Lin, “Cipl: counterfactual interactive policy learning to eliminate popularity bias for online rec-ommendation,” IEEE Transactions on Neural Networks and Learning Systems , vol. 35, no. 12, pp. 17 123–17 136, 2023. [8] E. Kiciman, R. Ness, A. Sharma, and C. Tan, “Causal reasoning and large language models: Opening a new frontier for causality,” 
+
+Transactions on Machine Learning Research , 2023. [9] J. Skalse, N. Howe, D. Krasheninnikov, and D. Krueger, “Defining and characterizing reward gaming,” Advances in Neural Information Processing Systems , vol. 35, pp. 9460–9471, 2022. [10] A. Pan, K. Bhatia, and J. Steinhardt, “The effects of reward misspeci-fication: Mapping and mitigating misaligned models,” in International Conference on Learning Representations , 2022. [11] Z. Jin, J. Liu, Z. LYU, S. Poff, M. Sachan, R. Mihalcea, M. T. Diab, and B. Sch¨ olkopf, “Can large language models infer causation from correlation?” in The Twelfth International Conference on Learning Representations , 2024. [12] B. Sch¨ olkopf, F. Locatello, S. Bauer, N. R. Ke, N. Kalchbrenner, A. Goyal, and Y. Bengio, “Toward causal representation learning,” 
+
+Proceedings of the IEEE , vol. 109, no. 5, pp. 612–634, 2021. [13] A. Barreto, W. Dabney, R. Munos, J. J. Hunt, T. Schaul, H. P. Van Has-selt, and D. Silver, “Successor features for transfer in reinforcement learning,” Advances in neural information processing systems , vol. 30, 2017. [14] Y. Zhang, Y. Du, B. Huang, Z. Wang, J. Wang, M. Fang, and M. Pech-enizkiy, “Interpretable reward redistribution in reinforcement learning: A causal approach,” Advances in Neural Information Processing Systems ,vol. 36, pp. 20 208–20 229, 2023. [15] J. Richens and T. Everitt, “Robust agents learn causal world models,” in The Twelfth International Conference on Learning Representations ,2024. JOURNAL OF L ATEX CLASS FILES, VOL. 14, NO. 8, JUNE 2026 12 
+
+[16] M. Zeˇ cevi´ c, D. Dhami, A. Karanam, S. Natarajan, and K. Kersting, “Interventional sum-product networks: Causal inference with tractable probabilistic models,” Advances in neural information processing sys-tems , vol. 34, pp. 15 019–15 031, 2021. [17] S. Hao, Y. Gu, H. Ma, J. Hong, Z. Wang, D. Wang, and Z. Hu, “Reasoning with language model is planning with world model,” in 
+
+Proceedings of the 2023 Conference on Empirical Methods in Natural Language Processing , 2023, pp. 8154–8173. [18] S. Booth, W. B. Knox, J. Shah, S. Niekum, P. Stone, and A. Allievi, “The perils of trial-and-error reward design: misdesign through overfitting and invalid task specifications,” in Proceedings of the AAAI Conference on Artificial Intelligence , vol. 37, no. 5, 2023, pp. 5920–5929. [19] W. B. Knox, A. Allievi, H. Banzhaf, F. Schmitt, and P. Stone, “Reward (mis) design for autonomous driving,” Artificial Intelligence , vol. 316, p. 103829, 2023. [20] S. Arora and P. Doshi, “A survey of inverse reinforcement learning: Challenges, methods and progress,” Artificial Intelligence , vol. 297, p. 103500, 2021. [21] M. Kwon, S. M. Xie, K. Bullard, and D. Sadigh, “Reward design with language models,” in The Eleventh International Conference on Learning Representations , 2023. [22] I.-C. Baek, T.-H. Park, J.-H. Noh, C.-M. Bae, and K.-J. Kim, “Chatpcg: Large language model-driven reward design for procedural content generation,” in 2024 IEEE Conference on Games (CoG) . IEEE, 2024, pp. 1–4. [23] Y. yang, X. Zhou, B. Ding, and M. Xin, “Uncertainty-aware reward design process,” Transactions on Machine Learning Research , 2025. [24] P. Li, H. Jianye, H. Tang, Y. Yuan, J. Qiao, Z. Dong, and Y. Zheng, “R*: Efficient reward design via reward structure evolution and parameter alignment optimization with large language models,” in Forty-second International Conference on Machine Learning , 2025. [25] X. Zheng, B. Aragam, P. K. Ravikumar, and E. P. Xing, “Dags with no tears: Continuous optimization for structure learning,” Advances in neural information processing systems , vol. 31, 2018. [26] R. Massidda, F. Landolfi, M. Cinquini, and D. Bacciu, “Constraint-free structure learning with smooth acyclic orientations,” in The Twelfth International Conference on Learning Representations , 2024. [27] H. Morioka and A. Hyv¨ arinen, “Causal representation learning made identifiable by grouping of observational variables,” in International Conference on Machine Learning , 2023. [28] X. Ding, H. Wu, J. Wang, J. Xu, and M. Xin, “Causal discovery for rolling bearing fault under missing data: from the perspective of causal effect and information flow,” IEEE Transactions on Instrumentation and Measurement , vol. 74, pp. 1–17, 2024. [29] R. Pamfil, N. Sriwattanaworachai, S. Desai, P. Pilgerstorfer, K. Geor-gatzis, P. Beaumont, and B. Aragam, “Dynotears: Structure learning from time-series data,” in International conference on artificial intelli-gence and statistics . Pmlr, 2020, pp. 1595–1605. [30] A. Abdulaal, N. Montana-Brown, T. He, A. Ijishakin, I. Drobnjak, D. C. Castro, D. C. Alexander et al. , “Causal modelling agents: Causal graph discovery through synergising metadata-and data-driven reasoning,” in 
+
+The Twelfth International Conference on Learning Representations ,2023. [31] D. Ha and J. Schmidhuber, “World models,” arXiv preprint arXiv:1803.10122 , vol. 2, no. 3, p. 440, 2018. [32] D. Hafner, T. P. Lillicrap, M. Norouzi, and J. Ba, “Mastering atari with discrete world models,” in International Conference on Learning Representations , 2021. [33] D. Hafner, J. Pasukonis, J. Ba, and T. Lillicrap, “Mastering diverse control tasks through world models,” Nature , pp. 1–7, 2025. [34] E. Dillies, Q. Delfosse, J. Bl¨ uml, R. Emunds, F. P. Busch, and K. Ker-sting, “Better decisions through the right causal world model,” arXiv preprint arXiv:2504.07257 , 2025. [35] K. Kobalczyk and M. Van Der Schaar, “Preference learning for AI align-ment: a causal perspective,” in Proceedings of the 42nd International Conference on Machine Learning , vol. 267. PMLR, 13–19 Jul 2025, pp. 31 063–31 083. [36] H. Cao, F. Feng, T. Yang, J. Huo, and Y. Gao, “Causal information prioritization for efficient reinforcement learning,” in International Con-ference on Learning Representations , Y. Yue, A. Garg, N. Peng, F. Sha, and R. Yu, Eds., vol. 2025, 2025, pp. 75 061–75 097. [37] J. Peters, D. Janzing, and B. Sch¨ olkopf, Elements of causal inference: foundations and learning algorithms . The MIT Press, 2017. [38] J. Pearl, Causality: Models, Reasoning, and Inference , 2nd ed. Cam-bridge University Press, 2009. [39] X. Zhang, G. Ren, H. Yu, H. Yuan, H. Wang, J. Li, J. Wu, L. Mo, L. Mao, M. Hao et al. , “Limix: Unleashing structured-data modeling capability for generalist intelligence,” arXiv preprint arXiv:2509.03505 ,2025. [40] K. Bello, B. Aragam, and P. Ravikumar, “Dagma: Learning dags via m-matrices and a log-determinant acyclicity characterization,” Advances in Neural Information Processing Systems , vol. 35, pp. 8226–8239, 2022. [41] M. R. Hestenes, “Multiplier and gradient methods,” Journal of optimiza-tion theory and applications , vol. 4, no. 5, pp. 303–320, 1969. [42] H. Wang, S. Feng, T. He, Z. Tan, X. Han, and Y. Tsvetkov, “Can language models solve graph problems in natural language?” Advances in Neural Information Processing Systems , vol. 36, pp. 30 840–30 861, 2023. [43] B. Fatemi, J. Halcrow, and B. Perozzi, “Talk like a graph: Encoding graphs for large language models,” in The Twelfth International Confer-ence on Learning Representations , 2024. [44] A. Liu, B. Feng, B. Xue, B. Wang, B. Wu, C. Lu, C. Zhao, C. Deng, C. Zhang, C. Ruan et al. , “Deepseek-v3 technical report,” arXiv preprint arXiv:2412.19437 , 2024. [45] Y. Chen, T. Wu, S. Wang, X. Feng, J. Jiang, Z. Lu, S. McAleer, H. Dong, S.-C. Zhu, and Y. Yang, “Towards human-level bimanual dexterous ma-nipulation with reinforcement learning,” Advances in Neural Information Processing Systems , vol. 35, pp. 5150–5163, 2022. [46] J. Gu, F. Xiang, X. Li, Z. Ling, X. Liu, T. Mu, Y. Tang, S. Tao, X. Wei, Y. Yao, X. Yuan, P. Xie, Z. Huang, R. Chen, and H. Su, “Maniskill2: A unified benchmark for generalizable manipulation skills,” in The Eleventh International Conference on Learning Representations ,2023. [47] Beijing Zhongke Huiling Robotics Technology Co., Ltd., “CASBOT W1: A versatile wheeled humanoid mobile manipulator,” https://casbot. tech/, 2024, accessed: 2026-04. [48] A. Gleave, M. D. Dennis, S. Legg, S. Russell, and J. Leike, “Quanti-fying differences in reward functions,” in International Conference on Learning Representations , 2021. [49] T. Fawcett, “An introduction to roc analysis,” Pattern recognition letters ,vol. 27, no. 8, pp. 861–874, 2006. [50] Qwen, A. Yang, B. Yang, B. Zhang, B. Hui, B. Zheng, B. Yu, C. Li, D. Liu, and F. Huang, “Qwen2.5 technical report,” 2024. [51] A. Grattafiori, A. Dubey, A. Jauhri, A. Pandey, A. Kadian, A. Al-Dahle, A. Letman, A. Mathur, A. Schelten, A. Vaughan et al. , “The llama 3 herd of models,” arXiv preprint arXiv:2407.21783 , 2024. [52] L. Lorch, S. Sussex, J. Rothfuss, A. Krause, and B. Sch¨ olkopf, “Amor-tized inference for causal structure learning,” in Advances in Neural Information Processing Systems , A. H. Oh, A. Agarwal, D. Belgrave, and K. Cho, Eds., 2022. JOURNAL OF L ATEX CLASS FILES, VOL. 14, NO. 8, JUNE 2026 13    
+
+> Fig. 11. Visualization of the CRWM. The background graph shows the task-invariant causal skeleton, where the red node denotes the score . The four insets present subgraphs corresponding to different tasks, illustrating the relevant structures within the CRWM. Directed edges indicate causal relationships, and edge weights represent the corresponding causal effects.
+
+APPENDIX AVISUALIZATION OF THE CRWM To illustrate the learned causal structure, we visualize the CRWM in Fig. 11. The background graph is the CRWM distilled from multi-task data, where the central red node denotes the fitness score. The four insets show subgraphs cor-responding to the Kettle , CatchAbreast , DoorCloseOutward ,and Pen tasks. These task-specific subgraphs are not learned as isolated graphs; instead, they are selected from the same CRWM according to the reward components relevant to each task. This visualization shows how different task appearances can share a common reward-relevant topology while using different subsets of the global component pool. APPENDIX BIMPLEMENTATION DETAILS 
+
+A. Causal-Guided System Prompt 
+
+The following prompt is provided to the LLM as a system-level directive. It forces the model to generate Python code based on the CRWM, effectively bypassing spurious structural correlations. 
+
+System Prompt: CRWM-Guided Reward Synthesis 
+
+The following causal graph (format: [source, target, weight] ) explicitly defines the physical dependencies between primitive reward components and the score .
+
+CRITICAL DIRECTIVE 1: Causal Pruning 
+
+You MUST ONLY include primitive components that possess a valid causal path to the score node. Any variable or sub-path (e.g., A → B) that fails to reach score is a spurious correlation. You MUST exclude these by setting their coefficients to 0.0 in the Python code. 
+
+CRITICAL DIRECTIVE 2: Task-Specific Selection & Adaptation 
+
+Among all valid components that causally influence the 
+
+score , you must proactively select the optimal combination of reward terms that best aligns with the specific objective of the target task. Furthermore, you can smoothly adapt the abstract component names from the causal graph to match the exact concrete variable names defined in the current environment’s observation space. 
+
+Graph Interpretation Rules : 
+
+> •
+
+Edges ( source → target ): Defines a prerequisite relationship where the source physically drives the 
+
+target . 
+
+> •
+
+Causal Weights ( 0.0 − 1.0): Quantifies structural importance. Use these as inductive priors to scale your reward coefficients. JOURNAL OF L ATEX CLASS FILES, VOL. 14, NO. 8, JUNE 2026 14   
+
+> Fig. 12. The global pool of normalized atomic reward components used to construct the shared structural variable space.
+> •Variables : Comprises raw state observations and primitive reward terms.
+
+B. Multi-Task Implementation Details 
+
+This appendix provides implementation details for con-structing the shared structural variable space used by the CRWM and performing joint optimization across pre-training tasks. 
+
+Task-Specific Name Normalization. Different tasks may use task-specific names for semantically equiva-lent physical quantities, such as scissors_position ,
+
+pot_position , or bottle_position . To support cross-task causal structure learning, we normalize these names into a shared set of atomic reward components. For example, object-specific position terms are mapped to a unified component, such as object_position . This reduces redundant task-specific naming while preserving each variable’s physical meaning. 
+
+Global Atomic Reward Component Pool. After normal-ization, all atomic reward components are organized into a global component pool (Fig. 12), covering common reward-relevant factors in manipulation tasks, including spatial re-lations, contact, grasping, stability, velocity, orientation, and task progress. Each pre-training task uses only a subset of this pool, and its task-specific state vector is aligned into the same d-dimensional structural variable space st ∈ Rd
+
+with unused variables zero-padded. This alignment enables heterogeneous task trajectories to be combined into the uni-fied micro-level dataset Dmicro . When a target task requires reward components outside the current pool, the corresponding physical variables must be added to the pool and supported by additional task data before the CRWM can reason over them. 
+
+Compositional Coverage. The global component pool is not intended to cover all possible physical variables, but provides a reusable set of kinematic and dynamic variables commonly used in robotic manipulation. The CRWM gener-alizes to new tasks through new causal combinations of these existing structural variables, not by enumerating every possible variable. In the ManiSkill2 generalization experiments, reward  
+
+> Fig. 13. Reward component combinations used for the three ManiSkill2 generalization tasks. These components are instantiated from the global atomic reward component pool.
+
+components for unseen tasks are selected from this pool, as shown in Fig. 13. 
+
+Joint Distillation and Cross-Task Voting. During Joint Optimization, pre-training tasks are optimized jointly rather than sequentially. At each training step, batches are sam-pled from the aggregated multi-task dataset, supporting the Confidence-Aware Soft Fusion module. If a structural halluci-nation originates from task-specific naming or semantic bias, it is unlikely to be consistently supported by physical transi-tions across tasks. Thus, reconstruction gradients accumulated across tasks can weaken such spurious edges in Minv , while recurring physical relationships are reinforced in the shared structural variable space. 
+
+C. CRWM Hyper-parameter Settings 
+
+In this section, we detail the three hyper-parameters gov-erning the distillation process of the CRWM that warrant discussion, as shown in Table III.         
+
+> TABLE III HYPERPARAMETERS OF CRWM .
+> Hyper-parameter Value
+> Macro-level Sampling Size N30 Acyclicity Penalty Weight λ0.1 Soft Fusion Weight γ1.0
+
+Macro-level Intervention Sampling Size ( N ): This param-eter controls the amount of offline interventional data collected before joint optimization. By default, we set N = 30 for all tasks and reduce it to 20 and 10 to study its impact. As shown in Fig. 14, the Success Rate (SR) decreases as 
+
+N becomes smaller. This trend reflects reduced data support during training: smaller N limits both the macroscopic dataset (Dmacro ) and microscopic trajectories ( Dmicro ). With fewer samples, the structural prior becomes less reliable and joint optimization receives weaker physical signals, leading to less accurate reward alignment. 
+
+DAGMA Acyclicity Penalty Weight ( λ): This parameter controls the strength of the Directed Acyclic Graph (DAG) constraint. We solve the constrained optimization using the Augmented Lagrangian Method (ALM), initializing λ to 0.1.During optimization, λ is updated in the ALM outer loop to enforce the acyclicity constraint h(Minv ) = 0 . Since λ is adjusted during training, we do not treat it as a fixed hyper-parameter or ablate predefined values. This scheme enforces the DAG constraint without manual tuning. JOURNAL OF L ATEX CLASS FILES, VOL. 14, NO. 8, JUNE 2026 15      
+
+> Fig. 14. Sensitivity analysis of macro-level intervention sampling size N.
+> Reducing Ndecreases the amount of offline interventional data and leads to lower SR, indicating that sufficient macro-level interventions and micro-level trajectories are important for CRWM.
+
+Confidence-Aware Soft Fusion Weight ( γ): This weight controls the balance between the structural prior ( Lsof t ) and the reconstruction term ( LM SE ). We set γ = 1 .0 by default and evaluate γ ∈ { 0.1, 1.0, 5.0}. As shown in Fig. 15, γ = 1 .0
+
+yields the best performance. Reducing γ to 0.1 weakens the influence of the structural prior, leading to lower SR due to limited data support. Increasing γ to 5.0 over-constrains the model with the prior, reducing the ability of physical data to correct structural hallucinations.      
+
+> Fig. 15. Sensitivity analysis of the Soft Fusion weight γ.The default setting
+> γ= 1 .0achieves the best balance between the structural prior and physical transition data, while overly small or large values reduce the SR.
+
+D. Offline Pre-training Cost 
+
+The CRWM requires a one-time offline pre-training stage before zero-shot deployment. In the Dexterity zero-shot eval-uation, this stage uses only the 14 pre-training tasks, while the 6 held-out tasks are reserved for evaluation. As summarized in Table IV, the ARD-based component construction process pro-duces approximately 140 reward-function specifications; with 
+
+N = 30 reward-weight configurations per reward function, this yields 4200 policy-training runs for constructing Dmacro 
+
+and Dmicro .This offline cost is incurred once during CRWM construc-tion. Afterward, reward generation for held-out tasks requires no evolutionary search or task-specific environment feedback, resulting in ESI = 0 during zero-shot deployment. Thus, ESI in the main experiments measures deployment-time search cost, while the offline pre-training cost is reported separately here.               
+
+> TABLE IV OFFLINE PRE -TRAINING COST FOR CRWM CONSTRUCTION .
+> Item Setting
+> Pre-training tasks 14 Reward-function specifications 140 Reward-weight configurations per reward function N= 30
+> Total policy-training runs 4200 RL policy training iterations per run 3000 Hardware for data collection 8 NVIDIA A800 GPUs Parallel policy-training runs per batch 80 Wall-clock time per collection batch ∼1 hour Estimated collection batches 50 Deployment-time ESI after CRWM construction 0
+
+APPENDIX CLIMITATIONS AND DISCUSSION 
+
+Pre-training Cost. The proposed framework relies on a pre-training stage to construct the CRWM from multi-task offline data. This stage requires interventional data collection and multiple RL policy-training runs, introducing non-trivial computational cost. Unlike iterative ARD methods that dis-tribute this cost across tasks through online interaction, our approach concentrates it in an offline phase before deployment. Although the resulting CRWM can be reused for zero-shot reward generation on new tasks, the upfront cost may become significant when scaling to larger task suites or more complex environments. Reducing the data and computation required for this pre-training stage remains an important direction for future work. 
+
+Bounded Generalization by the Component Pool. The CRWM generalizes to new tasks by recombining reward-relevant structural variables in the global atomic reward com-ponent pool. Thus, its zero-shot generalization is bounded by the pool coverage. If a target task requires physical primi-tives absent from the pool, such as fluid dynamics variables or deformable-object constraints, the CRWM cannot directly reason over them. Extending the CRWM with open-vocabulary physical variable discovery and automatic component-pool expansion remains an important direction for future work. 
+
+Sim-to-Real Coverage for Dual-Hand Manipulation. Al-though our main experiments focus on dual-hand dexterous manipulation in simulation, we do not provide corresponding dual-hand sim-to-real validation due to the lack of suitable dual-hand robotic hardware in our current setup. Extending the evaluation to real-world dual-hand systems is an impor-tant next step for further assessing the framework’s practical applicability. JOURNAL OF L ATEX CLASS FILES, VOL. 14, NO. 8, JUNE 2026 16 
+
+# Supplementary Material for “Causal Reward World Models: Zero-shot Reward Design for Automated Skill Generation” 
+
+S-A DETAILED TASK SPECIFICATIONS 
+
+Dexterity Environments Environment (obs dim, action dim) Task description 
+
+Over (398, 40) 
+
+This class corresponds to the HandOver task. This environment consists of two shadow hands with palms facing up, opposite each other, and an object that needs to be passed. In the beginning, the object will fall randomly in the area of the shadow hand on the right side. Then the hand holds the object and passes the object to the other hand. Note that the base of the hand is fixed. More importantly, the hand which holds the object initially cannot directly touch the target, nor can it directly roll the object to the other hand, so the object must be thrown up and stays in the air in the process. 
+
+DoorCloseInward (417, 52) 
+
+This class corresponds to the DoorCloseInward task. This environment require a closed door to be opened and the door can only be pushed outward or initially open inward. Both these two environments only need to do the push behavior, so it is relatively simple. 
+
+DoorCloseOutward (417, 52) 
+
+This class corresponds to the DoorCloseOutward task. This environment also require a closed door to be opened and the door can only be pushed inward or initially open outward, but because they cannot complete the task by simply pushing, which need to catch the handle by hand and then open or close it, so it is relatively difficult. 
+
+DoorOpenInward (417, 52) 
+
+This class corresponds to the DoorOpenInward task. This environment also require a opened door to be closed and the door can only be pushed inward or initially open outward, but because they cannot complete the task by simply pushing, which need to catch the handle by hand and then open or close it, so it is relatively difficult. 
+
+DoorOpenOutward (417, 52) 
+
+This class corresponds to the DoorOpenOutward task. This environment require a opened door to be closed and the door can only be pushed outward or initially open inward. Both these two environments only need to do the push behavior, so it is relatively simple. 
+
+Scissors (417, 52) 
+
+This class corresponds to the Scissors task. This environment involves two hands and scissors, we need to use two hands to coordinate and open the scissors successfully. 
+
+SwingCup (417, 52) 
+
+This class corresponds to the SwingCup task. This environment involves two hands and a dual handle cup, we need to use two hands to hold and swing the cup together in a synchronized motion. JOURNAL OF L ATEX CLASS FILES, VOL. 14, NO. 8, JUNE 2026 17 
+
+Switch (417, 52) 
+
+This class corresponds to the Switch task. This environment involves dual hands and a bottle, we need to use dual hand fingers to press the desired button with precision. 
+
+Kettle (417, 52) 
+
+The Kettle environment corresponds to the internal PourWater task. This environment involves two hands, a kettle, and a bucket. The agent needs to hold the kettle with one hand and the bucket with the other hand, and pour water from the kettle into the bucket. 
+
+LiftUnderarm (417, 52) 
+
+This class corresponds to the LiftUnderarm task. This environment requires grasping the pot handle with two hands and lifting the pot to the designated position, simulating daily lifting skills. 
+
+Pen (417, 52) 
+
+The Pen environment corresponds to the internal Open Pen Cap task. This environment involves two hands and a pen. The agent needs to use both hands to open the pen cap through fine-grained coordination. 
+
+BottleCap (420, 52) 
+
+This class corresponds to the Bottle Cap task. This environment involves two hands and a bottle, we need to hold the bottle with one hand and open the bottle cap with the other hand without dropping the cap. 
+
+CatchAbreast (422, 52) 
+
+This environment consists of two shadow hands placed side by side and an object to be passed. It simulates two hands of the same person passing objects, requiring complex rotation and translation. 
+
+CatchOver2Underarm (422, 52) 
+
+This environment requires two objects to be thrown into the other hand at the same time, necessitating higher manipulation techniques than single-object tasks. 
+
+CatchUnderarm (422, 52) 
+
+In this task, two hands pass an object from one palm to the other. Unlike HandOver, the hands’ translation and rotation degrees of freedom are added to the action space. 
+
+ReOrientation (422, 40) 
+
+Each hand holds an object and must independently reorient it to match a specified target orientation. JOURNAL OF L ATEX CLASS FILES, VOL. 14, NO. 8, JUNE 2026 18 
+
+GraspAndPlace (425, 52) 
+
+This environment consists of dual-hands, an object and a bucket, requiring the agent to pick up the object and accurately place it into the bucket. 
+
+BlockStack (428, 52) 
+
+Involves dual hands and two blocks. The agent must stack the blocks to form a stable tower. 
+
+PushBlock (428, 52) 
+
+Two hands must separately reach and push two blocks to their desired goals. This is a basic coordination task. 
+
+TwoCatchUnderarm (446, 52) 
+
+Similar to Catch Underarm but with two objects handled simultaneously, requiring extremely high precision and timing for the exchange. 
+
+Maniskill2 Environments Environment (obs dim, action dim) Task description 
+
+PickCube-v0 (51, 7) 
+
+This class corresponds to the PickCube task in ManiSkill. This environment consists of a robot arm and a cube placed on the table. At the beginning, the cube appears at a random location and orientation. The agent must control the gripper to approach, grasp, and lift the cube above a threshold height. The challenge lies in object localization, precise control, and stable grasping 
+
+TurnFaucet-v0 (40, 7) 
+
+This class corresponds to the TurnFaucet task. A faucet handle is mounted on a wall, and the agent must rotate it clockwise or counterclockwise to a target angle. The challenge lies in establishing proper contact, applying sufficient torque, and maintaining stability during the turning motion 
+
+OpenCabinetDrawer-v1 (75, 11) 
+
+This class corresponds to the OpenCabinetDrawer task. The robot must open a drawer embedded in a cabinet by locating the handle and pulling it outward. The task requires both accurate handle grasping and force application along a linear trajectory, while avoiding excessive torque that could misalign the drawer 
+
+S-B THEORETICAL ANALYSIS OF MECHANISM DECOUPLING 
+
+In this section, we provide the theoretical motivation for the mechanism decoupling formulation and analyze the approximation gap of monolithic static causal graphs in reward distillation. The analysis is intended to characterize why a static graph may be insufficient when state-dependent transient interactions exist, rather than to prove exact recovery of the full physical dynamics. JOURNAL OF L ATEX CLASS FILES, VOL. 14, NO. 8, JUNE 2026 19 
+
+A. Structural Optimization Bottleneck 
+
+The decoupling architecture is motivated by the Independent Causal Mechanisms (ICM) principle. In embodied systems, the reward-relevant skeleton can be viewed as a stable structural abstraction retained for reward generation, while state-dependent mechanism activations capture contextual variations observed during transitions. This skeleton is not intended to represent the complete time-lagged physical dynamics, which may contain feedback loops and inertial couplings. The formulation 
+
+Minst (st−1) = Minv ⊙
+
+
+
+1d×d + Mtrans (st−1; θ)
+
+
+
+(S-1) implements this design through an optimization bottleneck: 
+
+Stable Reward-Relevant Skeleton: The acyclicity constraint h(Minv ) = 0 and the soft prior Lsof t are applied exclusively to Minv , guiding it to capture a compact reward-relevant prerequisite structure for downstream reward generation. 
+
+State-Dependent Modulation: The neural parameterization Mtrans is confined by the Hadamard mask to scaling the magnitudes of candidate edges based on the context st−1, without freely introducing unrelated edges outside the structure anchored by Minv .This structural bottleneck allows state-dependent variations to be modeled by Mtrans during reconstruction, while Minv 
+
+retains the stable structure used as the CRWM for reward generation. 
+
+B. Error Bounds of Mechanism Decoupling 
+
+To analyze the effect of the dynamic gating mechanism, we study the approximation error of static versus dynamically modulated graphs under a locally linear instantiation. Consider the following transition model: 
+
+st = M ◦
+
+> inst
+
+(st−1)st−1 + ϵt, ϵt ∼ N (0 , σ 2I), (S-2) where M ◦ 
+
+> inst
+
+denotes the oracle instantaneous graph in this locally linear setting, written as: 
+
+M ◦
+
+> inst
+
+(st−1) = M ◦ 
+
+> inv
+
+⊙
+
+
+
+1d×d + M ◦
+
+> trans
+
+(st−1)
+
+
+
+. (S-3) Here, M ◦ 
+
+> inv
+
+denotes the stable reward-relevant backbone, and M ◦ 
+
+> trans
+
+denotes state-dependent transient modulation. 
+
+Assumption 1. M ◦
+
+> trans
+
+(st−1) is statistically independent of st−1 and has zero mean, i.e., E[M ◦
+
+> trans
+
+] = 0 and M ◦ 
+
+> trans
+
+⊥⊥ st−1.
+
+The optimal static causal graph ˆMstatic is defined as: 
+
+ˆMstatic = arg min  
+
+> M∈H static
+
+E∥st − M s t−1∥22
+
+. (S-4) Under Assumption 1, ˆMstatic = M ◦ 
+
+> inv
+
+.
+
+Proof Sketch. The unconstrained solution is: ˆM = E[sts⊤
+
+> t−1
+
+]Σ −1 
+
+> s
+
+, (S-5) where Σs = E[st−1s⊤
+
+> t−1
+
+]. Since 
+
+E[M ◦
+
+> inst
+
+] = M ◦ 
+
+> inv
+
+⊙
+
+
+
+1 + E[M ◦
+
+> trans
+
+]
+
+
+
+= M ◦ 
+
+> inv
+
+, (S-6) we obtain: 
+
+E[sts⊤
+
+> t−1
+
+] = E[M ◦
+
+> inst
+
+]E[st−1s⊤
+
+> t−1
+
+] = M ◦ 
+
+> inv
+
+Σs. (S-7) Thus ˆM = M ◦ 
+
+> inv
+
+. If M ◦ 
+
+> inv
+
+satisfies the acyclicity constraint, it is also the constrained optimal static solution. Let L(M ◦
+
+> inst
+
+) be the oracle risk achieved by the instantaneous graph. The excess risk of the static model is: 
+
+L( ˆMstatic ) − L (M ◦
+
+> inst
+
+) = E
+
+h  M ◦
+
+> inst
+
+(st−1) − M ◦
+
+> inv
+
+st−1
+
+> 22
+
+i
+
+. (S-8) Substituting M ◦
+
+> inst
+
+(st−1) − M ◦ 
+
+> inv
+
+= M ◦ 
+
+> inv
+
+⊙ M ◦
+
+> trans
+
+(st−1) and applying the trace inequality with λmin (Σ s) > 0, we have: 
+
+E
+
+h  M ◦ 
+
+> inv
+
+⊙ M ◦
+
+> trans
+
+st−1
+
+> 22
+
+i
+
+= Tr  E[R⊤R]Σ s
+
+
+
+≥ λmin (Σ s) · E
+
+h
+
+∥M ◦ 
+
+> inv
+
+⊙ M ◦
+
+> trans
+
+∥2
+
+> F
+
+i
+
+,
+
+(S-9) where R = M ◦ 
+
+> inv
+
+⊙ M ◦
+
+> trans
+
+.
+
+Theorem 1. Under Assumption 1, a static graph incurs a non-zero excess risk whenever the state-dependent transient modulation M ◦ 
+
+> trans
+
+has non-zero variance. A decoupled formulation can reduce this approximation gap by explicitly modeling such modulation through the neural component Mtrans .
+
+This analysis shows that, under the stated assumptions, static causal modeling can be suboptimal in the presence of state-dependent transient modulation. The decoupled formulation provides an optimization aid for extracting a reward-relevant skeleton while accounting for transient variations during reconstruction. It does not claim exact or lossless recovery of the complete physical causal dynamics. JOURNAL OF L ATEX CLASS FILES, VOL. 14, NO. 8, JUNE 2026 20 
+
+S-C SNAPSHOTS OF THE HIERARCHICAL INTERVENTIONAL DATASET 
+
+To verify our data collection protocol, we provide snapshots of the two data levels: the macroscopic configurations ( Dmacro )and the microscopic state transitions ( Dmicro ). 
+
+A. Macro-level Configurations ( Dmacro )
+
+Table S-I presents a subset of the macro-level dataset. By applying Pearl’s do -operations to coefficients (e.g., whold , w grasp ), we evaluate the resultant policies to obtain the Fitness Score ( F). This enables the foundational model to extract structural priors. 
+
+TABLE S-I SNAPSHOT OF THE HIERARCHICAL INTERVENTIONAL DATASET . Dmacro FEEDS INTO THE FOUNDATION MODEL FOR STRUCTURAL PRIORS , WHILE 
+
+Dmicro IS PRESERVED FOR EXPLICIT MECHANISM DECOUPLING (EMD). 
+
+Macro Config ( Dmacro ) Outcome Micro Data ( Dmicro )
+
+whold wgrasp wrot wpos F Trajectory 
+
+0.15 0.15 0.1 0.2 0.2070 (s0, s 1, . . . , s T )
+
+0.15 0.50 0.5 0.2 0.3306 (s0, s 1, . . . , s T )
+
+0.50 0.15 0.1 0.2 0.1880 (s0, s 1, . . . , s T )
+
+0.50 0.50 0.1 0.2 0.4204 (s0, s 1, . . . , s T )
+
+0.50 0.50 0.1 0.5 0.4631 (s0, s 1, . . . , s T )
+
+0.50 0.50 0.1 0.8 0.3817 (s0, s 1, . . . , s T )
+
+B. Micro-level Trajectories ( Dmicro )
+
+Simultaneous with macro-evaluation, the system logs transient dynamics. The snippet below shows a serialized sample. Raw observations ot are discarded; st ∈ Rd exclusively records the values of the physically meaningful variables used by Joint Optimization Module. 
+
+[{"epoch": 2500, "macro_config": ["hold_distance", "grasp_force", "object_rotation", "object_position" ], "micro_trajectory": [[0.00378, 0.00036, 1.00000, 0.27126], [0.00399, 0.00038, 1.00000, 0.84320], [0.00396, 0.00039, 1.00000, 0.88702], "... (trajectory continues until step T)" ]}]
+
+S-D ABLATION ON DAGMA A CYCLICITY REGULARIZATION 
+
+To examine the effect of the DAGMA acyclicity regularization, we evaluate an additional variant, denoted as CRWM w.o. DAG . In this variant, we remove the acyclicity term λh (Minv ), while keeping EMD and Confidence-Aware Soft Fusion unchanged. This setting isolates the influence of the DAGMA regularizer on the reward-relevant causal skeleton. As shown in Table S-II, removing the acyclicity regularization leads to a decline in average SR compared with CRWM. This result suggests that the DAGMA term helps regularize the learned causal skeleton by discouraging circular dependencies among reward-relevant structural variables. 
+
+TABLE S-II ABLATION OF DAGMA ACYCLICITY REGULARIZATION ACROSS SIX UNSEEN TASKS .
+
+Method Kettle CatchAbreast CatchOver2Underarm 
+
+CRWM 0.88 0.65 0.92 CRWM w.o. DAG 0.81 0.61 0.82 JOURNAL OF L ATEX CLASS FILES, VOL. 14, NO. 8, JUNE 2026 21 
+
+(a) Abreast (b) CatchOver2Underarm (c) DoorCloseOutward 
+
+(d) Pen (e) CatchUnderarm (f) DoorOpenOutward 
+
+(g) GraspAndPlace (h) Kettle (i) ReOrientation     
+
+> Fig. S-1. Comparison of reward and SR curves across 9 simulation tasks, complemented by reward evolution. Pruning spurious correlations (green) consistently resolves Optimization Collapse (blue boxes) and Specification Gaming (orange boxes), enabling robust alignment and policy convergence where baseline rewards (red) fail.
+
+S-E DISCUSSION OF OPTIMIZATION COLLAPSE AND SPECIFICATION GAMING 
+
+In this appendix, we provide extended qualitative evidence to support the statistical findings in Sec.VI. Fig. S-1 presents the training curves for 9 simulation tasks. As illustrated, the baseline rewards (red curves) frequently suffer from two systemic failures. Optimization Collapse (highlighted in blue boxes) is characterized by rewards and success rates stagnating near zero, where noisy spurious correlations impede gradient-based learning. Meanwhile, Specification Gaming (highlighted in orange boxes) manifests as deceptive reward surges accompanied by low physical success. In contrast, the rewards with causal pruning (green curves) consistently ensure that reward increases are coupled with physical task progress. S-F LLM AND PRE -TRAINED CAUSAL FOUNDATION MODEL ALTERNATIVES 
+
+A. LLM Alternatives 
+
+In Fig. S-2, we compare the performance of Causal-ARD using DeepSeek-V3, Qwen-2.5(qwen-max-0919) [50], and Llama3(llama-v3-70b-instruct) [51]. These results demonstrate the consistency of our framework across different LLMs and eliminate concerns that the inherent capabilities of specific language models might bias the final success rates. 
+
+B. Pre-trained Causal Foundation Model Alternatives 
+
+To evaluate the impact of different causal priors, we compare our default LimiX with AVICI [52]. AVICI serves as a representative baseline because, similar to LimiX, it is a specialized causal foundation model pre-trained on diverse functional JOURNAL OF L ATEX CLASS FILES, VOL. 14, NO. 8, JUNE 2026 22 
+
+Fig. S-2. Causal-ARD demonstrates consistent performance across different LLMs 
+
+Fig. S-3. CRWM distillation exhibits invariant success rates across different pre-trained causal foundation models. 
+
+forms and causal topologies. While LimiX incorporates structural-causal priors, AVICI relies on amortized neural inference over numerical distributions. As shown in Fig. S-3, the nearly identical success rates indicate that the choice of the pre-trained causal foundation model does not significantly affect the final performance, confirming the stability of our CRWM distillation process.
