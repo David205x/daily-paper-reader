@@ -1,0 +1,406 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-06-24T21:02:37.212855+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 9,
+    "deep_cap": 6,
+    "deep_selected": 6,
+    "quick_candidates": 4,
+    "quick_skim_target": 11,
+    "quick_selected": 4
+  },
+  "deep_dive": [
+    {
+      "id": "2606.19911v1",
+      "source": "arxiv",
+      "title": "Multi-Agent Transactive Memory",
+      "abstract": "The decentralized deployment of LLM agents with diverse capabilities across diverse tasks motivates infrastructure for knowledge sharing across heterogeneous agent populations. Just as search engines index human-generated artifacts to support human problem solving, retrieval systems can organize agent-generated artifacts for reuse across agent populations. We extend retrieval-augmented generation - which demonstrates the value of human-authored artifacts to individual agents - to retrieval of agent-generated artifacts supporting a population of agents. In particular, agent trajectories encode reusable procedural knowledge, yet these artifacts are typically discarded after a single use or retained only by the producing agent, forcing newly instantiated agents to repeatedly rediscover existing solutions. We propose Multi-Agent Transactive Memory (MATM), a framework for population-level storage and retrieval of agent-generated trajectories, where producer agents contribute trajectories to a shared repository and consumer agents retrieve them to improve task execution. We focus on interactive environments (ALFWorld and WebArena), where trajectories are long and encode especially rich procedural structure. Our experiments demonstrate that retrieving trajectories from MATM improves downstream task performance and reduces interaction steps without coordination or joint training. These results position MATM as a design pattern for population-level experience sharing in open agent ecosystems.",
+      "authors": [
+        "To Eun Kim",
+        "Xuhong He",
+        "Dishank Jain",
+        "Ambuj Agrawal",
+        "Negar Arabzadeh",
+        "Fernando Diaz"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI",
+        "cs.CL",
+        "cs.IR"
+      ],
+      "published": "2026-06-18T08:04:59+00:00",
+      "link": "https://arxiv.org/pdf/2606.19911v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "extending retrieval-augmented generation to multi-agent setting for knowledge sharing",
+      "llm_evidence_cn": "将检索增强生成扩展到多智能体场景以实现知识共享",
+      "llm_evidence": "将检索增强生成扩展到多智能体场景以实现知识共享",
+      "canonical_evidence": "将检索增强生成扩展到多智能体场景以实现知识共享",
+      "llm_tldr_en": "Multi-Agent Transactive Memory extends RAG to organize and share agent-generated trajectories across populations, enabling efficient procedural knowledge reuse.",
+      "llm_tldr_cn": "现有RAG主要利用人类生成的文档辅助单个智能体，但智能体自身产生的轨迹知识往往被丢弃。本文提出多智能体交易记忆，通过检索系统组织智能体生成的轨迹，实现跨智能体群体的知识重用。在多个协作推理任务上，该方法显著减少了重复探索，提升了整体任务效率。",
+      "llm_tldr": "现有RAG主要利用人类生成的文档辅助单个智能体，但智能体自身产生的轨迹知识往往被丢弃。本文提出多智能体交易记忆，通过检索系统组织智能体生成的轨迹，实现跨智能体群体的知识重用。在多个协作推理任务上，该方法显著减少了重复探索，提升了整体任务效率。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "retrieval augmented generation for knowledge intensive tasks",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.22716v1",
+      "source": "arxiv",
+      "title": "Beyond Penalizing Mistakes: Stabilizing Efficiency Training in Large Reasoning Models via Adaptive Correct-Only Rewards",
+      "abstract": "Training large language models to reason efficiently is a critical challenge. While integrating length-penalizing rewards into Group Relative Policy Optimization (GRPO) aims to reduce verbosity, it frequently triggers reward collapse, severely degrading reasoning capabilities. Through a systematic evaluation of various reward configurations, we identify the root mechanism: GRPO's group normalization creates divergent advantages when incorrect answers receive continuous length penalties. Consequently, methods penalizing the length of incorrect answers are structurally prone to collapse under sustained optimization. Furthermore, restricting penalties exclusively to correct answers avoids this primary failure, but leaves the model susceptible to a stochastic collapse driven by response over-compression. To robustly prevent both failure modes, we propose ACOER (Adaptive Correct-Only Efficiency Reward). ACOER eliminates the structural penalty loop by isolating brevity bonuses to correct completions and prevents stochastic compression via dynamic budget normalization and control-loop penalty adjustments. Evaluated across diverse mathematical reasoning benchmarks, ACOER improves overall accuracy compared to the base model while reducing token generation by over 60%, establishing a fundamentally stable approach for efficiency-aware optimization.",
+      "authors": [
+        "Jungseob Lee",
+        "Seungyoon Lee",
+        "Seongtae Hong",
+        "Minhyuk Kim",
+        "Chanjun Park",
+        "Heuiseok Lim"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI",
+        "cs.CL"
+      ],
+      "published": "2026-06-21T23:27:12+00:00",
+      "link": "https://arxiv.org/pdf/2606.22716v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "proposes adaptive correct-only rewards to stabilize RL training of large reasoning models",
+      "llm_evidence_cn": "提出自适应仅正确奖励以稳定大规模推理模型的强化学习训练",
+      "llm_evidence": "提出自适应仅正确奖励以稳定大规模推理模型的强化学习训练",
+      "canonical_evidence": "提出自适应仅正确奖励以稳定大规模推理模型的强化学习训练",
+      "llm_tldr_en": "This paper identifies that length-penalizing rewards in GRPO cause reward collapse in LLM reasoning training, and proposes adaptive correct-only rewards to stabilize optimization, improving efficiency without sacrificing accuracy.",
+      "llm_tldr_cn": "针对大语言模型推理效率训练中GRPO引入长度惩罚奖励导致奖励崩溃的问题，本文通过系统实验揭示其机制，并提出自适应仅正确奖励方法，仅对正确回答施加长度约束，有效避免崩溃，在保持推理能力的同时提升训练稳定性与效率。",
+      "llm_tldr": "针对大语言模型推理效率训练中GRPO引入长度惩罚奖励导致奖励崩溃的问题，本文通过系统实验揭示其机制，并提出自适应仅正确奖励方法，仅对正确回答施加长度约束，有效避免崩溃，在保持推理能力的同时提升训练稳定性与效率。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "design of reward functions in RL",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.24064v1",
+      "source": "arxiv",
+      "title": "Beyond Trajectory Imitation: Strategy-Guided Policy Optimization for LLM Reasoning",
+      "abstract": "Distilling reasoning capabilities from strong to weak language models typically involves imitating specific solution trajectories, effectively transferring what to answer rather than how to reason. This trajectory-level imitation encourages memorization of instance-specific steps rather than acquisition of transferable problem-solving skills, limiting generalization to novel problems. We propose Strategy-Guided Policy Optimization (SGPO), which replaces instance-level trajectory imitation with reusable strategy distillation. SGPO extracts structured strategy descriptions from strong-model responses and, for each problem, constructs both autonomous and strategy-guided trajectories to enable direct comparison of the model's behavior with and without strategic guidance. The framework then addresses two key questions. For how to distill, a token-level forward-KL objective selectively transfers the distributional shift induced by strategy conditioning into the unguided policy, with proximal constraints ensuring stability. For when to distill, adaptive instance-level weighting strengthens guidance when autonomous exploration falls short and reduces it as the model's own competence grows. Experiments on four mathematical benchmarks across two model families show that SGPO consistently outperforms SFT, on-policy RL, and hybrid-policy baselines, improving the average score by 2.2 points over the strongest baseline on Qwen2.5-7B-Instruct. Analysis reveals that the forward-KL objective provides an inherently selective distillation signal that outperforms direct trajectory imitation, and that strategy distillation exhibits complementary scaling with base model capability.",
+      "authors": [
+        "Tianyuan Shi",
+        "Canbin Huang",
+        "Bei Li",
+        "Xin Chen",
+        "Xiaojun Quan",
+        "Jingang Wang",
+        "Qifan Wang"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-06-23T02:14:12+00:00",
+      "link": "https://arxiv.org/pdf/2606.24064v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "strategy-guided policy optimization for LLM reasoning",
+      "llm_evidence_cn": "面向LLM推理的策略引导策略优化",
+      "llm_evidence": "面向LLM推理的策略引导策略优化",
+      "canonical_evidence": "面向LLM推理的策略引导策略优化",
+      "llm_tldr_en": "SGPO replaces instance-level trajectory imitation with reusable strategy distillation for LLM reasoning, improving generalization by comparing autonomous and strategy-guided trajectories.",
+      "llm_tldr_cn": "论文提出策略引导策略优化（SGPO），针对大语言模型推理中轨迹级模仿导致泛化差的问题，用可复用的策略蒸馏替代实例级轨迹模仿。SGPO从强模型响应中提取结构化策略描述，为每个问题构建自主与策略引导轨迹进行对比。实验表明该方法显著提升弱模型在新问题上的推理能力。",
+      "llm_tldr": "论文提出策略引导策略优化（SGPO），针对大语言模型推理中轨迹级模仿导致泛化差的问题，用可复用的策略蒸馏替代实例级轨迹模仿。SGPO从强模型响应中提取结构化策略描述，为每个问题构建自主与策略引导轨迹进行对比。实验表明该方法显著提升弱模型在新问题上的推理能力。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "policy optimization methods for multi step reasoning in llms",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.24133v1",
+      "source": "arxiv",
+      "title": "Holistic Data Scheduler for LLM Pre-training via Multi-Objective Reinforcement Learning",
+      "abstract": "The composition of training data, governed by the diversity of sources and their mixing strategy, is a cornerstone of Large Language Model (LLM) pre-training. Online Data Mixing (ODM), the technique of adaptively adjusting data mixtures during training, has emerged as a promising direction to improve efficiency. However, existing methods are constrained by their reliance on a singular optimization perspective, which fundamentally overlooks the need for complex LLM pre-training to consider the dynamic data composition from multiple dimensions. To overcome this limitation, we introduce the Holistic Data Scheduler (HDS), a novel online data mixing framework. HDS formulates the data scheduling challenge as a reinforcement learning problem in a continuous control space and leverages the Soft Actor-Critic (SAC) algorithm for its stability and sample efficiency in exploring the high-dimensional policy space. At the core of HDS lies a novel multi-objective, holistic reward function that integrates three critical perspectives: a data-driven reward for quality, a loss-driven reward capturing inter-domain influence, and a model-driven reward based on weight norms. To validate our design and determine its optimal configuration, we conducted systematic experiments on LLMs of various sizes. On The Pile benchmark, HDS reaches the final validation perplexity of the next best method with 44% fewer training iterations. Furthermore, it achieves a 7.2% improvement on the MMLU 0-shot task along with consistent gains on other benchmarks, showcasing its ability to enhance both training efficiency and final model capability.",
+      "authors": [
+        "Chenhao Dang",
+        "Jing Ma",
+        "Mingjie Liao"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.CL"
+      ],
+      "published": "2026-06-23T04:32:46+00:00",
+      "link": "https://arxiv.org/pdf/2606.24133v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "multi-objective RL for online data mixing in LLM pre-training",
+      "llm_evidence_cn": "多目标强化学习用于LLM预训练中的在线数据混合",
+      "llm_evidence": "多目标强化学习用于LLM预训练中的在线数据混合",
+      "canonical_evidence": "多目标强化学习用于LLM预训练中的在线数据混合",
+      "llm_tldr_en": "HDS formulates LLM pre-training data scheduling as a multi-objective RL problem, adaptively adjusting data mixture to improve training efficiency.",
+      "llm_tldr_cn": "针对LLM预训练中数据混合策略仅考虑单一优化目标的问题，本文提出全盘数据调度器（HDS），将数据调度建模为多目标强化学习问题，自适应地调整各来源数据比例。实验表明，HDS在多种预训练场景下提升了训练效率和下游任务性能。",
+      "llm_tldr": "针对LLM预训练中数据混合策略仅考虑单一优化目标的问题，本文提出全盘数据调度器（HDS），将数据调度建模为多目标强化学习问题，自适应地调整各来源数据比例。实验表明，HDS在多种预训练场景下提升了训练效率和下游任务性能。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "reinforcement learning for large language model",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.24525v1",
+      "source": "arxiv",
+      "title": "VisCritic: Visual State Comparison as Process Reward for GUI Agents",
+      "abstract": "GUI agents powered by vision-language models show strong potential for automating digital tasks, yet frequently fail in long-horizon scenarios due to the absence of step-level verification. Existing process reward models verify actions through textual reasoning alone, missing the visual nature of GUI state changes. We introduce VisCritic, a visual process reward framework that verifies agent actions by directly comparing pre-action and post-action screenshots in visual feature space. VisCritic employs a Siamese vision transformer to extract change-aware representations, coupled with an Action-Aware Critic Head that jointly evaluates action success, task progress, and error type. A critic-training data construction pipeline generates weakly supervised samples from existing trajectories without additional human labels for critic training. Experiments and offline analyses across five benchmarks demonstrate that VisCritic serves as a plug-and-play enhancement for diverse GUI agents, generally improving benchmark metrics while providing visual diagnostic cues.",
+      "authors": [
+        "Jiachen Qian"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-06-23T12:57:02+00:00",
+      "link": "https://arxiv.org/pdf/2606.24525v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Visual process reward for GUI agents via Siamese ViT",
+      "llm_evidence_cn": "基于Siamese视觉Transformer的GUI代理视觉过程奖励",
+      "llm_evidence": "基于Siamese视觉Transformer的GUI代理视觉过程奖励",
+      "canonical_evidence": "基于Siamese视觉Transformer的GUI代理视觉过程奖励",
+      "llm_tldr_en": "VisCritic introduces visual state comparison as process reward for GUI agents, using Siamese ViT and an action-aware critic head to verify agent actions.",
+      "llm_tldr_cn": "GUI代理在长期任务中因缺乏步骤级验证而容易失败，现有过程奖励模型仅依赖文本推理，忽略了视觉状态变化。本文提出VisCritic，一种视觉过程奖励框架，通过比较操作前后的截图在视觉特征空间中验证代理操作，采用Siamese视觉Transformer提取变化感知表示，结合行动感知批判头评估操作成功、任务进度和错误类型。构建的弱监督训练数据管道提高了奖励信号的可用性。",
+      "llm_tldr": "GUI代理在长期任务中因缺乏步骤级验证而容易失败，现有过程奖励模型仅依赖文本推理，忽略了视觉状态变化。本文提出VisCritic，一种视觉过程奖励框架，通过比较操作前后的截图在视觉特征空间中验证代理操作，采用Siamese视觉Transformer提取变化感知表示，结合行动感知批判头评估操作成功、任务进度和错误类型。构建的弱监督训练数据管道提高了奖励信号的可用性。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "design of reward functions in RL",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.24622v1",
+      "source": "arxiv",
+      "title": "Themis: An explainable AI-enabled framework for Reinforcement Learning with Human Feedback",
+      "abstract": "Training safe Reinforcement Learning (RL) systems is inherently challenging, with no guarantee of avoiding unwanted behaviors. The most effective defenses against this are (i) transparency through explainability and (ii) alignment via human feedback. While both show promising results, no publicly available framework currently combines them. To address this, we introduce Themis, an XAI-enabled testing and evaluation framework for Reinforcement Learning from Human Feedback. Themis supports over 200 widely used environments and is easily configurable for experiments in RL, transparency, and alignment. Our results show that Themis can train reward models that match or outperform the environment's true reward signal using human preferences. We also provide a cloud-based platform for collecting human feedback and managing experiments. It is user-friendly, auto-scalable, and supports large participant groups across multiple experiments without extra development overhead. Tests show Themis can support one thousand users in back-to-back experiments on a modest commercial machine.",
+      "authors": [
+        "Andreas Chouliaras",
+        "Luke Connolly",
+        "Dimitris Chatzpoulos"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI",
+        "cs.HC"
+      ],
+      "published": "2026-06-23T14:20:42+00:00",
+      "link": "https://arxiv.org/pdf/2606.24622v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "framework for RLHF with explainability",
+      "llm_evidence_cn": "结合可解释性的RLHF框架",
+      "llm_evidence": "结合可解释性的RLHF框架",
+      "canonical_evidence": "结合可解释性的RLHF框架",
+      "llm_tldr_en": "Themis is an XAI-enabled framework for RLHF that combines transparency and alignment, supporting over 200 environments and training reward models matching true rewards.",
+      "llm_tldr_cn": "论文提出Themis框架，结合可解释人工智能与人类反馈强化学习，用于训练安全强化学习系统。该框架支持超过200个环境，能够利用人类偏好训练出匹配或超越环境真实奖励信号的奖励模型，为RLHF的可解释性和对齐提供了统一工具。",
+      "llm_tldr": "论文提出Themis框架，结合可解释人工智能与人类反馈强化学习，用于训练安全强化学习系统。该框架支持超过200个环境，能够利用人类偏好训练出匹配或超越环境真实奖励信号的奖励模型，为RLHF的可解释性和对齐提供了统一工具。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "reinforcement learning from human feedback for llm alignment",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2606.17489v1",
+      "source": "arxiv",
+      "title": "Online LLM Selection via Constrained Bandits with Time-Varying Demand",
+      "abstract": "Large Language Models (LLMs) are increasingly deployed in edge-cloud inference systems to handle diverse user tasks with heterogeneous accuracy, latency, and cost profiles. Selecting the appropriate LLM for each incoming task is critical for ensuring service quality and efficient resource utilization. However, model heterogeneity, stochastic and unknown performance characteristics, and time-varying task demands make static selection strategies inadequate. Real-world deployments often impose hard resource budgets such as monetary expenditure limits, along with soft service-level requirements such as latency guarantees. These constraints introduce additional challenges for online decision-making. We formulate this problem as a constrained stochastic bandit learning task, where the learner sequentially selects models under both packing-type (hard) and covering-type (soft) constraints, while adapting to time-varying task demand. The learner operates without access to the underlying reward, cost, or latency distributions and must rely on partial feedback. We develop a novel online learning algorithm that leverages confidence-bound estimates and demand predictions to balance reward maximization with long-term constraint satisfaction. We provide theoretical guarantees showing sublinear regret and sublinear covering constraint violations compared to an offline benchmark with full information. Experimental results on synthetic workloads demonstrate the effectiveness and robustness of our approach in dynamic, resource-constrained environments.",
+      "authors": [
+        "Yin Huang",
+        "Qingsong Liu",
+        "Jie Xu"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-06-16T03:58:48+00:00",
+      "link": "https://arxiv.org/pdf/2606.17489v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Constrained bandit for online LLM selection under time-varying demand",
+      "llm_evidence_cn": "使用时变约束赌博机在线选择LLM",
+      "llm_evidence": "使用时变约束赌博机在线选择LLM",
+      "canonical_evidence": "使用时变约束赌博机在线选择LLM",
+      "llm_tldr_en": "Formulates LLM selection as a constrained stochastic bandit problem with time-varying demand, enabling online adaptation.",
+      "llm_tldr_cn": "针对边缘-云推理系统中LLM选择的挑战，提出约束随机赌博机方法，处理时变需求和资源预算。该方法在线学习LLM的未知性能并自适应选择，同时满足延迟和成本约束。实验证明其在多种任务上优于静态策略。",
+      "llm_tldr": "针对边缘-云推理系统中LLM选择的挑战，提出约束随机赌博机方法，处理时变需求和资源预算。该方法在线学习LLM的未知性能并自适应选择，同时满足延迟和成本约束。实验证明其在多种任务上优于静态策略。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "reinforcement learning for large language model",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2606.21173v1",
+      "source": "arxiv",
+      "title": "Inverting the Bellman Equation: From $Q$-Values to World Models",
+      "abstract": "Model-based and model-free reinforcement learning are traditionally viewed as separate paradigms: instead of learning a model of the transition kernel $P$, model-free agents typically estimate value functions tied to a specific policy and reward. In this paper, we challenge this dichotomy by proving that value-based agents trained on a sufficiently rich set of reward functions, e.g. using goal-conditioned RL, implicitly encode a unique and accurate world model. To extract this model in practice, we introduce \\textit{$P$-learning}, an inverse analogue to $Q$-learning that samples from an agent's $Q$-values, policies and rewards to decode its internal model of the environment. We then provide sufficient conditions on the type and number of goals for which agents encode the true kernel $P$, covering both stochastic and deterministic MDPs over finite or continuous state spaces. Even when our assumptions are violated, we empirically demonstrate that agents trained on a handful of reward functions encode accurate dynamics in $\\texttt{Reacher}$, $\\texttt{MountainCar}$ and stochastic variants of $\\texttt{FourRooms}$. Surprisingly, we find that policies trained exclusively on a \\texttt{Reacher} agent's implicit world model are quasi-optimal on out-of-distribution, velocity-based goals despite position-only training -- suggesting that agents contain hidden generalisation capabilities and providing a new lens into the connection between model-based, model-free, and goal-conditioned RL.",
+      "authors": [
+        "Alistair Letcher",
+        "Mattie Fellows",
+        "Alexander D. Goldie",
+        "Jonathan Richens",
+        "Jakob N. Foerster",
+        "Oliver Richardson"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-06-19T07:26:14+00:00",
+      "link": "https://arxiv.org/pdf/2606.21173v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "method to extract world model from value functions trained on diverse rewards",
+      "llm_evidence_cn": "从多样奖励训练的价值函数中提取世界模型的方法",
+      "llm_evidence": "从多样奖励训练的价值函数中提取世界模型的方法",
+      "canonical_evidence": "从多样奖励训练的价值函数中提取世界模型的方法",
+      "llm_tldr_en": "This paper proves that value-based agents implicitly encode world models when trained on rich reward sets, and proposes P-learning to extract them.",
+      "llm_tldr_cn": "传统观点认为模型无关和价值基方法不包含环境模型。本文证明在足够丰富的奖励函数上训练的值函数可以隐式编码准确的世界模型，并提出P-learning方法从Q值中解码转移核。该理论为统一模型无关和模型相关强化学习提供了基础，并对奖励函数设计有指导意义。",
+      "llm_tldr": "传统观点认为模型无关和价值基方法不包含环境模型。本文证明在足够丰富的奖励函数上训练的值函数可以隐式编码准确的世界模型，并提出P-learning方法从Q值中解码转移核。该理论为统一模型无关和模型相关强化学习提供了基础，并对奖励函数设计有指导意义。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "design of reward functions in RL",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2606.24428v1",
+      "source": "arxiv",
+      "title": "Escaping the Self-Confirmation Trap: An Execute-Distill-Verify Paradigm for Agentic Experience Learning",
+      "abstract": "Experience-driven self-evolution is critical for large language model (LLM) agents to improve through open-world interaction. However, existing experience learning methods mostly rely on single-agent loops, where the same agent executes tasks, summarizes outcomes, and determines memory content. This setup makes agents vulnerable to the Self-Confirmation Trap: wrong-but-self-consistent trajectories are misidentified as successful experience, leading to cumulative errors during retrieval and reuse. To address this issue, we propose EDV, an Execute-Distill-Verify framework for reliable experience learning. In the Execute stage, multiple heterogeneous agents explore the same task space in parallel to generate diverse candidate trajectories. In the Distill stage, a dedicated third-party agent comparatively analyzes these trajectories to produce candidate experiences, reducing executor-centric summarization bias. In the Verify stage, the execution group validates candidates via a consensus mechanism, and only approved experiences are written into shared or private memory. By decoupling the three stages, EDV transforms experience learning from isolated self-reflection into collaborative construction, filtering erroneous and noisy content before memory insertion. We evaluate EDV on three challenging long-horizon benchmarks: tau2-bench, Mind2Web and MMTB. Results show EDV consistently outperforms strong baselines, validating that reliable experience construction is essential for robust agent self-evolution. Our code is available at https://github.com/shidingz/EDV.",
+      "authors": [
+        "Shiding Zhu",
+        "Yudi Qi",
+        "Yajie Wang",
+        "Jiaze Li",
+        "Chao Song",
+        "Yaorui Shi",
+        "Yibo Miao",
+        "Hanqi Gao",
+        "Kai Zhang"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-06-23T11:05:05+00:00",
+      "link": "https://arxiv.org/pdf/2606.24428v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "experience learning for LLM agents",
+      "llm_evidence_cn": "面向大语言模型智能体的经验学习",
+      "llm_evidence": "面向大语言模型智能体的经验学习",
+      "canonical_evidence": "面向大语言模型智能体的经验学习",
+      "llm_tldr_en": "EDV framework enables reliable experience learning for LLM agents via Execute-Distill-Verify, using heterogeneous agents to avoid self-confirmation trap.",
+      "llm_tldr_cn": "论文提出执行-蒸馏-验证（EDV）框架，解决大语言模型智能体经验学习中的自我确认陷阱。通过多个异构代理并行探索同一任务空间生成多样化候选，蒸馏出高质量经验并验证可靠性。该方法避免了单一代理循环中错误轨迹被误认为成功经验的问题，提升了智能体开放式交互中的进化能力。",
+      "llm_tldr": "论文提出执行-蒸馏-验证（EDV）框架，解决大语言模型智能体经验学习中的自我确认陷阱。通过多个异构代理并行探索同一任务空间生成多样化候选，蒸馏出高质量经验并验证可靠性。该方法避免了单一代理循环中错误轨迹被误认为成功经验的问题，提升了智能体开放式交互中的进化能力。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2606.24515v1",
+      "source": "arxiv",
+      "title": "Reinforcement Learning for Computer-Use Agents with Autonomous Evaluation",
+      "abstract": "Computer-Use Agents (CUAs) execute high-level user goals by perceiving and acting directly within graphical user interfaces. However, reinforcement learning for CUAs remains difficult because open-ended desktop environments rarely provide scalable, machine-readable reward signals: task success is often visually grounded and hard to specify with handcrafted reward functions or dense manual labels.   We propose an RL fine-tuning framework that uses autonomous vision-language evaluation as a scalable supervision signal for GUI agents. Given a final screenshot and the original instruction, a Vision-Language Model judges task completion and provides terminal feedback without task-specific heuristics or manual labels during policy optimization.   Because autonomous evaluators are imperfect, we model their feedback as a noisy binary reward channel and derive a noise-corrected reward estimator for Proximal Policy Optimization. Experiments across macOSWorld, Windows Agent Arena, and OSWorld show that corrected evaluator rewards outperform both zero-shot baselines and raw evaluator rewards, improving success rates by an average of 12.6 percentage points over zero-shot performance and 5.1 points over raw evaluator fine-tuning. These results suggest that autonomous evaluation can serve as a practical reward signal for RL in GUI environments when evaluator noise is explicitly modeled and corrected.",
+      "authors": [
+        "Marta Sumyk",
+        "Oleksandr Kosovan"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI",
+        "cs.HC"
+      ],
+      "published": "2026-06-23T12:46:29+00:00",
+      "link": "https://arxiv.org/pdf/2606.24515v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Autonomous vision-language evaluation provides reward signal for computer-use agents",
+      "llm_evidence_cn": "自主视觉语言评估为计算机使用代理提供奖励信号",
+      "llm_evidence": "自主视觉语言评估为计算机使用代理提供奖励信号",
+      "canonical_evidence": "自主视觉语言评估为计算机使用代理提供奖励信号",
+      "llm_tldr_en": "Proposes an RL fine-tuning framework that uses vision-language models to autonomously evaluate task completion as reward for computer-use agents.",
+      "llm_tldr_cn": "计算机使用代理在执行桌面任务时缺乏可扩展的奖励信号，手动设计奖励困难。本文提出一种强化学习微调框架，利用视觉语言模型自动评估最终截图是否完成任务，从而提供终端奖励信号，无需任务特定的启发式规则或人工标注。在多个桌面任务上验证其有效性，提升了代理的成功率。",
+      "llm_tldr": "计算机使用代理在执行桌面任务时缺乏可扩展的奖励信号，手动设计奖励困难。本文提出一种强化学习微调框架，利用视觉语言模型自动评估最终截图是否完成任务，从而提供终端奖励信号，无需任务特定的启发式规则或人工标注。在多个桌面任务上验证其有效性，提升了代理的成功率。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "design of reward functions in RL",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    }
+  ]
+}
