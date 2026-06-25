@@ -1,0 +1,623 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-06-25T22:08:44.278095+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 7,
+    "deep_cap": 6,
+    "deep_selected": 6,
+    "quick_candidates": 9,
+    "quick_skim_target": 11,
+    "quick_selected": 9
+  },
+  "deep_dive": [
+    {
+      "id": "2606.24994v1",
+      "source": "arxiv",
+      "title": "ExTra: Exploratory Trajectory Optimization for Language Model Reinforcement Learning",
+      "abstract": "Reinforcement Learning with Verifiable Rewards (RLVR) for language-model reasoning can fail at both extremes of task difficulty: easy prompts often produce all-correct, low-diversity rollout groups with little gradient signal, while hard prompts can produce all-incorrect groups with no positive reward. We introduce ExTra (Exploratory Trajectory Optimization), a GRPO-compatible framework that extracts exploration signals from the model's own rollouts. ExTra combines two mechanisms: (i) a novelty reward that adds embedding-based diversity bonuses after GRPO normalization, rewarding diverse correct solutions; and (ii) entropy-guided prefix regeneration, which scores partial trajectories using entropy signals and continues exploration from promising intermediate steps. Across six mathematical reasoning benchmarks, ExTra improves Qwen3-1.7B over GRPO by about +5 points on pass@1 and +7 points on pass@16, showing that trajectory-level exploration signals can improve both single-sample accuracy and inference-time coverage.",
+      "authors": [
+        "Wenyang Hu",
+        "Junxiang Jia",
+        "Zhen Shu",
+        "Daniel Dahlmeier",
+        "See-Kiong Ng",
+        "Bryan Kian Hsiang Low"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-06-23T15:51:39+00:00",
+      "link": "https://arxiv.org/pdf/2606.24994v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "introduces novelty reward and exploration for RL-based LLM reasoning",
+      "llm_evidence_cn": "提出新颖性奖励与探索机制用于基于强化学习的大语言模型推理",
+      "llm_evidence": "提出新颖性奖励与探索机制用于基于强化学习的大语言模型推理",
+      "canonical_evidence": "提出新颖性奖励与探索机制用于基于强化学习的大语言模型推理",
+      "llm_tldr_en": "ExTra adds a novelty reward and entropy-guided prefix regeneration to GRPO for language-model reasoning, improving exploration and gradient signal on both easy and hard prompts.",
+      "llm_tldr_cn": "针对语言模型强化学习中简单任务梯度稀疏、困难任务无正奖励的问题，本文提出ExTra框架，在GRPO基础上引入基于嵌入相似度的新颖性奖励和熵引导前缀重生成机制。该框架能从模型自身轨迹中提取探索信号，提升多样化正确解的产生。实验表明其在数学推理等任务上显著优于标准GRPO。",
+      "llm_tldr": "针对语言模型强化学习中简单任务梯度稀疏、困难任务无正奖励的问题，本文提出ExTra框架，在GRPO基础上引入基于嵌入相似度的新颖性奖励和熵引导前缀重生成机制。该框架能从模型自身轨迹中提取探索信号，提升多样化正确解的产生。实验表明其在数学推理等任务上显著优于标准GRPO。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "reinforcement learning for large language model",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.25451v1",
+      "source": "arxiv",
+      "title": "Learning with a Single Rollout via Monte Carlo Pass@k Critic",
+      "abstract": "Estimating token-level advantages in reinforcement learning (RL) for language models remains challenging because scaling up episodic experience collection is expensive. The difficulty intensifies for baseline advantage estimation methods, where repeated sampling causes trajectories to diverge into substantially different reasoning prefixes. In this context, RL algorithms such as GRPO prove limited: an outcome reward is too sparse to be attributed to specific actions like intermediate steps, and comparisons across sampled traces are non-trivial because they are heterogeneous. To mitigate both the computational cost of repeated sampling and the difficulty of credit assignment, we study single-rollout proximal policy optimization (SR-PPO) featuring token-level credit assignment in RL for language models. Instead of estimating advantages by normalizing episodic returns within the candidate group, we train a calibrated token-level credit critic using Monte Carlo outcomes from one rollout per prompt. Specifically, we use the critic to predict the Pass@k success probability at the prompt prefix, which is derived from a Pass@1 attempt. This choice yields a more selective learning signal than Pass@1: it discounts easily solved prefixes while prioritizing hard ones whose success probability remains marginal. We show that as $k$ increases, Pass@k converges to a reachability indicator, reflecting whether a prefix can lead to at least one successful continuation. In an explicit state graph, the limit ($k \\rightarrow \\infty$) can be computed in $O(|V|+|E|)$ time, offering a promising surrogate for direct credit assignment without the need to sample contrastive traces. As an initial validation, SR-PPO exhibits stable learning dynamics, along with consistent gains in Pass@128 success rates on mathematical reasoning benchmarks such as HMMT26 and AIME24.",
+      "authors": [
+        "Fengdi Che",
+        "Yang Liu",
+        "Lei Yu",
+        "Meng Cao",
+        "Tong Che",
+        "Rupam Mahmood",
+        "Dale Schuurmans"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-06-24T06:26:34+00:00",
+      "link": "https://arxiv.org/pdf/2606.25451v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "single-rollout PPO with Monte Carlo critic for token-level credit assignment in language model RL",
+      "llm_evidence_cn": "单次轨迹PPO结合蒙特卡洛评论家用于语言模型强化学习中的令牌级信用分配",
+      "llm_evidence": "单次轨迹PPO结合蒙特卡洛评论家用于语言模型强化学习中的令牌级信用分配",
+      "canonical_evidence": "单次轨迹PPO结合蒙特卡洛评论家用于语言模型强化学习中的令牌级信用分配",
+      "llm_tldr_en": "Proposes SR-PPO using a Monte Carlo Pass@k critic to estimate token-level advantages from a single rollout, reducing computational cost and improving credit assignment in RL for language models.",
+      "llm_tldr_cn": "针对语言模型强化学习中重复采样轨迹成本高、信用分配困难的问题，本文提出SR-PPO，利用单次轨迹结合蒙特卡洛Pass@k评论家估计令牌级优势。该方法避免了多次采样导致的轨迹发散，在推理任务上显著优于GRPO等基线，同时降低了计算开销。",
+      "llm_tldr": "针对语言模型强化学习中重复采样轨迹成本高、信用分配困难的问题，本文提出SR-PPO，利用单次轨迹结合蒙特卡洛Pass@k评论家估计令牌级优势。该方法避免了多次采样导致的轨迹发散，在推理任务上显著优于GRPO等基线，同时降低了计算开销。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "reinforcement learning for large language model",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.25832v1",
+      "source": "arxiv",
+      "title": "MiniOpt: Reasoning to Model and Solve General Optimization Problems with Limited Resources",
+      "abstract": "Achieving strong optimization generalization across diverse optimization problems while requiring limited training resources remains a challenging problem for optimization-oriented large language models (LLMs). Existing approaches typically rely on large-scale supervised datasets, costly reasoning annotations, and expensive intermediate step verification, resulting in substantial training overhead. To address these challenges, we propose MiniOpt, a reinforcement learning framework that learns to solve optimization problems through an \"reasoning-to-model-and-solve\" paradigm. MiniOpt decomposes optimization reasoning into structured optimization modeling and executable solver generation. Building upon this paradigm, we introduce OptReward, a reward function with hierarchical score structure that jointly evaluates formulation and solution, enabling effective policy learning without expert demonstrations. We further develop an optimization-oriented policy optimization strategy that improves exploration efficiency and stabilizes reinforcement learning for compact models. Extensive experiments show that MiniOpt-3B exhibits strong optimization generalization across various optimization types, problem scenarios, and task domains. For models with fewer than 10B parameters, MiniOpt series achieves the highest average solving accuracy (SA). For models with more than 10B parameters, MiniOpt still shows competitive performance. These results suggest that optimization-oriented reward design and reinforcement learning provide an effective pathway for developing compact optimization-specialized language models with strong optimization generalization capabilities. The code is available at https://github.com/Hsiang-1/MiniOpt.",
+      "authors": [
+        "Ke Zhao",
+        "Zixiang Di",
+        "Hong Qian",
+        "Xiang Shu",
+        "Yaolin Wen",
+        "Qitao Shi",
+        "Bingdong Li",
+        "Xingyu Lu",
+        "Xiangfeng Wang",
+        "Jun Zhou",
+        "Ke Tang",
+        "Yang Yu"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-06-24T13:48:06+00:00",
+      "link": "https://arxiv.org/pdf/2606.25832v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "RL framework for LLMs to solve optimization problems",
+      "llm_evidence_cn": "用于解决优化问题的大模型强化学习框架",
+      "llm_evidence": "用于解决优化问题的大模型强化学习框架",
+      "canonical_evidence": "用于解决优化问题的大模型强化学习框架",
+      "llm_tldr_en": "MiniOpt uses reinforcement learning to train LLMs to solve optimization problems by decomposing reasoning into modeling and solver generation, reducing training overhead.",
+      "llm_tldr_cn": "现有大模型求解优化问题依赖大量监督数据和昂贵验证，MiniOpt提出强化学习框架，通过将优化推理分解为结构化建模和可执行求解器生成，在有限资源下实现强泛化。实验表明该方法可显著降低训练开销。",
+      "llm_tldr": "现有大模型求解优化问题依赖大量监督数据和昂贵验证，MiniOpt提出强化学习框架，通过将优化推理分解为结构化建模和可执行求解器生成，在有限资源下实现强泛化。实验表明该方法可显著降低训练开销。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "reinforcement learning for large language model",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.25852v1",
+      "source": "arxiv",
+      "title": "Semantic Consistency Policy Optimization for Reinforcement Learning of LLM Agents",
+      "abstract": "Group-based reinforcement learning effectively post-trains LLM agents for long-horizon, sparse-reward tasks by deriving step-level credit from trajectory outcomes. However, this ties a step's credit to its rollout's final outcome: semantically near-identical intermediate steps receive opposite credit depending on whether their trajectory eventually succeeded or failed. Such semantic credit inconsistency sends conflicting gradients to similar actions and wastes the partially-correct progress inside failed rollouts. Motivated by this, we propose Semantic Consistency Policy Optimization (SCPO), a value-free reward-shaping method that mitigates this inconsistency by recovering step-level credit from successful siblings in the same rollout group. Concretely, SCPO scores each failed step against a successful sibling and adds positive step-level credit for new progress along that sibling. On ALFWorld and WebShop, SCPO matches or exceeds strong group-based baselines, reaching 93.7+/-4.1 percent success on ALFWorld and 74.8+/-2.0 percent on WebShop at 1.5B parameters, with gains concentrated on the hardest multi-step tasks.",
+      "authors": [
+        "Peng Xu",
+        "Sijia Chen",
+        "Junzhuo Li",
+        "Xuming Hu"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-06-24T14:02:13+00:00",
+      "link": "https://arxiv.org/pdf/2606.25852v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "reinforcement learning for LLM agents with credit assignment",
+      "llm_evidence_cn": "面向LLM智能体的强化学习信用分配",
+      "llm_evidence": "面向LLM智能体的强化学习信用分配",
+      "canonical_evidence": "面向LLM智能体的强化学习信用分配",
+      "llm_tldr_en": "SCPO proposes semantic consistency policy optimization to fix credit inconsistency in group-based RL for LLM agents, improving learning efficiency by recovering step-level credit from successful siblings.",
+      "llm_tldr_cn": "基于组的强化学习在LLM智能体训练中面临语义信用不一致问题：语义相似的中间步骤因轨迹最终结果不同而获得相反信用，浪费部分正确进展。本文提出SCPO，一种价值无关的奖励塑形方法，通过从同一组中成功轨迹的兄弟步骤恢复步骤级信用来缓解不一致。实验证明，该方法发送更一致的梯度，提升训练效率和最终性能。该工作为LLM智能体长期稀疏奖励任务提供了有效的信用分配机制。",
+      "llm_tldr": "基于组的强化学习在LLM智能体训练中面临语义信用不一致问题：语义相似的中间步骤因轨迹最终结果不同而获得相反信用，浪费部分正确进展。本文提出SCPO，一种价值无关的奖励塑形方法，通过从同一组中成功轨迹的兄弟步骤恢复步骤级信用来缓解不一致。实验证明，该方法发送更一致的梯度，提升训练效率和最终性能。该工作为LLM智能体长期稀疏奖励任务提供了有效的信用分配机制。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "reinforcement learning for large language model",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.26027v1",
+      "source": "arxiv",
+      "title": "Why Multi-Step Tool-Use Reinforcement Learning Collapses and How Supervisory Signals Fix It",
+      "abstract": "Tool use enables large language models (LLMs) to perform complex tasks, and recent agentic reinforcement learning (RL) methods show promise for enhancing model capabilities. However, RL alone often leads to instability or limited gains in tool-use tasks. In our experiments, some models exhibit catastrophic collapse, where performance abruptly drops and tool-invocation structures fail. The analysis reveals that these failures stem from unexpected probability spikes in specific control tokens, disrupting structured execution, yet the underlying tool-use capability remains intact, merely obscured by specific formats. To address this, we systematically investigate a diverse set of supervisory signals, including off-policy supervision, hint-based guidance, erroneous example supervision, and others, applied under both synchronous and interleaved training schemes. We find that interleaving supervised fine-tuning (SFT) with RL substantially improves stability, but exhibits degraded performance under format and content out-of-distribution (OOD) evaluation. We also analyze the impact of learning rates and generalization across settings. These results highlight the importance of understanding RL failures and demonstrate how diverse supervisory signals can guide exploratory learning, enabling robust training of LLMs for complex, multi-step tool-use tasks. Our Code is available at https://github.com/hypasd-art/Tool-RL-Box.",
+      "authors": [
+        "Yupu Hao",
+        "Zhuoran Jin",
+        "Huanxuan Liao",
+        "Kang Liu",
+        "Jun Zhao"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.LG"
+      ],
+      "published": "2026-06-24T16:55:56+00:00",
+      "link": "https://arxiv.org/pdf/2606.26027v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "investigates collapse in multi-step tool-use RL for LLMs and proposes supervisory signals",
+      "llm_evidence_cn": "研究LLM多步工具使用强化学习中的崩溃问题并提出监督信号解决方案",
+      "llm_evidence": "研究LLM多步工具使用强化学习中的崩溃问题并提出监督信号解决方案",
+      "canonical_evidence": "研究LLM多步工具使用强化学习中的崩溃问题并提出监督信号解决方案",
+      "llm_tldr_en": "Analyzes catastrophic collapse in tool-use RL for LLMs, identifying probability spikes in control tokens as cause, and shows off-policy supervision and other signals can stabilize training.",
+      "llm_tldr_cn": "本文研究LLM工具使用强化学习中出现的性能崩溃现象，发现控制令牌概率尖峰是主因，而工具使用能力并未丢失。系统探索了多种监督信号（如离策略监督）来稳定训练。实验表明，适当监督信号可恢复并提升工具使用性能，揭示了纯RL在工具聚簇中的局限性。",
+      "llm_tldr": "本文研究LLM工具使用强化学习中出现的性能崩溃现象，发现控制令牌概率尖峰是主因，而工具使用能力并未丢失。系统探索了多种监督信号（如离策略监督）来稳定训练。实验表明，适当监督信号可恢复并提升工具使用性能，揭示了纯RL在工具聚簇中的局限性。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.26080v1",
+      "source": "arxiv",
+      "title": "Neglected Free Lunch from Post-training: Progress Advantage for LLM Agents",
+      "abstract": "Process reward models enable fine-grained, step-level evaluation of LLMs, yet building them for agentic settings remains prohibitively difficult: long-horizon interactions, irreversible actions, and stochastic environment feedback make both human annotation and Monte Carlo estimation infeasible at scale. In this work, we show that reinforcement learning (RL) post-training already provides the ingredients for effective step-level scoring, eliminating the need for dedicated reward model training altogether. Concretely, we derive an implicit advantage under a general stochastic Markov decision process, which we term progress advantage -- log-probability ratio between the RL-trained policy and its reference policy exactly recovers the optimal advantage function. This formulation makes the resulting signal annotation-free, domain-agnostic, and available as a byproduct of the standard RL post-training pipeline. We validate the effectiveness of the progress advantage across three different applications: test-time scaling, uncertainty quantification, and failure attribution on five benchmarks and four model families. Across all settings, it consistently outperforms confidence-based baselines and, despite requiring no task-specific training, surpasses dedicated trained reward models. We complement these results with deeper analyses on characteristics of progress advantage, offering practical guidance for adoption in real-world agentic systems.",
+      "authors": [
+        "Changdae Oh",
+        "Wendi Li",
+        "Seongheon Park",
+        "Samuel Yeh",
+        "Tanwi Mallick",
+        "Sharon Li"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-06-24T17:54:08+00:00",
+      "link": "https://arxiv.org/pdf/2606.26080v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "derives implicit step-level advantage from RL post-training without reward model",
+      "llm_evidence_cn": "从RL后训练中推导隐式步骤级优势，无需额外奖励模型",
+      "llm_evidence": "从RL后训练中推导隐式步骤级优势，无需额外奖励模型",
+      "canonical_evidence": "从RL后训练中推导隐式步骤级优势，无需额外奖励模型",
+      "llm_tldr_en": "Progress advantage: RL post-training's log-probability ratio naturally yields step-level scoring for LLM agents, bypassing reward model training.",
+      "llm_tldr_cn": "过程奖励模型在Agent场景中构建困难，本文证明RL后训练中策略与参考策略的对数概率比可直接恢复最优优势函数，从而无需单独训练奖励模型即可实现步骤级评分。实验表明该方法在多种Agent任务上有效。",
+      "llm_tldr": "过程奖励模型在Agent场景中构建困难，本文证明RL后训练中策略与参考策略的对数概率比可直接恢复最优优势函数，从而无需单独训练奖励模型即可实现步骤级评分。实验表明该方法在多种Agent任务上有效。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "design of reward functions in RL",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2606.25442v1",
+      "source": "arxiv",
+      "title": "PolicyAlign: Direct Policy-Based Safety Alignment for Large Language Models",
+      "abstract": "Safety alignment of large language models (LLMs) typically depends on high-quality supervision data, such as safe demonstrations or preference pairs. However, in real-world deployment, emerging safety requirements are often specified as natural-language policies, while corresponding supervision data may be costly, delayed, or unavailable. This creates a mismatch between rapidly evolving safety policies and conventional data-driven alignment methods. To address this, we propose PolicyAlign, a simple yet effective framework for directly aligning LLMs with safety policies. Given a safety policy, PolicyAlign first synthesizes policy-violating instructions and then performs on-policy self-distillation to internalize policy-guided behavior. To improve training stability and data efficiency, we further introduce Policy-Sensitive Filtering, which selects instructions where the policy induces the largest behavioral shift. Experiments across multiple models show that PolicyAlign consistently improves safety while maintaining low over-refusal and preserving general capabilities. PolicyAlign also generalizes to medical, legal, and financial safety scenarios, highlighting its potential as a scalable and maintainable approach to policy-based LLM safety alignment. The code is released at https://github.com/Qwen-Applications/PolicyAlign.",
+      "authors": [
+        "Chang Wu",
+        "Junfeng Fang",
+        "Houcheng Jiang",
+        "Kai Tang",
+        "Pengyu Cheng",
+        "Xiaoxi Jiang",
+        "Guanjun Jiang",
+        "Xiang Wang"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-06-24T06:10:33+00:00",
+      "link": "https://arxiv.org/pdf/2606.25442v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "direct policy-based safety alignment for LLMs",
+      "llm_evidence_cn": "直接基于策略的LLM安全对齐",
+      "llm_evidence": "直接基于策略的LLM安全对齐",
+      "canonical_evidence": "直接基于策略的LLM安全对齐",
+      "llm_tldr_en": "PolicyAlign directly aligns LLMs with natural-language safety policies via on-policy self-distillation, avoiding reliance on human-annotated preference data, and effectively internalizes policy-guided behavior.",
+      "llm_tldr_cn": "传统LLM安全对齐依赖高质量标注数据，但新兴安全需求常以自然语言策略形式出现，数据昂贵且滞后。本文提出PolicyAlign框架，给定安全策略后，先合成违反策略的指令，再通过在线自蒸馏将策略引导的行为内化到模型中。实验表明，该方法能有效对齐未见过的安全策略，且无需人工标注。该工作弥合了快速变化的策略与数据驱动对齐方法之间的鸿沟。",
+      "llm_tldr": "传统LLM安全对齐依赖高质量标注数据，但新兴安全需求常以自然语言策略形式出现，数据昂贵且滞后。本文提出PolicyAlign框架，给定安全策略后，先合成违反策略的指令，再通过在线自蒸馏将策略引导的行为内化到模型中。实验表明，该方法能有效对齐未见过的安全策略，且无需人工标注。该工作弥合了快速变化的策略与数据驱动对齐方法之间的鸿沟。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "reinforcement learning from human feedback for llm alignment",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2606.18837v2",
+      "source": "arxiv",
+      "title": "Skill-MAS: Evolving Meta-Skill for Automatic Multi-Agent Systems",
+      "abstract": "Large Language Model (LLM)-based automatic Multi-Agent Systems (MAS) generation has become a crucial frontier for tackling complex tasks. However, existing methods face a dilemma between model capability and experience retention. Inference-time MAS leverages frozen frontier LLMs but repeats identical searches without learning from past experience. Conversely, Training-time MAS internalizes experience via gradient updates but is constrained by the low capability ceiling of smaller models, and is hard to scale to large frontier LLMs. To bridge this gap, we propose Skill-MAS, a novel third path that decouples experience retention from parametric updates by conceptualizing the high-level orchestration capability as an evolvable Meta-Skill. Skill-MAS refines this architectural knowledge through a closed optimization loop: (1) Multi-Trajectory Rollout samples a behavioral distribution for each task under the current Meta-Skill; and (2) Selective Reflection adaptively selects priority tasks and applies hierarchical contrastive analysis to distill systemic experience into generalizable, strategy-level principles. Extensive experiments across four complex benchmarks and four distinct LLMs demonstrate that Skill-MAS not only achieves remarkable performance gains but also maintains a favorable cost-performance trade-off. Further analysis reveals that the evolved Meta-Skills are highly robust and exhibit strong transferability across unseen tasks and different LLMs.",
+      "authors": [
+        "Hehai Lin",
+        "Qi Yang",
+        "Chengwei Qin"
+      ],
+      "primary_category": "cs.MA",
+      "categories": [
+        "cs.MA",
+        "cs.AI",
+        "cs.LG"
+      ],
+      "published": "2026-06-17T09:12:50+00:00",
+      "link": "https://arxiv.org/pdf/2606.18837v2",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "LLM-based multi-agent systems generation",
+      "llm_evidence_cn": "基于大语言模型的多智能体系统自动生成",
+      "llm_evidence": "基于大语言模型的多智能体系统自动生成",
+      "canonical_evidence": "基于大语言模型的多智能体系统自动生成",
+      "llm_tldr_en": "Skill-MAS proposes a meta-skill evolution framework for automatic LLM-based multi-agent systems, decoupling experience retention from parameter updates, enabling scalable and experienced multi-agent generation.",
+      "llm_tldr_cn": "现有LLM多智能体生成方法在模型能力与经验保留之间存在矛盾：推理时方法缺乏学习，训练时方法受限于小模型能力。本文提出Skill-MAS，将高层编排能力概念化为可进化的元技能，从而解耦经验保留与参数更新。实验表明，该方法能在保持前沿LLM能力的同时积累经验，提升复杂任务表现。该工作为自动多智能体系统生成提供了新范式。",
+      "llm_tldr": "现有LLM多智能体生成方法在模型能力与经验保留之间存在矛盾：推理时方法缺乏学习，训练时方法受限于小模型能力。本文提出Skill-MAS，将高层编排能力概念化为可进化的元技能，从而解耦经验保留与参数更新。实验表明，该方法能在保持前沿LLM能力的同时积累经验，提升复杂任务表现。该工作为自动多智能体系统生成提供了新范式。",
+      "llm_tags": [
+        "query:rl:composite"
+      ],
+      "matched_query_tag": "query:rl:composite",
+      "matched_query_text": "Papers central to 查找大模型检索推理智能体、大模型强化学习领域的文章, especially work that connects or combines: reinforcement learning for large language model; design of reward functions in RL; policy gradient methods for language generation; large language model agents for task automation; reinforcement learning from human feedback for llm alignment; reinforcement learning for multi turn dialogue systems; application of reinforcement learning in large language model reasoning; retrieval augmented generation for knowledge intensive tasks; policy optimization methods for multi step reasoning in llms.",
+      "matched_requirement_id": "req-composite-rl",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2606.21453v1",
+      "source": "arxiv",
+      "title": "CORTIS: Text-Only Adaptation of Spoken Language Models for Task-Oriented Voice Agents",
+      "abstract": "Task-oriented voice agents need to map spoken user requests to structured outputs such as semantic frames, executable actions, and function calls. A common approach is to cascade ASR with a text-based LLM, but transcription errors can propagate to downstream structured output generation, especially under noisy conditions. Spoken language models (SLMs) offer a direct speech-based alternative, yet adapting them to new tasks typically requires paired speech-target annotations. Motivated by this gap, we present CORTIS, a text-only adaptation framework for task-oriented voice agents. CORTIS fine-tunes SLMs using text-form task supervision, enabling speech-based structured output generation at inference time without task-specific speech-target annotations during adaptation. We evaluate CORTIS on two Qwen2.5-Omni backbones and three task-oriented speech datasets, including an in-house product dataset, and compare it with matched ASR-LLM cascades trained with the same text-form task supervision. Results show that CORTIS performs competitively with matched cascades and offers clearer advantages under acoustic degradation, particularly in preserving high-level task semantics. These findings suggest that text-only fine-tuning of SLMs can serve as a practical adaptation strategy for voice agents when paired speech-target data are costly to collect.",
+      "authors": [
+        "Youngwon Choi",
+        "Hyeonyu Kim",
+        "Taeyoun Kwon",
+        "Donghyuk Jung",
+        "Myeongkyun Cho"
+      ],
+      "primary_category": "cs.HC",
+      "categories": [
+        "cs.HC",
+        "cs.AI",
+        "cs.SD",
+        "eess.AS"
+      ],
+      "published": "2026-06-19T14:11:10+00:00",
+      "link": "https://arxiv.org/pdf/2606.21453v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Text-only adaptation of spoken language models for task-oriented voice agents",
+      "llm_evidence_cn": "面向任务导向语音智能体的文本仅适配方法",
+      "llm_evidence": "面向任务导向语音智能体的文本仅适配方法",
+      "canonical_evidence": "面向任务导向语音智能体的文本仅适配方法",
+      "llm_tldr_en": "Proposes CORTIS, a text-only adaptation framework for SLMs to produce structured outputs from speech at inference time without paired speech-target data.",
+      "llm_tldr_cn": "任务导向语音智能体需要从语音映射到结构化输出，但现有方法依赖ASR-LLM级联，传播误差。本文提出CORTIS，使用文本形式的任务监督微调SLM，推理时直接处理语音生成结构化输出，无需语音-标注配对数据。",
+      "llm_tldr": "任务导向语音智能体需要从语音映射到结构化输出，但现有方法依赖ASR-LLM级联，传播误差。本文提出CORTIS，使用文本形式的任务监督微调SLM，推理时直接处理语音生成结构化输出，无需语音-标注配对数据。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2606.24437v1",
+      "source": "arxiv",
+      "title": "ReM-MoA: Reasoning Memory Sustains Mixture-of-Agents Scaling",
+      "abstract": "Mixture-of-Agents (MoA) architectures improve inference-time scaling by organizing multiple LLM agents into layered reasoning pipelines. However, existing MoA variants fail to sustain gains as depth increases, exhibiting degradation, early plateauing, or saturation. We propose ReM-MoA, a memory-augmented MoA framework that sustains scaling through two mechanisms: (1) a Ranked Reasoning Memory that persistently stores and ranks reasoning traces from all layers using a comparative Reviewer Agent, and (2) a Curated Diversified Memory Routing scheme that exposes different agents to distinct combinations of successful and failed traces, preserving exploration diversity while propagating high-quality reasoning. We further introduce an optional multi-domain Reviewer distillation pipeline that improves ranking quality through frontier-model supervision. Across five reasoning benchmarks spanning math, formal logic, code, knowledge, and commonsense, ReM-MoA consistently outperforms prior MoA variants across both depth and width scaling, and its advantage widens with depth, establishing structured cross-layer reasoning memory as a key missing mechanism for scalable multi-agent inference.",
+      "authors": [
+        "Heng Ping",
+        "Arijit Bhattacharjee",
+        "Peiyu Zhang",
+        "Shixuan Li",
+        "Wei Yang",
+        "Ali Jannesari",
+        "Nesreen Ahmed",
+        "Paul Bogdan"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-06-23T11:14:37+00:00",
+      "link": "https://arxiv.org/pdf/2606.24437v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "LLM agents reasoning memory for scaling",
+      "llm_evidence_cn": "大语言模型智能体的推理记忆与扩展",
+      "llm_evidence": "大语言模型智能体的推理记忆与扩展",
+      "canonical_evidence": "大语言模型智能体的推理记忆与扩展",
+      "llm_tldr_en": "ReM-MoA augments Mixture-of-Agents with ranked reasoning memory and diversified routing to sustain scaling gains.",
+      "llm_tldr_cn": "针对混合智能体（MoA）架构深层扩展时性能饱和甚至退化的问题，本文提出ReM-MoA，通过排名推理记忆存储各层推理轨迹，并采用策展多样化记忆路由为不同智能体提供成功与失败组合，从而保持探索多样性与高质量推理传播。实验表明该方法在多种推理任务上持续提升性能。",
+      "llm_tldr": "针对混合智能体（MoA）架构深层扩展时性能饱和甚至退化的问题，本文提出ReM-MoA，通过排名推理记忆存储各层推理轨迹，并采用策展多样化记忆路由为不同智能体提供成功与失败组合，从而保持探索多样性与高质量推理传播。实验表明该方法在多种推理任务上持续提升性能。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2606.22807v1",
+      "source": "arxiv",
+      "title": "KaLM-Reranker-V1: Fast but Not Late Interaction for Compressed Document Reranking",
+      "abstract": "As retrieval systems scale, high-quality reranking becomes increasingly important. However, most existing rerankers, whether encoder-based or decoder-based, jointly encode the query and passage, tightly coupling their computation and limiting deployment efficiency as well as flexibility. We present KaLM-Reranker-V1, a fast but not late-interaction (FBNL) reranker that decouples query and passage computation while retaining expressive relevance modeling. Built on an encoder-decoder architecture, KaLM-Reranker-V1 uses the encoder to pre-encode passages with Matryoshka embedding pooling, while the decoder models the system instruction, user instruction, and query intent; cross-attention then captures relevance between the query context and passage representations. This design makes KaLM-Reranker-V1 efficient through decoupled passage encoding, yet not late interaction, by preserving rich relevance modeling through cross-attention. We instantiate KaLM-Reranker-V1 in three sizes, Nano, Small, and Large, with 0.27B, 1B, and 4B activated parameters, respectively. Extensive experiments on BEIR, MIRACL, and LMEB demonstrate that KaLM-Reranker-V1 achieves strong reranking performance with superior efficiency. On BEIR, KaLM-Reranker-V1 achieves state-of-the-art performance, on par with strong industrial models such as the Qwen3-Reranker series; on MIRACL, despite not being extensively trained on multilingual data, KaLM-Reranker-V1 still shows excellent reranking performance. Moreover, on LMEB, reranking models demonstrate a clear advantage, with even the 0.27B Nano model remaining competitive with 7-12B embedding models.",
+      "authors": [
+        "Xinping Zhao",
+        "Jiaxin Xu",
+        "Ziqi Dai",
+        "Xin Zhang",
+        "Shouzheng Huang",
+        "Danyu Tang",
+        "Xinshuo Hu",
+        "Meishan Zhang",
+        "Baotian Hu",
+        "Min Zhang"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-06-22T03:36:31+00:00",
+      "link": "https://arxiv.org/pdf/2606.22807v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "fast reranker for retrieval augmented generation systems",
+      "llm_evidence_cn": "用于检索增强生成系统的快速重排器",
+      "llm_evidence": "用于检索增强生成系统的快速重排器",
+      "canonical_evidence": "用于检索增强生成系统的快速重排器",
+      "llm_tldr_en": "KaLM-Reranker-V1 decouples query and passage computation in reranking using encoder-decoder with Matryoshka embedding pooling and cross-attention, enabling efficient and flexible deployment.",
+      "llm_tldr_cn": "针对现有重排器查询与文档编码耦合导致部署效率低的问题，本文提出KaLM-Reranker-V1，采用编码器-解码器架构，编码器使用俄罗斯套娃嵌入池化预编码文档，解码器建模查询意图，通过交叉注意力获取相关性。该方法解耦了查询和文档计算，在保持排序质量的同时显著提升速度。",
+      "llm_tldr": "针对现有重排器查询与文档编码耦合导致部署效率低的问题，本文提出KaLM-Reranker-V1，采用编码器-解码器架构，编码器使用俄罗斯套娃嵌入池化预编码文档，解码器建模查询意图，通过交叉注意力获取相关性。该方法解耦了查询和文档计算，在保持排序质量的同时显著提升速度。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "retrieval augmented generation for knowledge intensive tasks",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2606.25398v1",
+      "source": "arxiv",
+      "title": "MAPL: Multi-Objective Preference Learning for Robot Locomotion",
+      "abstract": "Reward design remains a major bottleneck in reinforcement learning for robot locomotion, where successful policies often depend on carefully tuned, task-specific reward functions. Preference-based reinforcement learning offers an alternative, but existing LLM-based methods typically ask for a single overall judgment between behaviors, making it difficult to capture the multiple competing objectives that underlie high-quality locomotion. We present Multi-Objective AI-Informed Preference Learning (MAPL), a framework that learns locomotion rewards from high-level natural language objectives rather than manually engineered reward equations. MAPL prompts a large language model to compare trajectories independently along semantically meaningful criteria, using generic language descriptions that are terrain-invariant and require little domain expertise. These objective-wise preferences are used to train a multi-head preference scoring model, whose outputs are aggregated to form a scalar reward for policy optimization. Across four quadruped locomotion environments, MAPL trains policies using only LLM-generated preferences and achieves performance comparable to or better than expert-designed rewards, while eliminating task-specific reward engineering.",
+      "authors": [
+        "Xiyue Chen",
+        "Muhan Lin",
+        "Shuyang Shi",
+        "Joseph Campbell"
+      ],
+      "primary_category": "cs.RO",
+      "categories": [
+        "cs.RO"
+      ],
+      "published": "2026-06-24T04:52:04+00:00",
+      "link": "https://arxiv.org/pdf/2606.25398v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Preference learning for reward design in RL using LLMs",
+      "llm_evidence_cn": "基于偏好学习利用大模型设计奖励函数",
+      "llm_evidence": "基于偏好学习利用大模型设计奖励函数",
+      "canonical_evidence": "基于偏好学习利用大模型设计奖励函数",
+      "llm_tldr_en": "MAPL uses LLMs to compare trajectories along multiple objectives, learning reward functions from natural language for robot locomotion.",
+      "llm_tldr_cn": "强化学习中的奖励设计是瓶颈，传统方法需要手工调参。MAPL利用大语言模型从高层的自然语言目标出发，沿多个语义维度独立比较轨迹，自动学习适应多目标需求的奖励函数。在机器人运动任务上，MAPL避免了繁琐的手动奖励工程，提升了策略的质量和泛化性。",
+      "llm_tldr": "强化学习中的奖励设计是瓶颈，传统方法需要手工调参。MAPL利用大语言模型从高层的自然语言目标出发，沿多个语义维度独立比较轨迹，自动学习适应多目标需求的奖励函数。在机器人运动任务上，MAPL避免了繁琐的手动奖励工程，提升了策略的质量和泛化性。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "design of reward functions in RL",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2606.24004v1",
+      "source": "arxiv",
+      "title": "Towards Spec Learning: Inference-Time Alignment from Preference Pairs",
+      "abstract": "Steering a large language model (LLM) toward a desired behavior typically relies on an iterative process of hand-crafting a prompt based on a careful inspection of the model's responses. This is an involved, brittle, and error-prone process. Preference-based fine-tuning is a more rigorous but often prohibitively expensive solution. We propose spec learning, a framework that relies on a brief user instruction and a small set of preference judgments. These are compiled into specifications in the form of natural-language prompts for an LLM. Specifications condition LLMs at inference time, and no parameter updates to the underlying models are required. We show that the responses generated based on the compiled specifications often outperform direct preference optimization (DPO) on datasets from specialized domains whose preference signal is dense. Unlike opaque weight updates, the resulting specifications are human-readable and double as interpretable and transparent written embodiments of the preference signal that produced them.",
+      "authors": [
+        "Dhriti Krishnan",
+        "Tejas Goyal",
+        "Jaromir Savelka"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.AI"
+      ],
+      "published": "2026-06-22T23:21:55+00:00",
+      "link": "https://arxiv.org/pdf/2606.24004v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "inference-time alignment from preference pairs without parameter update",
+      "llm_evidence_cn": "基于偏好对的推理时对齐，无需参数更新",
+      "llm_evidence": "基于偏好对的推理时对齐，无需参数更新",
+      "canonical_evidence": "基于偏好对的推理时对齐，无需参数更新",
+      "llm_tldr_en": "Spec Learning compiles user instructions and preference judgments into natural-language specifications for LLM inference-time alignment, outperforming direct preference learning without parameter update.",
+      "llm_tldr_cn": "传统方法通过手工提示或偏好微调对齐大语言模型，前者脆弱，后者昂贵。本文提出规范学习（Spec Learning），利用简短用户指令和小量偏好判断编译成自然语言规范，在推理时条件化LLM，无需参数更新。实验表明，生成的回复优于直接偏好微调的效果。",
+      "llm_tldr": "传统方法通过手工提示或偏好微调对齐大语言模型，前者脆弱，后者昂贵。本文提出规范学习（Spec Learning），利用简短用户指令和小量偏好判断编译成自然语言规范，在推理时条件化LLM，无需参数更新。实验表明，生成的回复优于直接偏好微调的效果。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "reinforcement learning from human feedback for llm alignment",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2606.25622v1",
+      "source": "arxiv",
+      "title": "Probabilistic Agents in Deterministic Audits: Evaluating Multi-Agent Systems for Automated Audits Based on the German IT-Grundschutz",
+      "abstract": "The NIS-2 Directive mandates robust Risk Management from thousands of small and medium enterprises. To ensure compliance, companies rely on established standards such as the German IT-Grundschutz (IT-GS) of the Federal Office for Information Security. However, IT-GS certification is resource-intensive and requires a high level of manual effort for documentation, validation, and revision, making scalable implementation difficult and expensive.   Building upon our previous conceptual framework, this paper presents the technical implementation and empirical evaluation of a Multi-Agent System (MAS) architecture combined with Hybrid Retrieval Augmented Generation (HybridRAG) for the partial automation of IT-GS certification. We introduce two novel technical contributions to the MAS architecture to enforce the compliance rigor. The Hypothesis-Verification Loop in the Structural Analysis (SA) phase that cross-references agent-inferred dependencies against the Knowledge Graph to reduce hallucinations, and a Decoupled Reasoning Pipeline that separates agent-driven semantic extraction from the deterministic protection need inheritance. We utilize the BSI's \"RecPlast GmbH\" case study as a human expert-generated reference data set for end-to-end evaluation of the architecture and to quantify Precision, Recall, and F1-scores. The performance of the system is investigated across the phases of SA, Protection Needs Assessment (PNA), Modeling, and IT-GS Check.   The empirical results reveal noticeable differences throughout the different steps of IT-GS. While the MAS demonstrates high efficacy in semantic tasks (SA and Modeling), significantly reducing manual effort through automated information extraction, quantitative results reveal limitations in logical reasoning phases (PNA and IT-GS Check) as the probabilistic nature of current LLMs struggles to meet the deterministic rigor required by IT-GS.",
+      "authors": [
+        "Lea Roxanne Muth",
+        "Marian Margraf"
+      ],
+      "primary_category": "cs.CR",
+      "categories": [
+        "cs.CR",
+        "cs.AI"
+      ],
+      "published": "2026-06-24T09:31:06+00:00",
+      "link": "https://arxiv.org/pdf/2606.25622v1",
+      "tags": [
+        "query:rl"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Multi-agent system with HybridRAG for automated audits",
+      "llm_evidence_cn": "结合混合检索增强生成的多智能体系统用于自动化审计",
+      "llm_evidence": "结合混合检索增强生成的多智能体系统用于自动化审计",
+      "canonical_evidence": "结合混合检索增强生成的多智能体系统用于自动化审计",
+      "llm_tldr_en": "Implements a Multi-Agent System with Hybrid RAG to automate IT-Grundschutz audits, reducing manual effort.",
+      "llm_tldr_cn": "中小企业IT-Grundschutz认证需大量手工工作。本文实现多智能体系统结合混合检索增强生成（HybridRAG），自动执行文档验证和合规检查。评估表明可显著减少手动工作量，同时保持审计质量。",
+      "llm_tldr": "中小企业IT-Grundschutz认证需大量手工工作。本文实现多智能体系统结合混合检索增强生成（HybridRAG），自动执行文档验证和合规检查。评估表明可显著减少手动工作量，同时保持审计质量。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2606.24965v1",
+      "source": "arxiv",
+      "title": "Project Auto-World: Towards Automated Benchmarking of Neural Relational Reasoners",
+      "abstract": "Reasoning about relational structures remains a significant challenge for neural models, particularly when they must systematically apply learned knowledge to problem instances that are harder than those seen in training. Progress is hampered by the difficulty of evaluating such generalization, since a priori, it is rarely clear what makes an instance hard. We study how this issue can be addressed by using large language models (LLMs) to automate benchmark generation, learning to produce increasingly challenging instances in an end-to-end manner. Concretely, given a world parametrized by Datalog rules, and an Edge Transformer as the reasoning evaluator, we use LLM-driven evolutionary search (based on FunSearch) and autonomous agentic search to discover sampling functions that yield hard problem instances. We also show that the Edge Transformer can be improved using this data such that it generalizes well to further data perturbations. Finally, we show that the same machinery can be applied to novel worlds proposed by LLMs, opening the door to autonomous research on neural relational reasoning.",
+      "authors": [
+        "Anirban Das",
+        "Joanne Boisson",
+        "Irtaza Khalid",
+        "Sumita Garai",
+        "Steven Schockaert"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI",
+        "cs.LG"
+      ],
+      "published": "2026-06-23T09:36:46+00:00",
+      "link": "https://arxiv.org/pdf/2606.24965v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "LLM-driven evolutionary search and autonomous agentic search for benchmark generation",
+      "llm_evidence_cn": "利用LLM驱动的进化搜索和自主智能体搜索生成基准",
+      "llm_evidence": "利用LLM驱动的进化搜索和自主智能体搜索生成基准",
+      "canonical_evidence": "利用LLM驱动的进化搜索和自主智能体搜索生成基准",
+      "llm_tldr_en": "Uses LLMs to automate benchmark generation for neural relational reasoners via evolutionary search and agentic search, producing increasingly challenging instances.",
+      "llm_tldr_cn": "评估推理泛化困难，缺乏难度可控的基准。本文利用LLM驱动进化搜索和自主智能体搜索，自动生成递增难度的关系推理实例。结合Datalog规则和Edge Transformer评估器，实现端到端基准生成。",
+      "llm_tldr": "评估推理泛化困难，缺乏难度可控的基准。本文利用LLM驱动进化搜索和自主智能体搜索，自动生成递增难度的关系推理实例。结合Datalog规则和Edge Transformer评估器，实现端到端基准生成。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}
