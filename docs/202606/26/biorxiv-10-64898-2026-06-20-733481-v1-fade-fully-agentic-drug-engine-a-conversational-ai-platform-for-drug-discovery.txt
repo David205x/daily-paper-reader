@@ -1,0 +1,1096 @@
+Title: 53055493
+
+URL Source: https://www.biorxiv.org/content/10.64898/2026.06.20.733481v1.full.pdf
+
+Number of Pages: 18
+
+Markdown Content:
+1
+
+# F.A.D.E. (Fully Agentic Drug Engine): A Conversational AI 1
+
+# Platform for Drug Discovery 2
+
+Jason Kantorow 1*, † , Natesan Mani 1*, † , Naveen Rajagopal Mohanraj 2† , and Xue Zong 3† 3
+
+> 1
+
+Department of Chemical Engineering, Northeastern University, Boston, MA 4
+
+> 2
+
+Department of Computer Engineering, Northeastern University, Boston, MA 5
+
+> 3
+
+College of Computing, Georgia Institute of Technology, Atlanta, GA 6
+
+> †
+
+These authors contributed equally to this work. 7
+
+> *
+
+Corresponding authors: Jason Kantorow (email:  kantorow.j@northeastern.edu ), Natesan Mani 8
+
+(email:  mani.na@northeastern.edu )9
+
+10 
+
+Abstract 11 
+
+Drug discovery remains one of the costliest and most time -intensive endeavors in the 12 
+
+pharmaceutical pipeline, with average development costs exceeding $2.3 billion per drug, 13 
+
+timelines spanning more than a deca de, and attrition rates above 90% in clinical trials. While 14 
+
+computational methods have expanded the searchable chemical space, current pipelines remain 15 
+
+fragmented and largely inaccessible to researchers without deep interdisciplinary expertise. Here 16 
+
+we present F.A.D.E. (Fully Agentic Drug Engine), a multi -agent, open -source platform that 17 
+
+converts natural language queries into potential drug candidates, substantially lowering the 18 
+
+expertise barrier to advanced computational drug discovery. F.A.D.E. employs a three -branch 19 
+
+hierarchical architecture that adapts to the level of available structural data for any protein target, 20 
+
+integrating structure prediction, binding pocket detection, equivariant diffusion -based de novo 21 
+
+ligand generation, and binding affinity estimation into a single automated pipeline. We validate 22 
+
+F.A.D.E. on two structurally distinct targets: the epidermal growth factor receptor kinase domain 23 
+
+(EGFR), a well -established oncology target, and cellular retinol -binding protein 1 (CRBP1), a 24 
+
+lipid -bind ing protein involved in retinoid metabolism. For EGFR, our generated candidates 25 
+
+achieved QED scores of 0.85 compared to 0.46 for the co -crystallised reference ligand, 26 
+
+demonstrating marked improvement in predicted drug -likeness. Results across both targets 27 
+
+confirm that F.A.D.E. can reliably generate chemically tractable, drug -like hit compounds across 28 
+
+diverse protein classes from simple natural language input. 29 
+
+30 
+
+> .CC-BY-NC 4.0 International license available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is made The copyright holder for this preprint this version posted June 25, 2026. ;https://doi.org/10.64898/2026.06.20.733481 doi: bioRxiv preprint
+
+2
+
+31 
+
+32 
+
+Keywords: drug discovery; multi -agent AI; large language models; structure -based drug design; 33 
+
+de novo ligand generation; binding affinity prediction; diffusion models; agentic workflow 34 
+
+35 
+
+1. Introduction 36 
+
+Drug discovery remains prohibitively expensive and time -consuming, often taking over a decade 37 
+
+and billions of dollars to bring a single drug to market (DiMasi et al. 2016; Mullard 2014; Wouters 38 
+
+et al. 2020). While computational approaches have emerged to accelerate this process, they face 39 
+
+critical limitations such as proprietary constraints that lock out broader research communities, 40 
+
+fragmented pipeline s that require specialised expertise across multiple domains, and AI -driven 41 
+
+solutions that often lack the rigorous physics -based validation necessary for reliable predictions. 42 
+
+These challenges create significant barriers to entry and slow innovation in developing life -saving 43 
+
+therapeutics. 44 
+
+There have been notable recent advances in structure -based drug design, including diffusion -based 45 
+
+generative models (Schneuing et al. 2024; Yim et al. 2023 ; Wu et al. 2024), binding affinity 46 
+
+predictors (Passaro et al. 202 5), and protein structure prediction (Jumper et al. 2021; Passaro et al. 47 
+
+2025 ). However, these tools have remained largely fragmented and require considerable technical 48 
+
+expertise, severely limiting the ability of early -stage computational researchers or experimentalists 49 
+
+to move seamlessly from a drug discovery -based query to a viable output. Several recent efforts 50 
+
+have sought to address this fragmentation by building LLM -powered agentic frameworks for 51 
+
+chemical and biological research. ChemCrow (M. Bran et al. 2024) was among the first to 52 
+
+demonstrate that augmenting an LLM with a suite of chemistry -specific tools could enable 53 
+
+autonomous execution of drug discovery tasks. Coscientist (Boiko et al. 2023) proved that LLM 54 
+
+agents can plan and execute chemical experiments with minimal human intervention by 55 
+
+coordinating robotic laboratory platforms. DrugAgent (Liu et al. 2024) introduced a multi -agent 56 
+
+framework specifically targeting the automation of machine learning programming tasks within 57 
+
+drug discovery, achievi ng strong performance in ADMET prediction workflows. AgentD (Ock et 58 
+
+al. 2026) further extended this paradigm to an end -to -end LLM -powered agent capable of data 59 
+
+retrieval, molecular generation, multi -property prediction, and 3D protein –ligand structure 60 
+
+generation from a single interface. Similarly, the Prompt -to -Pill (Vichentijevikj et al. 2025) 61 
+
+> .CC-BY-NC 4.0 International license available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is made The copyright holder for this preprint this version posted June 25, 2026. ;https://doi.org/10.64898/2026.06.20.733481 doi: bioRxiv preprint
+
+3
+
+framework proposes a comprehensive multi -agent architecture spanning the full preclinical 62 
+
+pipeline, from target identification through lead optimization, synthesizin g insights from over 50 63 
+
+LLM -based drug discovery systems. Collectively, these works establish the viability of agentic 64 
+
+and conversational interfaces for computational drug discovery. 65 
+
+Despite these advances, existing agentic frameworks have largely focused on property prediction 66 
+
+with very little to no incorporation of data obtained from robust physics -based methods. 67 
+
+Furthermore, very few employ a data retrieval strategy that is capable of handling targets across 68 
+
+the full spectrum of structural characterizati ons, from well -resolved crystal structures to sequences 69 
+
+with no experimental structures. F.A.D.E addresses these challenges through a fully automated, 70 
+
+open -source multi -agent workflow that aims to democratize the drug discovery process. F.A.D.E 71 
+
+was a submission to the 2025 LLM Hackathon for Applications in Materials Science and 72 
+
+Chemistry (Roy et al. 2026). The system accepts natural language queries, such as "Identify drug 73 
+
+candidates targeting the EGFR receptor," and uses these alone to orchestrate the enti re pipeline 74 
+
+from target identification and structure retrieval to de novo ligand generation, property screening, 75 
+
+and binding affinity prediction. F.A. D.E’s novelty stems from its seamless integration of otherwise 76 
+
+distinct tools into a cohesive, automated pipeline that handles diverse scenarios, including de novo 77 
+
+structure prediction, equivariant diffusion -based ligand generation, binding pocket identification, 78 
+
+and binding energy prediction. The natural language interface eliminates the need for specialised 79 
+
+computational chemistry expertise, opening drug discovery to a wider research community. 80 
+
+Additionally, the usage of open -source tools such as Boltz -2 (Passaro et al. 2025) and fpocket (Le 81 
+
+Guilloux et al. 2009) expands the configurability of F.A.D.E. and provides easy access to user 82 
+
+modification for specific needs. 83 
+
+Central to F.A.D.E. is a three -branch hierarchical architecture that adapts to the available structural 84 
+
+data for any target of interest. When experimentally determined ligand -bound structures and 85 
+
+binding site information are available in the RCSB Protein Data Bank, the system proceeds directly 86 
+
+to de novo molecule generation (Branch 1). When a structure exists but binding site information 87 
+
+is absent or of insufficient resolution, binding pockets are identified computationally using fpocket 88 
+
+(Branch 2). In cases where no experimental structure exists, the target sequence is retrieved from 89 
+
+UniProt, and the three -dimensional structure is predicted using Boltz -2, after which binding pocket 90 
+
+identification and candidate generation proceed as in Branch 2 (Branch 3). All three branches 91 
+
+converge on a shared candidate generation and ranking module: drug -like molecules are generated 92 
+
+> .CC-BY-NC 4.0 International license available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is made The copyright holder for this preprint this version posted June 25, 2026. ;https://doi.org/10.64898/2026.06.20.733481 doi: bioRxiv preprint
+
+4
+
+using DiffSBDD (Schneuing et al. 2024), an equivariant diffusion model conditioned on the three -93 
+
+dimensional binding pocket geometry, and candidates are scored and ranked by the Quantitative 94 
+
+Estimate of Drug -likeness (QED), synthetic accessibility (SA) score, and predicted binding affinity 95 
+
+estimated by Boltz -2. 96 
+
+97 
+
+We demonstrate the utili ty of F.A.D.E. on two clinically relevant protein targets: the epidermal 98 
+
+growth factor receptor (EGFR) (PDB ID: 4G5J) (Kung 2021), a well -validated oncology target, 99 
+
+and cellular retinol -binding protein 1 (CRBP1) (PDB ID: 5H9A) (Silvaroli et al. 2016), a less 100 
+
+characterised target involved in retinoid metabolism. These case studies validate F.A.D.E.'s 101 
+
+multiple -pathway architecture and illustrate its capacity to generate viable, drug -like hit 102 
+
+compounds across diverse protein classes. 103 
+
+104 
+
+2. Methods 105 
+
+2.1 System Arc hitecture and Agentic Workflow 106 
+
+F.A.D.E. is implemented as a multi -agentic, multi -layered workflow in which dedicated agents 107 
+
+handle discrete stages of the drug discovery pipeline (see Figure 1 ). Users interact with the system 108 
+
+via a natural language interface, with a dedicated agent parsing and processing the input query. 109 
+
+Upon identifying the target of interest, this agent then directs downstream agents responsible for 110 
+
+database retrieval, pocket identification, molecule generation, and property scoring. The m odular 111 
+
+architecture enables individual components to be updated or replaced independently as more 112 
+
+accurate computational tools become available. 113 
+
+114 
+
+2.2 Hierarchical Database Search and Structure Retrieval 115 
+
+Upon receiving a target query, F.A.D.E. conducts a hierarchical database search to identify the 116 
+
+best structural and functional information available (see Figure 1 ). The path taken by the workflow 117 
+
+through one of three branches depends on what data can be retrieved. Table 1 summarizes the 118 
+
+workflow branches and their associated data requirements. 119 
+
+120 
+
+121 
+
+122 
+
+123 
+
+> .CC-BY-NC 4.0 International license available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is made The copyright holder for this preprint this version posted June 25, 2026. ;https://doi.org/10.64898/2026.06.20.733481 doi: bioRxiv preprint
+
+5
+
+124 
+
+Branch  Input Data  Key Tools  Pocket Source  Confidence 
+
+1 Ligand -bound co -crystal 
+
+structure 
+
+RCSB PDB  Experimental 
+
+coordinates 
+
+Highest 
+
+2 Apo or unliganded 
+
+structure 
+
+fpocket  Computed (fpocket)  Moderate 
+
+3 Amino acid sequence 
+
+only 
+
+Boltz -2, fpocket  Computed (Boltz -2
+
++ fpocket) 
+
+Lower 
+
+Table 1: Summary of F.A.D.E. workflow branches and the structural data requirements, 125 
+
+computational tools, and confidence levels associated with each 126 
+
+127 
+
+Branch 1: Known binders with structural data. The agent searches the RCSB database (Burley 128 
+
+et al. 2024) to identify an experimentally solved co -crystallised structure of the target protein in 129 
+
+complex with known binders, including information about the specific residues or binding site 130 
+
+coordinates with which those ligands are known to interact (see Panel (i) of Figure 1 ). If a relevant 131 
+
+crystal complex between receptor and ligand(s) of sufficient resolution quality (< 3.0 Å) is found, 132 
+
+the pipeline proceeds directly to candidate generation. The binding site is extracted by identifying 133 
+
+receptor residues within 5Å of the p resent ligand, bypassing the need for computational pocket 134 
+
+prediction. This branch represents the highest -confidence pathway, as it leverages experimentally 135 
+
+derived structural binding data to predict novel drug discovery candidates. 136 
+
+Branch 2: Structure available but binders unknown or low -resolution. If a relevant structure 137 
+
+is present in the PDB but known binders are unavailable, or the available co -crystallised structure 138 
+
+is of insufficient resolution (> 3.0Å) to reliably define the binding site, F.A.D.E. then prompts an 139 
+
+agent to perform computational binding pocket prediction using fpocket (Le Guilloux et al. 2009) 140 
+
+(see Panel (ii) of Figure 1 ). fpocket is an algorithm that identifies druggable cavities on the surface 141 
+
+of a protein and ranks them based on a druggability score. The residues of identified pockets 142 
+
+corresponding to higher druggability scores are then used as binding site inputs for downstream 143 
+
+de novo candidate generation. 144 
+
+Branch 3: No structural data available. If F.A.D.E i s unable to find any relevant crystal structure 145 
+
+from the RCSB database for the target of interest, the agent retrieves the protein sequence from 146 
+
+the UniProt database (Ahmad et al. 2025) and uses Boltz -2 (Passaro et al. 2025) to predict the 147 
+
+structure solely from its sequence (see Panel (iii) of Figure 1 ). Boltz -2 is a state -of -the -art, open -148 
+
+source, transformer -based model capable of accurate protein structure and receptor -ligand binding 149 
+
+> .CC-BY-NC 4.0 International license available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is made The copyright holder for this preprint this version posted June 25, 2026. ;https://doi.org/10.64898/2026.06.20.733481 doi: bioRxiv preprint
+
+6
+
+affinity prediction. The predicted structure is then passed to fpocket f or binding pocket 150 
+
+identification, after which the pipeline converges with Branch 2 for candidate generation and 151 
+
+ranking. 152 
+
+This hierarchical architecture ensures that F.A.D.E. can operate across the full spectrum of target 153 
+
+characterisation, ranging from well -studied protein -ligand complexes with rich structural data to 154 
+
+entirely uncharacterized targets for which only sequence information is available. 155 
+
+156 
+
+2.3 Binding Pocket Generation using fpocket 157 
+
+Following the hierarchical database search and structure retrieval (Section 2.2), the next critical 158 
+
+step in the F.A.D.E. workflow is the accurate identification of the binding pockets in the protein 159 
+
+structure. When the workflow follows Branch 1 , the binding site is extracted directly from the 160 
+
+experimentally determined co -crystallised ligand position, bypassing the need for computational 161 
+
+prediction. For cases following Branch 2 or Branch 3 , wherein the holo structure is absent or is 162 
+
+of low resolution, the open -source tool fpocket is used for binding pock et detection. fpocket is a 163 
+
+robust protein cavity detection tool that identifies druggable binding sites on the protein surface 164 
+
+by analysing the geometry of the protein and its physicochemical properties. 165 
+
+166 
+
+The algorithm identifies binding sites by calculating a druggability score for each detected pocket. 167 
+
+This score, ranging from 0 to 1, is estimated based on several key features, including the number 168 
+
+of alpha spheres, density, polarity, mean local hydrophobic density, and the proportion of apolar 169 
+
+alpha sph eres. The pockets that are assigned a high druggability score (typically greater than 0.5) 170 
+
+are considered viable binding domains. These identified coordinates are then passed to the de novo 171 
+
+ligand generation module (Section 2.4) to accurately determine drug -like candidates for the 172 
+
+calculated binding pockets. This ensures that F.A.D.E. can reliably identify potential ligand -173 
+
+binding sites even in the absence of explicit, high -resolution experimental binding information. 174 
+
+175 
+
+2.4 De Novo Ligand Generation 176 
+
+Followin g binding site identification, F.A.D.E. generates drug -like small -molecule candidates 177 
+
+using DiffSBDD (Schneuing et al. 2024). DiffSBDD is a structure -based drug design equivariant 178 
+
+diffusion model that generates novel ligands for a particular protein pocket by incorporating 179 
+
+translation, rotation and permutation symmetries designed around the physiochemical and 180 
+
+> .CC-BY-NC 4.0 International license available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is made The copyright holder for this preprint this version posted June 25, 2026. ;https://doi.org/10.64898/2026.06.20.733481 doi: bioRxiv preprint
+
+7
+
+topological properties of an input binding site. For each target, the top 10 generated molecules are 181 
+
+ranked based on the Quantitative Estimate of Drug -likeness (QED) values (Bickerton et al. 2012). 182 
+
+QED scores range from 0 to 1, with higher values indicating greater overall drug -likeness based 183 
+
+on physicochemical properties including molecular weight, lipophilicity, hydrogen bond donors 184 
+
+and acceptors, polar surface area, and the presence of structural alerts. 185 
+
+Generated molecules are filtered through a multi -metric evaluation framework prior to ranking. 186 
+
+Only molecules meeting all acceptance thresholds simultaneously are retained for downstream 187 
+
+binding affin ity prediction. Table 2 summarizes the evaluation criteria and thresholds applied 188 
+
+during candidate filtering. 189 
+
+190 
+
+Metric  Threshold  Description 
+
+QED Score  ≥ 0.5  Quantitative Estimate of Drug -likeness: composite score (0 –1) 
+
+integrating molecular weight, LogP, hydrogen bond 
+
+donors/acceptors, polar surface area, and structural alerts. 
+
+SA Score  ≤ 6  Synthetic Accessibility score (1 –10); lower values indicate 
+
+greater ease of chemical synthesis. 
+
+Novelty  Tanimoto < 0.85  Tanimoto similarity to the reference ligand must be below the 
+
+threshold to ensure structural novelty of generated candidates. 
+
+Chemical Validity  Pass  Generated molecules must be chemically valid with correct 
+
+valences and a connected molecular graph. 
+
+Uniqueness  Pass  Duplicate structures within the generated set are removed prior 
+
+to ranking. 
+
+Table 2: Evaluation criteria and acceptance thresholds for DiffSBDD -generated candidate 191 
+
+molecules. 192 
+
+2.5 Binding Affinity Prediction and Candidate Ranking 193 
+
+Generated candidates are ranked by a combination of QED scores, synthetic accessibility (SA) 194 
+
+score (Ertl and Schuffenhauer 2009 ) and predicted binding affinity values. SA scores reflect the 195 
+
+estimated ease of chemical synthesis, with lower values indicating compounds that are more 196 
+
+readily synthesisable. Binding affinities are estimated using Boltz -2, which provides rapid binding 197 
+
+affinity predictions from protein -ligand complexes without relying on molecular dynamics 198 
+
+simulations or rigorous free energy calculations. This integration of these metrics allows F.A.D.E. 199 
+
+to prioritize candidates that are not only geometrically complementary to the target pocket but also 200 
+
+drug -like, synthesizable, and predicted to be high -affinity binders. 201 
+
+202 
+
+> .CC-BY-NC 4.0 International license available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is made The copyright holder for this preprint this version posted June 25, 2026. ;https://doi.org/10.64898/2026.06.20.733481 doi: bioRxiv preprint
+
+8
+
+2.6 Case Study Targets 203 
+
+F.A.D.E. was validated on two targets. The first, EGFR, is a receptor tyrosine kinase that is well -204 
+
+established in l ung cancer -targeting therapies. Both apo and holo structures were readily extracted 205 
+
+from the RCSB database, making this target well -suited to demonstrate Branch 1 of the workflow 206 
+
+(see section 2.2 in Methods) . The second, CRBP1, is a lipid -binding protein involved in vitamin 207 
+
+A (retinol) transport and metabolism. While both apo and holo conformations were found in the 208 
+
+RCSB database, the holo structures are generally of lower resolution. This target was therefore 209 
+
+selected to demonstrate Branch 2 of the workflo w. 210 
+
+Branch 3 of the F.A.D.E. workflow is designed to perform de novo structure prediction from 211 
+
+sequence via Boltz -2, followed by fpocket -based pocket identification and DiffSBDD -based 212 
+
+ligand generation. In practice, the majority of commonly studied drug targets have at least an apo 213 
+
+structure deposited in the PDB, so Branches 1 and 2 cover most routine use cases. Branch 3 is 214 
+
+intended primarily for novel or poorly characterized targets for which no experimental structure 215 
+
+exists. While the platform's architecture supports this pathway, its full implementation has not yet 216 
+
+been completed, and the two case studies presented here exercise Branches 1 and 2 only. 217 
+
+Completing and validating Branch 3 , including benchmarking the predicted structures against 218 
+
+experimentally determined ground -truth structures, remains a priority for extending F.A.D.E.'s 219 
+
+coverage to this harder regime and is an immediate next step for this work. 220 
+
+221 
+
+3. Results 222 
+
+3.1 Validation of Binding Pocket Identification 223 
+
+A critical design decision in the F.A.D.E. pipeline was the selection of fpocket as the binding 224 
+
+pocket detection algorithm for Branches 2 and 3 of the workflows . To validate this choice, we 225 
+
+assessed fpocket’s ability to recover experimentally known binding sites from an apo structure by 226 
+
+comparing its predictions against a co -crystallised holo structure of the same target. 227 
+
+We obtained the apo structure of EGFR (PDB: 7SI1) and evaluated fpocket’s predictions by 228 
+
+comparison to the experimentally determined holo structure (PDB: 4G5J), which contains two co -229 
+
+crystallised ligands: 0WN, bound in the ATP -binding cleft, and 0WM. fpocket’s highest -scoring 230 
+
+pocket on the apo structure, Pocket 15 (druggability score = 0.713), overlaps precisely with the 231 
+
+experimentally characterised 0WN binding site (see SI Figure 1). The secondary pockets, Pocket 232 
+
+9 (d ruggability = 0.154) and Pocket 4 (druggability = 0.139), overlap with the 0WM ligand 233 
+
+> .CC-BY-NC 4.0 International license available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is made The copyright holder for this preprint this version posted June 25, 2026. ;https://doi.org/10.64898/2026.06.20.733481 doi: bioRxiv preprint
+
+9
+
+positions. These results confirm that fpocket can reliably recover known binding sites from apo 234 
+
+structures, validating its incorporation as the pocket detection tool in the F.A.D.E. workflow. 235 
+
+236 
+
+3.2 Pipeline Performance on EGFR 237 
+
+For the EGFR target, F.A.D.E. successfully retrieved the holo crystal structure from the RCSB 238 
+
+database, with two co -crystallised ligands 0WN and 0WM. F.A.D.E identified the binding sites 239 
+
+using these l igands as a reference following the Branch 1 pathway. A diverse set of small -240 
+
+molecule drug candidates was then generated for each of these binding sites using DiffSBDD. The 241 
+
+top 10 candidates for each binding site were then ranked by QED and SA scores and considered 242 
+
+for binding affinity evaluation using Boltz -2. The results were then compared against reference 243 
+
+ligand poses. 244 
+
+245 
+
+Compound  QED  SA Score  Predicted 
+
+Binding Affinity 
+
+Source 
+
+0WN (reference)  0.46  3.08  -1.31  Co -crystallised 
+
+0WM (reference)  0.46  3.08  -1.31  Co -crystallised 
+
+Ligand 1 (0WN site)  0.85  4.51  -0.32  F.A.D.E. -generated 
+
+Ligand 2 (0WN site)  0.85  3.99  -0.23  F.A.D.E. -generated 
+
+Table 3: Comparison of QED, SA, and predicted binding affinity scores for EGFR reference 246 246 
+
+ligands and top F.A.D.E. generated candidates. 247 
+
+248 
+
+Both the reference docked ligands 0WN and 0WM exhibited a QED score of 0.46 and an SA score 249 
+
+of 3.08, with a Boltz -2 predicted binding affinity of -1.31 ( Table 3 ). Based on the binding site 250 
+
+obtained from 0WN, the top two candidates generated by F.A.D.E (Ligand 1 and Ligand 2) 251 
+
+exhibited substantially improved QED scores of 0.85, indicating better predicted drug -likeness 252 
+
+compared to the reference bound ligand. The SA scores of these two candidates were 4.51 and 253 
+
+3.99, respectively, suggesting moderate ability to synthesize. The predicted binding affinities ( -254 
+
+0.32 and -0.23 respectively) were higher (weaker) than the reference ligand 0 WN, a finding that is 255 
+
+discussed further in Section 4. In the case of the binding site obtained from 0WM, the predicted 256 
+
+affinity values indicate weak binders or almost non -binders. It is important to note that the 257 
+
+generated ligands are novel drug candidates selected to balance multiple desired properties and are 258 
+
+> .CC-BY-NC 4.0 International license available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is made The copyright holder for this preprint this version posted June 25, 2026. ;https://doi.org/10.64898/2026.06.20.733481 doi: bioRxiv preprint
+
+10 
+
+not optimized for binding affinity alone. The primary objective of this initial pipeline is the 259 
+
+identification of drug -like scaffolds for further optimization and hence downstream methods are 260 
+
+planned to increase the binding affinity of chosen candidates. 261 
+
+The chemical space coverage of generated EGFR candidates was visualised (see Panel C of 262 
+
+Figure 2 ) using t -SNE dimensionality reduction (van der Maaten 2008), confirming that F.A.D.E. 263 
+
+generates structurally diverse molecules spanning distinct regions of chemical space relative to the 264 
+
+reference ligand. Candidates were generated from three independent binding pockets identified by 265 
+
+the pipeline, further expanding structural diversity. 266 
+
+267 
+
+3.3 Pipeline Perform ance on CRBP1 268 
+
+In the case of the CRBP1 target, F.A.D.E correctly selected Branch 2 of the workflow for pocket 269 
+
+detection, as a high -resolution holo structure was not available. fpocket was used to determine 270 
+
+binding pockets based on the apo structure from RCSB and identified nine potential binding 271 
+
+pockets on the protein surface. Table 4 summarises the key physicochemical and geometric 272 
+
+properties of all detected pockets. Only four pockets exhibited non -zero druggability scores 273 
+
+(Pockets 1, 5, 6, and 8), with P ocket 1 showing a substantially higher druggability score (0.888) 274 
+
+than all others. 275 
+
+276 
+
+Pocket  Score  Druggabili ty Volume 
+
+(Å³) 
+
+SASA  Apolar 
+
+Ratio 
+
+Hydrophobicity  Alpha 
+
+Spheres 
+
+1 0.350  0.888  668.4  175.0  0.585  40.3  106 
+
+2 0.060  0.000  382.8  85.6  0.188  11.6  16 
+
+3 0.051  0.000  500.3  156.2  0.206  9.8  34 
+
+4 0.043  0.000  170.4  23.1  0.474  14.4  19 
+
+5 0.027  0.001  395.4  105.7  0.296  28.6  27 
+
+6 −0.004  0.004  288.8  105.5  0.560  23.1  25 
+
+7 −0.026  0.000  223.3  74.8  0.267  12.8  15 
+
+8 −0.063  0.002  289.8  118.4  0.600  37.7  15 
+
+9 −0.064  0.000  228.7  82.8  0.150  24.8  20 
+
+Table 4: Physicochemical properties of all binding pockets identified by fpocket analysis of 277 
+
+CRBP1 (PDB: 5H9A). Pockets are listed in order of pocket number as assigned by fpocket. 278 
+
+> .CC-BY-NC 4.0 International license available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is made The copyright holder for this preprint this version posted June 25, 2026. ;https://doi.org/10.64898/2026.06.20.733481 doi: bioRxiv preprint
+
+11 
+
+Pocket 1 is characterised by a large volume (668.4 Å³), a high apolar alpha -sphere proportion 279 
+
+(0.585), and a hydrophobicity score of 40.3, consistent with the deeply buried hydrophobic channel 280 
+
+that naturally accommodates retinol in this protein family. The remaining druggable pockets (5, 6, 281 
+
+and 8) exhibited markedly lower druggability scores (≤ 0.004), representing potential secondary 282 
+
+or allosteric binding sites. DiffSBDD was run independently for each druggable pocket, and the 283 
+
+top 10 candidates by QED across all pockets originated from Pockets 1, 5, and 6. 284 
+
+The most promising candidates, based on a combination of QED score and predicted binding 285 
+
+characteristi cs from Boltz -2, were identified and named as Molecule_03_Pocket_1, 286 
+
+Molecule_06_Pocket_6, and Molecule_08_Pocket_5. This finding indicates that viable candidates 287 
+
+can be generated across multiple identified binding sites even when high -resolution holo -structure 288 
+
+data is unavailable, confirming the utility of Branch 2. Visual inspection of the generated 289 
+
+candidates in the binding pocket confirms geometrically possible binding poses for multiple top -290 
+
+ranked compounds (see Panels B and C of Figure 3). 291 
+
+292 
+
+4. Discuss ion 293 
+
+Our findings demonstrate that F.A.D.E. represents a meaningful step toward the democratization 294 
+
+and large -scale integration of computational drug discovery tools. By combining natural language 295 
+
+interaction with agentic AI, cutting -edge physics -based tools, and binding affinity predictions 296 
+
+within a single automated workflow, the platform removes key barriers that have confined 297 
+
+advanced computational methods to specialised research groups. The results on EGFR and CRBP1 298 
+
+demonstrate that F.A.D.E. can reliably generate drug -like candidates across chemically diverse 299 
+
+targets, providing a foundation for broader therapeutic exploration. 300 
+
+Compared to existing agentic frameworks, F.A.D.E. offers several distinguishing features. Unlike 301 
+
+ChemCrow (M. Bran et al. 2024) and DrugAgent (Liu et al. 2024), which primarily focus on tool 302 
+
+augmentation for property prediction and ADMET workflows, F.A.D.E. integrates structure -based 303 
+
+de novo ligand generation through DiffSBDD, producing entirely novel molecular scaffolds rather 304 
+
+than screening existing compound libraries. AgentD (Ock et al. 2026) shares F.A.D.E.’s end -to -305 
+
+end ambition but relies on a single linear pipeline, whereas F.A.D.E.’s three -branch hierarchical 306 
+
+architecture allows the system to adapt its strategy to the level of available structural data. The 307 
+
+Prompt -to -Pill framework (Vichentijevikj et al. 2025) proposes the broadest scope, spanning the 308 
+
+full preclinical pipeline, but remains largely conceptual; by contrast, F.A.D.E. presents validated 309 
+
+> .CC-BY-NC 4.0 International license available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is made The copyright holder for this preprint this version posted June 25, 2026. ;https://doi.org/10.64898/2026.06.20.733481 doi: bioRxiv preprint
+
+12 
+
+results on multiple protein t argets. Additionally, F.A.D.E.’s reliance on open -source, physics -310 
+
+based tools such as Boltz -2 and fpocket distinguishes it from frameworks that depend on 311 
+
+proprietary models or purely data -driven property predictors without structural grounding. 312 
+
+313 
+
+From the EGFR case study, the substantial improvement in QED scores observed for FADE -314 
+
+generated candidates (0.85 versus 0.46 for the reference co -crystallised ligand) suggests that the 315 
+
+generative pipeline inherently favours drug -like chemical compounds. This is cons istent with the 316 
+
+design of DiffSBDD, which samples from a learned distribution over drug -like chemical space 317 
+
+conditioned on pocket geometry, rather than optimising against a single binding affinity objective. 318 
+
+While the predicted binding affinities of generated compounds did not surpass the reference ligand, 319 
+
+this outcome reflects the intended design of the current pipeline, which prioritises diverse, drug -320 
+
+like scaffold generation over single -property optimization. 321 
+
+322 
+
+The binding affinity results warrant careful interpretation. The weaker predicted affinities of 323 
+
+F.A.D.E. -generated candidates relative to the co -crystallised reference ligands do not necessarily 324 
+
+indicate poor therapeutic potential, since the reference ligands have undergone extensive medicinal 325 
+
+chemistry optimisation, whereas the generated candidates represent initial hit compounds. It is also 326 
+
+important to note that Boltz -2’s affinity estimation is not a simple scoring function applied to a 327 
+
+rigid receptor: the model jointly predicts the three -dimensional arrangement of both the protein 328 
+
+and ligand in the bound state, meaning the receptor conformation in the output may differ from 329 
+
+the input crystal structure as the model predicts conformational adjustments upon ligand binding. 330 
+
+The affinity values are therefore derived from these predicted complexes rather than from rigid 331 
+
+docking. Nonetheless, these predictions have not been systematically benchmarked against 332 
+
+experimental binding data for de novo generated compounds, and the absolute values should be 333 
+
+interpreted with caution. The primary value of these predictions within the current pipeline lies in 334 
+
+their use as a relative ranking metric among generated candidates rather than as absolute measures 335 
+
+of binding strength. Future iterations of F.A.D.E. will incorporate more rigorous affinity estimation 336 
+
+methods, such as molecular dynamics -based free energy perturbation or MM -GBSA rescoring, to 337 
+
+provide higher -confidence affinity predictions and enable direct comparison with experimental 338 
+
+IC50 or Kd val ues. 339 
+
+340 
+
+> .CC-BY-NC 4.0 International license available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is made The copyright holder for this preprint this version posted June 25, 2026. ;https://doi.org/10.64898/2026.06.20.733481 doi: bioRxiv preprint
+
+13 
+
+The modular architecture of F.A.D.E. is a significant design strength. The individual modules —341 
+
+structure retrieval, pocket detection, molecule generation, and affinity prediction —function 342 
+
+independently, enabling users to substitute bespoke or cutting -edge tools as they become available. 343 
+
+This flexibility positions F.A.D.E. as a living platform capable of incorporating methodological 344 
+
+advances in real time. 345 
+
+346 
+
+Several limitations of the current implementation should be acknowledged. The SA scores indicate 347 
+
+that some generated candidates may present synthetic challenges, with scores above 4.0 suggesting 348 
+
+moderately complex synthesis routes. Addressing these limitations through integration of 349 
+
+retrosynthetic planning tools and expanded experimental validation is a priority for future 350 
+
+development. 351 
+
+352 
+
+5. Conclusion 353 
+
+We have introduced F.A.D.E., a fully agentic, open -source drug discovery platform that enables 354 
+
+researchers to generate and evaluate small -molecule drug candidates through natural language 355 
+
+queries. By orche strating a hierarchical workflow that adapts to the level of available structural 356 
+
+data, F.A.D.E. demonstrates robust performance across distinct protein targets. 357 
+
+The platform's key achievements include widening the accessibility of computational drug 358 
+
+discovery tools through a conversational interface, a multiple -pathway architecture that maintains 359 
+
+performance regardless of whether experimental structural data is available, and the generation of 360 
+
+drug -like candidates with QED scores substantially exceeding t hose of reference ligands. Future 361 
+
+development will focus on systematic benchmarking against experimental binding data, 362 
+
+incorporation of more rigorous binding affinity estimation methods, expansion to additional 363 
+
+therapeutic modalities, automated candidate docking for additional binder screening, and broader 364 
+
+validation across diverse target classes. 365 
+
+F.A.D.E. is openly available on GitHub (https://github.com/Naveen -R-M/F.A.D.E), and we invite 366 
+
+the community to contribute to its continued development. 367 
+
+368 
+
+Author Contributions : N.M.: Conceptualisation, Data Curation, Writing, Analysis, 369 
+
+Visualisation; J.K.: Software, Data Curation, Analysis, Visualisation; N.R.M.: Software, Data 370 
+
+Curation, Analysis; X.Z.: Conceptualisation, Software, Data Curation and Analysis, Writing. 371 
+
+> .CC-BY-NC 4.0 International license available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is made The copyright holder for this preprint this version posted June 25, 2026. ;https://doi.org/10.64898/2026.06.20.733481 doi: bioRxiv preprint
+
+14 
+
+372 
+
+References 373 
+
+Ahmad S, da Costa Gonzales LJ, Bowler -Barnett EH, Rice DL, Kim M, Wijerathne S, Luciani A, 374 
+
+Kandasaamy S, Luo J, Watkins X, Turner E, Martin MJ, the UniProt Consortium. 2025. The 375 
+
+UniProt website API: facilitating programmati c access to protein knowledge. Nucleic Acids 376 
+
+Research. 53(W1):W547 -W553. doi:10.1093/nar/gkaf394. 377 
+
+Bickerton GR, Paolini GV, Besnard J, Muresan S, Hopkins AL. 2012. Quantifying the chemical 378 
+
+beauty of drugs. Nature Chemistry. 4(2):90 -98. doi:10.1038/nchem.1243. 379 
+
+Boiko DA, MacKnight R, Kline B, Gomes G. 2023. Autonomous chemical research with large 380 
+
+language models. Nature. 624(7992):570 -578. doi:10.1038/s41586 -023 -06792 -0. 381 
+
+Burley SK et al. 2024. Updated resources for exploring experimentally -determined PDB stru ctures 382 
+
+and computed structure models at the RCSB Protein Data Bank. Nucleic Acids Research. 383 
+
+53(D1):D564 -D574. doi:10.1093/nar/gkae1091. 384 
+
+DiMasi JA, Grabowski HG, Hansen RW. 2016. Innovation in the pharmaceutical industry: new 385 
+
+estimates of R&D costs. Journal of Health Economics. 47:20 -33. doi: 386 
+
+10.1016/j.jhealeco .2016.01.012. 387 
+
+Ertl P, Schuffenhauer A. 2009. Estimation of synthetic accessibility score of drug -like molecules 388 
+
+based on molecular complexity and fragment contributions. Journal of Cheminformatics. 1(1 ):8. 389 
+
+doi:10.1186/1758 -2946 -1-8. 390 
+
+Jumper J et al. 2021. Highly accurate protein structure prediction with AlphaFold. Nature. 391 
+
+596(7873):583 -589. doi:10.1038/s41586 -021 -03819 -2. 392 
+
+Kung JE, Wu P, Kiefer JR, Sudhamsu J. 2021. Crystal structure of apo EGFR kinase domain. 393 
+
+Protein Data Bank. PDB ID: 7SI1. 394 
+
+Le Guilloux V, Schmidtke P, Tuffery P. 2009. Fpocket: an open source platform for ligand pocket 395 
+
+detection. BMC Bioinformatics. 10:168. doi:10.1186/1471 -2105 -10 -168. 396 
+
+Liu S, Lu Y, Chen S, Hu X, Zhao J, Lu Y, Zhao Y. 20 24. DrugAgent: automating AI -aided drug 397 
+
+discovery programming through LLM multi -agent collaboration. arXiv. arXiv:2411.15692. 398 
+
+M. Bran A et al. 2024. Augmenting large language models with chemistry tools. Nature Machine 399 
+
+Intelligence. 6(5):525 -535. doi:10.1038/s42256 -024 -00832 -8. 400 
+
+Mullard A. 2014. New drugs cost US$2.6 billion to develop. Nature Reviews Drug Discovery. 401 
+
+13(12):877. doi:10.1038/nrd4507. 402 
+
+> .CC-BY-NC 4.0 International license available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is made The copyright holder for this preprint this version posted June 25, 2026. ;https://doi.org/10.64898/2026.06.20.733481 doi: bioRxiv preprint
+
+15 
+
+Ock J et al. 2026. Large language model agent for modular task execution in drug discovery. 403 
+
+Journal of Chemica l Information and Modeling. 66(4):2055 -2068. doi:10.1021/acs.jcim.5c02454. 404 
+
+Passaro S, Corso G, Wohlwend J, Reveiz M, Thaler S, Somnath VR, Getz N, Portnoi T, Roy J, 405 
+
+Stark H, Kwabi -Addo D, Beaini D, Jaakkola T, Barzilay R. 2025. Boltz -2: towards accurate and 406 
+
+efficient binding affinity prediction. bioRxiv. doi:10.1101/2025.06.14.659707. 407 
+
+Roy A et al. 2026. From knowledge to action: outcomes of the 2025 large language model (LLM) 408 
+
+hackathon for applications in materials science and chemistry. arXiv . arXiv:2605.03205. 409 
+
+Schneuing A, Harris C, Du Y, Didi K, Jamasb A, Igashov I, Du W, Gomes C, Blundell TL, Lio P, 410 
+
+Welling M, Bronstein M, Correia B. 2024. Structure -based drug design with equivariant diffusion 411 
+
+models. Nature Computational Science. 4(12):899 -909. doi:10.1038/s43588 -024 -00737 -x. 412 
+
+Silvaroli JA, Arne JM, Chelstowska S, Kiser PD, Banerjee S, Golczak M. 2016. Ligand binding 413 
+
+induces conformational changes in human cellular retinol -binding protein 1 (CRBP1) revealed by 414 
+
+atomic resolution crystal structures. Journal of Biological Chemistry. 291(16):8528 -8540. 415 
+
+doi:10.1074/jbc.M116.714535. 416 
+
+van der Maaten L, Hinton G. 2008. Visualizing data using t -SNE. Journal of Machine Learning 417 
+
+Research. 9:2579 -2605. 418 
+
+Vichentijevikj I, Mishev K, Simjanoska Misheva M. 2025. Prompt -to -pill: multi -agent drug 419 
+
+discovery and clinical simulation pipeline. Bioinformatics Advances. 6(1). 420 
+
+doi:10.1093/bioadv/vbaf323. 421 
+
+Wouters OJ, McKee M, Luyten J. 2020. Estimated research and development investment needed 422 
+
+to bring a new medicine to market, 2009 -2018. JAMA. 323(9):844 -853. 423 
+
+doi:10.1001/jama.2020.1166. 424 
+
+Wu KE et al. 2024. Protein structure generation via folding diffusion. Nature Communications. 425 
+
+15(1):1059. doi:10.1038/s41467 -024 -45051 -2. 426 
+
+Yim J, Stärk H, Corso G, Jing B, Barzilay R, Jaakkola TS. 2024. Diffusion models in protein 427 
+
+structure and docking. WIREs Computational Molecular Science. 14(2):e1711. 428 
+
+doi:10.1002/wcms.1711. 429 
+
+> .CC-BY-NC 4.0 International license available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is made The copyright holder for this preprint this version posted June 25, 2026. ;https://doi.org/10.64898/2026.06.20.733481 doi: bioRxiv preprint
+
+T
+
+Figure 1. Overview of the F.A.D.E. pipeline. The workflow is initiated by a natural language query describing the target 
+
+of interest. In Step 1, a hierarchical database search determines the appropriate pathway based on data availability: (i) if a
+
+ligand -bound structure with known binders is retriev ed from the RCSB PDB, the pipeline proceeds directly to candidate 
+
+generation; (ii) if only an apo -structure is available, binding pockets are identified computationally using fpocket ; or (iii) 
+
+if no experimental structure exists, the target sequence is retrieved from UniProt and the three -dimensional structure is 
+
+predicted using Boltz -2. In Step 2, the identified or predicted binding site is used as input for de novo molecule generati on 
+
+via DiffSBDD, an equivariant diffusion model conditioned on pocket geom etry. In Step 3, generated candidates are ranked 
+
+by QSAR properties, Quantitative Estimate of Drug -likeness (QED), synthetic accessibility (SA) score, and predicted 
+
+binding affinity estimated by Boltz -2, yielding a prioritised set of hit compounds. 
+
+> .CC-BY-NC 4.0 International license available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is made The copyright holder for this preprint this version posted June 25, 2026. ;https://doi.org/10.64898/2026.06.20.733481 doi: bioRxiv preprint
+
+Figure 2. F.A.D.E. -generated small -molecule candidates docked to the EGFR kinase domain. Surface 
+
+representation of the EGFR kinase domain, with the ATP -binding pocket highlighted by the inset region (see 
+
+Figure 2A ). In Figure 2B, we see a close -up view of the binding pocket showing the co -crystallised reference 
+
+ligand (0WN, shown in red) overlaid with the two top -ranked F.A.D.E. -generated candidates, named affinity_3 
+
+(shown in green) and affinity_4 (shown in blue), demonstrating ge ometrically plausible binding poses within 
+
+the pocket. In Figure 2C , we see t -SNE dimensionality reduction of the f ull generated library of compounds 
+
+(shown in grey), with the top 10 QED -ranked molecules (highlighted in orange), the reference ligand 0WN 
+
+(red circle), and the two top affinity -ranked candidates, affinity_3 (purple star) and affinity_4 (blue star), 
+
+annota ted with their two -dimensional chemical structures. The spatial separation of generated candidates from 
+
+the reference ligand confirms that F.A.D.E. samples a chemically diverse region of drug -like chemical space. 
+
+> .CC-BY-NC 4.0 International license available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is made The copyright holder for this preprint this version posted June 25, 2026. ;https://doi.org/10.64898/2026.06.20.733481 doi: bioRxiv preprint
+
+Figure 3. F.A.D.E. -generated small -molecule candidates docked to CRBP1. Combined surface and 
+
+ribbon representation of CRBP1 are shown in Figure 3A , showing the distribution of generated candidates 
+
+across three distinct binding pockets identified by the pipeline. We see the representations of the primary 
+
+retinol -binding cavity (shown in magenta), a secondary surface -exposed pocket (shown in orange), and a 
+
+third peripheral site (shown in cyan).In Figure 3B, we see a close -up view of the cyan pocket showing a top -
+
+ranked candidate in stick representation, occupying a shallow surface groove on the protein exterior. In 
+
+Figure 3C , we see a close -up view of the primary binding cavity showing the two top -ranked candidates, 
+
+one from the orange pocket and one from the magenta pocket. They both adopting geometrically 
+
+complementary poses within the deep hydrophobic interior characterist ic of lipid -binding proteins. The 
+
+multi -pocket sampling demonstrated here illustrates F.A.D.E.'s ability to explore diverse binding sites on a 
+
+singl e target, expanding the hit compound search space beyond a single predefined cavity.

@@ -1,0 +1,250 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-06-26T21:29:28.596870+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 4,
+    "deep_cap": 6,
+    "deep_selected": 4,
+    "quick_candidates": 2,
+    "quick_skim_target": 11,
+    "quick_selected": 2
+  },
+  "deep_dive": [
+    {
+      "id": "2606.26917v1",
+      "source": "arxiv",
+      "title": "GEOALIGN: Geometric Rollout Curation for Robust LLM Reinforcement Learning",
+      "abstract": "Online reinforcement learning is widely used to align large language models (LLMs) with reward signals, yet training can be unstable under noisy or misspecified rewards. We identify a failure mode we call directional inconsistency: within a batch, a small set of high-reward rollouts induces representation-space preference directions that sharply disagree with the batch majority, resulting in high-variance and destabilizing updates. We propose geoalign, a lightweight plug-in for rollout curation in iterative policy optimization. Geoalign (i) forms within-prompt preference pairs, (ii) learns an online projector on per-rollout hidden states to concentrate reward-ordered displacement directions, and (iii) detects directionally inconsistent rollouts via their angular deviation from a batch consensus prototype and rectifies them with within-prompt stable alternatives. Geoalign is forward-pass only and adds negligible overhead. Across dialogue alignment with a learned reward model and mathematical reasoning with binary verified rewards, Geoalign improves final performance and reduces training oscillation, outperforming PF-PPO, PAR, PODS, and Seed-GRPO. These results suggest latent directional consensus as an effective reliability signal for online LLM RL.",
+      "authors": [
+        "Ting Zhou",
+        "Zhenqing Ling",
+        "Yiyang Zhao",
+        "Ying Shen",
+        "Daoyuan Chen"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-06-25T11:53:37+00:00",
+      "link": "https://arxiv.org/pdf/2606.26917v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Rollout curation for robust LLM reinforcement learning using geometric analysis",
+      "llm_evidence_cn": "利用几何分析进行鲁棒的大模型强化学习轨迹筛选",
+      "llm_evidence": "利用几何分析进行鲁棒的大模型强化学习轨迹筛选",
+      "canonical_evidence": "利用几何分析进行鲁棒的大模型强化学习轨迹筛选",
+      "llm_tldr_en": "GEOALIGN identifies directional inconsistency in RL rollouts and curates training batches to stabilize LLM alignment under noisy rewards.",
+      "llm_tldr_cn": "在线强化学习对齐大模型时，噪声或错误奖励会导致训练不稳定。本文识别出一种名为方向不一致的失效模式：批次中少数高奖励轨迹与多数轨迹的表示空间偏好方向冲突，导致高方差更新。提出GEOALIGN，一个轻量级轨迹筛选插件，通过构建提示内偏好对、学习在线投影器集中奖励排序的位移方向，并检测不一致轨迹进行筛选。实验证明该方法有效稳定了训练，提升了最终对齐效果。",
+      "llm_tldr": "在线强化学习对齐大模型时，噪声或错误奖励会导致训练不稳定。本文识别出一种名为方向不一致的失效模式：批次中少数高奖励轨迹与多数轨迹的表示空间偏好方向冲突，导致高方差更新。提出GEOALIGN，一个轻量级轨迹筛选插件，通过构建提示内偏好对、学习在线投影器集中奖励排序的位移方向，并检测不一致轨迹进行筛选。实验证明该方法有效稳定了训练，提升了最终对齐效果。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "reinforcement learning for large language model",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.27369v1",
+      "source": "arxiv",
+      "title": "Reinforcement Learning without Ground-Truth Solutions can Improve LLMs",
+      "abstract": "Reinforcement learning with verifiable rewards (RLVR) for training LLMs typically rely on ground-truth answers to assign rewards, limiting their applicability to tasks where the ground-truth solution is unknown. We introduce a \\textbf{R}anking-\\textbf{i}nduced \\textbf{VER}ifiable framework (RiVER) that trains LLMs on score-based optimization tasks without ground-truth solutions, using deterministic execution feedback as continuous-valued supervision. When applying group-relative RL to such continuous rewards, we identify two key challenges: \\emph{scale dominance}, where uncalibrated score magnitudes across test instances distort policy updates, and \\emph{frequency dominance}, where repeatedly sampled suboptimal solutions can outweigh rare but stronger candidates. RiVER addresses these challenges with calibrated reward shaping that uses instance-wise comparisons and emphasizes top-ranked solvers while retaining bounded feedback for other valid solutions. We train on 12 AtCoder Heuristic Contest tasks and evaluate on Algorithm Engineering Benchmark (ALE-Bench), LiveCodeBench, and USACO. RiVER advances Qwen3-8B and GLM-Z1-9B-0414 by 8.9\\% and 9.4\\% in ALE rating rank. More importantly, despite training exclusively on score-based tasks without any ground-truth solutions, RiVER also improves the backbones across exact-solution benchmarks such as LiveCodeBench and USACO by an absolute average improvement of 2.4\\% and 3.5\\%. By contrast, baselines trained with raw execution scores improve ALE rating but fail to transfer to exact-solution benchmarks. These results suggest that score-based optimization tasks, combined with proper reward calibration, can serve as effective training environments for general coding ability without ground-truth solutions.",
+      "authors": [
+        "Yingyu Lin",
+        "Qiyue Gao",
+        "Nikki Lijing Kuang",
+        "Xunpeng Huang",
+        "Kun Zhou",
+        "Tongtong Liang",
+        "Zhewei Yao",
+        "Yi-An Ma",
+        "Yuxiong He"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-06-25T17:59:36+00:00",
+      "link": "https://arxiv.org/pdf/2606.27369v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Reinforcement learning with verifiable rewards for LLMs without ground-truth solutions",
+      "llm_evidence_cn": "无需真值解的LLM强化学习奖励框架",
+      "llm_evidence": "无需真值解的LLM强化学习奖励框架",
+      "canonical_evidence": "无需真值解的LLM强化学习奖励框架",
+      "llm_tldr_en": "RiVER trains LLMs on score-based tasks without ground-truth by using deterministic execution feedback as continuous rewards and addressing scale/frequency dominance.",
+      "llm_tldr_cn": "现有RLVR依赖真值答案，限制了在无标准答案场景下的应用。本文提出RiVER框架，将确定性执行反馈作为连续奖励来训练LLM，识别了规模主导和频率主导两个挑战，并引入组相对RL方法缓解。实验证明RiVER能在数学推理等任务上有效提升性能，扩展了RL在LLM中的适用范围。",
+      "llm_tldr": "现有RLVR依赖真值答案，限制了在无标准答案场景下的应用。本文提出RiVER框架，将确定性执行反馈作为连续奖励来训练LLM，识别了规模主导和频率主导两个挑战，并引入组相对RL方法缓解。实验证明RiVER能在数学推理等任务上有效提升性能，扩展了RL在LLM中的适用范围。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "reinforcement learning for large language model",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.27136v1",
+      "source": "arxiv",
+      "title": "Joint Learning of Experiential Rules and Policies for Large Language Model Agents",
+      "abstract": "For LLM agents in multi-step interactive environments, a key challenge is to make effective use of accumulated interaction experience. Existing work has typically separated two uses of such experience: keeping it outside the model as natural-language rules for later prompting, or using trajectories and feedback to update the model parameters. The former is easy to interpret but can fall out of sync with the evolving policy; the latter improves the policy more broadly but provides only limited correction for local mistakes in sparse-reward settings. We present Joint Learning of Experiential Rules and Policies for LLM Agents (JERP), which updates a long-term experiential-rule pool and the policy from the same interaction trajectories. At decision time, JERP retrieves task-relevant rules and conditions the agent on them together with the interaction history. After each episode, it uses the collected trajectories both to optimize the policy and to revise the rule pool by comparing current rollouts with reference successful trajectories. This coupling keeps the rule pool aligned with the evolving policy while allowing stable and effective behaviors to be gradually absorbed into the model itself. Experiments on AlfWorld and WebShop show that JERP yields consistent gains in decision performance for complex interactive tasks.",
+      "authors": [
+        "Shicheng Ye",
+        "Chao Yu"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-06-25T15:11:02+00:00",
+      "link": "https://arxiv.org/pdf/2606.27136v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Joint learning of rules and policies for LLM agents in interactive environments",
+      "llm_evidence_cn": "LLM智能体在交互环境中的规则与策略联合学习",
+      "llm_evidence": "LLM智能体在交互环境中的规则与策略联合学习",
+      "canonical_evidence": "LLM智能体在交互环境中的规则与策略联合学习",
+      "llm_tldr_en": "JERP jointly learns a pool of experiential rules and the agent policy from the same interaction trajectories, combining interpretability of rules with policy improvement in sparse-reward settings.",
+      "llm_tldr_cn": "针对LLM智能体在稀疏奖励环境中如何有效利用交互经验的问题，提出JERP方法，从相同轨迹中联合更新长期经验规则池和策略参数。规则池提供可解释的局部修正，策略更新提供全局改进。实验表明，该方法在多个交互任务上优于单独使用规则或策略的方法。",
+      "llm_tldr": "针对LLM智能体在稀疏奖励环境中如何有效利用交互经验的问题，提出JERP方法，从相同轨迹中联合更新长期经验规则池和策略参数。规则池提供可解释的局部修正，策略更新提供全局改进。实验表明，该方法在多个交互任务上优于单独使用规则或策略的方法。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "biorxiv-10-64898-2026-06-20-733481-v1",
+      "source": "biorxiv",
+      "title": "F.A.D.E. (Fully Agentic Drug Engine): A Conversational AI Platform for Drug Discovery",
+      "abstract": "Drug discovery remains one of the costliest and most time-intensive endeavors in the pharmaceutical pipeline, with average development costs exceeding $2.3 billion per drug, timelines spanning more than a decade, and attrition rates above 90% in clinical trials. While computational methods have expanded the searchable chemical space, current pipelines remain fragmented and largely inaccessible to researchers without deep interdisciplinary expertise. Here we present F.A.D.E. (Fully Agentic Drug Engine), a multi-agent, open-source platform that converts natural language queries into potential drug candidates, substantially lowering the expertise barrier to advanced computational drug discovery. F.A.D.E. employs a three-branch hierarchical architecture that adapts to the level of available structural data for any protein target, integrating structure prediction, binding pocket detection, equivariant diffusion-based de novo ligand generation, and binding affinity estimation into a single automated pipeline. We validate F.A.D.E. on two structurally distinct targets: the epidermal growth factor receptor kinase domain (EGFR), a well-established oncology target, and cellular retinol-binding protein 1 (CRBP1), a lipid-binding protein involved in retinoid metabolism. For EGFR, our generated candidates achieved QED scores of 0.85 compared to 0.46 for the co-crystallised reference ligand, demonstrating marked improvement in predicted drug-likeness. Results across both targets confirm that F.A.D.E. can reliably generate chemically tractable, drug-like hit compounds across diverse protein classes from simple natural language input.",
+      "authors": [
+        "Kantorow, J.",
+        "Mani, N.",
+        "Mohanraj, N. R.",
+        "Zong, X."
+      ],
+      "primary_category": "biophysics",
+      "categories": [
+        "biophysics"
+      ],
+      "published": "2026-06-25T00:00:00+00:00",
+      "link": "https://www.biorxiv.org/content/10.64898/2026.06.20.733481v1.full.pdf",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "multi-agent platform for drug discovery using LLM agents",
+      "llm_evidence_cn": "使用大语言模型智能体进行药物发现的多智能体平台",
+      "llm_evidence": "使用大语言模型智能体进行药物发现的多智能体平台",
+      "canonical_evidence": "使用大语言模型智能体进行药物发现的多智能体平台",
+      "llm_tldr_en": "F.A.D.E. is a multi-agent platform that converts natural language queries into drug candidates, leveraging LLM agents for task automation in drug discovery.",
+      "llm_tldr_cn": "药物发现成本高昂且耗时，现有计算工具碎片化且需要深度跨学科专业知识。F.A.D.E. 是一个多智能体开源平台，通过分层架构将自然语言查询转化为候选药物，大幅降低了计算药物发现的专业壁垒。实验表明该平台能有效整合多种计算工具，为药物研发提供自动化智能体解决方案。",
+      "llm_tldr": "药物发现成本高昂且耗时，现有计算工具碎片化且需要深度跨学科专业知识。F.A.D.E. 是一个多智能体开源平台，通过分层架构将自然语言查询转化为候选药物，大幅降低了计算药物发现的专业壁垒。实验表明该平台能有效整合多种计算工具，为药物研发提供自动化智能体解决方案。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2606.26175v1",
+      "source": "arxiv",
+      "title": "RMTL: Reinforced Micro-task Learning for Long-Horizon Manipulation with VLM Rewards",
+      "abstract": "Reinforcement learning (RL) for robotic manipulation often requires manually designing a dense reward function, which is difficult to tune and often fragile, or learning a reward from human demonstrations or preferences, which can be expensive. A recent line of work uses pretrained vision-language models (VLMs) as zero-shot reward models, replacing these costs with a single text prompt. However, we argue that a single global prompt is too coarse for long-horizon manipulation tasks with randomized initial conditions. The single-prompt VLM reward is near-flat for much of the trajectory, making early progress hard for the agent to detect. We propose Reinforced Micro-Task Learning (RMTL), an approach that decomposes a manipulation task into a small set of language-described micro-tasks and trains the agent to switch between them. At each step, the agent receives a multi-view VLM reward computed using the prompt of the currently active micro-task and averaged across multiple camera views to reduce the effect of view-specific occlusions. A reverse curriculum gradually exposes the agent to harder initial conditions, while a PPO worker is first trained with a fixed distance-based rule that selects the active micro-task. We then replace this rule with a learned hierarchical manager, turning rule-based phase selection into a fully learned hierarchical policy. We instantiate RMTL on the Fetch manipulation environment using three short stage-specific prompts and without additional prompt tuning. Experiments show that RMTL provides more informative reward signals than single-prompt VLM rewards, enabling faster learning. These results suggest that decomposing VLM rewards into micro-task-specific language prompts can substantially improve the scalability of language-guided reinforcement learning for robotic manipulation.",
+      "authors": [
+        "Anıl Can Ateş",
+        "Orhan Kahraman",
+        "Cihan Topal"
+      ],
+      "primary_category": "cs.RO",
+      "categories": [
+        "cs.RO"
+      ],
+      "published": "2026-06-24T10:32:48+00:00",
+      "link": "https://arxiv.org/pdf/2606.26175v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "decomposes long-horizon manipulation tasks to improve VLM-based reward signals",
+      "llm_evidence_cn": "分解长程操作任务以改进基于视觉语言模型的奖励信号",
+      "llm_evidence": "分解长程操作任务以改进基于视觉语言模型的奖励信号",
+      "canonical_evidence": "分解长程操作任务以改进基于视觉语言模型的奖励信号",
+      "llm_tldr_en": "RMTL decomposes robotic manipulation into micro-tasks to provide dense reward signals from VLMs, improving early learning progress in long-horizon tasks.",
+      "llm_tldr_cn": "针对基于视觉语言模型(VLM)的零样本奖励在长程操作任务中坡度平坦的问题,本文提出强化微任务学习(RMTL),将任务分解为多个微任务,为每个微任务设计VLM奖励,形成更密集的奖励信号。实验表明,RMTL显著提高了智能体在长程操作任务中的早期学习效率,为机器人RL奖励设计提供了新框架。",
+      "llm_tldr": "针对基于视觉语言模型(VLM)的零样本奖励在长程操作任务中坡度平坦的问题,本文提出强化微任务学习(RMTL),将任务分解为多个微任务,为每个微任务设计VLM奖励,形成更密集的奖励信号。实验表明,RMTL显著提高了智能体在长程操作任务中的早期学习效率,为机器人RL奖励设计提供了新框架。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "design of reward functions in RL",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "biorxiv-10-64898-2026-06-16-732577-v1",
+      "source": "biorxiv",
+      "title": "VFB-MCP: Natural-Language Access to Drosophila Neuroscience Grounded by an Expert-Curated Ontology-Led Knowledgebase",
+      "abstract": "Biological databases store curated knowledge that researchers traditionally access through web interfaces or APIs. To move beyond casual browsing requires domain-specific knowledge and expertise to frame the queries necessary to explore this data. This generates a barrier for new users in scientific fields undergoing paradigm shifts. Exposing these databases to large language models (LLMs) via the Model Context Protocol (MCP) enables natural-language access, a potential accessibility solution. We implement this for Virtual Fly Brain (VFB), an expert-curated and ontology-backed knowledgebase of Drosophila neuroscience, providing the precision needed to make recently-integrated connectomes accessible. Benchmarked on 30 neuroscience tasks against a bare LLM and a web-search-assisted LLM, the VFB-MCP-equipped LLM produces precise, verifiable and appropriately quantified answers on 25/30 tasks vs 14/30 for web and 2/30 for bare (Wilcoxon p<0.01, Holm-corrected, all pairwise comparisons). The MCP advantage is largest for tasks where data quantification is required (89% vs 11% web). This work establishes MCP over ontology-backed knowledge graphs as an effective method to improve LLM response quality for neuroscience and connectomics data.",
+      "authors": [
+        "McLachlan, A. D.",
+        "Court, R.",
+        "Pilgrim, C.",
+        "Longden, K.",
+        "Brown, N. H. D.",
+        "Osumi-Sutherland, D.",
+        "Jefferis, G. S. X. E.",
+        "Armstrong, D. J."
+      ],
+      "primary_category": "neuroscience",
+      "categories": [
+        "neuroscience"
+      ],
+      "published": "2026-06-21T00:00:00+00:00",
+      "link": "https://www.biorxiv.org/content/10.64898/2026.06.16.732577v1.full.pdf",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "natural-language access to Drosophila knowledgebase using LLM and MCP",
+      "llm_evidence_cn": "利用大语言模型和模型上下文协议自然语言访问果蝇知识库",
+      "llm_evidence": "利用大语言模型和模型上下文协议自然语言访问果蝇知识库",
+      "canonical_evidence": "利用大语言模型和模型上下文协议自然语言访问果蝇知识库",
+      "llm_tldr_en": "Implements natural-language access to Virtual Fly Brain knowledgebase via LLMs and MCP, enabling query without domain expertise.",
+      "llm_tldr_cn": "实现通过大型语言模型和模型上下文协议对虚拟果蝇脑知识库的自然语言访问。利用专家策划的本体驱动知识库的精度，使得新用户无需领域专业知识即可查询数据。基准测试显示能有效获取神经科学信息。",
+      "llm_tldr": "实现通过大型语言模型和模型上下文协议对虚拟果蝇脑知识库的自然语言访问。利用专家策划的本体驱动知识库的精度，使得新用户无需领域专业知识即可查询数据。基准测试显示能有效获取神经科学信息。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "retrieval augmented generation for knowledge intensive tasks",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}
