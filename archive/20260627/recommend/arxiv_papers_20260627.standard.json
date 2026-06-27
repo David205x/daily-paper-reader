@@ -1,0 +1,261 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-06-27T20:08:34.862425+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 3,
+    "deep_cap": 6,
+    "deep_selected": 3,
+    "quick_candidates": 3,
+    "quick_skim_target": 11,
+    "quick_selected": 3
+  },
+  "deep_dive": [
+    {
+      "id": "2606.22402v1",
+      "source": "arxiv",
+      "title": "Reinforcement learning to improve large language model-based automated code compliance systems",
+      "abstract": "Large language model (LLM)-based approaches for automated code compliance (ACC) of building regulations are prone to generating incorrect and hallucinated computer-processable rules. This paper introduces P4IR, a two-stage framework that uses supervised fine-tuning (SFT) to instill domain knowledge in an LLM, followed by Group Relative Policy Optimization (GRPO) to improve the accuracy of the generated intermediate representations in the form of high-level code skeletons. The framework achieved reductions of up to 23.8% and 38.6% in tree edit distance and token-level Levenshtein distance respectively, relative to the SFT baselines. Comparative analysis demonstrates that this approach in a zero-shot setting outperforms leading LLMs in both code structure and semantics, specifically Claude Opus and Sonnet 4.5, GPT-5.2, Qwen-3-Max, and GLM-4.7, evaluated via few-shot prompting. Additionally, the GRPO stage produced a small yet statistically significant reduction in false positives. By combining SFT with GRPO to optimize directly for domain-specific objectives, this approach offers a path toward more accurate and reliable LLM-based ACC systems.",
+      "authors": [
+        "Jack Wei Lun Shi",
+        "Minghao Dang",
+        "Wawan Solihin",
+        "Leong Hien Poh",
+        "Justin K. W. Yeoh"
+      ],
+      "primary_category": "cs.SE",
+      "categories": [
+        "cs.SE",
+        "cs.AI",
+        "cs.CL",
+        "cs.LG"
+      ],
+      "published": "2026-06-21T09:17:02+00:00",
+      "link": "https://arxiv.org/pdf/2606.22402v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "uses GRPO, a policy gradient method, to improve LLM-generated code skeletons",
+      "llm_evidence_cn": "使用GRPO策略梯度方法改进LLM生成的代码骨架",
+      "llm_evidence": "使用GRPO策略梯度方法改进LLM生成的代码骨架",
+      "canonical_evidence": "使用GRPO策略梯度方法改进LLM生成的代码骨架",
+      "llm_tldr_en": "Introduces P4IR framework that uses supervised fine-tuning and Group Relative Policy Optimization (GRPO) to reduce hallucinations in LLM-based code compliance, achieving significant error reduction.",
+      "llm_tldr_cn": "该论文针对基于大语言模型的自动化代码合规系统生成错误和幻觉规则的问题，提出P4IR框架，先进行监督微调注入领域知识，再通过组相对策略优化（GRPO）提高中间表示的准确性。在零样本设置下，该方法相比SFT基线在树编辑距离和词元级莱文斯坦距离上分别降低23.8%和38.6%，优于主流大语言模型。这表明策略梯度方法可有效用于语言生成任务中的格式约束。",
+      "llm_tldr": "该论文针对基于大语言模型的自动化代码合规系统生成错误和幻觉规则的问题，提出P4IR框架，先进行监督微调注入领域知识，再通过组相对策略优化（GRPO）提高中间表示的准确性。在零样本设置下，该方法相比SFT基线在树编辑距离和词元级莱文斯坦距离上分别降低23.8%和38.6%，优于主流大语言模型。这表明策略梯度方法可有效用于语言生成任务中的格式约束。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "policy gradient methods for language generation",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.27291v1",
+      "source": "arxiv",
+      "title": "Designing Reward Signals for Portable Query Generation: A Case Study in Industrial Semantic Job Search",
+      "abstract": "Job-search platforms rely on low-bandwidth query interfaces that often fail to capture the high-dimensional complexity of candidate profiles. We present an end-to-end RLAIF (Reinforcement Learning from AI Feedback) framework to generate \\emph{portable} job search queries, terms that abstract away seeker-specific identifiers while preserving generalizable qualifications. This task introduces a highly adversarial reward surface where policy optimization frequently exploits flaws in LLM-as-judge rubrics, resulting in degenerate verbatim-copying behaviors.   We conducted comprehensive empirical experiments to isolate the impact of optimization mechanics against structured reward engineering. Our results demonstrate that for critic-free optimizers, performance is overwhelmingly dictated by robust reward shaping, rendering the specific choice of algorithm largely immaterial. While critic-free per-rollout baseline methods (RLOO and REINFORCE++) natively resist reward-hacking, the group-relative advantage normalization in GRPO appears uniquely sensitive to spurious reward signals, making it disproportionately susceptible to exploitation. We show that introducing a deterministic, rule-based reward floor to correct for rewards assigned to verbatim copying mitigates this failure mode, resulting in a substantial $+0.147$ quality improvement on a cross-family evaluation judge. Ultimately, we show that the training-time reward model inflates performance gains by $2.4\\times$, confirming that the training success is fundamentally dependent on enforcing reward-shaping disciplines rather than selecting alternative optimizers.",
+      "authors": [
+        "Ping Liu",
+        "Qianqi Shen",
+        "Jianqiang Shen",
+        "Wenqiong Liu",
+        "Rajat Arora",
+        "Yunxiang Ren",
+        "Chunnan Yao",
+        "Dan Xu",
+        "Baofen Zheng",
+        "Wanjun Jiang",
+        "Andrii Soviak",
+        "Kevin Kao",
+        "Jingwei Wu",
+        "Wenjing Zhang"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-06-25T17:09:12+00:00",
+      "link": "https://arxiv.org/pdf/2606.27291v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "designing reward signals for portable query generation using RLAIF",
+      "llm_evidence_cn": "使用RLAIF设计可迁移查询生成的奖励信号",
+      "llm_evidence": "使用RLAIF设计可迁移查询生成的奖励信号",
+      "canonical_evidence": "使用RLAIF设计可迁移查询生成的奖励信号",
+      "llm_tldr_en": "This paper studies reward engineering for RLAIF in industrial job search query generation, revealing flaws in LLM-as-judge rubrics.",
+      "llm_tldr_cn": "在工业语义岗位搜索中，生成可迁移查询面临高度对抗性的奖励面。本文采用RLAIF框架，系统研究了奖励工程对策略优化的影响，发现LLM作为评判者时存在易被利用的缺陷。实验表明精心设计的奖励信号能显著减少退化行为，为奖励函数设计提供了关键经验和启示。",
+      "llm_tldr": "在工业语义岗位搜索中，生成可迁移查询面临高度对抗性的奖励面。本文采用RLAIF框架，系统研究了奖励工程对策略优化的影响，发现LLM作为评判者时存在易被利用的缺陷。实验表明精心设计的奖励信号能显著减少退化行为，为奖励函数设计提供了关键经验和启示。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "design of reward functions in RL",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "biorxiv-10-64898-2026-06-23-734138-v1",
+      "source": "biorxiv",
+      "title": "Agentic AI for Structural Elucidation and Discovery of Drug Metabolites from Mass Spectrometry Data",
+      "abstract": "The majority of chemical signals detected in public metabolomics repositories remain structurally undefined. Large language models (LLMs) are probabilistic systems whose capacity to generate outputs beyond their training data, which can cause hallucinations, makes them also potentially suited to hypothesize structures for molecules that have never been described. We aimed to build a system that could harness this LLM generative capacity combined with domain specific tools/framework to constrain hallucination and produce validated discoveries. We developed a GNPS2 agentic AI system that interprets LC-MS/MS data by integrating spectral alignment, molecular formula inference, rule-based structural enumeration, machine learning-based spectrum prediction, and translates natural language hypotheses from domain experts into dynamically generated analytical workflows. We demonstrate the annotation of unknown drug metabolites from public data guided by chemical hypotheses. The agent predicted, and we experimentally confirmed, a phosphorylated hydroxyzine, an acetaminophen-p-coumaric acid ester, and identified two new oxidative ibuprofen-carnitine conjugates from public repositories. These results demonstrate that LLM-driven agentic reasoning, when combined with domain expertise, can indeed generate experimentally testable structural hypotheses for previously uncharacterized metabolites leveraging pan repository data.",
+      "authors": [
+        "Wang, X.",
+        "Patan, A.",
+        "Zhao, H. N.",
+        "Charron-Lamoureux, V.",
+        "Shin, Y.",
+        "Petras, D.",
+        "Hong, Y.",
+        "Bowen, B. P.",
+        "Northen, T. R.",
+        "Dorrestein, P. C.",
+        "Wang, M."
+      ],
+      "primary_category": "bioinformatics",
+      "categories": [
+        "bioinformatics"
+      ],
+      "published": "2026-06-26T00:00:00+00:00",
+      "link": "https://www.biorxiv.org/content/10.64898/2026.06.23.734138v1.full.pdf",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "LLM agent system for automated structural elucidation and discovery",
+      "llm_evidence_cn": "基于LLM的智能体系统，自动进行代谢物结构解析与发现",
+      "llm_evidence": "基于LLM的智能体系统，自动进行代谢物结构解析与发现",
+      "canonical_evidence": "基于LLM的智能体系统，自动进行代谢物结构解析与发现",
+      "llm_tldr_en": "A GNPS2 agentic AI system that integrates spectral alignment, molecular formula inference, rule-based enumeration, and LLM-based hypothesis generation for automated drug metabolite identification from LC-MS/MS data.",
+      "llm_tldr_cn": "该研究提出GNPS2智能体AI系统，将LLM的生成能力与领域专用工具（谱图比对、分子式推断、规则结构枚举）结合，自动从LC-MS/MS数据中解析和发现药物代谢物。系统通过集成约束生成和验证，减少LLM幻觉，实现了对未知代谢物的有效结构假设，为代谢组学发现提供了自动化解决方案。",
+      "llm_tldr": "该研究提出GNPS2智能体AI系统，将LLM的生成能力与领域专用工具（谱图比对、分子式推断、规则结构枚举）结合，自动从LC-MS/MS数据中解析和发现药物代谢物。系统通过集成约束生成和验证，减少LLM幻觉，实现了对未知代谢物的有效结构假设，为代谢组学发现提供了自动化解决方案。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2606.21350v1",
+      "source": "arxiv",
+      "title": "A Reward-Petri-Net Interpretation of Temporal Behavior Trees",
+      "abstract": "This paper introduces an interpretation of Temporal Behavior Trees (TBTs) as Reward-Petri-Nets (RPNs) for reinforcement learning (RL). Designing reward functions for complex, long-horizon robotic tasks is notoriously difficult, especially when tasks have hierarchical structure and temporal constraints. TBTs extend conventional behavior trees (BTs) used in robotic applications by incorporating temporal properties into their leaf nodes. This allows TBTs to represents not only the behavioral task structure defined by BT operators such as Sequence, Fallback, and Parallel, but also the task's temporal constraints. In this work, the constraints are specified in the leaf nodes using Linear Temporal Logic. In order to inform RL rewards using TBTs, we provide a translation from TBT into a Petri Net (PN) and show how rewards can be automatically assigned based on the TBT's structure, resulting in a RPN. In a series of increasingly challenging environments, we demonstrate how TBT-based rewards enable learning where vanilla RL fails, improve sample efficiency, and offer flexible, intuitive control over the learning progress. We showcase the learning impact by using different reward distribution schemes and TBT structures.",
+      "authors": [
+        "Till Schmeil",
+        "Günther Waxenegger-Wilfing",
+        "Sebastian Schirmer"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-06-19T11:47:54+00:00",
+      "link": "https://arxiv.org/pdf/2606.21350v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "interprets Temporal Behavior Trees as Reward-Petri-Nets for reward design in RL",
+      "llm_evidence_cn": "将时间行为树解释为奖励Petri网用于RL奖励设计",
+      "llm_evidence": "将时间行为树解释为奖励Petri网用于RL奖励设计",
+      "canonical_evidence": "将时间行为树解释为奖励Petri网用于RL奖励设计",
+      "llm_tldr_en": "Provides a formal translation from Temporal Behavior Trees to Reward-Petri-Nets to guide reward function design for complex robotic tasks with temporal constraints.",
+      "llm_tldr_cn": "针对机器人长程任务中带有时间约束的奖励设计难题，提出将时间行为树（TBT）解释为奖励Petri网（RPN）的翻译方法。TBT通过线性时序逻辑指定叶节点的时间约束，翻译为RPN后可自动生成结构化奖励信号。该方法使得复杂层次化任务和时间约束能自然地融入强化学习奖励函数，但论文专注于机器人领域，未涉及大语言模型。",
+      "llm_tldr": "针对机器人长程任务中带有时间约束的奖励设计难题，提出将时间行为树（TBT）解释为奖励Petri网（RPN）的翻译方法。TBT通过线性时序逻辑指定叶节点的时间约束，翻译为RPN后可自动生成结构化奖励信号。该方法使得复杂层次化任务和时间约束能自然地融入强化学习奖励函数，但论文专注于机器人领域，未涉及大语言模型。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "design of reward functions in RL",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2606.24962v1",
+      "source": "arxiv",
+      "title": "Towards Scalable Multi-Task Reinforcement Learning with Large Decision Models",
+      "abstract": "Recent progress in large-scale sequence modeling has shown that a single model can learn useful representations across highly diverse data distributions. Inspired by these advances, we investigate whether a unified transformer policy can be trained across large collections of heterogeneous reinforcement learning environments.   We introduce LDM-v0, a Large Decision Model trained offline on trajectories collected from thousands of environments spanning multiple domains and modalities. LDM-v0 is a multi-task, multi-modal transformer policy conditioned on histories of observations, actions, rewards, and termination signals, and trained through supervised next-action prediction over offline trajectories. We describe the environment infrastructure, automated data generation pipeline, model architecture, and training methodology used to build LDM-v0, and evaluate its performance across diverse environments. We show that a single pretrained model matches the performance of independently trained task-specific reference policies on approximately 1,000 environments including robotics, autonomous driving, inventory management, cybersecurity, trading, and video games. These results demonstrate the feasibility of large-scale offline pretraining across heterogeneous reinforcement learning environments using a single transformer policy.",
+      "authors": [
+        "Thibaut Kulak"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-06-23T09:13:08+00:00",
+      "link": "https://arxiv.org/pdf/2606.24962v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Multi-task reinforcement learning with large decision models",
+      "llm_evidence_cn": "使用大型决策模型进行多任务强化学习",
+      "llm_evidence": "使用大型决策模型进行多任务强化学习",
+      "canonical_evidence": "使用大型决策模型进行多任务强化学习",
+      "llm_tldr_en": "Investigates training a unified transformer policy across thousands of RL environments, introducing LDM-v0 trained via offline supervised next-action prediction.",
+      "llm_tldr_cn": "本文探索是否可以用单一的Transformer策略在大量异构强化学习环境中统一训练。提出LDM-v0，一个大规模决策模型，在来自数千个环境的离线轨迹上进行监督下一动作预测训练，展示了多任务多模态策略的可行性。",
+      "llm_tldr": "本文探索是否可以用单一的Transformer策略在大量异构强化学习环境中统一训练。提出LDM-v0，一个大规模决策模型，在来自数千个环境的离线轨迹上进行监督下一动作预测训练，展示了多任务多模态策略的可行性。",
+      "llm_tags": [
+        "query:rl:composite"
+      ],
+      "matched_query_tag": "query:rl:composite",
+      "matched_query_text": "Papers central to 查找大模型检索推理智能体、大模型强化学习领域的文章, especially work that connects or combines: reinforcement learning for large language model; design of reward functions in RL; policy gradient methods for language generation; large language model agents for task automation; reinforcement learning from human feedback for llm alignment; reinforcement learning for multi turn dialogue systems; application of reinforcement learning in large language model reasoning; retrieval augmented generation for knowledge intensive tasks; policy optimization methods for multi step reasoning in llms.",
+      "matched_requirement_id": "req-composite-rl",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2606.25161v1",
+      "source": "arxiv",
+      "title": "TRUSTMEM: Learning Trustworthy Memory Consolidation for LLM Agents with Long-Term Memory",
+      "abstract": "Large language model (LLM) agents rely on long-term memory to support extended interactions and personalized assistance beyond finite context windows. Existing memory agents actively update external memory through generated write, revise, and delete operations, but these updates may omit important information, corrupt existing memory, or introduce unsupported hallucinated content. Once stored, such errors become persistent system-state failures that can affect future reasoning and generation. In this paper, we propose TrustMem, a framework designed to improve the trustworthiness of memory consolidation. TrustMem relies on a Memory Transition Verifier to evaluate the transition process of memory updates in terms of coverage, preservation, and faithfulness. It further constructs preference pairs among candidate updates under the same memory state, enabling preference-guided reinforcement learning to directly optimize memory updating behaviors. Extensive experiments demonstrate that TrustMem improves both memory utility and reliability: it achieves state-of-the-art results across MemoryAgentBench, HaluMem, and the Mem-alpha validation set, improves HaluMem memory extraction by 12.14 F1 points, and reduces transition-level omission, corruption, and hallucination by 40.1\\%, 79.1\\%, and 50.0\\%, respectively, compared with the strongest baseline for each error type.",
+      "authors": [
+        "Tianyu Yang",
+        "Sudipta Paul",
+        "Vijay Srinivasan",
+        "Vivek Kulkarni",
+        "Srinivas Chappidi"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-06-23T20:49:28+00:00",
+      "link": "https://arxiv.org/pdf/2606.25161v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "trustworthy memory consolidation for LLM agents",
+      "llm_evidence_cn": "为LLM代理提供可信内存巩固机制",
+      "llm_evidence": "为LLM代理提供可信内存巩固机制",
+      "canonical_evidence": "为LLM代理提供可信内存巩固机制",
+      "llm_tldr_en": "TrustMem uses a Memory Transition Verifier to prevent errors in LLM agent's long-term memory updates, improving coverage, preservation, and trustworthiness.",
+      "llm_tldr_cn": "LLM代理的外部记忆更新可能引入遗漏、破坏或幻觉内容。本文提出TrustMem框架，通过记忆转换验证器评估每次更新的完整性、保留性和真实性，防止错误持久化。实验表明TrustMem显著提升记忆更新的可靠性，从而增强代理在长周期交互中的表现和可信度。",
+      "llm_tldr": "LLM代理的外部记忆更新可能引入遗漏、破坏或幻觉内容。本文提出TrustMem框架，通过记忆转换验证器评估每次更新的完整性、保留性和真实性，防止错误持久化。实验表明TrustMem显著提升记忆更新的可靠性，从而增强代理在长周期交互中的表现和可信度。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    }
+  ]
+}
