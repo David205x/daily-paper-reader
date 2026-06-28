@@ -1,0 +1,346 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-06-28T20:54:47.885493+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 4,
+    "deep_cap": 6,
+    "deep_selected": 4,
+    "quick_candidates": 4,
+    "quick_skim_target": 11,
+    "quick_selected": 4
+  },
+  "deep_dive": [
+    {
+      "id": "2606.21777v1",
+      "source": "arxiv",
+      "title": "CalVerT: Augmenting Agents with Calibrated Verifier Telemetry Improves Action and Learning in Knowledge-Intensive Tasks",
+      "abstract": "LLM agents in knowledge intensive question answering take retrieval and reasoning actions with incomplete knowledge about whether their current answer is uncertain, unsupported, or already complete. This produces two failure modes: committing to confident but unsupported answers, which hurts accuracy, and over-retrieving when the evidence in hand already suffices, resulting in wasted compute. To give agents a more complete picture of the state space they are operating in, we introduce calibrated verifier telemetry (CalVerT), which augments the agent's state with additional telemetry: a calibrated self-confidence score and a grounding verifier score. We show that CalVerT can improve agents in both training-free and training-based settings. On four QA benchmarks, we find that CalVerT raises F1 by triggering retrieval in cases where agents over-rely on parametric knowledge, while cutting redundant retrieval in cases where agents have sufficient context to answer. We show that CalVerT can augment existing QA frameworks without training. Moreover, CalVerT also improves trained systems: by simply augmenting an agent's state with telemetry, we observe improvements after reinforcement learning, as compared to an agent with identical training but no CalVerT telemetry.",
+      "authors": [
+        "Ashwin Vinod",
+        "Ying Ding",
+        "Elias Stengel-Eskin"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.AI"
+      ],
+      "published": "2026-06-19T21:50:35+00:00",
+      "link": "https://arxiv.org/pdf/2606.21777v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "augmenting agents with verifier telemetry for knowledge-intensive tasks",
+      "llm_evidence_cn": "通过验证器遥测增强知识密集型任务中的智能体",
+      "llm_evidence": "通过验证器遥测增强知识密集型任务中的智能体",
+      "canonical_evidence": "通过验证器遥测增强知识密集型任务中的智能体",
+      "llm_tldr_en": "CalVerT augments LLM agents with calibrated confidence and grounding verifier scores to improve action selection and learning in knowledge-intensive QA.",
+      "llm_tldr_cn": "该论文提出CalVerT，为LLM智能体在知识密集型问答中增加校准的自信分数和接地验证器遥测。智能体通常不知道当前答案是否准确或需要更多检索，CalVerT通过提供状态信息帮助智能体避免过早承诺或过度检索。在训练和推理中均能提升性能，减少计算浪费。",
+      "llm_tldr": "该论文提出CalVerT，为LLM智能体在知识密集型问答中增加校准的自信分数和接地验证器遥测。智能体通常不知道当前答案是否准确或需要更多检索，CalVerT通过提供状态信息帮助智能体避免过早承诺或过度检索。在训练和推理中均能提升性能，减少计算浪费。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "retrieval augmented generation for knowledge intensive tasks",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.24014v1",
+      "source": "arxiv",
+      "title": "Reinforcement Learning Towards Broadly and Persistently Beneficial Models",
+      "abstract": "As AI systems are deployed across increasingly diverse and high-stakes settings, model alignment must generalize beyond the tasks and domains seen during training. This is especially important for reinforcement learning (RL), which can introduce unexpected misalignment through reward hacking, deception, or other unintended strategies. We study whether RL on beneficial behavior, instantiated in realistic domains, can produce broad and persistent alignment generalization beyond the training distribution. We construct a dataset of realistic situations designed to measure and train beneficial traits, such as truthfulness, fairness, risk awareness, and corrigibility, spanning varied domains, including health, science, and education. We then train models with RL on this dataset and evaluate them on more than 50 independent benchmarks of alignment and beneficial behavior. Compared to a compute-matched baseline, beneficial trait RL improves performance on over 80% of these out-of-distribution benchmarks. We observe substantial out-of-distribution alignment transfer: a beneficial-behavior RL intervention entirely limited to one domain, health, produces broad improvements on non-health alignment evaluations, including reduced reward hacking, deception, and general misalignment. Finally, we study alignment persistence: whether behavior remains robustly aligned under attempts to steer models towards misalignment. Models trained with beneficial trait RL show improved persistence, including greater resistance to adversarial prompting and harmful finetuning; further work is required to isolate the sources of these effects. These results suggest that RL to reinforce beneficial behavior in realistic domains can produce models that are more robustly aligned with human flourishing.",
+      "authors": [
+        "Akshay V. Jagadeesh",
+        "Rahul K. Arora",
+        "Khaled Saab",
+        "Ali Malik",
+        "Mikhail Trofimov",
+        "Foivos Tsimpourlas",
+        "Johannes Heidecke",
+        "Karan Singhal"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI",
+        "cs.CL"
+      ],
+      "published": "2026-06-22T23:35:49+00:00",
+      "link": "https://arxiv.org/pdf/2606.24014v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "RL for alignment generalization with beneficial behavior training",
+      "llm_evidence_cn": "RL用于有益行为泛化的对齐训练",
+      "llm_evidence": "RL用于有益行为泛化的对齐训练",
+      "canonical_evidence": "RL用于有益行为泛化的对齐训练",
+      "llm_tldr_en": "Studies whether RL on beneficial behavior can produce broad and persistent alignment generalization beyond training distribution using realistic domains.",
+      "llm_tldr_cn": "随着AI系统在高风险场景中部署，模型对齐必须泛化到训练任务之外。强化学习可能通过奖励破解等导致意外失调。本文研究在现实领域中通过有益行为（诚实、公平、风险意识、可纠正性）的强化学习能否产生跨领域（健康、科学、教育）的广泛且持久的对齐泛化。构建了一个包含多种现实情境的数据集来训练和评估这些有益特质。",
+      "llm_tldr": "随着AI系统在高风险场景中部署，模型对齐必须泛化到训练任务之外。强化学习可能通过奖励破解等导致意外失调。本文研究在现实领域中通过有益行为（诚实、公平、风险意识、可纠正性）的强化学习能否产生跨领域（健康、科学、教育）的广泛且持久的对齐泛化。构建了一个包含多种现实情境的数据集来训练和评估这些有益特质。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "reinforcement learning from human feedback for llm alignment",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.24962v1",
+      "source": "arxiv",
+      "title": "Towards Scalable Multi-Task Reinforcement Learning with Large Decision Models",
+      "abstract": "Recent progress in large-scale sequence modeling has shown that a single model can learn useful representations across highly diverse data distributions. Inspired by these advances, we investigate whether a unified transformer policy can be trained across large collections of heterogeneous reinforcement learning environments.   We introduce LDM-v0, a Large Decision Model trained offline on trajectories collected from thousands of environments spanning multiple domains and modalities. LDM-v0 is a multi-task, multi-modal transformer policy conditioned on histories of observations, actions, rewards, and termination signals, and trained through supervised next-action prediction over offline trajectories. We describe the environment infrastructure, automated data generation pipeline, model architecture, and training methodology used to build LDM-v0, and evaluate its performance across diverse environments. We show that a single pretrained model matches the performance of independently trained task-specific reference policies on approximately 1,000 environments including robotics, autonomous driving, inventory management, cybersecurity, trading, and video games. These results demonstrate the feasibility of large-scale offline pretraining across heterogeneous reinforcement learning environments using a single transformer policy.",
+      "authors": [
+        "Thibaut Kulak"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-06-23T09:13:08+00:00",
+      "link": "https://arxiv.org/pdf/2606.24962v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "multi-task RL with large decision model resembling LLM",
+      "llm_evidence_cn": "多任务强化学习结合类似LLM的大决策模型",
+      "llm_evidence": "多任务强化学习结合类似LLM的大决策模型",
+      "canonical_evidence": "多任务强化学习结合类似LLM的大决策模型",
+      "llm_tldr_en": "Introduces LDM-v0, a large decision model trained offline on diverse RL environments, showing unified transformer policy can generalize across tasks.",
+      "llm_tldr_cn": "大规模序列建模启发下，本文研究是否可以在异构强化学习环境中训练统一的Transformer策略。提出LDM-v0，一个大型决策模型，在数千环境中的离线轨迹上进行多任务、多模态训练，通过监督下一动作预测学习。实验表明该模型能够跨任务泛化，为多任务RL提供可扩展范式。",
+      "llm_tldr": "大规模序列建模启发下，本文研究是否可以在异构强化学习环境中训练统一的Transformer策略。提出LDM-v0，一个大型决策模型，在数千环境中的离线轨迹上进行多任务、多模态训练，通过监督下一动作预测学习。实验表明该模型能够跨任务泛化，为多任务RL提供可扩展范式。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "reinforcement learning for large language model",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "biorxiv-10-64898-2026-06-25-734665-v1",
+      "source": "biorxiv",
+      "title": "Client-server interfaces enable efficient agent-driven variant calling",
+      "abstract": "Background: Large language model (LLM) agents increasingly automate bioinformatics analyses, but most existing bioinformatics tools were built for standalone use by human experts. An agent driving such a tool must reason about its installation, configuration, and execution from documentation for human, spending many turns, tokens, and tool calls per result. How a method is exposed to an agent can therefore matter as much as the method itself. By designing agentic interfaces for these tools, agent can reduce such overhead and improve the reliability of agent-driven analyses. Findings: To test this design, we re-architected Clair3, a widely used deep-learning-based long-read variant caller, into a client-server system, Clair3-Connect. The client performs all genomics related processing and holds the identifiable data. The server runs only neural-network inference, and the client sends only feature tensors to the server, while sample identifiers and genomic context remain on the client. The client exposes schema-defined agent-facing tools that an agent invokes through single structured calls. On an APOE diplotyping task, all 60 agent runs were correct. The agentic tools used 12K tokens in 3 turns, 6.8 to 14 times fewer tokens than the shell-driven baselines (81K-163K tokens), at about a quarter the wall-clock time and far more stably (4% versus 35% token usage variation). Dropping the pileup and phasing stages to keep the client light left SNP F1 within 0.1-0.3 points of standard Clair3 by 50x coverage, while mutual TLS and AES-256-GCM encryption added 7.2% to end-to-end runtime. Conclusions: Recasting an established algorithm as developer-built, agentic tools behind a secure client-server boundary makes it more efficient, reliable, and easier to deploy for an LLM agent than a third-party wrapper, which cannot recover the defaults and conventions only its developers know. Agentic interfaces should be a first-class deliverable of bioinformatics tool development.",
+      "authors": [
+        "Yu, X.",
+        "Zheng, Z.",
+        "CHEN, L.",
+        "QIn, Z.",
+        "Guo, X.",
+        "He, M.",
+        "Luo, R."
+      ],
+      "primary_category": "bioinformatics",
+      "categories": [
+        "bioinformatics"
+      ],
+      "published": "2026-06-28T00:00:00+00:00",
+      "link": "https://www.biorxiv.org/content/10.64898/2026.06.25.734665v1.full.pdf",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "LLM agent for automating variant calling with client-server interface",
+      "llm_evidence_cn": "通过客户端-服务器接口实现LLM智能体自动化变异调用",
+      "llm_evidence": "通过客户端-服务器接口实现LLM智能体自动化变异调用",
+      "canonical_evidence": "通过客户端-服务器接口实现LLM智能体自动化变异调用",
+      "llm_tldr_en": "Re-architects the variant caller Clair3 into a client-server system with an agentic interface, enabling LLM agents to efficiently automate bioinformatics analysis with reduced overhead.",
+      "llm_tldr_cn": "现有生物信息学工具为人类专家设计，LLM智能体驱动时需大量交互。本文重新架构Clair3为客户端-服务器系统Clair3-Connect，使智能体可通过简洁接口直接调用，显著减少令牌消耗和调用次数。实验表明该接口设计大幅提升了LLM智能体在变异调用任务中的自动化效率和可靠性。",
+      "llm_tldr": "现有生物信息学工具为人类专家设计，LLM智能体驱动时需大量交互。本文重新架构Clair3为客户端-服务器系统Clair3-Connect，使智能体可通过简洁接口直接调用，显著减少令牌消耗和调用次数。实验表明该接口设计大幅提升了LLM智能体在变异调用任务中的自动化效率和可靠性。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2606.24369v2",
+      "source": "arxiv",
+      "title": "Accelerating Disaggregated RL for Visual Generative LLMs with Diffusion-Based Parallelism and Trainer-Assisted Generation",
+      "abstract": "Reinforcement learning (RL) has become a dominant post-training paradigm, driving the emergence of high-performance RL systems such as veRL for autoregressive large language models (LLMs). In parallel, diffusion-oriented RL algorithms, e.g., DanceGRPO and FlowGRPO, have rapidly expanded the scope of RL from language reasoning to diffusion-based visual and flow-based generation. However, efficient RL systems for diffusion generative LLMs remain underexplored. Existing implementations, e.g., veRL-Omni, still rely on colocated execution, which simplifies synchronization but couples rollout and training resources, limits heterogeneous deployment, and constrains independent scaling.   To this end, we introduce DigenRL, a disaggregated RL framework for diffusion-based generative LLMs that supports flexible resource allocation, accommodates heterogeneous GPUs, and facilitates efficient task scheduling. To maximally reduce the execution bubbles in the disaggregated architecture, we propose: 1) a generation-axis pipeline (GAP) and time-step parallelism (TSP) in the diffusion architecture to enable finer-grained pipelining between rollout and training; 2) an elastic trainer-assisted generation (TAG) approach to enable the trainer GPU resources to dynamically assist in executing rollout generations; and 3) a tightly one-step constrained asynchronous strategy to further utilize the tail bubble in the pipeline. Extensive experiments are conducted on three hardware testbeds with 16-32 GPUs using HunyuanVideo-13B, Wan2.1-14B, FLUX.1-12B, and QwenImage-20B generative models. Experimental results show that DigenRL achieves 1.56-2.10x throughput improvements over state-of-the-art diffusion RL systems, veRL-Omni and GenRL.",
+      "authors": [
+        "Sijie Wang",
+        "Zhengyu Qing",
+        "Zhiqiang Tan",
+        "Yiming Yin",
+        "Yeqing Zhang",
+        "Yaoyuan Wang",
+        "Qiang Wang",
+        "Xiaowen Chu",
+        "Shaohuai Shi"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI",
+        "cs.DC",
+        "cs.NI",
+        "cs.PF"
+      ],
+      "published": "2026-06-23T09:59:35+00:00",
+      "link": "https://arxiv.org/pdf/2606.24369v2",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "RL system acceleration for visual generative LLMs",
+      "llm_evidence_cn": "面向视觉生成LLM的RL系统加速",
+      "llm_evidence": "面向视觉生成LLM的RL系统加速",
+      "canonical_evidence": "面向视觉生成LLM的RL系统加速",
+      "llm_tldr_en": "The paper introduces a disaggregated RL system for diffusion-based visual generative LLMs, using diffusion parallelism and trainer-assisted generation to decouple rollout and training.",
+      "llm_tldr_cn": "该论文提出一种分离式RL系统，专为基于扩散的视觉生成LLM设计，通过扩散并行性和训练器辅助生成解耦推理和训练资源。现有共置方案限制了异构部署和独立缩放，而该系统支持独立扩展，提高了效率。这项工作扩展了RL在视觉生成领域的系统支持。",
+      "llm_tldr": "该论文提出一种分离式RL系统，专为基于扩散的视觉生成LLM设计，通过扩散并行性和训练器辅助生成解耦推理和训练资源。现有共置方案限制了异构部署和独立缩放，而该系统支持独立扩展，提高了效率。这项工作扩展了RL在视觉生成领域的系统支持。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "reinforcement learning for large language model",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2606.22540v2",
+      "source": "arxiv",
+      "title": "PolicyTrim: Boosting Intrinsic Policy Efficiency of Vision-Language-Action Models",
+      "abstract": "Vision-Language-Action (VLA) models provide a unified paradigm for robotic manipulation, yet their real-world deployment is often bottlenecked by execution efficiency. While existing efforts predominantly focus on compute-centric efficiency to reduce per-step inference latency, the intrinsic \\textbf{policy efficiency} of these models remains largely unexplored. Policy efficiency is fundamentally affected by two factors, namely the effective executable length of predicted action chunks and the total physical steps required to complete a task. These two factors jointly determine the total number of forward inference calls during execution. We observe that current VLA policies struggle with planning unreliability and action redundancy, suffering from severe prediction degradation at the tail of action chunks and tending to generate unnecessarily redundant physical steps. To address this, we propose \\textbf{PolicyTrim}, a reinforcement learning-based post-training framework that extends the reliable action chunk length and reduces redundant physical steps. For reliable chunk extension, we employ a dynamic exploration strategy that explicitly rewards the successful completion of longer executable lengths, progressively pushing the trustworthy prediction horizon to its empirical limit. For step efficiency, we design a redundancy-aware reward that directly favors successful task completions with fewer steps while penalizing unreproducible shortcuts, effectively eliminating redundant physical actions. Extensive experiments across three benchmarks and three VLA models demonstrate that PolicyTrim improves action chunk utilization by 3$\\times$ and reduces physical execution steps by 51.4\\%. Ultimately, our framework delivers up to a 5.83$\\times$ end-to-end deployment speedup without compromising task success rates.",
+      "authors": [
+        "Xianghui Wang",
+        "Feng Chen",
+        "Wenbo Zhang",
+        "Hua Yan",
+        "Zixuan Wang",
+        "Changsheng Li",
+        "Yinjie Lei"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-06-21T14:54:07+00:00",
+      "link": "https://arxiv.org/pdf/2606.22540v2",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "policy efficiency optimization for VLA models akin to policy gradient methods",
+      "llm_evidence_cn": "类似策略梯度方法的VLA模型策略效率优化",
+      "llm_evidence": "类似策略梯度方法的VLA模型策略效率优化",
+      "canonical_evidence": "类似策略梯度方法的VLA模型策略效率优化",
+      "llm_tldr_en": "Proposes PolicyTrim to boost intrinsic policy efficiency of Vision-Language-Action models by optimizing action chunk length and reducing redundant steps, akin to policy optimization in RL.",
+      "llm_tldr_cn": "视觉-语言-动作（VLA）模型在机器人操控中面临策略效率问题：动作块过长或冗余导致无效推理。本文提出PolicyTrim，通过优化预测动作块的有效长度并减少物理步骤数量，提升策略效率。方法类似于强化学习中的策略优化，无需重新训练模型。实验表明该方法显著减少了总推理次数和执行时间。",
+      "llm_tldr": "视觉-语言-动作（VLA）模型在机器人操控中面临策略效率问题：动作块过长或冗余导致无效推理。本文提出PolicyTrim，通过优化预测动作块的有效长度并减少物理步骤数量，提升策略效率。方法类似于强化学习中的策略优化，无需重新训练模型。实验表明该方法显著减少了总推理次数和执行时间。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "policy gradient methods for language generation",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2606.25354v1",
+      "source": "arxiv",
+      "title": "Efficient and Trainable Language Model Test-Time Scaling via Local Branch Routing",
+      "abstract": "Test-time scaling improves language-model reasoning, but existing approaches often face a difficult trade-off: long chain-of-thought sampling remains single-threaded, while sentence- or solution-level search can be computationally expensive and hard to train end-to-end. We introduce Local Branch Routing (LBR), a token-level test-time scaling framework that expands a small local lookahead tree, forwards all sampled branches through the language model, and uses a lightweight router to select the depth-1 subtree to commit. By routing over the hidden states of candidate local futures, LBR allows each token decision to use evidence beyond the root next-token distribution while avoiding full solution-level search. The resulting prune-shift-grow decoding process preserves discrete branch identities and defines a tractable tree-trajectory likelihood: newly grown nodes are counted when first sampled, and router decisions are assigned explicit probabilities. This enables end-to-end reinforcement learning with verifiable rewards, jointly optimizing the base model and router under the same likelihood-ratio principle as discrete-token RLVR. On synthetic hierarchical-planning tasks, LBR shows that post-candidate hidden states provide useful routing evidence. On mathematical reasoning benchmarks, LBR improves both Pass@1 and Pass@32 over discrete chain-of-thought, vanilla discrete-token RLVR, and RL-compatible soft-token branching baselines. These results suggest that lightweight local branching offers an efficient, trainable, and discrete form of language-model test-time scaling.",
+      "authors": [
+        "Yutong Yin",
+        "Mingyu Jin",
+        "Jin Pan",
+        "Changyi Yang",
+        "Zijie Xia",
+        "Dhruv Pai",
+        "Shuming Hu",
+        "Zhen Zhang",
+        "Chenyang Zhao",
+        "Jinman Zhao",
+        "Wujiang Xu",
+        "Raymond Li",
+        "Xin Eric Wang",
+        "Julian McAuley",
+        "Zhaoran Wang"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-06-24T03:42:44+00:00",
+      "link": "https://arxiv.org/pdf/2606.25354v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "token-level test-time scaling framework for language model reasoning",
+      "llm_evidence_cn": "语言模型推理的token级测试时扩展框架",
+      "llm_evidence": "语言模型推理的token级测试时扩展框架",
+      "canonical_evidence": "语言模型推理的token级测试时扩展框架",
+      "llm_tldr_en": "Proposes Local Branch Routing (LBR), a token-level test-time scaling method that expands a small local lookahead tree and uses a lightweight router to select the best subtree, improving reasoning efficiency without full search.",
+      "llm_tldr_cn": "现有语言模型测试时推理扩展方法面临效率与可训练性的权衡。本文提出局部分支路由（LBR），通过扩展局部前瞻树并利用轻量路由选择最佳子树，实现token级决策。该方法避免了全搜索的高成本，同时保持端到端可训练性。实验表明LBR在多个推理任务上提升了性能与效率，为LLM推理提供了可扩展的优化方案。",
+      "llm_tldr": "现有语言模型测试时推理扩展方法面临效率与可训练性的权衡。本文提出局部分支路由（LBR），通过扩展局部前瞻树并利用轻量路由选择最佳子树，实现token级决策。该方法避免了全搜索的高成本，同时保持端到端可训练性。实验表明LBR在多个推理任务上提升了性能与效率，为LLM推理提供了可扩展的优化方案。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "application of reinforcement learning in large language model reasoning",
+      "matched_requirement_id": "req-7",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2606.26918v1",
+      "source": "arxiv",
+      "title": "Diagnosing Task Insensitivity in Language Agents",
+      "abstract": "Large language models can serve as capable long-horizon agents, but their out-of-distribution (OOD) generalization remains weak. We identify a key source of this failure as task insensitivity: when faced with similar but distinct tasks, models might apply patterns learned during training and fail to solve the task at hand. We show that models often continue with actions aligned with the original task even when the instruction is semantically corrupted and cannot be directly answered. We further find that, when we replace the task description in a trained prompt with another similar but distinct task, the model may still output the same action. This behavior is accompanied by a consistent training-time attention drift away from task tokens and toward local observations, suggesting an optimization bias toward shortcuts. To mitigate this problem, we propose Task-Perturbed NLL Optimization, a lightweight contrastive regularizer that explicitly encourages action dependence on the task instruction. Extensive evaluations show that our intervention improves task sensitivity and OOD generalization while preserving more stable attention to task tokens.",
+      "authors": [
+        "Jingyu Liu",
+        "Xiaopeng Wu",
+        "Kehan Chen",
+        "Chuan Yu",
+        "Yong Liu"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-06-25T11:53:41+00:00",
+      "link": "https://arxiv.org/pdf/2606.26918v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "diagnosing task insensitivity in LLM agents",
+      "llm_evidence_cn": "诊断LLM智能体的任务不敏感性",
+      "llm_evidence": "诊断LLM智能体的任务不敏感性",
+      "canonical_evidence": "诊断LLM智能体的任务不敏感性",
+      "llm_tldr_en": "This paper identifies task insensitivity as a key failure mode in LLM agents, where models apply learned patterns regardless of task changes, and analyzes attention drift.",
+      "llm_tldr_cn": "LLM智能体在分布外泛化时表现脆弱，本文识别任务不敏感性为关键失败原因：模型在面对相似但不同任务时，可能机械应用已学模式。通过语义扰动和任务替换实验，发现智能体常忽略任务描述而依赖局部观察，同时伴有训练时注意力漂移。为改进智能体泛化提供了诊断方法和优化方向。",
+      "llm_tldr": "LLM智能体在分布外泛化时表现脆弱，本文识别任务不敏感性为关键失败原因：模型在面对相似但不同任务时，可能机械应用已学模式。通过语义扰动和任务替换实验，发现智能体常忽略任务描述而依赖局部观察，同时伴有训练时注意力漂移。为改进智能体泛化提供了诊断方法和优化方向。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}

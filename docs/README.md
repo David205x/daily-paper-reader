@@ -6,40 +6,44 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-06-27
-- 运行时间：2026-06-27 20:11:29 UTC
+- 最新运行日期：2026-06-28
+- 运行时间：2026-06-28 20:58:56 UTC
 - 运行状态：成功
-- 本次总论文数：6
-- 精读区：3
-- 速读区：3
+- 本次总论文数：8
+- 精读区：4
+- 速读区：4
 
 ### 今日简报（AI）
-1) 今日重点研究了强化学习与大语言模型的结合应用，精读两篇高分论文聚焦代码合规系统与工业语义搜索。  
-2) 最值得关注的方向：利用RL优化LLM的代码自动合规能力，以及设计奖励信号增强便携式查询生成。  
-3) 建议普通读者从这两个精读案例入手，掌握RL与LLM协同提升系统自动化与准确性的核心思路。
-- 详情：[/202606/27/README](/202606/27/README)
+今日共处理8篇论文，精读4篇，其中《CalVerT》和《RL Towards Broadly Beneficial Models》评分最高（8.0/10）。最值得关注的是通过校准验证器遥测增强智能体行动与学习，以及强化学习追求广泛且持久有益的模型方向。建议优先精读这两篇，深入理解验证器校准与RL对齐的核心方法。
+- 详情：[/202606/28/README](/202606/28/README)
 
 ### 精读区论文标签
-1. [Reinforcement learning to improve large language model-based automated code compliance systems](/202606/27/2606.22402v1-reinforcement-learning-to-improve-large-language-model-based-automated-code-compliance-systems)  
+1. [CalVerT: Augmenting Agents with Calibrated Verifier Telemetry Improves Action and Learning in Knowledge-Intensive Tasks](/202606/28/2606.21777v1-calvert-augmenting-agents-with-calibrated-verifier-telemetry-improves-action-and-learning-in-knowledge-intensive-tasks)  
    标签：评分：8.0/10、query:rl
-   evidence：使用GRPO策略梯度方法改进LLM生成的代码骨架
-2. [Designing Reward Signals for Portable Query Generation: A Case Study in Industrial Semantic Job Search](/202606/27/2606.27291v1-designing-reward-signals-for-portable-query-generation-a-case-study-in-industrial-semantic-job-search)  
+   evidence：通过验证器遥测增强知识密集型任务中的智能体
+2. [Reinforcement Learning Towards Broadly and Persistently Beneficial Models](/202606/28/2606.24014v1-reinforcement-learning-towards-broadly-and-persistently-beneficial-models)  
    标签：评分：8.0/10、query:rl
-   evidence：使用RLAIF设计可迁移查询生成的奖励信号
-3. [Agentic AI for Structural Elucidation and Discovery of Drug Metabolites from Mass Spectrometry Data](/202606/27/biorxiv-10-64898-2026-06-23-734138-v1-agentic-ai-for-structural-elucidation-and-discovery-of-drug-metabolites-from-mass-spectrometry-data)  
+   evidence：RL用于有益行为泛化的对齐训练
+3. [Towards Scalable Multi-Task Reinforcement Learning with Large Decision Models](/202606/28/2606.24962v1-towards-scalable-multi-task-reinforcement-learning-with-large-decision-models)  
    标签：评分：8.0/10、query:rl
-   evidence：基于LLM的智能体系统，自动进行代谢物结构解析与发现
+   evidence：多任务强化学习结合类似LLM的大决策模型
+4. [Client-server interfaces enable efficient agent-driven variant calling](/202606/28/biorxiv-10-64898-2026-06-25-734665-v1-client-server-interfaces-enable-efficient-agent-driven-variant-calling)  
+   标签：评分：8.0/10、query:rl
+   evidence：通过客户端-服务器接口实现LLM智能体自动化变异调用
 
 ### 速读区论文标签
-1. [A Reward-Petri-Net Interpretation of Temporal Behavior Trees](/202606/27/2606.21350v1-a-reward-petri-net-interpretation-of-temporal-behavior-trees)  
+1. [Accelerating Disaggregated RL for Visual Generative LLMs with Diffusion-Based Parallelism and Trainer-Assisted Generation](/202606/28/2606.24369v2-accelerating-disaggregated-rl-for-visual-generative-llms-with-diffusion-based-parallelism-and-trainer-assisted-generation)  
    标签：评分：7.0/10、query:rl
-   evidence：将时间行为树解释为奖励Petri网用于RL奖励设计
-2. [Towards Scalable Multi-Task Reinforcement Learning with Large Decision Models](/202606/27/2606.24962v1-towards-scalable-multi-task-reinforcement-learning-with-large-decision-models)  
+   evidence：面向视觉生成LLM的RL系统加速
+2. [Efficient and Trainable Language Model Test-Time Scaling via Local Branch Routing](/202606/28/2606.25354v1-efficient-and-trainable-language-model-test-time-scaling-via-local-branch-routing)  
    标签：评分：7.0/10、query:rl
-   evidence：使用大型决策模型进行多任务强化学习
-3. [TRUSTMEM: Learning Trustworthy Memory Consolidation for LLM Agents with Long-Term Memory](/202606/27/2606.25161v1-trustmem-learning-trustworthy-memory-consolidation-for-llm-agents-with-long-term-memory)  
-   标签：评分：7.0/10、query:rl
-   evidence：为LLM代理提供可信内存巩固机制
+   evidence：语言模型推理的token级测试时扩展框架
+3. [PolicyTrim: Boosting Intrinsic Policy Efficiency of Vision-Language-Action Models](/202606/28/2606.22540v2-policytrim-boosting-intrinsic-policy-efficiency-of-vision-language-action-models)  
+   标签：评分：6.0/10、query:rl
+   evidence：类似策略梯度方法的VLA模型策略效率优化
+4. [Diagnosing Task Insensitivity in Language Agents](/202606/28/2606.26918v1-diagnosing-task-insensitivity-in-language-agents)  
+   标签：评分：6.0/10、query:rl
+   evidence：诊断LLM智能体的任务不敏感性
 
 
 <div class="dpr-home-promo-card">
