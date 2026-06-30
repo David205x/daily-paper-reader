@@ -1,0 +1,899 @@
+Title: On the Policy Gradient Foundations of Group Relative Policy Optimization: Credit Assignment, Gradient Sparsity, and Rank Collapse
+
+URL Source: https://arxiv.org/pdf/2606.29238v1
+
+Published Time: Tue, 30 Jun 2026 01:00:37 GMT
+
+Number of Pages: 9
+
+Markdown Content:
+# On the Policy Gradient Foundations of Group Relative Policy Optimization: Credit Assignment, Gradient Sparsity, and Rank Collapse 
+
+Amritansh Mishra 1 Supriyo Chakraborty 1 Berkcan Kapusuzoglu 1
+
+## Abstract 
+
+Group Relative Policy Optimization (GRPO) eliminates the learned critic in PPO by using the mean reward of grouped rollouts as a baseline. We provide a rigorous derivation of GRPO from first principles of the policy gradient theorem, re-vealing a fundamental credit assignment failure: under output-only reward, every token in a roll-out receives identical advantage, collapsing token-level credit to a single scalar. We prove this in-duces gradient sparsity that intensifies over train-ing, and demonstrate empirically via SVD analy-sis of GRPO gradients on Nemotron-4B/GSM8K that the gradient matrix has effective rank ≈ 2
+
+regardless of group size R ∈ { 2, 4, 8}. We for-malize this as an intrinsic rank-2 structure arising from the zero-sum constraint on advantages and derive conditions under which GRPO’s baseline is optimal. Our results characterize when GRPO’s simplicity is theoretically justified and identify the credit assignment bottleneck as the key limitation for multi-step reasoning. 
+
+## 1. Introduction 
+
+Policy gradient methods have become central to post-training of large language models, both for aligning with human preferences (Ouyang et al., 2022) and for improv-ing reasoning capabilities (DeepSeek-AI, 2025; Shao et al., 2024). The standard approach uses Proximal Policy Opti-mization (PPO) (Schulman et al., 2017), which requires a learned value function (critic) to estimate advantages dou-bling memory and compute footprint. Group Relative Policy Optimization (GRPO) (Shao et al., 2024) offers an elegant alternative for each prompt, sample 
+
+R completions, compute their rewards, and use the group mean as the baseline. This eliminates the critic entirely. 
+
+> 1
+
+Capital One. Correspondence to: Amritansh Mishra <amri-tansh.mishra@capitalone.com >.
+
+Published as a paper at the 1 st FoGen workshop, ICML 2026 ,Seoul, South Korea, 2026. Copyright 2026 by the author(s). 
+
+GRPO has been successfully deployed in DeepSeek-R1 (DeepSeek-AI, 2025) and other systems, but its theoreti-cal properties-particularly around credit assignment and its links to Policy Gradient Methods remain poorly understood. In this paper, we show that the GRPO gradient is fundamen-tally a policy gradient estimator, and derive it step by step from the policy gradient theorem. By making explicit the as-sumptions under which GRPO is formulated—output-only reward and a group-mean baseline—we reveal a structural consequence: GRPO assigns identical credit to every token in a sequence . This uniform credit assignment is not merely a simplification but a fundamental property that shapes the gradient’s spectral characteristics. 
+
+Contributions. 
+
+1. We derive GRPO as a special case of the REINFORCE estimator with a group-mean baseline, making all ap-proximations explicit (Section 2). 2. We prove that output-only reward induces a uniform credit assignment where every token receives the same advantage, and characterize the resulting gradient spar-sity (Section 3). 3. We empirically demonstrate that the GRPO gradient matrix collapses to an effective rank ≈ 2 independent of group size R, and formalize how the zero-sum con-straint drives this behavior. 4. We validate our theory empirically: SVD analysis of GRPO gradients on Nemotron-4B/GSM8K confirms effective rank ≈ 2 for R ∈ { 2, 4, 8} (Section 7). 5. We also explain multi turn limitations of GRPO. 
+
+Scope. We focus on the policy gradient core of GRPO the advantage estimator and gradient structure deliberately set-ting aside clipping and KL regularization, which affect the optimization step but not the gradient signal’s fundamental properties. 1
+
+> arXiv:2606.29238v1 [cs.LG] 28 Jun 2026
+
+Policy Gradient Foundations of GRPO: Credit Assignment, Gradient Sparsity, and Rank Collapse 
+
+## 2. From Policy Gradients to GRPO 
+
+We derive GRPO from first principles, following the chain: value functions → policy gradient theorem → REINFORCE with baseline → advantage estimation → GRPO. 
+
+2.1. MDP Formulation for Text Generation 
+
+We model autoregressive generation as an episodic MDP 
+
+M = ( S, A, P, r, ρ 0). A state st is the concatenation of the prompt and tokens generated so far. An action at ∈A (the vocabulary) appends a token. The transition P is deterministic (concatenation). The initial distribution ρ0 is the prompt distribution. 
+
+Definition 2.1 (Value Functions) . For policy πθ with pa-rameters θ ∈ Rd:
+
+vπ (s) = Eπ [Gt | St = s], Gt = 
+
+> T−t−1
+
+X
+
+> k=0
+
+γkrt+k+1 ,
+
+(1) 
+
+qπ (s, a ) = Eπ [Gt | St = s, A t = a], (2) 
+
+Aπ (s, a ) = qπ (s, a ) − vπ (s). (3) 
+
+2.2. Policy Gradient Theorem 
+
+The objective J(θ) = Eτ ∼πθ [G0] has gradient (Sutton et al., 1999): 
+
+∇θ J(θ) = Eπθ
+
+"T −1X
+
+> t=0
+
+γtqπθ (St, A t)∇θ log πθ (At | St)
+
+#
+
+.
+
+(4) 
+
+2.3. The REINFORCE Estimator 
+
+The REINFORCE algorithm (Williams, 1992) estimates the policy gradient by replacing the expected return with a single Monte Carlo sample. Given a trajectory τ =(s0, a 0, r 1, . . . , s T −1, a T −1, r T ), the estimator is: 
+
+ˆgRF = 
+
+> T−1
+
+X
+
+> t=0
+
+γt ˆGt∇θ log πθ (At | St), (5) where ˆGt = PT −t−1 
+
+> k=0
+
+γkrt+k+1 is the empirical return from time t. The key insight is that ˆGt is a Monte Carlo estimate of qπ (St, A t): by definition, qπ (s, a ) = Eπ [Gt |
+
+St = s, A t = a], so a single rollout from state st after tak-ing action at gives an unbiased (but high-variance) sample of the action-value function. This substitution replacing qπ
+
+with the realized return from the trajectory is what makes REINFORCE a practical algorithm, at the cost of high vari-ance. 
+
+2.4. Variance Reduction via Baselines 
+
+To reduce variance, we can subtract any state-dependent baseline b(St) from the return. This does not introduce bias because: 
+
+Eπθ [b(St)∇θ log πθ (At | St)] = b(St) X
+
+> a
+
+∇θ πθ (a | St) = b(St)·∇ θ 1 = 0 .
+
+(6) Therefore we can write: 
+
+ˆgRF = 
+
+> T−1
+
+X
+
+> t=0
+
+γt( ˆGt − b(St)) ∇θ log πθ (At | St). (7) The variance-minimizing choice is b∗(s) = vπ (s). To see why this yields the advantage, note that the return ˆGt can be decomposed via the Bellman equation. In the one-step (TD) form: 
+
+ˆGt = rt+1 + γ ˆGt+1 = rt+1 + γv π (St+1 ). (8) Subtracting the baseline b(St) = vπ (St):
+
+ˆGt − vπ (St) ≈ rt+1 + γv π (St+1 ) − vπ (St) = δt, (9) which is the temporal difference (TD) error. In expectation, this equals the advantage: E[ ˆGt − vπ (St) | St = s, A t =
+
+a] = qπ (s, a )−vπ (s) = Aπ (s, a ). Thus the policy gradient becomes: 
+
+∇θ J(θ) = E
+
+"T −1X
+
+> t=0
+
+γtAπ (St, A t)∇θ log πθ (At | St)
+
+#
+
+.
+
+(10) This is the advantage actor-critic gradient. The challenge is that computing vπ (s) exactly requires a learned critic which is precisely what GRPO eliminates. 
+
+2.5. Deriving GRPO 
+
+GRPO arises from two specializations of the advantage-based policy gradient (Equation (10)). 
+
+Specialization 1: Output-only reward (ORM). In LLM training with an outcome reward model, reward is given only at the terminal state: r(st, a t) = 0 for all t < T − 1,and r(sT −1, a T −1) = Rterminal . Setting γ = 1 , consider what happens to the advantage at each token position. The return at any time step t is: 
+
+ˆGt = 
+
+> T−1
+
+X
+
+> k=t
+
+r(sk, a k) = Rterminal ∀ t ∈ { 0, . . . , T − 1},
+
+(11) since all intermediate rewards are zero. Now consider the value function: since the only reward comes at the end and γ = 1 , the value of any intermediate state st along a trajectory is the expected terminal reward conditioned on being in that state. But crucially, once we condition on the full trajectory (as in REINFORCE), the realized return is the same Rterminal regardless of which token position t we evaluate. 2Policy Gradient Foundations of GRPO: Credit Assignment, Gradient Sparsity, and Rank Collapse 
+
+This means the TD error at every position becomes: 
+
+δt = rt+1 + vπ (st+1 ) − vπ (st) = 0 + vπ (st+1 ) − vπ (st)
+
+(12) and the full Monte Carlo advantage ˆGt − vπ (st) =
+
+Rterminal − vπ (st). Since all states share the same initial prompt s0 and the value function under output-only reward satisfies vπ (s0) = Eπ [Rterminal | s0], the advantage estimate for the entire trajectory collapses to a single scalar: 
+
+At = Rterminal − vπ (s0) ∀ t. (13) 
+
+Every token receives the same advantage. The first token, the critical reasoning step, and filler tokens all get identical credit. 
+
+Specialization 2: Group-mean baseline. The remaining challenge is estimating vπ (s0). Instead of learning a critic, GRPO estimates it by sampling R rollouts from the same prompt and computing the sample mean: 
+
+ˆvR(s0) = 1
+
+R
+
+> R
+
+X
+
+> i=1
+
+ri, (14) where ri is the terminal reward of rollout i. This is a valid Monte Carlo estimate of vπ (s0) = Eπ [Rterminal | s0].Substituting both specializations into Equation (7), the GRPO gradient for a single prompt is: 
+
+ˆgGRPO = 1
+
+R
+
+> R
+
+X
+
+> i=1
+
+(ri − ˆvR)
+
+| {z }
+
+> ˆAi
+> Ti−1
+
+X
+
+> t=0
+
+∇θ log πθ (a(i) 
+
+> t
+
+| s(i) 
+
+> t
+
+).
+
+(15) This derivation makes explicit that GRPO is REINFORCE with a specific baseline choice, operating under the output-only reward assumption. The key consequence is immediate: 
+
+ˆAi does not depend on t.
+
+Note: The full GRPO objective also includes importance sampling clipping (analogous to PPO) and a KL divergence penalty against a reference policy. We omit these terms here as they affect the optimization step size but not the fundamental structure of the gradient signal—the credit assignment and rank properties we analyze depend only on the advantage estimator. 
+
+## 3. Credit Assignment Failure 
+
+We now formalize the credit assignment implications of Equation (15). Recall that in GRPO, we sample R rollouts from a single prompt s0 and compute one shared baseline 
+
+ˆvR(s0) = 1
+
+> R
+
+PRi=1 ri. The advantage for rollout i is then 
+
+ˆAi = ri − ˆvR(s0)—a scalar that measures how much better (or worse) rollout i performed relative to the group. Note that ˆAi̸ = 0 in general; it is positive for above-average rollouts and negative for below-average ones. The critical observation is what happens within each rollout: 
+
+Theorem 3.1 (Uniform Token-Level Credit) . Under output-only reward with γ = 1 , the advantage assigned to every token position t within rollout i is the same scalar: 
+
+ˆAi(t) = ri − ˆvR(s0) = ˆAi ∀ t ∈ { 0, . . . , T i − 1}. (16) 
+
+That is, GRPO assigns a single rollout-level credit signal uniformly across all token positions. The per-token gradient contribution is: 
+
+ˆgi(t) = ˆAi · ∇ θ log πθ (a(i) 
+
+> t
+
+| s(i) 
+
+> t
+
+), (17) 
+
+where ˆAi depends on the group of R rollouts but not on which token position t within rollout i we are at. Proof. Under ORM, the return at any position t within roll-out i is G(i) 
+
+> t
+
+= R(i) 
+
+> terminal
+
+= ri (since all intermediate rewards are zero and γ = 1 ). The baseline ˆvR(s0) = 1
+
+> R
+
+PRj=1 rj
+
+is computed once from the R group rewards and shared across all positions. Therefore ˆAi(t) = G(i) 
+
+> t
+
+− ˆvR(s0) = 
+
+ri − ˆvR(s0) = ˆAi, independent of t.
+
+Remark 3.2 (Credit Assignment Interpretation) . The advan-tage ˆAi is non-zero—it captures whether rollout i is better or worse than the group average. However, this credit signal cannot distinguish which tokens within rollout i were re-sponsible for the outcome. A rollout that succeeds because of a single correct reasoning step in the middle has every token—including irrelevant preamble and filler—reinforced equally. GRPO provides inter-rollout credit (which rollouts are good) but no intra-rollout credit (which tokens within a rollout are good). 
+
+3.1. Gradient Factorization 
+
+Since ˆAi is the same for every token in rollout i, we can factor it out of the inner sum in Equation (15). Define the 
+
+trajectory score of rollout i as the sum of all per-token log-probability gradients: 
+
+ψi =
+
+> Ti−1
+
+X
+
+> t=0
+
+∇θ log πθ (a(i) 
+
+> t
+
+| s(i) 
+
+> t
+
+) ∈ Rd. (18) This is a single vector that represents the direction in param-eter space that would increase the likelihood of the entire sequence i. The GRPO gradient then simplifies to: 
+
+ˆgGRPO = 1
+
+R
+
+> R
+
+X
+
+> i=1
+
+ˆAi · ψi. (19) Each rollout contributes one scalar weight ( ˆAi, how good the rollout was) times one direction ( ψi, how to make it more 3Policy Gradient Foundations of GRPO: Credit Assignment, Gradient Sparsity, and Rank Collapse 
+
+likely). If GRPO had token-level advantages, we could not factor this way—different tokens would pull in different directions with different magnitudes. The uniform credit is what enables this rank-reducing factorization. 
+
+## 4. Structural Constraints on Advantages 
+
+The factorized form Equation (19) reveals that the GRPO gradient is entirely determined by the advantage vector 
+
+( ˆA1, . . . , ˆAR) and the trajectory scores (ψ1, . . . , ψ R). We now characterize structural properties of the advantage vec-tor that constrain the gradient. 
+
+Theorem 4.1 (Zero-Sum and Correlation Structure) . The GRPO advantages satisfy: (i) Zero-sum: PRi=1 ˆAi = 0 . The advantages within a group always cancel—positive and negative rollouts exactly balance. (ii) Variance: Var( ˆAi) = R−1 
+
+> R
+
+σ2 
+
+> r
+
+, where σ2 
+
+> r
+
+= Var πθ (r |
+
+s0) is the reward variance under the current policy. (iii) Negative correlation: Cov( ˆAi, ˆAj ) = − σ2 
+
+> r
+> R
+
+for i̸ = j.Making one rollout’s advantage more positive neces-sarily pushes others more negative. (iv) ϵ-Effective rollouts: Define a rollout i as ϵ-effective if | ˆAi| = |ri − ˆvR| > ϵ . The expected fraction of 
+
+ϵ-effective rollouts is bounded by: 
+
+ρϵ = P
+
+
+
+| ˆAi| > ϵ 
+
+
+
+≤ (R − 1) σ2
+
+> r
+
+Rϵ 2 . (20) 
+
+Only ϵ-effective rollouts contribute meaningful gradi-ent signal; the rest produce near-zero updates. Proof. (i) P 
+
+> i
+
+ˆAi = P
+
+> i
+
+(ri − ˆvR) = P 
+
+> i
+
+ri − R · 1
+
+> R
+
+P 
+
+> i
+
+ri =0.(ii) Write ˆAi = ri − 1
+
+> R
+
+P 
+
+> j
+
+rj = R−1 
+
+> R
+
+ri − 1
+
+> R
+
+P  
+
+> j̸=i
+
+rj .Since the rj are i.i.d.: Var( ˆAi) =   R−1
+
+> R
+
+2 σ2 
+
+> r
+
++ R−1 
+
+> R2
+
+σ2 
+
+> r
+
+= 
+
+> R−1
+> R
+
+σ2 
+
+> r
+
+.(iii) From Var( P 
+
+> i
+
+ˆAi) = 0: R Var( ˆAi) + R(R −
+
+1) Cov( ˆAi, ˆAj ) = 0 , giving Cov( ˆAi, ˆAj ) = −σ2 
+
+> r
+
+/R .(iv) By Chebyshev’s inequality: P(| ˆAi| > ϵ) ≤
+
+Var( ˆAi)/ϵ 2 = R−1 
+
+> R
+
+σ2 
+
+> r
+
+/ϵ 2.
+
+Corollary 4.2 (Gradient Signal Decay) . The magnitude of the gradient ∥ˆgGRPO ∥ scales with σr —the reward standard deviation under the current policy. As training progresses and the policy converges (i.e., it gets most problems right or most wrong for a given prompt), σr → 0 and the advantages 
+
+ˆAi → 0 for all i simultaneously. When all rollouts from a prompt receive the same reward, ˆAi = 0 exactly and the prompt contributes zero gradient. 
+
+The zero-sum constraint means GRPO can only learn from prompts where the R rollouts produce diverse rewards— some correct, some incorrect. Prompts that are too easy (all correct) or too hard (all wrong) yield ˆAi = 0 for every roll-out and contribute nothing to learning. This makes GRPO a natural curriculum : it automatically focuses on prompts at the boundary of the policy’s capability, where reward variance is highest. 
+
+## 5. Sparse Gradient Updates and Rank Collapse 
+
+We now discuss how the GRPO gradient structure encour-ages sparse parameter updates and empirically leads to low-rank gradients. 
+
+5.1. Why Updates Are Sparse 
+
+From Equation (19), the gradient is ˆg = 1
+
+> R
+
+P 
+
+> i
+
+ˆAiψi. Two structural properties conspire to make this sparse: 
+
+(1) Zero-sum advantages concentrate signal. Since P 
+
+> i
+
+ˆAi = 0 , the gradient is determined entirely by the con-trast between rollouts. Consider binary reward ( r ∈ { 0, 1})as in GSM8K: if k of R rollouts are correct, then the cor-rect rollouts have ˆAi = 1 − k/R and incorrect ones have 
+
+ˆAi = −k/R . When k is close to 0 or R (easy/hard prompts), the advantages become small and the gradient vanishes. Only prompts where some rollouts succeed and some fail produce meaningful signal. 
+
+(2) Uniform credit concentrates in few directions. Be-cause ˆAi is a single scalar for all tokens in rollout i, the gradient for each rollout points in one direction ψi. If trajec-tory scores are similar (e.g., rollouts from the same prompt share syntactic structure), the R directions ψi cluster. We hy-pothesize that this clustering, combined with the zero-sum advantages, is what empirically concentrates the gradient into a low-dimensional (often rank-2) subspace. 
+
+## 6. Multi-Turn Limitation 
+
+The derivation in Section 2 reveals why GRPO is inherently a single-turn method. Recall the standard advantage at state 
+
+st:
+
+Aπ (st, a t) = qπ (st, a t)−vπ (st) = rt+1 +γv π (st+1 )−vπ (st).
+
+(21) This requires bootstrapping from the next state’s value 
+
+vπ (st+1 )—which is what a learned critic provides in PPO. GRPO has no critic. It uses the group-mean baseline ˆvR(s0),which estimates the value of the initial state s0 only. In the 4Policy Gradient Foundations of GRPO: Credit Assignment, Gradient Sparsity, and Rank Collapse 
+
+single-turn ORM setting this is fine: with γ = 1 and rt = 0 
+
+for t < T − 1, the advantage at every position reduces to 
+
+Rterminal − vπ (s0), and ˆvR(s0) is an unbiased estimate of 
+
+vπ (s0).But in multi-turn settings with per-step rewards r1, . . . , r H ,the true advantage at stage h requires vπ (sh)—the value of the current state, not the initial state. GRPO still subtracts 
+
+ˆvR(s0) from the total return: 
+
+ˆAGRPO (h) = 
+
+> H
+
+X
+
+> h′=1
+
+rh′ − ˆvR(s0). (22) This conflates past rewards (already received, not actionable) with future rewards (what the agent can still influence), introducing bias: 
+
+Bias h =
+
+> h−1
+
+X
+
+> h′=1
+
+rh′ + vπ (sh) − vπ (s0), (23) which grows linearly with stage h. The first term is accu-mulated past reward; the second is the value mismatch from using vπ (s0) instead of vπ (sh).
+
+In short: GRPO cannot perform the bootstrapping step 
+
+γv π (st+1 ) because it has no value function. This makes it exact for single-turn generation (where bootstrapping is unnecessary) but introduces growing bias for multi-turn problems where the value of states changes along the trajec-tory. 
+
+## 7. Experiments 
+
+We validate our theoretical predictions empirically using GRPO training of Nemotron-4B on GSM8K. 
+
+7.1. Setup 
+
+We train Nemotron-4B (NVIDIA, 2024) with GRPO on GSM8K (mathematical reasoning, binary correctness re-ward). We vary the group size R ∈ { 2, 4, 8} across 3 ran-dom seeds. Using a custom gradient SVD tracker integrated into our FSDP training pipeline, we explicitly capture the fully reduced flattened gradients ( ∇θ J) for tracked linear layers (e.g., q proj , v proj ) every 50 optimizer steps. For each tracked layer at each checkpoint, we stack the per-rollout gradient contributions into a matrix G ∈ RR×d and compute its truncated SVD. 
+
+Metrics: 
+
+• Effective rank : reff = ( P 
+
+> i
+
+σi)2 / P 
+
+> i
+
+σ2
+
+> i
+
+• Top-1 fraction : σ21 / P 
+
+> i
+
+σ2 
+
+> i
+
+(variance explained by first component) • Reward std : σr (k) at training step k                   
+
+> Figure 1. Effective rank of the GRPO gradient matrix across training steps for R∈ { 2,4,8}. Despite the maximum possible rank being higher, effective rank remains ≈2throughout training.
+> Figure 2. Top-1 singular value fraction ( σ21/P
+> iσ2
+> i) across train-ing. R= 4 shows the highest concentration, while R= 8 diffuses energy across more components. This non-monotonic pattern is explained by the interplay between advantage concentration and trajectory score diversity.
+
+7.2. Results Effective rank ≈ 2 for all R. Across all group sizes, the effective rank of the gradient matrix remains approximately 
+
+2 (Table 1). This holds despite the theoretical maximum rank being larger for groups R ≥ 2.
+
+Interpretation. The rank-2 structure means that each GRPO gradient step moves parameters along only ∼2 di-rections , regardless of whether 2 or 8 rollouts are computed. The additional rollouts for R > 2 refine the magnitude and 
+
+direction of these two components but do not add new di-mensions of movement. This has direct implications for training efficiency: increasing R provides diminishing re-turns in terms of gradient informativeness. 5Policy Gradient Foundations of GRPO: Credit Assignment, Gradient Sparsity, and Rank Collapse                                 
+
+> Figure 3. Training accuracy on GSM8K for different group sizes. Despite rank-2 gradient structure for all R, larger groups still im-prove learning speed by providing better estimates of the advantage direction ¯ψ+−¯ψ−.
+> Table 1. Spectral properties of GRPO gradient matrices (Nemotron-4B, GSM8K). Effective rank stays ≈2while max possible rank grows with R.
+> RMAX RANK EFF . R ANK TOP -1 F RAC .22*∼20.6–0.7 43∼20.7–0.8 87∼20.5–0.6
+> *For R= 2 , while advantages are zero-sum ( ˆA1=−ˆA2), the trajectory scores ψ1
+> and ψ2are linearly independent, making the maximum possible rank 2.
+
+## 8. Discussion and Future Work 
+
+Connection to memorization vs. generalization. The uniform credit assignment (Theorem 3.1) means GRPO reinforces entire sequences indiscriminately. From the memorization/generalization perspective, this biases toward 
+
+template-level learning : sequences that consistently achieve high reward are reinforced as holistic units, rather than hav-ing their compositional structure decomposed. This may explain why GRPO-trained models can reproduce success-ful reasoning patterns but struggle to compose them in novel ways. 
+
+Implications for multi-step reasoning. The multi-turn bias and rank-2 collapse together suggest that GRPO is poorly suited for learning which step in a reasoning chain matters. Process reward models (PRMs) that provide per-step credit are a natural remedy, but our analysis shows that even with dense reward, the group-relative baseline introduces structural limitations (negative correlations, zero-sum constraints) that constrain the gradient’s expressiveness. 
+
+Future directions. (1) Adaptive baselines : Can leave-one-out (RLOO) or learned token-level baselines break the rank-2 bottleneck? (2) Rank-aware training : If effective rank predicts training saturation, can we use it as a signal to increase R or switch to denser rewards? (3) Progressive rank collapse over training : Our theory predicts effective rank should decrease as σr → 0; longitudinal measurement would validate Theorem 4.2. 
+
+## 9. Related Work 
+
+Policy gradients and baselines. The policy gradient theo-rem (Sutton et al., 1999), REINFORCE (Williams, 1992), and optimal baselines (Weaver & Tao, 2001) provide the foundation. GAE (Schulman et al., 2015) offers a bias-variance tradeoff via temporal-difference mixing. 
+
+GRPO and RLHF. GRPO was introduced in DeepSeek-Math (Shao et al., 2024) and used in DeepSeek-R1 (DeepSeek-AI, 2025). RLOO (Ahmadian et al., 2024) uses a leave-one-out baseline that eliminates the O(1 /R ) bias. DPO (Rafailov et al., 2023) avoids RL entirely. 
+
+Credit assignment in LLMs. Process reward models (Lightman et al., 2023) address token-level credit. Re-cent work on advantage-weighted regression and return-conditioned training explores alternative credit mechanisms. 
+
+Gradient rank in deep learning. Low-rank gradient struc-ture has been observed in supervised learning (Li et al., 2018) and exploited in efficient fine-tuning (LoRA, Hu et al., 2021). Our work identifies a theoretical reason for low rank specific to GRPO’s policy gradient structure. 
+
+## 10. Conclusion 
+
+We have shown that GRPO, derived from first principles of the policy gradient theorem, suffers from a fundamen-tal credit assignment limitation: output-only reward forces identical advantage across all tokens, collapsing the gradient into a rank-2 structure independent of group size. This is validated empirically on Nemotron-4B/GSM8K. Our results formalize when GRPO’s simplicity is theoretically justi-fied (single-turn, high initial σr ) and where it breaks down (multi-step reasoning requiring fine-grained credit). Break-ing the rank-2 bottleneck—via denser rewards, token-level baselines, or hybrid approaches—is an important direction for scaling RLHF to complex reasoning tasks. 
+
+## References 
+
+Ahmadian, A., Cremer, C., Gall ´e, M., Fadaee, M., Kreutzer, J., Pietquin, O., ¨Ust ¨un, A., and Hooker, S. Back to basics: Revisiting REINFORCE style optimization for learning from human feedback in LLMs. arXiv preprint arXiv:2402.14740 , 2024. DeepSeek-AI. DeepSeek-R1: Incentivizing reasoning capa-bility in LLMs via reinforcement learning. arXiv preprint arXiv:2501.12948 , 2025. 6Policy Gradient Foundations of GRPO: Credit Assignment, Gradient Sparsity, and Rank Collapse 
+
+Hu, E. J., Shen, Y., Wallis, P., Allen-Zhu, Z., Li, Y., Wang, S., Wang, L., and Chen, W. LoRA: Low-rank adaptation of large language models. arXiv preprint arXiv:2106.09685 , 2021. Li, C., Farkhoor, H., Liu, R., and Yosinski, J. Measuring the intrinsic dimension of objective landscapes. arXiv preprint arXiv:1804.08838 , 2018. Lightman, H., Kosaraju, V., Burda, Y., Edwards, H., Baker, B., Lee, T., Leike, J., Schulman, J., Sutskever, I., and Cobbe, K. Let’s verify step by step. arXiv preprint arXiv:2305.20050 , 2023. NVIDIA. Nemotron-4 15b technical report. arXiv preprint arXiv:2402.16819 , 2024. Ouyang, L., Wu, J., Jiang, X., Almeida, D., Wainwright, C. L., Mishkin, P., Zhang, C., Agarwal, S., Slama, K., Ray, A., et al. Training language models to follow in-structions with human feedback. Advances in Neural Information Processing Systems , 35, 2022. Rafailov, R., Sharma, A., Mitchell, E., Ermon, S., Manning, C. D., and Finn, C. Direct preference optimization: Your language model is secretly a reward model. In Advances in Neural Information Processing Systems , 2023. Schulman, J., Moritz, P., Levine, S., Jordan, M., and Abbeel, P. High-dimensional continuous control using generalized advantage estimation. arXiv preprint arXiv:1506.02438 ,2015. Schulman, J., Wolski, F., Dhariwal, P., Radford, A., and Klimov, O. Proximal policy optimization algorithms. 
+
+arXiv preprint arXiv:1707.06347 , 2017. Shao, Z., Wang, P., Zhu, Q., Xu, R., Song, J., Bi, X., Zhang, H., Zhang, M., Li, Y., Wu, Y., and Guo, D. DeepSeek-Math: Pushing the limits of mathematical reasoning in open language models. arXiv preprint arXiv:2402.03300 ,2024. Sutton, R. S., McAllester, D., Singh, S., and Mansour, Y. Policy gradient methods for reinforcement learning with function approximation. In Advances in Neural Informa-tion Processing Systems , pp. 1057–1063, 1999. Weaver, L. and Tao, N. The optimal reward baseline for gradient-based reinforcement learning. In Uncertainty in Artificial Intelligence , pp. 538–545, 2001. Williams, R. J. Simple statistical gradient-following algo-rithms for connectionist reinforcement learning. Machine Learning , 8(3):229–256, 1992. 7Policy Gradient Foundations of GRPO: Credit Assignment, Gradient Sparsity, and Rank Collapse 
+
+## A. Proofs 
+
+A.1. Proof of Theorem 4.1 (Full Details) Zero-sum: PRi=1 ˆAi = P
+
+> i
+
+(ri − ˆvR) = P 
+
+> i
+
+ri − RˆvR = P 
+
+> i
+
+ri − P 
+
+> i
+
+ri = 0 .
+
+Variance: Write ˆAi = ri − 1
+
+> R
+
+P 
+
+> j
+
+rj = R−1 
+
+> R
+
+ri − 1
+
+> R
+
+P  
+
+> j̸=i
+
+rj . Then: 
+
+Var( ˆAi) = 
+
+ R − 1
+
+R
+
+2
+
+Var( ri) + 1
+
+R2
+
+X 
+
+> j̸=i
+
+Var( rj ) (24) 
+
+= (R − 1) 2
+
+R2 σ2 
+
+> r
+
++ R − 1
+
+R2 σ2 
+
+> r
+
+= (R − 1) 2 + ( R − 1) 
+
+R2 σ2 
+
+> r
+
+= (R − 1) RR2 σ2 
+
+> r
+
+= R − 1
+
+R σ2 
+
+> r
+
+. (25) 
+
+Covariance: From Var( P 
+
+> i
+
+ˆAi) = 0 :
+
+R Var( ˆAi) + R(R − 1) Cov( ˆAi, ˆAj ) = 0 = ⇒ Cov( ˆAi, ˆAj ) = − Var( ˆAi)
+
+R − 1 = − σ2
+
+> r
+
+R .
+
+Sparsity bound: Var( ri − ˆvR) = Var( ˆAi) = R−1 
+
+> R
+
+σ2 
+
+> r
+
+. By Chebyshev: P(| ˆAi| > ϵ ) ≤ (R−1) σ2 
+
+> r
+> Rϵ 2
+
+.
+
+A.2. Hoeffding Inequality Analysis 
+
+The baseline ˆvR(s0) = 1
+
+> R
+
+PRi=1 ri is the arithmetic mean of R i.i.d. random variables with ri ∈ [0 , 1] and E[ri] = vπ (s0).By Hoeffding’s inequality for bounded i.i.d. random variables: 
+
+P 1
+
+R
+
+> R
+
+X
+
+> i=1
+
+ri − E[ri] > ϵ 
+
+!
+
+≤ 2 exp −2R2ϵ2
+
+PRi=1 (bi − ai)2
+
+!
+
+= 2 exp 
+
+ −2R2ϵ2
+
+R · 12
+
+
+
+= 2 exp( −2Rϵ 2).
+
+Interpretation by group size: 
+
+R P(|ˆvR − vπ | > 0.3) P(|ˆvR − vπ | > 0.2) P(|ˆvR − vπ | > 0.1) 
+
+2 ≤ 1.34 (vacuous) ≤ 1.70 (vacuous) ≤ 1.92 (vacuous) 4 ≤ 0.93 (vacuous) ≤ 1.44 (vacuous) ≤ 1.85 (vacuous) 8 ≤ 0.44 ≤ 1.05 (vacuous) ≤ 1.71 (vacuous) 16 ≤ 0.10 ≤ 0.55 ≤ 1.47 (vacuous) The bound becomes non-trivial only for larger R or larger ϵ. This reflects the fact that with few rollouts ( R = 2 , 4), the baseline has substantial variance ( σ2 
+
+> r
+
+/R ), and the advantages are noisy estimates of the true ri − vπ (s0).
+
+Connection to advantage quality: The advantage error for rollout i is: 
+
+ˆAi − (ri − vπ (s0)) = vπ (s0) − ˆvR(s0).
+
+So this directly bounds the advantage estimation error: with probability ≥ 1 − 2e−2Rϵ 2
+
+, every rollout’s advantage is within 
+
+ϵ of its true value ri − vπ (s0).
+
+A.3. Multi-Turn Bias Derivation 
+
+In multi-turn with H stages, the true advantage at stage h is: 
+
+Aπ (sh, a h) = Eπ
+
+" HX
+
+> h′=h
+
+rh′ | sh, a h
+
+#
+
+− vπ (sh).
+
+8Policy Gradient Foundations of GRPO: Credit Assignment, Gradient Sparsity, and Rank Collapse 
+
+GRPO, lacking a value function for intermediate states, uses the same estimate for all stages: 
+
+ˆAGRPO (h) = 
+
+> H
+
+X
+
+> h′=1
+
+rh′
+
+| {z }
+
+> total return
+
+− ˆvR(s0)
+
+| {z } 
+
+> baseline from initial state
+
+.
+
+The key issue: GRPO subtracts ˆvR(s0) ≈ vπ (s0) when it should subtract vπ (sh). Taking expectations conditioned on 
+
+(sh, a h):
+
+E[ ˆAGRPO (h) | sh, a h] = 
+
+> h−1
+
+X
+
+> h′=1
+
+rh′
+
+| {z }
+
+> past rewards (fixed)
+
++ E
+
+" HX
+
+> h′=h
+
+rh′ | sh, a h
+
+#| {z } 
+
+> =qπ(sh,a h)
+
+−vπ (s0) (26) 
+
+=
+
+> h−1
+
+X
+
+> h′=1
+
+rh′ + Aπ (sh, a h) + vπ (sh) − vπ (s0). (27) Therefore: 
+
+Bias h = E[ ˆAGRPO (h)] − Aπ (sh, a h) = 
+
+> h−1
+
+X
+
+> h′=1
+
+rh′
+
+| {z }
+
+> past reward leakage
+
++ vπ (sh) − vπ (s0)
+
+| {z }
+
+> value mismatch
+
+.
+
+The bias has two sources: 1. Past reward leakage : Rewards from stages 1, . . . , h − 1 are included in the return but are not attributable to action ah.This grows as h increases. 2. Value mismatch : GRPO bootstraps from vπ (s0) instead of vπ (sh). In the standard advantage (Equation (21)), we subtract vπ (st)—the value of the current state. Without a critic, GRPO cannot compute vπ (sh) for h > 0.Bounding: | Bias h | ≤ (h − 1) rmax + |vπ (sh) − vπ (s0)| ≤ (h − 1) rmax + 2 Vmax .For single-turn ( H = 1 ): Bias 1 = 0 (no past rewards, no value mismatch). GRPO is exact. 9

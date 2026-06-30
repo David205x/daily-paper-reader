@@ -1,0 +1,828 @@
+Title: Process Advantage Signal Shaping: A Paradigm-Agnostic Middleware for Process-Supervised RL in LLM Reasoners
+
+URL Source: https://arxiv.org/pdf/2606.29296v1
+
+Published Time: Tue, 30 Jun 2026 01:04:24 GMT
+
+Number of Pages: 19
+
+Markdown Content:
+# PROCESS ADVANTAGE SIGNAL SHAPING : A PARADIGM -A GNOSTIC MIDDLEWARE FOR 
+
+# PROCESS -S UPERVISED RL IN LLM R EASONERS 
+
+Chao Wang ∗†
+
+Tsinghua University 
+
+Hongtao Tian ∗
+
+WeChat, Tencent 
+
+Tao Yang ‡
+
+WeChat, Tencent 
+
+Yunsheng Shi 
+
+WeChat, Tencent 
+
+Ting Yao 
+
+WeChat, Tencent 
+
+Wenbo Ding ‡
+
+Tsinghua University 
+
+# ABSTRACT 
+
+Group Relative Policy Optimization (GRPO) is a default recipe for process-supervised reinforcement learning of LLM reasoners, and dense process supervision—via learned process reward models (PRMs) or on-policy-distillation KL signals—is a common way to densify its otherwise weak outcome reward. Layering such a step-level signal on top of GRPO’s group-standardized advantage, however, exposes three structural pathologies: channel contamination between the pooled process, outcome, and format streams at group standardization; resolution mismatch between the granularity of the process signal and the granularity of the logical decisions being credited; and a cumulative trap by which GRPO’s return-to-go sum surfaces either length inflation or truncated exploration depending on the sign regime of the signal. We propose PASS (Process Advantage Signal Shaping ), a compact middleware that sits between any scalar step-level process signal and GRPO’s clipped surrogate and addresses the three pathologies in turn: Advantage Fusion standardizes the three streams independently within each group, Chunk-by-Value derives value-homogeneous chunks from the signal itself and broadcasts credit within each chunk, and Divide-Length converts the cumulative objective into an average-value-density score. We validate PASS across two domains and two process-signal paradigms—a learned PRM on mathematical reasoning and an on-policy-distillation KL signal (with a generalized variant) on multi-hop question answering—and under two group-standardization operators. In every regime PASS delivers a consistent pass@1 gain over the corresponding GRPO baseline. 
+
+# 1 Introduction 
+
+Group Relative Policy Optimization (GRPO) [Shao et al., 2024, Guo et al., 2025] has become a default recipe for process-supervised reinforcement learning (RL) of large language model (LLM) reasoners. When an outcome reward alone leaves long reasoning trajectories only weakly supervised, a natural remedy is to add a dense process signal 
+
+that scores the trajectory step by step: a learned process reward model (PRM) [Zhang et al., 2025, Lightman et al., 2023] in mathematical reasoning, or a token-level KL-style divergence against a stronger teacher, as in on-policy distillation [Agarwal et al., 2023], in more open-ended reasoning. In practice, however, attaching such a dense signal to GRPO’s clipped surrogate is rarely a drop-in operation, and the difficulties it surfaces are not properties of the signal itself but artifacts of how GRPO forms its advantage. These difficulties align naturally with the three stages of GRPO’s advantage pipeline: aggregation, broadcast, and trajectory summation. At the aggregation stage, pooling the process, outcome, and format streams into a single within-group standardization lets the high-variance outcome reward absorb the fine-grained fluctuations of sprc ; recent work 
+
+> ∗
+
+Contributed equally. 
+
+> †
+
+Work done while interning at Tencent. 
+
+> ‡
+
+Corresponding Author. luckytyang@tencent.com , ding.wenbo@sz.tsinghua.edu.cn 
+
+> arXiv:2606.29296v1 [cs.AI] 28 Jun 2026
+
+Process Advantage Signal Shaping: A Paradigm-Agnostic Middleware for Process-Supervised RL in LLM Reasoners has linked such naïve channel mixing to sharp accuracy drops and has traced the instability back to the group-relative statistic itself [Ye et al., 2025, Liu et al., 2026]. At the broadcast stage, the spatial granularity of sprc rarely matches the granularity of the logical decisions the policy actually makes: a PRM is too coarse, a token-level reverse KL is too fine, so the per-token advantage is either blunt or noisy. Recent surveys of credit-assignment granularity indeed single out the absence of a signal-driven mechanism for matching the resolution of credit to the resolution of reasoning as an open problem [Zhang, 2026]. At the trajectory-summation stage, GRPO’s return-to-go objective unconditionally rewards any step with a non-negative marginal contribution, which projects onto two different failure modes depending on the sign regime of sprc : length inflation and reward hacking [Liu et al., 2026, Sullivan, 2025, Li et al., 2026a] under a positively biased signal, and premature truncation under the negatively biased token-level reverse KL of on-policy distillation. A mechanism that addresses only one of these three stages, or only one of these two sign regimes, will leave the rest intact. We propose PASS (Process Advantage Signal Shaping ), a compact middleware that sits between any scalar step-level process signal sprc and GRPO’s clipped surrogate. PASS is deliberately not a new RL algorithm: it does not modify the clipped surrogate, the KL regularizer, or the rollout loop; it only reshapes how a generic scalar signal is turned into the per-token advantage that GRPO consumes. Its three rules line up, in the same order, with the three stages at which the difficulties above arise: Advantage Fusion (AF) at aggregation, Chunk-by-Value (CV) at broadcast, and Divide-Length 
+
+(DL) at trajectory summation. The three rules are stated in terms of a generic scalar step-level score and the same middleware is applied in both of our domains without algorithmic changes. Section 4 presents the precise definition of each rule and a first-order analysis of its effect on the GRPO gradient. 
+
+Empirical scope. We validate PASS in two domains that exercise very different process-signal paradigms. In mathematical reasoning, sprc is a learned PRM score and we evaluate on a standard panel of competition and school-level benchmarks. In multi-hop question answering, sprc is a token-level reverse-KL against a stronger teacher, realized both as vanilla on-policy distillation (OPD) and as a generalized variant (G-OPD) that anchors the divergence at an additional base policy; we evaluate on three multi-hop benchmarks that vary in hop count and distractor difficulty. To further isolate the contribution of PASS itself from the choice of numerical preprocessing, we additionally run every multi-hop configuration under two group-standardization operators in common use, masked-mean/std (Masked-Norm) and absolute-maximum scaling (Abs-Max Scaling). Across all of these axes, PASS is a positive and consistent contribution over its corresponding GRPO baseline. 
+
+Contributions. Our work makes the following contributions. • We identify three structural difficulties that arise when dense process supervision is layered on cumulative-advantage GRPO—aggregation-time channel contamination, broadcast-time resolution mismatch, and trajectory-time cumulative bias—and introduce PASS , a thin advantage-shaping middleware whose three rules (AF, CV, DL) address the three stages one by one. • We prove a length-collapse theorem for cumulative-advantage GRPO (Theorem 1) and show analytically that the DL rule converts the objective into an average-value-density form whose gradient is a two-sided marginal-value filter, symmetric in the sign of the marginal contribution. • We validate PASS across two process-signal paradigms, two domains, and two group-standardization operators, observing consistent pass@1 gains over the corresponding GRPO baseline in every regime. 
+
+# 2 Related Work 
+
+Process-reward models and mixed-reward GRPO. Dense PRMs were popularized by step-level verifiers [Lightman et al., 2023] and refined with self-supervised process-data pipelines [Zhang et al., 2025]. Layering such signals on GRPO-style group-normalized RL [Shao et al., 2024, Guo et al., 2025], however, repeatedly misbehaves: Sullivan [2025] shows that GRPO itself already acts as an implicit and frequency-biased process reward estimator, and Ye et al. [2025] reports that naïve mixing of outcome and process rewards can degrade accuracy by double-digit margins, tracing the instability back to incompatible channels sharing one group-standardization statistic. Proposed remedies split into three routes—frequency reweighting within the group [Sullivan, 2025], consistency filtering of rollouts [Ye et al., 2025], and reward-decoupled normalization [Liu et al., 2026]—all of which motivate PASS’s decoupling at the per-token advantage level rather than at the scalar reward. 
+
+Credit-assignment granularity. A parallel line targets the mismatch between the granularity of an RL signal and that of the logical transitions it should credit. Zhang [2026] organizes existing approaches into a granularity spectrum and identifies the absence of a signal-driven mechanism for matching credit resolution to reasoning resolution as a central open problem. Representative attacks on different points of this spectrum carry different costs: FIPO [Ma 2Process Advantage Signal Shaping: A Paradigm-Agnostic Middleware for Process-Supervised RL in LLM Reasoners et al., 2026] reweights tokens by a discounted future-KL term, which scales poorly on long trajectories; counterfactual span weighting [Khandoga et al., 2026] masks candidate spans but assumes correctness concentrates on a small, identifiable set; attribution-based approaches such as ACPO [Yin et al., 2025] rely on upstream semantic segmenters that degrade on unstructured reasoning. PASS addresses the similar spectrum without either auxiliary networks or correctness-localization assumptions. 
+
+Length inflation and the cumulative trap. Analyses of GRPO’s return-to-go structure consistently document a structural bias toward longer trajectories [Razin et al., 2025, Li et al., 2026a]. Proposed mitigations include multiplicative length rescaling (GR 3 [Li et al., 2026a]), which requires careful penalty-strength tuning, and correctness-decoupled baselines (DRPO [Li et al., 2025]), which presuppose an oracle that reliably labels rollouts as correct or incorrect. A recent survey [Liu et al., 2025] further notes that explicit length penalties cannot cleanly separate necessary long derivations from redundant verbosity. Divide-Length sidesteps both issues by rewriting the cumulative objective as an average-value-density score, expressing the admission criterion for additional tokens entirely in terms of the signal’s marginal contribution. 
+
+On-policy distillation dynamics. On-policy distillation [Agarwal et al., 2023] offers an alternative, token-level KL-style step signal. Li et al. [2026b] shows that the reliability of this signal is not uniform across depth: as the student drifts out-of-distribution, elevated teacher entropy emerges at the suffix and propagates backward over training, eventually bottlenecking long-horizon reasoning. This substantiates, from a different angle than the GRPO-native literature above, the need for a shaping mechanism that does not treat every token as a first-class credit-assignment unit. Our HotpotQA experiments (§5.2) then show that PASS transfers without algorithmic change from PRM-style signals to OPD and G-OPD [Yang et al., 2026] KL-style signals. 
+
+# 3 Preliminaries 
+
+We briefly formalize Group Relative Policy Optimization (GRPO) with process supervision, following the notation of Shao et al. [2024], Guo et al. [2025]. Let q denote an input query and let πθ be the policy under optimization. GRPO samples a group of G candidate outputs {o1, o 2, . . . , o G} from πθ (· | q). Each output oi is further segmented into Ki
+
+reasoning chunks by a tokenizer-level rule D (e.g., step boundaries produced by a reasoning template, or boundaries induced by a score trace). We let index( j) denote the ending token index of the j-th chunk of oi, and write Li for the total length of oi.
+
+Process signal. We adopt a generic notation sprc (i, j ) ∈ R for a scalar process signal evaluated at step j of output 
+
+oi. We intentionally leave the origin of sprc unspecified at this stage: it may be a Process Reward Model (PRM) score [Lightman et al., 2023], a token-level (reverse) KL divergence against a teacher policy, or any other step-level scalar that ranks local quality. Section 4 instantiates sprc for both the PRM and the on-policy distillation [Agarwal et al., 2023] regimes used in our experiments. 
+
+Group normalization. Following standard GRPO with process supervision, the raw step-level signals are pooled across the G outputs of the group, 
+
+S = {{ sprc (1 , 1) , . . . , s prc (1 , K 1)}, . . . , {sprc (G, 1) , . . . , s prc (G, K G)}} , (1) and standardized to produce the per-step score 
+
+˜sindex( j) 
+
+> i
+
+= N (sprc (i, j ); S) , (2) where N (·; S) denotes a group-level standardization operator (its concrete choice is deferred to §5). 
+
+Cumulative advantage. For any token at position t within oi, the baseline GRPO with process supervision computes a cumulative advantage by summing all remaining normalized step-level scores, 
+
+ˆAi,t = X  
+
+> index( j)≥t
+
+˜sindex( j) 
+
+> i
+
+. (3) The policy is then optimized by the GRPO clipped surrogate objective with ˆAi,t plugged in as the per-token advantage. This cumulative-sum formulation, together with the way sprc is combined with an outcome reward rout and a format reward rfmt , will motivate the PASS middleware described next. 3Process Advantage Signal Shaping: A Paradigm-Agnostic Middleware for Process-Supervised RL in LLM Reasoners 
+
+# 4 Method: The PASS Middleware 
+
+PASS ( Process Advantage Signal Shaping ) is a middleware that transforms any scalar step-level process signal sprc into a per-token advantage ˜Ai,t to be consumed by GRPO’s clipped surrogate, as illustrated in Figure 1, without otherwise modifying GRPO’s update rule, KL regularizer, or rollout loop. It consists of three operators, each a direct response to one of the pathologies identified in §1: (i) Advantage Fusion (AF) answers channel contamination by standardizing the process, outcome, and format streams independently within each group before they are recombined; (ii) Chunk-by-Value 
+
+(CV) answers resolution mismatch by deriving value-homogeneous chunks directly from sprc and broadcasting credit within each chunk; (iii) Divide-Length (DL) answers the cumulative trap by converting the trajectory objective from a return-to-go sum into an average-value-density score, whose gradient is a two-sided marginal-value filter. We present each operator in turn; for the remainder of this section sprc retains its generic meaning from §3, and the symbol ˜A
+
+always denotes the PASS-reshaped advantage.  
+
+> AF
+> Fuse multi-domain signal
+> CV
+> Densify process signal
+> DL
+> Filter marginal value (RTG /(Ki−j+1) k)
+
+PASS Middleware    
+
+> Clipped Surrogate
+> (GRPO Objective)
+> s0s1· · · sn
+> Baseline Aggregation
+
+Figure 1: The process-supervised RL computation graph. Baseline GRPO pools all reward signals directly into a single surrogate. PASS intercepts the multi-domain process signals s0, s 1, . . . , s n, where each si represents the process signal from a different domain, via a three-stage middleware: Advantage Fusion (AF), Chunk-by-Value (CV), and Divide-Length (DL). DL is implemented as a chunk-count residual divisor (Ki − j + 1) k applied on top of the per-chunk return-to-go Gji , reshaping the per-token advantage without modifying the underlying RL algorithm. 
+
+4.1 Advantage Fusion 
+
+A reasoning trajectory oi exposes three supervisory streams: the step-level process signal sprc (i, j ), a sequence-level outcome reward rout ,i , and a sequence-level format reward rfmt ,i . The baseline GRPO recipe pools them into a single global set and standardizes that union within the group. Because the outcome reward is near-binary and therefore high-variance, the union statistic is dominated by outcome variance, and the clamped group-normalized advantage becomes largely insensitive to the step-level fluctuations of sprc (channel contamination, Pathology 1). AF instead normalizes the three streams independently within the group . We denote the resulting per-step normalized scores by 
+
+˜s(t) 
+
+> prc
+
+, ˜r(t) 
+
+> out
+
+, and ˜r(t)
+
+> fmt
+
+, and attach static mixing weights wprc , w out , w fmt with total magnitude W = wprc + wout + wfmt . A format indicator Ifmt ,i ∈ { 0, 1} marks whether oi complies with the required output template. The fused advantage is then the piecewise function 
+
+˜A(t) =
+
+(wprc ˜s(t) 
+
+> prc
+
++ wout ˜r(t) 
+
+> out
+
++ wfmt ˜r(t)
+
+> fmt
+
+, Ifmt ,i = 1 ,W · ˜r(t)
+
+> fmt
+
+, Ifmt ,i = 0 , (4) which acts as a mild curriculum: when the format is violated, both the process and outcome channels are gated off and the gradient is devoted entirely to recovering the format, with the rescaling by W keeping the gradient norm comparable across the two branches. This before-standardization decoupling is conceptually complementary to post-hoc reward-calibration approaches that regress out spurious correlates such as length bias after the reward has already been aggregated [Singhal et al., 2024]: AF intervenes at the group aggregation statistic itself rather than at the scalar reward, and therefore does not require estimating a calibration function or assuming a specific functional form for the contaminating correlate. AF is the PASS response to Pathology 1 (channel contamination); its pseudocode is given in Algorithm 1, and an empirical comparison against the more common baseline of linearly combining the three raw rewards before group standardization is reported in §5.1 (Table 3). 4Process Advantage Signal Shaping: A Paradigm-Agnostic Middleware for Process-Supervised RL in LLM Reasoners 
+
+Two instantiations of sprc . AF is agnostic to how sprc is sourced. We highlight two concrete regimes that cover the experiments of §5: • PRM-style. sprc (i, j ) = rindex( j) 
+
+> prm ,i
+
+, a step-level score from a learned PRM [Lightman et al., 2023]. Used for the math-reasoning experiments in §5.1. • KL-style (on-policy distillation). Writing ℓteacher (t) = log πteacher (xt | x<t ) and ℓθ (t) = log πθ (xt | x<t ) for the token-level log-probabilities at position t, we set sprc (i, j ) = P 
+
+> t∈step j
+
+ ℓteacher (t)−ℓθ (t), i.e., the (negated) token-level reverse KL against a teacher policy aggregated over tokens inside step j [Agarwal et al., 2023]. The Generalized On-Policy Distillation (G-OPD) variant of Yang et al. [2026] replaces this with a reference policy πbase (an anchor) and a reward-scaling coefficient λ, so that, with ℓbase (t) = log πbase (xt | x<t ),
+
+sG-OPD prc (i, j ) = − X 
+
+> t∈step j
+
+h  ℓθ (t) − ℓbase (t) − λ ·  ℓteacher (t) − ℓbase (t)i
+
+, (5) which reduces to standard OPD when λ = 1 and πbase = πθ . Used for the multi-hop QA experiments in §5.2. 
+
+4.2 Chunk-by-Value 
+
+Logical progression in long-form reasoning is rarely uniform where short mechanical derivations are punctuated by a few critical conceptual leaps [Li et al., 2026b]. The intrinsic spatial frequency at which trajectory value changes is rarely matched by the granularity at which sprc varies—a PRM emits one score per heuristic step, a token-level KL fluctuates at every token—so uniformly broadcasting ˜sprc at either granularity is either too blunt or too noisy. CV, as the response of PASS to Pathology 2 (resolution mismatch), addresses this by deriving the credit-assignment resolution from sprc itself. We introduce a deterministic boundary detector D that segments oi into Ki value-homogeneous chunks with ending token indices Bi = {b1, . . . , b Ki } (bKi = Li), defined as a numerical-equality run-length compressor :a new boundary is placed whenever sprc at the current token differs from the previous token by more than a small numerical tolerance η = 10 −8, i.e., an equality test up to floating-point noise. This threshold-free rule transfers across process signals with very different numeric ranges. For PRM-style signals, which are piecewise constant within a reasoning step, D recovers the PRM’s own step boundaries; for token-level KL-style signals, PASS applies 
+
+D to the group-averaged, already-standardized token signal inside the answer region, a choice that simultaneously filters sample-level noise (averaging), makes an equality-based compressor well-posed across scales (standardization), and restricts boundaries to optimizable tokens (answer-region masking). In both cases D is fully determined by sprc 
+
+and introduces no signal-type-specific hyperparameter; full pseudocode is given in Algorithm 2. We then write the chunk-level fused advantage as ˜Abj 
+
+> i
+
+(evaluated via Equation 4 at the boundary token) and broadcast it to every token within the chunk: ˜Ai,t = ˜Abj 
+
+> i
+
+, bj−1 < t ≤ bj , (6) so that tokens inside the same logical step share identical credit and value transitions receive their own dedicated chunks. 
+
+4.3 Divide-Length 
+
+CV fixes the local resolution of credit assignment, but the cumulative sum in Equation 3 is still insensitive, in a structural way, to whether an appended step is worth its own length. Under the return-to-go sum, any step with a non-negative marginal contribution is unconditionally rewarded, and any trajectory that continues into a negative-margin regime is unconditionally penalized at every additional step (the cumulative trap, Pathology 3). The next theorem, whose full proof is deferred to Appendix A, makes the positive-margin projection of this pathology precise. 
+
+Assumption 1 (Reachability of mediocre redundancy) . There exists a family of “safe, non-committal” reasoning steps (tautologies, redundant rewrites, trivial comments) that the policy πθ can readily generate and for which the process signal, after group standardization, is bounded below by some constant ϵ > 0.
+
+Theorem 1 (Length collapse in the summation paradigm) . Under Assumption 1, maximizing the expected initial cumulative advantage J(θ) = Eπθ [ ˆAi, 1] drives the optimal policy to extend the trajectory length Li toward the environment limit Lmax , diluting the logical density of the generation. Proof sketch. Appending m redundant steps to a valid, concise trajectory strictly increases the cumulative advantage by at least mϵ without altering the prefix, so the policy gradient is monotonically increasing in m; the full argument appears in Appendix A. To close this loophole, DL replaces the absolute cumulative sum with a length-attenuated logical-density score. Following the standard process-supervision aggregation used by GRPO [Shao et al., 2024], write Gji = P 
+
+> j′≥j
+
+˜Abj′ 
+
+> i
+
+for 5Process Advantage Signal Shaping: A Paradigm-Agnostic Middleware for Process-Supervised RL in LLM Reasoners the per-chunk return-to-go at chunk j of trajectory oi. DL attenuates each Gji by the residual chunk count (Ki − j + 1) k
+
+rather than by the absolute sequence length: 
+
+˜Abj , DL  
+
+> i
+
+= Gji
+
+(Ki − j + 1) k =
+
+P 
+
+> j′≥j
+
+˜Abj′
+
+> i
+
+(Ki − j + 1) k , k ≥ 0, (7) which, at j = 1 , recovers a trajectory-level average-value-density score S(oi) =   P Ki 
+
+> j=1
+
+˜Abj
+
+> i
+
+/(Ki)k. The DL-attenuated chunk-level value ˜Abj , DL  
+
+> i
+
+is then broadcast back to every token inside the chunk via the same rule as Equation 6, so tokens within one chunk continue to share an identical credit. Working with the residual chunk count rather than the residual token length keeps DL consistent with the chunk-by-chunk credit assignment of CV and avoids re-introducing a token-position dependence that CV has just eliminated. The exponent k interpolates between no-penalty ( k → 0) and strict average-reward MDP normalization ( k = 1 ): small k preserves the benefit of genuinely long, hard deductions; large k aggressively discounts redundancy. All multi-hop QA runs in this paper fix k = 0 .7; the sensitivity of the mathematical-reasoning results to k is ablated in Appendix C (Table 5). 
+
+A marginal-value reading of DL. To make explicit what DL does and does not promise, we analyze its effect at the path-score level S(oi) =   P Ki 
+
+> j=1
+
+˜Abj
+
+> i
+
+/(Ki)k from Equation 7. Consider appending one extra chunk of signed marginal contribution δ to a trajectory oi with Ki chunks whose current path score is S(oi). Under the summation objective the resulting change in S(oi) is simply δ, which is always non-negative whenever δ ≥ 0. Under the DL objective, to first order in 1/K i,
+
+∆S(oi) ≈ 1(Ki)k
+
+
+
+δ − k · S(oi)
+
+Ki
+
+
+
+, (8) so the sign of ∆S(oi) depends on whether the marginal contribution δ exceeds k times the current average value density 
+
+S(oi)/K i. DL therefore acts as a two-sided marginal-value filter : it admits additional steps only when they raise the trajectory’s average value density and rejects them otherwise. Crucially, the sign of δ in Equation 8 is not fixed by DL itself. When the regime is dominated by positive-biased redundant steps, DL suppresses them (its length-inflation defusal role noted after Theorem 1); when the regime is dominated by truncation of a trajectory that is still above its current density threshold, DL admits the depth-extending step. The two behaviors are symmetric consequences of the same admission criterion and require no algorithmic change across regimes. DL does not promise that the optimized trajectory must be shorter than a baseline trajectory; a policy that lengthens its output while strictly increasing value density is still improving under DL. This distinction matters for the interpretation of our multi-hop QA experiments in §5. DL is the PASS response to Pathology 3 (the cumulative trap); its pseudocode is given in Algorithm 3. 
+
+From process signal to advantage. Putting the three pieces together, PASS transforms an arbitrary process signal sprc 
+
+into a per-token advantage ˜Ai,t via: (1) independent group standardization of the three streams, (2) piecewise Advantage Fusion (Equation 4), (3) chunk-level broadcasting along D (Equation 6), (4) formation of the per-chunk return-to-go 
+
+Gji in the standard GRPO process-supervision sense, and (5) the residual chunk-count divisor (Ki − j + 1) k from DL (Equation 7) on top of Gji , with the resulting density-rescaled chunk value re-broadcast to every token inside the chunk. Each process signal sprc must first pass through a group-level standardization operator N (·; S). Two concrete instantiations of this operator are used in our experiments, Masked-Norm and Abs-Max Scaling; the interaction between the choice of N (·; S) and PASS is analyzed empirically in Appendix D. A complete algorithmic specification of the three operators and their end-to-end composition is given in Appendix B (Algorithms 1–4). 
+
+# 5 Experiments 
+
+We evaluate PASS on two intentionally dissimilar domains to test the claim that PASS is a paradigm-agnostic middleware, i.e., that its effectiveness does not hinge on the specific construction of the upstream process signal. The two subsections that follow are deliberately orthogonal in what they exercise. §5.1 pairs PASS with a learned PRM on mathematical reasoning: here the process signal is emitted at heuristic step boundaries and is piecewise constant within a step, so this subsection probes whether PASS can consume a discrete, coarse, boundary-aligned signal produced by an external scorer and convert it into a competitive advantage for the policy. §5.2 pairs PASS with a token-level reverse-KL signal obtained from on-policy distillation on multi-hop question answering: here sprc fluctuates at every token and has no natural step structure, so this subsection probes whether the same middleware can consume a dense, high-frequency, continuous signal produced implicitly by a teacher policy. Taken together, the two subsections are the two ends of the “process-signal paradigm” axis that the introduction identifies, and an improvement that is visible in both cases is what we read as evidence of paradigm-agnostic behavior rather than of fitting to a specific signal construction. A 6Process Advantage Signal Shaping: A Paradigm-Agnostic Middleware for Process-Supervised RL in LLM Reasoners detailed sensitivity study on the DL length exponent k and on the scale of the upstream PRM is deferred to Appendix C; an alternative group-standardization operator (Abs-Max Scaling) for the KL-style setting and a joint length–accuracy analysis across both operators are deferred to Appendix D. 
+
+5.1 Mathematical Reasoning with a PRM Process Signal Setup. We instantiate sprc as a Qwen2.5-Math-PRM-7B [Zhang et al., 2025] step-level score on Qwen2.5-Math-7B [Yang et al., 2024] as the actor, train on DeepScaleR [Michael Luo and Sijun Tan and Justin Wong and Xiaoxiang Shi and William Tang and Manan Roongta and Colin Cai and Jeffrey Luo and Tianjun Zhang and Erran Li and Raluca Ada Popa and Ion Stoica, 2025], and evaluate on AIME24/25, AMC23, GSM8K, MATH, Minerva, and Olympiad. Metrics are pass@1 / pass@8 (%) measured with the math_verify checker [Kydlíˇ cek, 2025]. Further dataset and optimizer details follow Michael Luo and Sijun Tan and Justin Wong and Xiaoxiang Shi and William Tang and Manan Roongta and Colin Cai and Jeffrey Luo and Tianjun Zhang and Erran Li and Raluca Ada Popa and Ion Stoica [2025] and are omitted for space. 
+
+Main results. Table 1 reports PASS against the untuned base model and a standard outcome-reward GRPO baseline. With the PRM as sprc , PASS improves average pass@1 by an absolute 5.9 points over GRPO(ORM) ( 29 .8 → 35 .7)and lifts pass@8 by 1.9 points ( 53 .1 → 55 .0), with especially large gains on competition-level benchmarks (AIME25 pass@1 5.5 → 9.8, AMC23 pass@1 47 .0 → 53 .8). Table 1: PASS vs. a base model and outcome-reward GRPO on mathematical reasoning. Metrics are pass@1 / pass@8 (%). Averaged over the seven benchmarks, PASS improves pass@1 by +5 .9 absolute over GRPO(ORM).                                 
+
+> Model AIME24 AIME25 AMC23 GSM8K MATH Minerva Olympiad Average
+> Base Model (Qwen2.5-Math-7B) 8.9/33.2 2.3/13.4 22.8/70.4 30.1/83.2 27.9/64.6 8.4/33.7 4.1/14.6 14.9/44.7 GRPO(ORM) 13.2/37.6 5.5/21.6 47.0/83.5 64.9/94.3 48.5/70.2 19.8/45.0 9.7/19.8 29.8/53.1
+> PASS (Ours) 14.8/39.1 9.8/27.4 53.8/83.7 77.5/95.4 55.1/71.3 27.3/47.2 11.5/21.1 35.7/55.0
+
+Structural ablation: CV and DL. Table 2 ablates the two downstream PASS operators, which probes Pathology 2 (resolution mismatch) and Pathology 3 (cumulative trap) jointly. Removing DL (PASS w/o DL) triggers length-driven reward hacking and collapses average pass@1 by 10 .9 points ( 35 .7 → 24 .8), exhibiting the positive-margin projection of the cumulative trap (Theorem 1). Removing CV (PASS w/o CV) preserves DL’s length-hacking safeguard but sacrifices the high-signal-to-noise credit assignment afforded by chunk-level aggregation, dropping average pass@1 by 
+
+3.1 points ( 35 .7 → 32 .6) and pass@8 by 4.6 points ( 55 .0 → 50 .4), consistent with the resolution-mismatch reading of CV. The full PASS achieves the best pass@1 on all seven benchmarks (tied with PASS w/o CV on Minerva) and the best pass@8 on six of seven benchmarks. Table 2: CV / DL structural ablation on mathematical reasoning. PASS w/o DL exhibits length inflation and collapses accuracy; PASS w/o CV retains DL’s safeguard but leaves a visible gap on both pass@1 and pass@8; the full PASS attains the best averages on both metrics.                                 
+
+> Configuration AIME24 AIME25 AMC23 GSM8K MATH Minerva Olympiad Average
+> PASS w/o CV (AF + DL) 8.4/30.0 3.3/14.0 51.1/79.0 76.8/95.1 51.8/68.8 27.3 /47.8 9.5/17.8 32.6/50.4 PASS w/o DL (AF + CV) 3.7/19.0 1.7/8.7 37.6/73.6 59.4/90.6 41.5/64.3 22.9/44.6 7.1/15.6 24.8/45.2
+> PASS (AF + CV + DL) 14.8/39.1 9.8/27.4 53.8/83.7 77.5/95.4 55.1/71.3 27.3 /47.2 11.5/21.1 35.7/55.0
+
+Advantage Fusion vs. naive reward shaping. A natural alternative to the AF operator of Equation 4 is to linearly combine the raw process, outcome, and format rewards before group standardization, which is the default recipe that Pathology 1 (channel contamination) warned against. Table 3 compares the two choices while keeping CV and DL fixed at k = 1 .0. Advantage Fusion outperforms the linear reward-shaping baseline by +3 .2 points on average pass@1 and +3 .2 on pass@8, with the largest gap on AIME25 ( 3.9 → 9.8 pass@1). The gap is consistent with the motivation of §4.1: pooling a near-binary outcome signal with a continuous step-level signal before standardization inflates the outcome variance and attenuates the gradient contribution of sprc , whereas independently standardizing the three streams preserves the step-level gradient component and additionally makes the format indicator a hard gate rather than a soft summand. 7Process Advantage Signal Shaping: A Paradigm-Agnostic Middleware for Process-Supervised RL in LLM Reasoners Table 3: Advantage Fusion (Equation 4) versus a naive linear reward-shaping baseline of the form R = wprm rprm +
+
+wout rout + wfmt rfmt . Both variants use CV and DL with k = 1 .0. Metrics are pass@1 / pass@8 (%). 
+
+Fusion Method AIME24 AIME25 AMC23 GSM8K MATH Minerva Olympiad Average 
+
+Reward Shaping 11.1/36.2 3.9/15.0 49.1/81.8 75.1/94.8 51.5/68.9 27.4/47.3 9.4/18.4 32.5/51.8 
+
+Advantage Fusion 14.8/39.1 9.8/27.4 53.8/83.7 77.5/95.4 55.1/71.3 27.3/47.2 11.5/21.1 35.7/55.0 
+
+5.2 Multi-hop Question Answering with a KL-style Process Signal Setup. We evaluate PASS on three multi-hop question-answering benchmarks: HotpotQA [Yang et al., 2018], 2WikiMultihopQA [Ho et al., 2020], and MuSiQue [Trivedi et al., 2022]. Training follows the HotpotQA distractor setup on a 5k-prompt subset of its training split, and evaluation uses the full development splits of all three datasets with 16 sampled responses per task. The actor is Qwen2.5-7B-Instruct [Qwen et al., 2025] and the teacher is Qwen2.5-32B-Instruct. We instantiate sprc in two ways: (i) OPD , the token-level negative KL against the teacher [Agarwal et al., 2023], and (ii) G-OPD , the λ-shifted variant of Equation 5 anchored on the actor’s initial weights as πbase , with 
+
+λ = 1 .25 . Throughout this subsection we use Masked-Norm as the group-level standardization operator N (·; S), i.e., we subtract the masked group mean and divide by the masked standard deviation of sprc ; this is the same operator adopted in the mathematical-reasoning setup of §5.1. All eight multi-hop QA runs—four reported in this subsection and four reported in Appendix D—share the same optimizer, sampler, and rollout configuration (global batch size 128 ,maximum sequence length 6,144 , 16 rollouts per prompt, learning rate 10 −6, two training epochs), and evaluation numbers are reported at the end of training. Per-run hyperparameter differences are given in Appendix E. We report pass@1 (exact-match answer accuracy under SQuAD-style normalization) on each dataset together with an unweighted average, and defer pass@8 and pass@16 to Appendix E. Table 4 summarizes the Masked-Norm results; the two paired comparisons below probe the effectiveness of PASS on each process-signal paradigm. Table 4: pass@1 (%) on three multi-hop QA benchmarks with the Masked-Norm standardization operator. PASS consistently improves the average pass@1 on both the OPD and the G-OPD process signals. ∆ denotes the absolute improvement over the corresponding non-PASS baseline. 
+
+Process signal Method MuSiQue 2Wiki HotpotQA Average ∆ Avg 
+
+GRPO(+OPD) 37.68 63.25 62.03 54.32 –OPD PASS + OPD 48.50 66.81 64.14 59.82 +5 .50 
+
+GRPO(+G-OPD) 39.01 63.69 61.96 54.89 –G-OPD PASS + G-OPD 47.29 67.19 64.34 59.61 +4 .72 
+
+On the vanilla OPD signal, attaching PASS raises pass@1 from 37 .68 to 48 .50 on MuSiQue, from 63 .25 to 66 .81 on 2Wiki, and from 62 .03 to 64 .14 on HotpotQA, for an average absolute gain of +5 .50 points ( 54 .32 → 59 .82 ). The largest improvement appears on MuSiQue, the most challenging four-hop benchmark in the group, which is consistent with chunk-level credit assignment benefiting tasks whose solution trajectories contain more stable logical segments. On the G-OPD variant, PASS again produces a consistent improvement across all three benchmarks (MuSiQue 
+
+39 .01 → 47 .29 ; 2Wiki 63 .69 → 67 .19 ; HotpotQA 61 .96 → 64 .34 ), yielding an average pass@1 of 59 .61 and an absolute gain of +4 .72 points. The magnitude of the G-OPD gain tracks that of OPD closely, indicating that the effectiveness of PASS does not depend on the specific construction of the KL-style signal, and the gains PASS achieves on mathematical reasoning under a PRM signal transfer to multi-hop QA under a KL-style signal without algorithmic changes. The trend on pass@1 carries over to the pass@8 and pass@16 numbers tabulated in Appendix E. 
+
+Robustness to the choice of standardization operator. We have reported PASS on top of Masked-Norm, the same group-standardization operator adopted in the mathematical-reasoning setup of §5.1. The two KL-style signals, however, differ from PRM scores in one specific respect: OPD and G-OPD carry an implicit or explicit origin that is not located at the within-group mean, so a natural question is whether the improvement we report survives a different group-standardization operator that respects this origin. We verify that it does. Specifically, we repeat all four configurations of Table 4 with Abs-Max Scaling, a standardization operator that divides each entry of sprc by the group-wide maximum absolute value and leaves the signal’s zero point in place. Under Abs-Max Scaling the baselines are stronger and the residual room for PASS is therefore smaller, but PASS still delivers a non-negative average pass@1 gain under both OPD and G-OPD, so the main claim of this subsection—that PASS improves a GRPO baseline with a KL-style 8Process Advantage Signal Shaping: A Paradigm-Agnostic Middleware for Process-Supervised RL in LLM Reasoners process signal on multi-hop QA—is not an artifact of the specific standardization operator we use in the main body. The Abs-Max Scaling results (Table 7) together with a joint analysis of the length, entropy, and teacher-KL dynamics induced by each operator (Figures 2, 3, 4, Table 8), as well as a mechanism-level reading of how each operator interacts with DL’s two-sided marginal-value filter, are deferred to Appendix D. 
+
+# 6 Discussion 
+
+Beyond the sourcing of the process signal. The central value proposition of PASS is that its three operators, Advantage Fusion, Chunk-by-Value, and Divide-Length, act on a generic step-level scalar sprc , regardless of whether that scalar is produced by a learned PRM or by a teacher-anchored KL divergence. Our mathematical-reasoning and multi-hop QA experiments are a first step in validating this scope; extending the same middleware to more diverse process signals (e.g., rubric-based LLM judges or execution-based reward models) is a natural follow-up that our formulation readily accommodates. 
+
+Domain specificity and credit-assignment boundaries. Our strongest evidence comes from mathematical reasoning, where logical steps admit near-deterministic verification and CV’s value-homogeneous chunking is therefore especially natural. On open-ended or multi-turn tasks, chunk boundaries and what counts as a “correct” step are softer concepts; deploying PASS in those regimes will benefit from dynamic, rubric-style signal generators that can still be exposed through the sprc interface. 
+
+# 7 Conclusion 
+
+PASS (Process Advantage Signal Shaping) is a thin middleware between a generic step-level process signal and GRPO’s clipped surrogate, whose three operators each intervene at a different stage of GRPO’s advantage pipeline—aggregation, broadcast, and trajectory summation—to close the three structural pathologies identified in §1. The same unmodified middleware yields consistent gains over GRPO across two process-signal paradigms (a learned PRM for mathematical reasoning; on-policy-distillation and G-OPD KL signals for multi-hop QA) and two group-standardization operators (Masked-Norm, Abs-Max). A natural next step, directly enabled by PASS’s signal-agnostic interface, is to replace the dedicated PRM with a frozen LLM-as-judge at training time, amortizing the critic’s cognitive capacity without the cost of training ever-larger dedicated scorers. 
+
+# References 
+
+Zhihong Shao, Peiyi Wang, Qihao Zhu, Runxin Xu, Junxiao Song, Xiao Bi, Haowei Zhang, Mingchuan Zhang, Y. K. Li, Y. Wu, and Daya Guo. DeepSeekMath: Pushing the Limits of Mathematical Reasoning in Open Language Models. 
+
+arXiv , arXiv:2402.03300, April 2024. doi: 10.48550/arXiv.2402.03300. Daya Guo, Dejian Yang, Haowei Zhang, Junxiao Song, Ruoyu Zhang, Runxin Xu, Qihao Zhu, Shirong Ma, Peiyi Wang, Xiao Bi, et al. Deepseek-r1: Incentivizing reasoning capability in llms via reinforcement learning. arXiv preprint arXiv:2501.12948 , 2025. Zhenru Zhang, Chujie Zheng, Yangzhen Wu, Beichen Zhang, Runji Lin, Bowen Yu, Dayiheng Liu, Jingren Zhou, and Junyang Lin. The Lessons of Developing Process Reward Models in Mathematical Reasoning, June 2025. Hunter Lightman, Vineet Kosaraju, Yuri Burda, Harrison Edwards, Bowen Baker, Teddy Lee, Jan Leike, John Schulman, Ilya Sutskever, and Karl Cobbe. Let’s Verify Step by Step. In Proceedings of the Twelfth International Conference on Learning Representations , 2023. URL https://openreview.net/forum?id=v8L0pN6EOi .Rishabh Agarwal, Nino Vieillard, Yongchao Zhou, Piotr Stanczyk, Sabela Ramos Garea, Matthieu Geist, and Olivier Bachem. On-Policy Distillation of Language Models: Learning from Self-Generated Mistakes. In Proceedings of the Twelfth International Conference on Learning Representations , 2023. URL https://openreview.net/forum? id=3zKtaqxLhW .Chenlu Ye, Zhou Yu, Ziji Zhang, Hao Chen, Narayanan Sadagopan, Jing Huang, Tong Zhang, and Anurag Beniwal. Beyond Correctness: Harmonizing Process and Outcome Rewards through RL Training, 2025. URL http://arxiv. org/abs/2509.03403 .Shih-Yang Liu, Xin Dong, Ximing Lu, Shizhe Diao, Peter Belcak, Mingjie Liu, Min-Hung Chen, Hongxu Yin, Yu-Chiang Frank Wang, Kwang-Ting Cheng, Yejin Choi, Jan Kautz, and Pavlo Molchanov. GDPO: Group reward-Decoupled Normalization Policy Optimization for Multi-reward RL Optimization, January 2026. 9Process Advantage Signal Shaping: A Paradigm-Agnostic Middleware for Process-Supervised RL in LLM Reasoners Chenchen Zhang. From Reasoning to Agentic: Credit Assignment in Reinforcement Learning for Large Language Models, 2026. URL https://arxiv.org/abs/2604.09459v2 .Michael Sullivan. GRPO is Secretly a Process Reward Model, October 2025. Zichao Li, Jie Lou, Fangchen Dong, Zhiyuan Fan, Mengjie Ren, Hongyu Lin, Xianpei Han, Debing Zhang, Le Sun, Yaojie Lu, and Xing Yu. Tackling Length Inflation Without Trade-offs: Group Relative Reward Rescaling for Reinforcement Learning, 2026a. URL https://arxiv.org/abs/2603.10535v1 .Chiyu Ma, Shuo Yang, Kexin Huang, Jinda Lu, Haoming Meng, Shangshang Wang, Bolin Ding, Soroush Vosoughi, Guoyin Wang, and Jingren Zhou. FIPO: Eliciting Deep Reasoning with Future-KL Influenced Policy Optimization, 2026. URL http://arxiv.org/abs/2603.19835 .Mykola Khandoga, Rui Yuan, and Vinay Kumar Sankarapu. Beyond Uniform Credit: Causal Credit Assignment for Policy Optimization, 2026. URL https://arxiv.org/abs/2602.09331v1 .Junxi Yin, Haisen Luo, Zhenyu Li, Yihua Liu, Dan Liu, Zequn Li, and Xiaohang Xu. Pinpointing crucial steps: Attribution-based Credit Assignment for Verifiable Reinforcement Learning, 2025. URL https://arxiv.org/ abs/2510.08899v1 .Noam Razin, Zixuan Wang, Hubert Strauss, Stanley Wei, Jason D. Lee, and Sanjeev Arora. What Makes a Reward Model a Good Teacher? An Optimization Perspective. arXiv , arXiv:2503.15477, March 2025. doi: 10.48550/arXiv. 2503.15477. Gang Li, Yan Chen, Ming Lin, and Tianbao Yang. DRPO: Efficient Reasoning via Decoupled Reward Policy Optimization, 2025. URL https://arxiv.org/abs/2510.04474v2 .Qiyuan Liu, Hao Xu, Xuhong Chen, Wei Chen, Yee Whye Teh, and Ning Miao. Enhancing Large Language Model Reasoning with Reward Models: An Analytical Survey, 2025. URL https://arxiv.org/abs/2510.01925v2 .Yaxuan Li, Yuxin Zuo, Bingxiang He, Jinqian Zhang, Chaojun Xiao, Cheng Qian, Tianyu Yu, Huan-ang Gao, Wenkai Yang, Zhiyuan Liu, and Ning Ding. Rethinking On-Policy Distillation of Large Language Models: Phenomenology, Mechanism, and Recipe, 2026b. URL http://arxiv.org/abs/2604.13016 .Wenkai Yang, Weijie Liu, Ruobing Xie, Kai Yang, Saiyong Yang, and Yankai Lin. Learning beyond Teacher: Generalized On-Policy Distillation with Reward Extrapolation, 2026. URL http://arxiv.org/abs/2602.12125 .Prasann Singhal, Tanya Goyal, Jiacheng Xu, and Greg Durrett. A Long Way to Go: Investigating Length Correlations in RLHF, 2024. An Yang, Beichen Zhang, Binyuan Hui, Bofei Gao, Bowen Yu, Chengpeng Li, Dayiheng Liu, Jianhong Tu, Jingren Zhou, Junyang Lin, Keming Lu, Mingfeng Xue, Runji Lin, Tianyu Liu, Xingzhang Ren, and Zhenru Zhang. Qwen2.5-math technical report: Toward mathematical expert model via self-improvement. arXiv preprint arXiv:2409.12122 ,2024. Michael Luo and Sijun Tan and Justin Wong and Xiaoxiang Shi and William Tang and Manan Roongta and Colin Cai and Jeffrey Luo and Tianjun Zhang and Erran Li and Raluca Ada Popa and Ion Stoica. Deepscaler: Surpassing o1-preview with a 1.5b model by scaling rl. Technical report, agentica, 2025. Hynek Kydlíˇ cek. Math-Verify: Math Verification Library, September 2025. Zhilin Yang, Peng Qi, Saizheng Zhang, Yoshua Bengio, William Cohen, Ruslan Salakhutdinov, and Christopher D. Manning. HotpotQA: A Dataset for Diverse, Explainable Multi-hop Question Answering. In Ellen Riloff, David Chiang, Julia Hockenmaier, and Jun’ichi Tsujii, editors, Proceedings of the 2018 Conference on Empirical Methods in Natural Language Processing , pages 2369–2380. Association for Computational Linguistics, 2018. doi: 10.18653/ v1/D18-1259. URL https://aclanthology.org/D18-1259/ .Xanh Ho, Anh-Khoa Duong Nguyen, Saku Sugawara, and Akiko Aizawa. Constructing A Multi-hop QA Dataset for Comprehensive Evaluation of Reasoning Steps. In Donia Scott, Nuria Bel, and Chengqing Zong, editors, Proceedings of the 28th International Conference on Computational Linguistics , pages 6609–6625. International Committee on Computational Linguistics, 2020. doi: 10.18653/v1/2020.coling-main.580. URL https://aclanthology.org/ 2020.coling-main.580/ .Harsh Trivedi, Niranjan Balasubramanian, Tushar Khot, and Ashish Sabharwal. MuSiQue: Multihop Questions via Single-hop Question Composition. Transactions of the Association for Computational Linguistics , 10:539–554, 2022. doi: 10.1162/tacl_a_00475. URL https://aclanthology.org/2022.tacl-1.31/ .Qwen, An Yang, Baosong Yang, Beichen Zhang, Binyuan Hui, Bo Zheng, Bowen Yu, Chengyuan Li, Dayiheng Liu, Fei Huang, Haoran Wei, Huan Lin, Jian Yang, Jianhong Tu, Jianwei Zhang, Jianxin Yang, Jiaxi Yang, Jingren Zhou, Junyang Lin, Kai Dang, Keming Lu, Keqin Bao, Kexin Yang, Le Yu, Mei Li, Mingfeng Xue, Pei Zhang, Qin Zhu, Rui Men, Runji Lin, Tianhao Li, Tianyi Tang, Tingyu Xia, Xingzhang Ren, Xuancheng Ren, Yang Fan, Yang Su, 10 Process Advantage Signal Shaping: A Paradigm-Agnostic Middleware for Process-Supervised RL in LLM Reasoners Yichang Zhang, Yu Wan, Yuqiong Liu, Zeyu Cui, Zhenru Zhang, and Zihan Qiu. Qwen2.5 Technical Report, 2025. URL http://arxiv.org/abs/2412.15115 .
+
+# A Proof of the Length Collapse Theorem 
+
+We restate Assumption 1 and Theorem 1 and give the detailed argument deferred from §4.3. 
+
+Proof of Theorem 1. Let τi be a valid, concise reasoning trajectory generated by the current policy π that correctly derives the answer and emits an end-of-sequence (EOS) token at step k ≪ Kmax . The initial-token cumulative advantage of τi under Equation 3 is 
+
+ˆAi, 1(τi) = 
+
+> k
+
+X
+
+> j=1
+
+˜sindex( j) 
+
+> i
+
+≜ Rvalid . (9) Consider a perturbed policy π′ that replicates τi up to step k but suppresses the EOS token and, instead, appends m
+
+redundant steps satisfying Assumption 1, with k + m ≤ Kmax . Write the resulting augmented trajectory as τi′ . Its initial-token cumulative advantage is 
+
+ˆAi′,1(τi′ ) = 
+
+> k
+
+X
+
+> j=1
+
+˜sindex( j) 
+
+> i′
+
++
+
+> k+m
+
+X
+
+> j=k+1
+
+˜sindex( j) 
+
+> i′
+
+. (10) Because the first k steps are shared, the prefix term equals Rvalid . By Assumption 1 the remaining m terms are each bounded below by ϵ > 0, so 
+
+ˆAi′,1(τi′ ) ≥ Rvalid + m · ϵ > ˆAi, 1(τi) for all m > 0. (11) By the policy gradient theorem, the objective J(θ) = Eπθ [ ˆAi, 1] therefore receives a strictly positive gradient in the direction that increases m, i.e., suppresses EOS and appends additional redundant steps. Iterating this argument, the optimal policy drives Li toward Lmax , which proves the claim. The chunk-count-attenuated path score S(oi) =   P Ki 
+
+> j=1
+
+˜Abj
+
+> i
+
+/(Ki)k recovered at j = 1 from Equation 7 neutralizes this gradient: for k ∈ (0 , 1] , once m is large enough the marginal gain mϵ is dominated by the (Ki)k divisor, so appending further redundant chunks stops improving S and can even reduce it (this is the explicit content of the marginal-value criterion in Equation 8). This restores a finite optimum for Ki, and consequently for Li, whenever the marginal process signal ϵ is small compared with the average density of genuinely logical chunks. 
+
+# B Algorithmic Specification of PASS Operators 
+
+This appendix gives pseudocode for the three PASS operators introduced in §4. All three algorithms take inputs that already come from the upstream preliminaries of §3: a group of G rollouts {o1, . . . , o G}, a step-level process signal 
+
+sprc (i, j ), sequence-level outcome and format rewards rout ,i , r fmt ,i , and a group-level standardization operator N (·; S).The three algorithms are composed in order (AF → CV → DL); their composition is summarized in Algorithm 4. 
+
+# C Additional Ablations on Mathematical Reasoning 
+
+This appendix reports two sensitivity studies on mathematical reasoning that complement the main-body ablations of §5.1: the length-decay exponent k of the DL rule (Equation 7) and the scale of the upstream PRM. 
+
+Length decay exponent k. The DL rule is a one-parameter family indexed by the length exponent k ∈ (0 , 1] ,interpolating between strict average-reward normalization ( k=1 ) and no length attenuation ( k → 0). Table 5 sweeps 
+
+k ∈ { 1.0, 0.7, 0.5, 0.3}. A relaxation from the strict k=1 .0 toward k=0 .7 protects valid long deductions, lifts average pass@1 from 35 .7 to 36 .9, and moves the ceiling from 55 .0 to 55 .7 pass@8. Further relaxation to k=0 .5 or k=0 .3
+
+does not yield an additional pass@1 improvement over k=0 .7, although pass@8 continues to rise marginally. We accordingly set k = 0 .7 as the default for all subsequent experiments, including the multi-hop QA runs of §5.2. 11 Process Advantage Signal Shaping: A Paradigm-Agnostic Middleware for Process-Supervised RL in LLM Reasoners 
+
+Algorithm 1 Advantage Fusion (AF). Independent within-group standardization of the process, outcome, and format streams, followed by format-gated piecewise recombination. Implements Equation 4. 
+
+Require: Group rollouts {o1, . . . , o G}; per-step signal sprc (i, j ); outcome rout ,i ; format rfmt ,i ; format indicator Ifmt ,i ∈{0, 1}; mixing weights wprc , w out , w fmt with W = wprc + wout + wfmt ; standardization operator N (·; S).
+
+Ensure: Per-step fused advantage ˜A(t) 
+
+> i
+
+for every token t in every rollout oi.
+
+1: Sprc ← { sprc (i, j )}i,j , Sout ← { rout ,i }i, Sfmt ← { rfmt ,i }i ▷ three independent channel sets 
+
+2: for each rollout i ∈ { 1, . . . , G } and each step j ∈ { 1, . . . , K i} do 
+
+3: ˜s(t) 
+
+> prc
+
+← N (sprc (i, j ); Sprc ) for t inside step j ▷ process channel 
+
+4: end for 
+
+5: for each rollout i ∈ { 1, . . . , G } do 
+
+6: ˜r(t) 
+
+> out
+
+← N (rout ,i ; Sout ) for all t in oi ▷ outcome channel, broadcast over tokens 
+
+7: ˜r(t) 
+
+> fmt
+
+← N (rfmt ,i ; Sfmt ) for all t in oi ▷ format channel, broadcast over tokens 
+
+8: end for 
+
+9: for each rollout i ∈ { 1, . . . , G } and each token t in oi do 
+
+10: if Ifmt ,i = 1 then ▷ format-compliant branch 
+
+11: ˜A(t) 
+
+> i
+
+← wprc ˜s(t) 
+
+> prc
+
++ wout ˜r(t) 
+
+> out
+
++ wfmt ˜r(t)
+
+> fmt
+
+12: else ▷ format-violating branch: gate off prc/out, preserve gradient norm via W
+
+13: ˜A(t) 
+
+> i
+
+← W · ˜r(t)
+
+> fmt
+
+14: end if 
+
+15: end for 
+
+16: return { ˜A(t) 
+
+> i
+
+}i,t 
+
+Algorithm 2 Chunk-by-Value (CV). Numerical-equality run-length boundary detection on sprc , followed by chunk-level broadcasting of the AF-fused advantage. Implements Equation 6. 
+
+Require: Per-step signal sprc (i, j ) and its already-standardized form ˜s(t) 
+
+> prc
+
+from Algorithm 1; fused advantage ˜A(t) 
+
+> i
+
+from Algorithm 1; numerical tolerance η = 10 −8; signal mode ∈ { PRM , KL }; for the KL mode, an answer-region mask 
+
+Mi.
+
+Ensure: Per-token advantage ˜Ai,t (chunk-constant within each chunk) for every rollout oi.
+
+1: if signal mode = PRM then ▷ PRM is piecewise constant within a reasoning step 
+
+2: ut ← sprc at token t, padded by PRM step boundaries for rollout oi
+
+3: else ▷ KL-style: smooth and restrict to optimizable tokens 
+
+4: ¯ut ← 1
+
+> G
+
+PGi′=1 ˜s(t) 
+
+> prc
+
+(i′) for each token position t ▷ group-averaged, already-standardized signal 
+
+5: ut ← ¯ut if Mi[t] = 1 (inside the answer region); else treat as out-of-scope 
+
+6: end if 
+
+7: Initialize boundaries Bi ← {} , previous value vprev ← u1
+
+8: for t = 2 , . . . , L i do 
+
+9: if |ut − vprev | > η or t crosses the PRM step boundary then 
+
+10: Append t − 1 to Bi ▷ close previous chunk at token t − 1
+
+11: vprev ← ut
+
+12: end if 
+
+13: end for 
+
+14: Append Li to Bi and write Bi = {b1, . . . , b Ki } with bKi = Li
+
+15: for each chunk index j = 1 , . . . , K i do 
+
+16: ˜Abj 
+
+> i
+
+← ˜A(bj ) 
+
+> i
+
+▷ evaluate AF-fused advantage at the boundary token 
+
+17: for each token t with bj−1 < t ≤ bj (let b0 ≜ 0) do 
+
+18: ˜Ai,t ← ˜Abj 
+
+> i
+
+▷ broadcast one value across the chunk 
+
+19: end for 
+
+20: end for 
+
+21: return { ˜Ai,t }i,t and chunk structure {B i}i
+
+12 Process Advantage Signal Shaping: A Paradigm-Agnostic Middleware for Process-Supervised RL in LLM Reasoners 
+
+Algorithm 3 Divide-Length (DL). Trajectory-level chunk-count attenuation of the per-chunk return-to-go derived from the CV-broadcast advantage. Each chunk’s RTG is divided by the residual chunk count (Ki − j + 1) k and the resulting density-rescaled chunk value is broadcast back to every token inside that chunk. Implements Equation 7. 
+
+Require: Per-token advantage ˜Ai,t from Algorithm 2; chunk structure {B i}i with Bi = {b1, . . . , b Ki }; chunk-level fused advantage ˜Abj 
+
+> i
+
+; exponent k ∈ [0 , 1] .
+
+Ensure: DL-reshaped per-token advantage ˜ADL  
+
+> i,t
+
+and trajectory-level path score S(oi).
+
+1: for each rollout i ∈ { 1, . . . , G } do 
+
+2: for each chunk index j = 1 , . . . , K i do 
+
+3: Gji ← P 
+
+> j′≥j
+
+˜Abj′ 
+
+> i
+
+▷ per-chunk return-to-go 
+
+4: ˜Abj , DL  
+
+> i
+
+← Gji
+
+(Ki − j + 1) k ▷ Equation 7 
+
+5: for each token t with bj−1 < t ≤ bj (let b0 ≜ 0) do 
+
+6: ˜ADL  
+
+> i,t
+
+← ˜Abj , DL  
+
+> i
+
+▷ broadcast one density-rescaled value per chunk 
+
+7: end for 
+
+8: end for 
+
+9: S(oi) ←
+
+PKi 
+
+> j=1
+
+˜Abj
+
+> i
+
+(Ki)k ▷ trajectory-level density score 
+
+10: end for 
+
+11: return { ˜ADL  
+
+> i,t
+
+}i,t , {S(oi)}i
+
+Algorithm 4 PASS: end-to-end composition of AF, CV, and DL. The output ˜ADL  
+
+> i,t
+
+is plugged into GRPO’s clipped surrogate in place of the baseline cumulative advantage ˆAi,t of Equation 3. 
+
+Require: Group rollouts, raw signals, and hyperparameters from Algorithms 1–3. 
+
+Ensure: PASS-reshaped per-token advantage { ˜ADL  
+
+> i,t
+
+}i,t for the clipped surrogate. 
+
+1: { ˜A(t) 
+
+> i
+
+} ← AF ({oi}, s prc , r out , r fmt , Ifmt , {w·}, N ) ▷ Algorithm 1 
+
+2: ({ ˜Ai,t }, {B i}) ← CV ({ ˜A(t) 
+
+> i
+
+}, s prc , ˜s(t) 
+
+> prc
+
+, mode , η ) ▷ Algorithm 2 
+
+3: { ˜ADL  
+
+> i,t
+
+} ← DL ({ ˜Ai,t }, {B i}, { ˜Abj 
+
+> i
+
+}, k ) ▷ Algorithm 3 
+
+4: return { ˜ADL  
+
+> i,t
+
+}i,t 
+
+Table 5: Sensitivity of PASS to the length-decay exponent k in Equation 7. Metrics are pass@1 / pass@8 (%). Setting 
+
+k< 1.0 protects necessary reasoning verbosity and raises the exploratory ceiling; k=0 .7 achieves the best average pass@1 and is used as the default throughout this paper. 
+
+Decay Factor AIME24 AIME25 AMC23 GSM8K MATH Minerva Olympiad Average 
+
+k = 1 .0 (Strict DL) 14.8/39.1 9.8 /27.4 53.8/ 83.7 77.5/ 95.4 55.1/71.3 27.3/47.2 11.5/21.1 35.7/55.0 
+
+k = 0 .7 17.8/47.1 9.3/24.7 56.2 /81.8 78.3 /95.2 55.7/71.4 29.1/48.6 11.8/21.2 36.9 /55.7 
+
+k = 0 .5 (Sqrt-L) 15.9/44.2 9.9/ 27.9 53.4/82.6 74.7/95.2 52.8/71.0 27.6/48.2 11.1/21.2 35.1/55.8 
+
+k = 0 .3 15.7/45.9 9.4/26.7 54.1/83.0 77.1/95.4 54.8/71.2 28.5/48.1 11.5/20.9 35.9/ 55.9 
+
+13 Process Advantage Signal Shaping: A Paradigm-Agnostic Middleware for Process-Supervised RL in LLM Reasoners 
+
+PRM scale. A natural question is whether the actor’s ceiling is bounded by the resolution of the process signal itself. Table 6 replaces the 7B PRM with the 72B PRM of Zhang et al. [2025], keeping all other components of the pipeline (including k=1 .0 for a direct match with Table 1) fixed. The stronger PRM raises average pass@1 from 35 .7 to 37 .3
+
+and pass@8 from 55 .0 to 55 .8, with the largest gains on AIME24 ( 14 .8 → 17 .2) and AMC23 ( 53 .8 → 57 .2) pass@1. Within the regime we tested, this monotone trend across the 7B-to-72B PRM scaling indicates that PASS demonstrates robust performance scaling across PRMs of different capacities, and benefits from the higher resolution of larger reward models without requiring algorithmic modification; we report this as a robustness property of the middleware on the specific scales we evaluated rather than as a strong universal scalability claim, as the present experiments do not extend beyond the 72B PRM tier nor to fundamentally different verifier architectures. Table 6: Effect of scaling the PRM from 7B to 72B parameters, with all other components of PASS fixed at the Table 1 configuration. Metrics are pass@1 / pass@8 (%). 
+
+PRM Scale AIME24 AIME25 AMC23 GSM8K MATH Minerva Olympiad Average 
+
+7B PRM 14.8/39.1 9.8 /27.4 53.8/ 83.7 77.5/95.4 55.1/71.3 27.3/47.2 11.5/21.1 35.7/55.0 
+
+72B PRM 17.2/43.7 9.1/ 27.4 57.2 /83.5 79.8/95.5 56.9/71.6 29.2/47.5 12.0/21.5 37.3/55.8 
+
+# D Abs-Max Scaling and Length–Accuracy Dynamics 
+
+This appendix gathers the detailed results for the alternative standardization operator (Abs-Max Scaling) and the joint length–accuracy analysis across both standardization operators. The main-body §5.2 establishes the core comparison under Masked-Norm; what follows documents the complementary Abs-Max Scaling runs and the length–accuracy profiles of all eight configurations. 
+
+D.1 An Alternative Standardization Operator: Abs-Max Scaling Motivation. The Masked-Norm operator used in §5.2 is a standard Z-score normalization that subtracts the within-group mean and divides by the within-group standard deviation. This choice is natural for PRM scores, whose within-group values are approximately symmetric around a data-dependent reference level, so subtracting their mean does not displace an intrinsic reference point of the signal. For KL-style signals the situation is different. A token-level negative reverse KL against a stronger teacher (the OPD signal) is non-positive by construction: the signal has no meaningful origin of its own and is better thought of as a single-directional friction field, in which zero only means “no penalty” rather than “neutral.” The G-OPD variant of Equation 5 behaves differently again: by subtracting a base-policy term, G-OPD introduces an intrinsic zero that separates tokens on which the teacher is more confident than the base (a “positive” cognitive increment), tokens on which teacher and base agree (a “neutral” region near zero), and tokens on which the base is more confident than the teacher (a “negative” region). For both KL-style signals, Masked-Norm replaces the implicit or explicit origin of the raw signal with the group mean and recenters the distribution at zero regardless of where the original zero lay. We therefore study a second standardization operator, Abs-Max Scaling , which divides each entry of sprc by the group-wide maximum absolute value and leaves the mean untouched. Abs-Max Scaling brings sprc to a bounded numeric range comparable to Masked-Norm while preserving the sign of each entry and the relative position of its zero point, and is the natural candidate for an operator that respects the origin of a KL-style signal. 
+
+Setup. We repeat the four configurations of Table 4 with N (·; S) replaced by Abs-Max Scaling, keeping all other optimizer, sampling, and architectural settings identical. All eight configurations are summarized in Appendix E. Table 7: pass@1 (%) on the three multi-hop QA benchmarks with the Abs-Max Scaling standardization operator. PASS retains a positive improvement on both OPD and G-OPD; the baselines themselves are stronger than their Masked-Norm counterparts in Table 4, which reduces the absolute headroom for PASS in this setting. 
+
+Process signal Method MuSiQue 2Wiki HotpotQA Average ∆ Avg 
+
+GRPO(+OPD, scaled) 43.30 65.53 63.04 57.29 –OPD PASS + OPD (scaled) 44.31 65.34 62.61 57.42 +0 .13 
+
+GRPO(+G-OPD, scaled) 42.19 64.32 62.16 56.22 –G-OPD PASS + G-OPD (scaled) 43.77 64.66 62.48 56.97 +0 .75 
+
+14 Process Advantage Signal Shaping: A Paradigm-Agnostic Middleware for Process-Supervised RL in LLM Reasoners 
+
+Observation. Table 7 reports the Abs-Max Scaling results. Two features are worth noting. First, the Abs-Max baselines are systematically stronger than the Masked-Norm baselines: GRPO(+OPD, scaled) improves the average over GRPO(+OPD) from 54 .32 to 57 .29 , and GRPO(+G-OPD, scaled) improves the average over GRPO(+G-OPD) from 54 .89 to 56 .22 . This confirms that Abs-Max Scaling is a reasonable choice for KL-style signals in its own right. Second, on top of these stronger baselines, PASS still delivers positive average gains under both process signals ( +0 .13 
+
+on OPD, +0 .75 on G-OPD), though the gains are smaller in absolute terms than those observed under Masked-Norm. We therefore report PASS’s effectiveness as consistent across both standardization operators, while deferring the quantitative interpretation of the gain-gap to §D.2, where we analyze it jointly with the response-length behavior. 
+
+D.2 Length–Accuracy Dynamics across Standardization Operators 
+
+The Masked-Norm results of §5.2 and the Abs-Max Scaling results of §D.1 report two different profiles on the same four PASS/baseline pairs: Masked-Norm achieves larger pass@1 gains, while Abs-Max Scaling starts from stronger baselines but leaves smaller residual room for PASS. We now examine these runs jointly through the lens of their response length, first at training time and then at deployment time. In the terminology of §4.3, the DL rule is a two-sided marginal-value filter: on the multi-hop QA panel its admissible region contains trajectories whose marginal step contribution exceeds the current average density of the path, and whether this region corresponds to shorter or longer responses than a baseline trajectory is a regime-dependent question rather than a design choice. 
+
+Figure 2: Training-time mean rollout length (in tokens) on HotpotQA across one training epoch, for the four Masked-Norm configurations of Table 4. Left: OPD—GRPO(+OPD) vs. PASS + OPD. Right: G-OPD—GRPO(+G-OPD) vs. PASS + G-OPD. All four runs start from the same actor at a rollout length of roughly 180 tokens. The two baseline runs drift downward to 115 –135 tokens, while the two PASS runs drift upward to 235 –260 tokens. This figure reports rollout-time tokens and is complementary to the deployment-time token counts in Table 8. 
+
+Training-time rollout length. Figure 2 shows the mean rollout length of the four Masked-Norm configurations across one training epoch on HotpotQA training rollouts. The four runs start from the same actor and therefore share a common starting rollout length of roughly 180 tokens. Over training, the two non-PASS runs (GRPO(+OPD) and GRPO(+G-OPD)) decrease monotonically to 115 –135 tokens, shortening relative to the starting point rather than extending it. The two PASS runs, by contrast, grow from the same 180 -token starting length to 235 –260 tokens over the same number of optimizer steps. The two trajectories therefore diverge from a common initialization in opposite directions, and the comparison is not between a short baseline and a long PASS output at an arbitrary training snapshot but between two policies that, starting from the same rollout length, are pushed to shrink and to grow respectively by the optimization objective. The direction of drift is not a free parameter: it is determined by the advantage-shaping rule that each run optimizes against, with PASS admitting rollout length whenever the marginal contribution is above the current density of the path and the baseline curtailing it whenever cumulative friction outweighs local gains. 
+
+Training-time entropy and teacher-KL dynamics. Figures 3 and 4 complement the length profile of Figure 2 with two further training-time observables on the same four Masked-Norm runs: the actor’s token-level entropy and its mean 15 Process Advantage Signal Shaping: A Paradigm-Agnostic Middleware for Process-Supervised RL in LLM Reasoners 
+
+Figure 3: Training-time token-level entropy of the actor on HotpotQA across one training epoch, for the same four Masked-Norm configurations. Left: OPD. Right: G-OPD. All four runs start from a common actor entropy of roughly 0.35 . The two baseline runs stay near 0.35 –0.45 throughout training, whereas the two PASS runs decrease monotonically to 0.07 –0.10 .
+
+Figure 4: Training-time mean token-level KL divergence against the teacher on HotpotQA across one training epoch, for the same four Masked-Norm configurations. Left: OPD. Right: G-OPD. Both the baseline and the PASS runs reduce DKL relative to the teacher over training, but the PASS runs converge to a higher residual DKL (around 0.15 )than the corresponding baseline runs ( ≈ 0.10 on OPD and ≈ 0.05 on G-OPD). 16 Process Advantage Signal Shaping: A Paradigm-Agnostic Middleware for Process-Supervised RL in LLM Reasoners token-level KL against the teacher. Two regularities are visible and consistent across the OPD and G-OPD panels. First, the two PASS runs drive the actor’s entropy down to 0.07 –0.10 over training, while the two baseline runs stay near the initial 0.35 –0.45 band; taken together with the rollout-length panel, PASS produces policies that are simultaneously longer and more confident at the token level, which is hard to reconcile with a reading in which the extra length is uncommitted padding. Second, on the teacher-KL panel, the PASS runs reduce DKL against the teacher over training, but plateau at a noticeably higher residual level than the corresponding baseline runs. The interpretation we adopt is deliberately conservative: read jointly with the downward length drift and the near-flat entropy of the baselines, the very low baseline DKL is most parsimoniously attributed to baselines that shorten their rollouts and stay close to the easy, high-agreement prefix of the teacher’s distribution; the higher plateau of PASS is consistent with a policy that commits to a longer, lower-entropy rollout while maintaining a non-degenerate distance to the teacher, rather than collapsing onto it. We do not claim these three panels isolate a causal mechanism, but the three observables move in a mutually consistent direction under PASS versus the baseline across both process signals. Table 8: Average response length in tokens (Qwen2.5 tokenizer) on the three multi-hop QA benchmarks for all eight configurations of Tables 4 and 7. Under Masked-Norm, PASS is associated with a sizeable length expansion on top of its base run; under Abs-Max Scaling, the expansion is substantially smaller. 
+
+Operator Method MuSiQue 2Wiki HotpotQA Average ∆ rel. 
+
+GRPO(+OPD) 188.14 159.66 136.56 161.45 –
+
+PASS + OPD 412.15 286.94 240.02 313.04 +94% 
+
+GRPO(+G-OPD) 170.68 131.74 116.60 139.67 –Masked-Norm 
+
+PASS + G-OPD 476.59 316.68 262.13 351.80 +152% 
+
+GRPO(+OPD, scaled) 208.35 180.44 139.71 176.17 –
+
+PASS + OPD (scaled) 261.46 214.47 194.64 223.52 +27% 
+
+GRPO(+G-OPD, scaled) 248.32 176.21 131.08 185.20 –Abs-Max Scaling 
+
+PASS + G-OPD (scaled) 275.75 228.03 202.09 235.29 +27% 
+
+Two length regimes. Table 8 exhibits a clear dichotomy. Under Masked-Norm, attaching PASS roughly doubles or more the average response length (OPD: 161 → 313 tokens, +94% ; G-OPD: 140 → 352 tokens, +152% ). Under Abs-Max Scaling the corresponding expansion is limited to about one quarter (OPD: 176 → 224 tokens, +27% ;G-OPD: 185 → 235 tokens, +27% ). A natural question is whether the Masked-Norm expansion is consistent with what PASS actually promises. As discussed in §4, DL is a two-sided marginal-value filter rather than a length penalty: it admits additional steps only when they raise the path’s average value density, but does not force the final trajectory to be shorter than a baseline trajectory. The empirical question is therefore whether the observed length growth is accompanied by a commensurate accuracy gain on the same benchmarks, or whether it is closer to free length padding. 
+
+Accuracy-coupled length growth. On the hardest benchmark in our multi-hop panel, MuSiQue (four hops with adversarial distractors), the Masked-Norm rows show that the length growth of PASS is tied to a substantial pass@1 improvement rather than decoupled from accuracy. For OPD the average length grows from 188 to 412 tokens, about a factor of two, and pass@1 rises from 37 .68% to 48 .50% , a relative improvement of roughly 29% ; for G-OPD the length grows from 171 to 477 tokens while pass@1 rises from 39 .01% to 47 .29% . On 2Wiki and HotpotQA the growth in length is more moderate and pass@1 improves by a smaller but still positive margin. This pattern is inconsistent with a scenario in which PASS trades length for no additional correctness (as would be expected from pure step padding) and is consistent with DL’s two-sided marginal-value filter admitting the extra steps precisely because they raise the average value density of the trajectory. 
+
+A mechanism-level reading. We describe, without asserting strict causality, how the observed length regimes relate to the interaction between the standardization operator and the downstream DL rule. Because Masked-Norm subtracts the group mean, for KL-style signals whose raw origin does not coincide with the within-group mean, the operation displaces the zero of ˜sprc relative to the zero of sprc , which in turn reshapes the group distribution of marginal values that the DL rule of Equation 8 sees. Under this displacement, some tokens whose raw signal was above the origin can still fall on the negative half of ˜sprc , while others whose raw signal was below the origin can be pushed above it, expanding the dynamic range of the standardized signal that DL integrates. Under Abs-Max Scaling the zero of ˜sprc coincides with the zero of sprc , so the marginal distribution entering DL is closer to the raw signal’s own profile. The two operators therefore place PASS at two different operating points of the same two-sided marginal-value filter, and it is plausible that the wider dynamic range offered by Masked-Norm gives the policy more room to lengthen its reasoning whenever 17 Process Advantage Signal Shaping: A Paradigm-Agnostic Middleware for Process-Supervised RL in LLM Reasoners those longer trajectories still clear DL’s density threshold. We stress that this reading is descriptive: it accounts for the observed regimes without an explicit causal intervention on the standardization operator, and isolating the contribution of each mechanism is left to future work. 
+
+A caveat on “value density.” Dividing pass@1 by average response length gives a very coarse proxy for value density, and on this proxy every PASS row sits below its baseline row in our multi-hop panel. We do not claim PASS raises this ratio. DL does not promise that pass@1-per-token goes up; it promises that a single additional step is rewarded only when its contribution exceeds the current density of the path, which is a local property of the gradient rather than a global property of the deployed trajectory. The coupling we report above, between large relative pass@1 gains and large relative length growth on the hardest benchmark, is the empirical signal we rely on; the pass@1-per-token ratio is not. 
+
+Takeaway. The main experimental message of Tables 4, 7, and 8 is consistent across the matrix of experiments: PASS delivers a positive pass@1 gain on both KL-style process signals and under both standardization operators. The choice of standardization operator shifts the length and accuracy profile along which PASS operates: Masked-Norm aligns the setup with the mathematical-reasoning experiments of §5.1 and admits longer trajectories that are coupled to larger pass@1 gains on difficult multi-hop prompts, while Abs-Max Scaling keeps each entry of ˜sprc on the same side of zero as the corresponding raw signal and yields smaller but length-controlled gains. The two operators are better read as two operating points of the same underlying middleware than as a quality ordering. 
+
+# E Multi-hop QA Training Configuration and Additional Metrics 
+
+All multi-hop QA runs (four reported in §5.2 and four reported in Appendix D) share the following optimizer and sampling configuration: rollout and training global batch sizes are both 128 ; the maximum sequence length is 6,144 ;the sampler produces 16 rollouts per prompt; we use Adam with learning rate 1.0 × 10 −6, a constant decay schedule with 20 warmup steps, β1 = 0 .9, β2 = 0 .999 , and weight decay 0; the outer loop runs for 2 training epochs; the GRPO clip ratio is 0.2; and the reference-KL coefficient βKL is 10 −2. Evaluation numbers are reported at the end of training (roughly 78 optimizer updates on the 5k-prompt subset at the above batch size). The actor is Qwen2.5-7B-Instruct and the teacher is Qwen2.5-32B-Instruct in every run. The remaining run-specific fields are summarized in Table 9. Table 9: Per-run hyperparameter differences for the eight multi-hop QA configurations reported in Tables 4, 7, and 8. Entries marked “–” mean the field is not applicable for that configuration. 
+
+# Configuration PASS Process signal N (·; S) λG-OPD kDL 
+
+# GRPO(+OPD) off OPD Masked-Norm – –
+
+# PASS + OPD on OPD Masked-Norm – 0.7
+
+# GRPO(+G-OPD) off G-OPD Masked-Norm 1.25 –
+
+# PASS + G-OPD on G-OPD Masked-Norm 1.25 0.7
+
+# GRPO(+OPD, scaled) off OPD Abs-Max Scaling – –
+
+# PASS + OPD (scaled) on OPD Abs-Max Scaling – 0.7
+
+# GRPO(+G-OPD, scaled) off G-OPD Abs-Max Scaling 1.25 –
+
+# PASS + G-OPD (scaled) on G-OPD Abs-Max Scaling 1.25 0.7
+
+Signal-aggregation weights. All eight configurations set the mixing weights wout = wfmt = wprc = 1 .0 for the outcome, format, and process-signal streams, so that the total magnitude W = 3 .0 in Equation 4 is shared across runs. 
+
+Chunk-by-Value and Divide-Length. For the four PASS configurations we enable both the CV and DL sub-modules and fix the length exponent to k = 0 .7. The non-PASS configurations do not invoke these sub-modules. 
+
+G-OPD anchoring. The four G-OPD configurations use the student’s initial weights as πbase and the shift coefficient 
+
+λ = 1 .25 ; the four OPD configurations reduce to the (πθ , π teach ) formulation and do not consume λ.
+
+Additional metrics: pass@8 and pass@16. Table 10 reports pass@8 and pass@16 for the same eight configurations on the three multi-hop QA benchmarks, complementing the pass@1 numbers in the main body. The ordering of the 18 Process Advantage Signal Shaping: A Paradigm-Agnostic Middleware for Process-Supervised RL in LLM Reasoners methods at k ∈ { 8, 16 } is broadly consistent with the pass@1 ordering; in particular, the PASS variants retain their non-negative margin on the unweighted average under both Masked-Norm and Abs-Max Scaling. Table 10: pass@8 and pass@16 (%) on the three multi-hop QA benchmarks for the eight configurations of Table 9. 
+
+pass@8 pass@16 Operator Method MuSiQue 2Wiki HotpotQA MuSiQue 2Wiki HotpotQA Avg pass@16 
+
+GRPO(+OPD) 60.04 73.69 72.72 65.00 75.94 75.02 71.99 
+
+PASS + OPD 65.85 75.30 72.00 69.51 76.97 73.63 73.37 GRPO(+G-OPD) 59.93 73.21 72.12 64.92 75.31 74.26 71.50 Masked-Norm 
+
+PASS + G-OPD 65.46 75.30 72.21 69.55 76.88 73.80 73.41 GRPO(+OPD, scaled) 64.15 75.53 72.87 68.35 77.46 74.94 73.58 
+
+PASS + OPD (scaled) 66.25 77.20 73.13 70.91 79.38 75.23 75.17 GRPO(+G-OPD, scaled) 61.99 74.06 71.03 66.45 75.87 72.76 71.69 Abs-Max Scaling 
+
+PASS + G-OPD (scaled) 65.36 76.46 72.68 69.92 78.57 74.69 74.39 19

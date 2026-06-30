@@ -1,0 +1,735 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-06-30T21:10:45.239097+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 14,
+    "deep_cap": 6,
+    "deep_selected": 7,
+    "quick_candidates": 10,
+    "quick_skim_target": 11,
+    "quick_selected": 10
+  },
+  "deep_dive": [
+    {
+      "id": "2606.27578v1",
+      "source": "arxiv",
+      "title": "PEBS: Per-rater Empirical-Bayes Shrinkage for RLHF Reward-Model Calibration",
+      "abstract": "Reward models for Reinforcement Learning from Human Feedback (RLHF) pool preferences across thousands of annotators and fit one global affine calibrator, collapsing raters with systematically different rating-scale offsets and slopes into a single average-rater fit that does not match any individual annotator. PEBS is a per-rater empirical-Bayes shrinkage estimator: it fits per-rater affine calibrators on a held-out slice of each annotator's ratings and applies Morris-James-Stein empirical-Bayes shrinkage toward the population mean, in closed form and without retraining the reward model. On PRISM, PEBS reduces within-user held-out RMSE by 8.58% over the pooled population-slope baseline. The procedure replicates on PluriHarms harm ratings (Qwen-2.5 base, in-family) with a +9.66% RMSE reduction over the same population-slope baseline. PEBS is a closed-form post-hoc estimator for annotator-specific affine calibration in RLHF reward modeling; it leaves the reward base model unchanged and estimates only the rater-level map used at inference time for new ratings.",
+      "authors": [
+        "Arnav Raj"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-06-25T22:09:50+00:00",
+      "link": "https://arxiv.org/pdf/2606.27578v1",
+      "tags": [
+        "keyword:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "RLHF reward model calibration per-rater shrinkage",
+      "llm_evidence_cn": "基于每个标注者的RLHF奖励模型校准收缩方法",
+      "llm_evidence": "基于每个标注者的RLHF奖励模型校准收缩方法",
+      "canonical_evidence": "基于每个标注者的RLHF奖励模型校准收缩方法",
+      "llm_tldr_en": "PEBS applies per-rater empirical-Bayes shrinkage to calibrate RLHF reward models, reducing RMSE by 8.58% over pooled baselines.",
+      "llm_tldr_cn": "针对RLHF中奖励模型因聚合所有标注者偏好而忽略个体差异的问题，提出PEBS方法，为每个标注者独立拟合线性校准器并通过经验贝叶斯收缩向总体均值靠拢。在PRISM数据集上，该方法将用户内RMSE降低8.58%，无需重新训练奖励模型。",
+      "llm_tldr": "针对RLHF中奖励模型因聚合所有标注者偏好而忽略个体差异的问题，提出PEBS方法，为每个标注者独立拟合线性校准器并通过经验贝叶斯收缩向总体均值靠拢。在PRISM数据集上，该方法将用户内RMSE降低8.58%，无需重新训练奖励模型。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "reinforcement learning from human feedback for llm alignment",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.29238v1",
+      "source": "arxiv",
+      "title": "On the Policy Gradient Foundations of Group Relative Policy Optimization: Credit Assignment, Gradient Sparsity, and Rank Collapse",
+      "abstract": "Group Relative Policy Optimization (GRPO) eliminates the learned critic in PPO by using the mean reward of grouped rollouts as a baseline. We provide a rigorous derivation of GRPO from first principles of the policy gradient theorem, revealing a fundamental credit assignment failure: under output-only reward, every token in a rollout receives identical advantage, collapsing token-level credit to a single scalar. We prove this induces gradient sparsity that intensifies over training, and demonstrate empirically via SVD analysis of GRPO gradients on Nemotron-4B/GSM8K that the gradient matrix has effective rank $\\approx$ 2 regardless of group size $R \\in \\{2, 4, 8\\}$. We formalize this as an intrinsic rank-2 structure arising from the zero-sum constraint on advantages and derive conditions under which GRPO's baseline is optimal. Our results characterize when GRPO's simplicity is theoretically justified and identify the credit assignment bottleneck as the key limitation for multi-step reasoning.",
+      "authors": [
+        "Amritansh Mishra",
+        "Supriyo Chakraborty",
+        "Berkcan Kapusuzoglu"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-06-28T06:51:45+00:00",
+      "link": "https://arxiv.org/pdf/2606.29238v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "policy gradient analysis of GRPO for LLM language generation",
+      "llm_evidence_cn": "针对LLM语言生成的GRPO策略梯度分析",
+      "llm_evidence": "针对LLM语言生成的GRPO策略梯度分析",
+      "canonical_evidence": "针对LLM语言生成的GRPO策略梯度分析",
+      "llm_tldr_en": "Provides rigorous policy gradient derivation of GRPO, revealing token-level credit assignment failure and gradient rank collapse.",
+      "llm_tldr_cn": "从策略梯度定理出发严格推导GRPO，揭示其固有的信用分配失败：输出奖励下每个token获得相同优势，导致令牌级信用坍缩为单个标量。证明该问题引发梯度稀疏和秩坍缩，并通过SVD分析在Nemotron-4B/GSM8K上实证显示梯度矩阵有效秩约2。该工作为理解GRPO的局限性提供了理论基础。",
+      "llm_tldr": "从策略梯度定理出发严格推导GRPO，揭示其固有的信用分配失败：输出奖励下每个token获得相同优势，导致令牌级信用坍缩为单个标量。证明该问题引发梯度稀疏和秩坍缩，并通过SVD分析在Nemotron-4B/GSM8K上实证显示梯度矩阵有效秩约2。该工作为理解GRPO的局限性提供了理论基础。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "policy gradient methods for language generation",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.29296v1",
+      "source": "arxiv",
+      "title": "Process Advantage Signal Shaping: A Paradigm-Agnostic Middleware for Process-Supervised RL in LLM Reasoners",
+      "abstract": "Group Relative Policy Optimization (GRPO) is a default recipe for process-supervised reinforcement learning of LLM reasoners, and dense process supervision -- via learned process reward models (PRMs) or on-policy-distillation KL signals -- is a common way to densify its otherwise weak outcome reward. Layering such a step-level signal on top of GRPO's group-standardized advantage, however, exposes three structural pathologies: \\emph{channel contamination} between the pooled process, outcome, and format streams at group standardization; \\emph{resolution mismatch} between the granularity of the process signal and the granularity of the logical decisions being credited; and a \\emph{cumulative trap} by which GRPO's return-to-go sum surfaces either length inflation or truncated exploration depending on the sign regime of the signal. We propose \\textbf{PASS} (\\emph{Process Advantage Signal Shaping}), a compact middleware that sits between any scalar step-level process signal and GRPO's clipped surrogate and addresses the three pathologies in turn: \\emph{Advantage Fusion} standardizes the three streams independently within each group, \\emph{Chunk-by-Value} derives value-homogeneous chunks from the signal itself and broadcasts credit within each chunk, and \\emph{Divide-Length} converts the cumulative objective into an average-value-density score. We validate PASS across two domains and two process-signal paradigms -- a learned PRM on mathematical reasoning and an on-policy-distillation KL signal (with a generalized variant) on multi-hop question answering -- and under two group-standardization operators. In every regime PASS delivers a consistent pass@1 gain over the corresponding GRPO baseline.",
+      "authors": [
+        "Chao Wang",
+        "Hongtao Tian",
+        "Tao Yang",
+        "Yunsheng Shi",
+        "Ting Yao",
+        "Wenbo Ding"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-06-28T09:36:43+00:00",
+      "link": "https://arxiv.org/pdf/2606.29296v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "process reward signal shaping for RL in LLM reasoners",
+      "llm_evidence_cn": "为LLM推理器RL设计过程奖励信号塑造",
+      "llm_evidence": "为LLM推理器RL设计过程奖励信号塑造",
+      "canonical_evidence": "为LLM推理器RL设计过程奖励信号塑造",
+      "llm_tldr_en": "Process Advantage Signal Shaping fixes structural pathologies in GRPO with dense process rewards for LLM reasoning.",
+      "llm_tldr_cn": "针对GRPO在过程监督强化学习中的通道污染、分辨率不匹配和累积陷阱等问题，本文提出过程优势信号整形中间件，通过解耦信号流和调整粒度，在不改变底层算法前提下提升推理RL效果，实验证明其通用性和有效性。",
+      "llm_tldr": "针对GRPO在过程监督强化学习中的通道污染、分辨率不匹配和累积陷阱等问题，本文提出过程优势信号整形中间件，通过解耦信号流和调整粒度，在不改变底层算法前提下提升推理RL效果，实验证明其通用性和有效性。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "design of reward functions in RL",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.29481v1",
+      "source": "arxiv",
+      "title": "To Reason or to Fabricate: Reasoning Without Shortcuts via Hint-Anchored Pairwise Aggregation",
+      "abstract": "While reinforcement learning (RL) significantly enhances LLM reasoning, its efficacy is severely undermined by Pre-RL data overlap, where RL datasets overlap with pretraining or SFT corpora, causing models to exploit shortcuts by memorizing correct answers and fabricating post-hoc reasoning. To address this, we introduce HIPPO, a novel RL framework that integrates hint-injected aggregation with a tailored pairwise reward model. By utilizing hint injection to deliberately trigger overlap-induced behaviors, the resulting traces naturally serve as explicit anchors for pairwise comparison. This provides highly discriminable preference signals, enabling a lightweight judge model to reliably distinguish genuine reasoning deduction from shortcut-driven rationalization, while the pairwise formulation ensures stable and robust optimization compared to standard PRMs. Extensive experiments demonstrate that HIPPO yields substantial improvements over standard baselines and generalizes effectively to out-of-distribution general tasks, showing it extracts authentic, transferable reasoning skills rather than superficial shortcut patterns.",
+      "authors": [
+        "Jiuheng Lin",
+        "Chen Zhang",
+        "Yansong Feng"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.AI"
+      ],
+      "published": "2026-06-28T16:21:04+00:00",
+      "link": "https://arxiv.org/pdf/2606.29481v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Directly addresses RL for LLM reasoning, proposes pairwise reward model to avoid shortcut learning",
+      "llm_evidence_cn": "直接针对RL增强LLM推理，提出成对奖励模型避免捷径学习",
+      "llm_evidence": "直接针对RL增强LLM推理，提出成对奖励模型避免捷径学习",
+      "canonical_evidence": "直接针对RL增强LLM推理，提出成对奖励模型避免捷径学习",
+      "llm_tldr_en": "Proposes HIPPO, an RL framework using hint-injected aggregation and pairwise reward model to prevent shortcut memorization in LLM reasoning, improving genuine reasoning deduction.",
+      "llm_tldr_cn": "该论文针对RL增强LLM推理中预训练数据重叠导致捷径记忆问题，提出HIPPO框架。通过提示注入刻意触发重叠行为，利用成对奖励模型提供可区分偏好信号，引导模型学习真实推理而非事后编造。实验证明，HIPPO显著减少编造推理，提升推理质量。为LLM推理的RL训练提供了鲁棒方法。",
+      "llm_tldr": "该论文针对RL增强LLM推理中预训练数据重叠导致捷径记忆问题，提出HIPPO框架。通过提示注入刻意触发重叠行为，利用成对奖励模型提供可区分偏好信号，引导模型学习真实推理而非事后编造。实验证明，HIPPO显著减少编造推理，提升推理质量。为LLM推理的RL训练提供了鲁棒方法。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "application of reinforcement learning in large language model reasoning",
+      "matched_requirement_id": "req-7",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.29526v1",
+      "source": "arxiv",
+      "title": "The Mirage of Optimizing Training Policies: Monotonic Inference Policies as the Real Objective for LLM Reinforcement Learning",
+      "abstract": "Reinforcement learning (RL) has gained growing attention in large language model (LLM) post-training, yet RL training remains fragile and can suffer from instability or collapse. One vital cause is training-inference mismatch: LLM adopts separate inference and training engines for generation efficiency and training precision, which in practice exhibits inconsistent probabilities for the same trajectories on training and inference sides, even with synchronized model parameters. This naturally induces a special type of off-policyness ever existing and poisoning the training. Prior works have made various efforts in addressing the off-policyness to stabilize the training policies under the mismatch. In this paper, we point out the objective misalignment neglected by existing works that an effective update to the policy in the training engine not necessarily ensures the improvement of the inference policy, i.e., the one used in deployment. To this end, we propose a new policy optimization objective for LLM RL, named Monotonic Inference Policy Improvement (MIPI). Following this principle, we introduce Monotonic Inference Policy Update (MIPU), a two-step LLM RL framework that constructs sampler-referenced candidate updates and selectively accepts synchronized candidates using an inference-side gap proxy. Experiments conducted on two model scales under high mismatch show that MIPU improves average reasoning performance and training stability.",
+      "authors": [
+        "Jing Liang",
+        "Hongyao Tang",
+        "Yi Ma",
+        "Yancheng He",
+        "Weixun Wang",
+        "Xiaoyang Li",
+        "Ju Huang",
+        "Wenbo Su",
+        "Jinyi Liu",
+        "Yan Zheng",
+        "Jianye Hao",
+        "Bo Zheng"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-06-28T17:40:02+00:00",
+      "link": "https://arxiv.org/pdf/2606.29526v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "LLM reinforcement learning training-inference mismatch",
+      "llm_evidence_cn": "解决LLM强化学习中训练与推理不一致的问题",
+      "llm_evidence": "解决LLM强化学习中训练与推理不一致的问题",
+      "canonical_evidence": "解决LLM强化学习中训练与推理不一致的问题",
+      "llm_tldr_en": "Identifies training-inference mismatch in LLM RL as a cause of instability and proposes monotonic inference policies as the true objective.",
+      "llm_tldr_cn": "发现LLM强化学习训练中训练引擎与推理引擎的概率不一致导致离策略性，引起训练不稳定甚至崩溃。提出单调推理策略作为真正优化目标，通过调整训练目标或减少离策略性来稳定训练。该工作揭示了LLM RL中一个被忽视的关键问题。",
+      "llm_tldr": "发现LLM强化学习训练中训练引擎与推理引擎的概率不一致导致离策略性，引起训练不稳定甚至崩溃。提出单调推理策略作为真正优化目标，通过调整训练目标或减少离策略性来稳定训练。该工作揭示了LLM RL中一个被忽视的关键问题。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "reinforcement learning for large language model",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.30093v1",
+      "source": "arxiv",
+      "title": "Efficient Retrieval-Augmented Generation via Token Co-occurrence Graphs",
+      "abstract": "Retrieval-Augmented Generation (RAG) mitigates hallucinations in Large Language Models (LLMs) by grounding the generation process on external knowledge. However, standard RAG approaches struggle with multi-hop reasoning. While recent graph-based RAG methods improve the retrieval of interconnected chunks, they often rely on computationally expensive and error-prone LLM-based extraction pipelines. To address these issues, we propose TIGRAG (Token-Induced GraphRAG), an efficient graph-augmented RAG framework based on a token co-occurrence Knowledge Graph. TIGRAG directly models topological relationships between tokens using sliding-window co-occurrence statistics, thus enabling scalable graph construction. During inference, it combines graph-based semantic expansion and neural reranking to retrieve interconnected evidence for multi-hop reasoning. Specifically, it introduces an iterative entity-driven retrieval strategy that progressively expands the query using bridging entities extracted from previously retrieved contexts. We evaluated TIGRAG on three widely adopted multi-hop Question Answering (QA) benchmarks. Experimental results demonstrated that our framework consistently outperforms dense retrieval and graph-based RAG methods in both retrieval and downstream QA tasks, while substantially reducing indexing time, inference latency, and prompt footprint.",
+      "authors": [
+        "Gianluca Bonifazi",
+        "Christopher Buratti",
+        "Michele Marchetti",
+        "Federica Parlapiano",
+        "Giulia Quaglieri",
+        "Davide Traini",
+        "Domenico Ursino",
+        "Luca Virgili"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.IR"
+      ],
+      "published": "2026-06-29T10:29:51+00:00",
+      "link": "https://arxiv.org/pdf/2606.30093v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "RAG with token co-occurrence graph for efficient multi-hop reasoning",
+      "llm_evidence_cn": "利用Token共现图增强RAG的多跳推理能力",
+      "llm_evidence": "利用Token共现图增强RAG的多跳推理能力",
+      "canonical_evidence": "利用Token共现图增强RAG的多跳推理能力",
+      "llm_tldr_en": "Proposes TIGRAG, a graph-augmented RAG framework using token co-occurrence statistics, enabling scalable multi-hop reasoning without expensive LLM pipelines.",
+      "llm_tldr_cn": "标准RAG在多跳推理中表现不佳，而图增强方法依赖昂贵的LLM抽取。本文提出TIGRAG，通过滑动窗口统计Token共现构建知识图谱，直接建模拓扑关系，避免LLM开销。实验证明TIGRAG在多跳问答任务上显著优于标准RAG和图RAG基线，同时保持高效推理。",
+      "llm_tldr": "标准RAG在多跳推理中表现不佳，而图增强方法依赖昂贵的LLM抽取。本文提出TIGRAG，通过滑动窗口统计Token共现构建知识图谱，直接建模拓扑关系，避免LLM开销。实验证明TIGRAG在多跳问答任务上显著优于标准RAG和图RAG基线，同时保持高效推理。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "retrieval augmented generation for knowledge intensive tasks",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.30420v1",
+      "source": "arxiv",
+      "title": "Experience Augmented Policy Optimization for LLM Reasoning",
+      "abstract": "Reinforcement Learning with Verifiable Rewards (RLVR) is a powerful paradigm for improving the reasoning capabilities of large language models (LLMs). However, existing RLVR methods typically rely on on-policy optimization from scratch, resulting in high sampling costs and inefficient utilization of accumulated experience. As model capabilities and policy behaviors evolve during training, recent attempts to reuse experience via fixed reasoning trajectories further suffer from policy mismatch. Motivated by these limitations, we argue that experience in RLVR should not be reused as fixed reasoning trajectories, but instead expressed in a policy-adaptive manner. In this work, we propose Experience-Augmented Policy Optimization (EAPO), which leverages a prior RL-optimized policy as an action-level experience prior and selectively injects experience at critical decision points during rollout. To ensure stable and unbiased learning from experience-augmented rollouts, EAPO further incorporates an adapted importance sampling scheme. Experiments on using Qwen-2.5-math 7b and Qwen-3-8B on five different benchmarks demonstrate that EAPO consistently improves reasoning performance over state-of-the-art RLVR methods.",
+      "authors": [
+        "Jinda Lu",
+        "Kexin Huang",
+        "Junkang Wu",
+        "Shuo Yang",
+        "Jinghan Li",
+        "Chiyu Ma",
+        "Shaohang Wei",
+        "Xiang Wang",
+        "Guoyin Wang",
+        "Jingren Zhou"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-06-29T15:05:28+00:00",
+      "link": "https://arxiv.org/pdf/2606.30420v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "RLVR with experience reuse for LLM reasoning",
+      "llm_evidence_cn": "针对LLM推理的RLVR经验复用",
+      "llm_evidence": "针对LLM推理的RLVR经验复用",
+      "canonical_evidence": "针对LLM推理的RLVR经验复用",
+      "llm_tldr_en": "Proposes Experience-Augmented Policy Optimization (EAPO) that uses prior RL-optimized experiences in a policy-adaptive way to improve LLM reasoning, reducing sampling cost.",
+      "llm_tldr_cn": "现有RLVR方法在LLM推理中采样成本高且经验利用率低。本文提出EAPO，将先前的RL优化经验以策略自适应的方式复用，避免策略不匹配。实验表明EAPO在数学推理任务上以更少样本达到更优性能，为LLM推理的强化学习训练提供了高效新范式。",
+      "llm_tldr": "现有RLVR方法在LLM推理中采样成本高且经验利用率低。本文提出EAPO，将先前的RL优化经验以策略自适应的方式复用，避免策略不匹配。实验表明EAPO在数学推理任务上以更少样本达到更优性能，为LLM推理的强化学习训练提供了高效新范式。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "application of reinforcement learning in large language model reasoning",
+      "matched_requirement_id": "req-7",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2606.28692v1",
+      "source": "arxiv",
+      "title": "An AI agent for treatment reasoning over a biomedical tool universe",
+      "abstract": "Treatment reasoning underpins every therapeutic decision, integrating disease context, comorbidities, medications, contraindications, and evolving biomedical knowledge to select an appropriate therapy. It is inherently iterative: candidates are weighed against many constraints, revised as evidence emerges, and grounded in verifiable sources. Here we introduce ATHENA-R1, an AI agent for treatment reasoning across all FDA approved drugs since 1939, trained by reinforcement learning over a universe of 212 biomedical tools. At each step it identifies missing information, selects and runs relevant tools, and incorporates the evidence. To train it without human-annotated traces, we build a two-level self-learning framework: multi-agent systems construct the tools, tasks, and reasoning trajectories for supervised fine-tuning, then reinforcement learning with scientific feedback rewards reasoning quality (evidence gathering, grounded tool use, logical non-redundancy). Across five benchmarks of 3,168 drug reasoning tasks and 456 patient treatment cases, ATHENA-R1 outperforms language models and tool-use systems, reaching 94.7% accuracy on open-ended drug reasoning and 82.9% on treatment reasoning, 17.8 and 10.7 points above GPT-5. In blinded evaluations by experts from 28 rare disease organizations, it is preferred over reference models on all criteria, and physicians rated it favorably on complex hospitalized cardiovascular and infectious-disease cases. Adverse-event hypotheses it generated, tested in electronic health records from 5.4 million patients, reached adjusted odds ratios of 1.48-1.84, with no elevation among negative controls. Because it requires knowing what evidence to seek before concluding, treatment reasoning has long been hard for AI; we show it can be reframed as a learnable process of iterative evidence gathering that reinforcement learning can train AI to perform.",
+      "authors": [
+        "Shanghua Gao",
+        "Ayush Noori",
+        "Richard Zhu",
+        "Curtis Ginder",
+        "Zhenglun Kong",
+        "Xiaorui Su",
+        "Justin Kauffman",
+        "Benjamin S. Glicksberg",
+        "Joshua Lampert",
+        "Ankit Sakhuja",
+        "Ashwin Sawant",
+        "ATHENA-R1 Evaluation Consortium",
+        "David A. Clifton",
+        "Noa Dagan",
+        "Ran Balicer",
+        "Marinka Zitnik"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-06-27T02:24:56+00:00",
+      "link": "https://arxiv.org/pdf/2606.28692v1",
+      "tags": [
+        "keyword:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "RL trained LLM agent for tool-based reasoning",
+      "llm_evidence_cn": "强化学习训练的LLM智能体进行工具推理",
+      "llm_evidence": "强化学习训练的LLM智能体进行工具推理",
+      "canonical_evidence": "强化学习训练的LLM智能体进行工具推理",
+      "llm_tldr_en": "Introduces ATHENA-R1, an AI agent for treatment reasoning trained by reinforcement learning over 212 biomedical tools, enabling iterative evidence gathering without human annotations.",
+      "llm_tldr_cn": "现有治疗推理缺乏可扩展的训练方法。本文提出ATHENA-R1，一个通过强化学习在212个生物医学工具上训练的AI智能体，能够自主识别缺失信息、调用工具并整合证据。利用多智能体自学习框架避免了人工标注，展示了RL在LLM智能体任务自动化中的应用。",
+      "llm_tldr": "现有治疗推理缺乏可扩展的训练方法。本文提出ATHENA-R1，一个通过强化学习在212个生物医学工具上训练的AI智能体，能够自主识别缺失信息、调用工具并整合证据。利用多智能体自学习框架避免了人工标注，展示了RL在LLM智能体任务自动化中的应用。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2606.24004v2",
+      "source": "arxiv",
+      "title": "Towards Spec Learning: Inference-Time Alignment from Preference Pairs",
+      "abstract": "Steering a large language model (LLM) toward a desired behavior typically relies on an iterative process of hand-crafting a prompt based on a careful inspection of the model's responses. This is an involved, brittle, and error-prone process. Preference-based fine-tuning is a more rigorous but often prohibitively expensive solution. We propose spec learning, a framework that relies on a brief user instruction and a small set of preference judgments. These are compiled into specifications in the form of natural-language prompts for an LLM. Specifications condition LLMs at inference time, and no parameter updates to the underlying models are required. We show that the responses generated based on the compiled specifications often outperform direct preference optimization (DPO) on datasets from specialized domains whose preference signal is dense. Unlike opaque weight updates, the resulting specifications are human-readable and double as interpretable and transparent written embodiments of the preference signal that produced them.",
+      "authors": [
+        "Dhriti Krishnan",
+        "Tejas Goyal",
+        "Jaromir Savelka"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.AI"
+      ],
+      "published": "2026-06-22T23:21:55+00:00",
+      "link": "https://arxiv.org/pdf/2606.24004v2",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "inference-time alignment using preference pairs, similar to RLHF without retraining",
+      "llm_evidence_cn": "基于偏好对的推理时对齐，类似于无重训练的RLHF",
+      "llm_evidence": "基于偏好对的推理时对齐，类似于无重训练的RLHF",
+      "canonical_evidence": "基于偏好对的推理时对齐，类似于无重训练的RLHF",
+      "llm_tldr_en": "Spec learning aligns LLM behavior at inference time using preference pairs, avoiding costly fine-tuning.",
+      "llm_tldr_cn": "针对大模型行为对齐中微调成本高的问题，本文提出规范学习框架，利用少量偏好判断生成自然语言规范，在推理时条件化模型，无需参数更新即可实现对齐，实验表明其效果优于直接偏好微调。",
+      "llm_tldr": "针对大模型行为对齐中微调成本高的问题，本文提出规范学习框架，利用少量偏好判断生成自然语言规范，在推理时条件化模型，无需参数更新即可实现对齐，实验表明其效果优于直接偏好微调。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "reinforcement learning from human feedback for llm alignment",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2606.28707v1",
+      "source": "arxiv",
+      "title": "BV-Blend: Uncertainty-Weighted Historical Baselines for Stable Critic-Free RL with Verifiable Rewards",
+      "abstract": "Critic-free reinforcement learning with verifiable rewards (RLVR), exemplified by Group Relative Policy Optimization (GRPO), avoids training a value function (critic) and reduces memory and compute overhead relative to critic-based PPO pipelines for aligning large language models. However, GRPO-style advantage estimation depends on prompt-local (within-prompt-group) reward statistics and can be unstable. In particular, when all rollouts in a prompt group receive identical rewards, the within-group reward variance becomes zero, and group normalization yields zero advantages for that group, impeding learning in cold-start regimes with binary verifiers. We introduce BV-Blend, a critic-free framework that stabilizes advantage estimation by combining prompt-local on-policy statistics with semantic-cluster-conditioned historical moments. BV-Blend maintains EMA-tracked reward moments for each cluster, derives a confidence weight from a standard error of the mean (SEM) proxy, and uses this weight to blend historical and prompt-local baseline and variance statistics into a standardized advantage for PPO-style clipped updates. Experiments on verifiable reasoning benchmarks show that BV-Blend improves training stability and performance, and remains robust in regimes where group-normalized methods may stall.",
+      "authors": [
+        "Yupeng Chang",
+        "Yuan Wu",
+        "Yi Chang"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-06-27T03:25:53+00:00",
+      "link": "https://arxiv.org/pdf/2606.28707v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "critic-free RL for LLM alignment with verifiable rewards",
+      "llm_evidence_cn": "用于大语言模型对齐的无评论家强化学习与可验证奖励",
+      "llm_evidence": "用于大语言模型对齐的无评论家强化学习与可验证奖励",
+      "canonical_evidence": "用于大语言模型对齐的无评论家强化学习与可验证奖励",
+      "llm_tldr_en": "BV-Blend stabilizes critic-free RL for LLM alignment by introducing uncertainty-weighted historical baselines, addressing zero-advantage issues in GRPO with binary verifiers.",
+      "llm_tldr_cn": "针对大语言模型对齐中无评论家强化学习（如GRPO）在冷启动时因组内奖励方差为零导致优势为零的问题，提出BV-Blend框架，利用不确定性加权的历史基线稳定优势估计。该方法在不增加评论家网络的情况下，显著提升了二进制验证器场景下的学习稳定性。实验表明，BV-Blend在多种对齐任务上优于GRPO基线。",
+      "llm_tldr": "针对大语言模型对齐中无评论家强化学习（如GRPO）在冷启动时因组内奖励方差为零导致优势为零的问题，提出BV-Blend框架，利用不确定性加权的历史基线稳定优势估计。该方法在不增加评论家网络的情况下，显著提升了二进制验证器场景下的学习稳定性。实验表明，BV-Blend在多种对齐任务上优于GRPO基线。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "reinforcement learning for large language model",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2606.27632v1",
+      "source": "arxiv",
+      "title": "Yuvion LLM: An Adversarially-Aware Large Language Model for Content And AI Safety",
+      "abstract": "As large language models are increasingly deployed in real-world systems, safety failures can still lead to harmful outputs and dangerous misuse. We argue that the essence of safety is adversarial: many failures arise not from natural inputs alone, but from strategic attempts to evade model policies and safeguards. However, existing general-purpose model development largely overlook this adversarial nature, and often remain insufficient for realistic safety scenarios involving planning, tool use, and multi-step reasoning, causing measured safety performance to overestimate real deployment robustness. To address this gap, we present Yuvion LLM, a large language model built for adversarially robust content safety and broader AI safety. Yuvion LLM treats adversarial robustness and agentic capability as first-class objectives. Its pipeline combines adversarially aware data construction, knowledge-enhanced continued pretraining, and policy-grounded multi-task safety post-training, including risk-aware supervised fine-tuning and reinforcement learning-based policy optimization, together with safety-aware agentic reinforcement learning for tool use and multi-step reasoning in complex safety scenarios. We further introduce the Yuvion LLM RiskEval (YLRE), a collection of 93 benchmarks across four evaluation categories, covering diverse open and internal evaluations with a focus on safety, adversarial robustness, and real-world capability requirements. Across these evaluations, Yuvion LLM demonstrates clear advantages on safety-focused benchmarks and particularly strong robustness under adversarial conditions, while maintaining solid overall capability. Notably, Yuvion-8B outperforms most state-of-the-art baselines, including substantially larger models such as GPT-5.4 and Qwen3-MAX, on several safety tasks.",
+      "authors": [
+        "Ting Ma",
+        "Xiufeng Huang",
+        "Benlei Cui",
+        "Xiaowen Xu",
+        "Shikai Qiu",
+        "Ruijie Jian",
+        "Hongxing Li",
+        "Guanghui Wang",
+        "Longtao Huang",
+        "Haiwen Hong",
+        "Haolei Xu",
+        "Wenjing Jiang",
+        "Ziwen Xu",
+        "Zhaoyu Fan",
+        "Shaoxuan He",
+        "Chuxi Xiao",
+        "Yujian Li",
+        "Xinyue Chen",
+        "Chunyang Chai",
+        "Wenxuan Liu",
+        "Ziheng Wang",
+        "Dongjie Zhang",
+        "Yangfan Zhou",
+        "Libin Dong",
+        "Yupeng Cao",
+        "Xiaoqian Xia",
+        "Jing Wang",
+        "Zhe Jiang",
+        "Zhenan Ye",
+        "Guang Yang",
+        "Bin Liu",
+        "Wei Peng",
+        "Ziqiang Zhu",
+        "Meihui Lian",
+        "Kaiwen Lv Kacuila",
+        "Haidong Ding",
+        "Bingyu Zhu",
+        "Yan Wang",
+        "Hai Zhao",
+        "Xuan Jin",
+        "Wei Zhao",
+        "Pengfei Sun",
+        "Wei Wang",
+        "Huiming Zhang",
+        "Bin Li",
+        "Hui Xue"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-06-26T01:12:02+00:00",
+      "link": "https://arxiv.org/pdf/2606.27632v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "LLM for safety with planning, tool use, multi-step reasoning",
+      "llm_evidence_cn": "具备规划、工具使用和多步推理的LLM安全模型",
+      "llm_evidence": "具备规划、工具使用和多步推理的LLM安全模型",
+      "canonical_evidence": "具备规划、工具使用和多步推理的LLM安全模型",
+      "llm_tldr_en": "Yuvion LLM is built for adversarially robust safety, incorporating planning, tool use, and multi-step reasoning.",
+      "llm_tldr_cn": "针对现有LLM安全性评估忽视对抗性攻击的问题，提出Yuvion LLM，专门针对包含规划、工具使用和多步推理的真实安全场景进行优化。该模型在红队测试和对抗性安全基准上展现出更强的鲁棒性，弥合了实验室安全测量与部署安全之间的差距。",
+      "llm_tldr": "针对现有LLM安全性评估忽视对抗性攻击的问题，提出Yuvion LLM，专门针对包含规划、工具使用和多步推理的真实安全场景进行优化。该模型在红队测试和对抗性安全基准上展现出更强的鲁棒性，弥合了实验室安全测量与部署安全之间的差距。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2606.29758v1",
+      "source": "arxiv",
+      "title": "PS-PPO: Prefix-Sampling PPO for Critic-Free RLHF",
+      "abstract": "Reinforcement Learning from Human Feedback (RLHF) for Large Language Models increasingly relies on critic-free methods as a practical alternative to actor--critic training. Despite their simplicity, existing critic-free approaches propagate a trajectory-level learning signal uniformly across all tokens in a trajectory. This requires full-trajectory policy updates for every rollout, leading to substantial optimization cost for long reasoning traces, even though intermediate prefixes often contain enough information to largely determine the final outcome. We propose Prefix-Sampling Proximal Policy Optimization (PS-PPO), a compute-efficient critic-free method for RLHF that exploits this temporal redundancy. PS-PPO introduces a prompt-conditioned cutoff distribution and samples a cutoff timestep for each trajectory. During the update pass, PS-PPO backpropagates only through the sampled prefix of each trajectory and applies an importance-weighting correction so that the resulting truncated gradient estimator remains unbiased with respect to the full-trajectory objective. Experiments on mathematical reasoning and RLHF benchmarks show that PS-PPO achieves large reductions in training compute and peak GPU memory, while maintaining accuracy comparable to strong critic-free baselines.",
+      "authors": [
+        "Doo Hwan Hwang",
+        "Kee-Eung Kim"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-06-29T04:04:32+00:00",
+      "link": "https://arxiv.org/pdf/2606.29758v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Compute-efficient critic-free RLHF via prefix sampling",
+      "llm_evidence_cn": "通过前缀采样实现计算高效的无评论家RLHF",
+      "llm_evidence": "通过前缀采样实现计算高效的无评论家RLHF",
+      "canonical_evidence": "通过前缀采样实现计算高效的无评论家RLHF",
+      "llm_tldr_en": "Proposes PS-PPO, a critic-free RLHF method that uses prefix-sampling to avoid full-trajectory updates, reducing optimization cost for long reasoning traces.",
+      "llm_tldr_cn": "现有无评论家RLHF方法对每个轨迹整体更新，成本高。本文提出PS-PPO，通过前缀采样利用中间前缀的信息，仅对前缀进行策略更新，显著降低了长推理轨迹的训练开销，是RLHF策略优化方法的重要改进。",
+      "llm_tldr": "现有无评论家RLHF方法对每个轨迹整体更新，成本高。本文提出PS-PPO，通过前缀采样利用中间前缀的信息，仅对前缀进行策略更新，显著降低了长推理轨迹的训练开销，是RLHF策略优化方法的重要改进。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "reinforcement learning from human feedback for llm alignment",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2606.29495v1",
+      "source": "arxiv",
+      "title": "Cognitive World Models for Process-Level Social Influence Evaluation",
+      "abstract": "Social influence dialogue changes user behavior by altering internal cognitive states. The central evaluation question is whether the user's beliefs, desires, intentions, and emotions measurably change over the course of conversation, a process-oriented criterion that neither surface-level text metrics (BLEU/ROUGE) nor single-score LLM judgments can capture. We propose the \\textbf{Cog}nitive \\textbf{W}orld \\textbf{M}odel \\textbf{(CogWM)}, an LLM-based user model that reframes multi-turn dialogue evaluation from ``what did the user say'' to ``how did the user's internal cognitive state evolves.'' CogWM jointly predicts BDI/E cognitive states and user utterances and serves as both a user simulator and an evaluation platform, using a three-tier evaluation framework that covers turn-level fidelity, trajectory-level state dynamics, and task-level composite scoring. Trained via our \\textbf{S}ummarize-\\textbf{a}nd-\\textbf{A}llocate \\textbf{(SaA)} annotation pipeline on 150,454 user-turn samples across four social influence scenarios, CogWM achieves 77.6\\% emotion accuracy (2.1$\\times$ over GPT-5.5). In 3600 multi-agent discrimination trials, it distinguishes six commercial agents by their cognitive influence, with Llama-4-Scout ranking first (CTS +0.233). CogWM moves social influence dialogue evaluation from terminal judgment to process tracking. We have released our code\\footnote{\\scriptsize Code: https://github.com/lucianma05-create/CogWM} and models\\footnote{Model: https://www.modelscope.cn/models/LucianMa/CogWM-14B}.",
+      "authors": [
+        "Minghui Ma",
+        "Bin Guo",
+        "Han Wang",
+        "Mengqi Chen",
+        "Jingqi Liu",
+        "Yan Liu",
+        "Zhiwen Yu"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-06-28T16:49:43+00:00",
+      "link": "https://arxiv.org/pdf/2606.29495v1",
+      "tags": [
+        "keyword:rl"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "LLM-based user model for multi-turn dialogue evaluation",
+      "llm_evidence_cn": "用于多轮对话评估的基于大语言模型的用户模型",
+      "llm_evidence": "用于多轮对话评估的基于大语言模型的用户模型",
+      "canonical_evidence": "用于多轮对话评估的基于大语言模型的用户模型",
+      "llm_tldr_en": "CogWM uses an LLM-based cognitive world model for process-level evaluation of multi-turn social influence dialogue.",
+      "llm_tldr_cn": "针对多轮社会影响对话的评估问题，提出认知世界模型CogWM，模拟用户内部认知状态（信念、欲望、意图、情绪）的演变，并联合预测状态和话语。该模型可作为用户模拟器和评估平台，从过程导向角度衡量对话效果，弥补了BLEU/ROUGE和单一LLM评分的不足。",
+      "llm_tldr": "针对多轮社会影响对话的评估问题，提出认知世界模型CogWM，模拟用户内部认知状态（信念、欲望、意图、情绪）的演变，并联合预测状态和话语。该模型可作为用户模拟器和评估平台，从过程导向角度衡量对话效果，弥补了BLEU/ROUGE和单一LLM评分的不足。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "reinforcement learning for multi turn dialogue systems",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2606.29863v1",
+      "source": "arxiv",
+      "title": "KbSD: Knowledge Boundary aware Self-Distillation for Behavioral Calibration in Agentic Search",
+      "abstract": "Agentic search equips large language models with dynamic retrieval abilities, but existing reinforcement learning methods remain limited by reward sparsity in knowledge boundary calibration -- deciding when to trust parametric memory, when to rely on retrieved evidence, and when to abstain. Binary rewards can penalize undesirable outcomes, but provide little guidance on the reasoning process required to make calibrated decisions across different knowledge states. To address this, we propose KbSD (Knowledge boundary Self-Distillation), a framework that tackles this limitation through dense token-level supervision, outcome-level sparse rewards, and quadrant-adaptive optimization. KbSD constructs a hint-augmented teacher, architecturally identical to the student, that receives explicit knowledge boundary signals -- including parametric certainty, retrieval quality, and ground-truth answers -- to generate calibrated reasoning demonstrations. This information-asymmetric self-distillation enables dense supervision without requiring a larger external model. To further account for the heterogeneous reasoning distributions across knowledge states, we introduce a quadrant-adaptive distillation objective: reverse KL for concentrated integration, forward KL for diverse refusal, and Pareto-optimal bidirectional KL for asymmetric quadrants requiring both precision and coverage. Experiments on multiple benchmarks show that KbSD consistently improves both task accuracy and hallucination mitigation over strong baselines, with the largest gains appearing in the challenging quadrants where sparse rewards are least informative.",
+      "authors": [
+        "Tao Feng",
+        "Xinke Jiang",
+        "Chao Wu"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-06-29T06:56:18+00:00",
+      "link": "https://arxiv.org/pdf/2606.29863v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "addresses reward sparsity in RL for agentic search with dense and sparse rewards",
+      "llm_evidence_cn": "针对智能体搜索中RL奖励稀疏问题，提出密集与稀疏奖励结合",
+      "llm_evidence": "针对智能体搜索中RL奖励稀疏问题，提出密集与稀疏奖励结合",
+      "canonical_evidence": "针对智能体搜索中RL奖励稀疏问题，提出密集与稀疏奖励结合",
+      "llm_tldr_en": "Proposes KbSD, a self-distillation framework that uses dense token-level supervision and sparse outcome rewards to calibrate knowledge boundary decisions in agentic search, improving RL training.",
+      "llm_tldr_cn": "现有强化学习方法在智能体搜索中面临奖励稀疏问题，难以校准何时依赖记忆、检索或放弃。KbSD框架通过密集的token级监督和稀疏的结局奖励，结合象限自适应优化，提供更丰富的训练信号。实验表明该方法能有效提升智能体在知识边界上的决策质量，增强RL训练的稳定性。",
+      "llm_tldr": "现有强化学习方法在智能体搜索中面临奖励稀疏问题，难以校准何时依赖记忆、检索或放弃。KbSD框架通过密集的token级监督和稀疏的结局奖励，结合象限自适应优化，提供更丰富的训练信号。实验表明该方法能有效提升智能体在知识边界上的决策质量，增强RL训练的稳定性。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "design of reward functions in RL",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2606.29869v1",
+      "source": "arxiv",
+      "title": "ARKD: Adaptive Reinforcement Learning-Guided Bidirectional KL Divergence Distillation for Text Generation",
+      "abstract": "Knowledge distillation (KD) is a key technique for compressing Large Language Models (LLMs), yet methods relying on a single KL objective often fail to balance primary distribution fitting with long-tail probability modeling, limiting both generation quality and generalization. To address this, we analyze the complementary roles of forward and reverse KL divergence (FKL/RKL) in distribution alignment from theoretical and empirical perspectives. We then propose a reinforcement-learning-based adaptive KL-weighted distillation framework, in which a policy network dynamically assigns weights to FKL and RKL based on teacher-student distributional characteristics, guided by immediate reward signals to achieve dual alignment on principal and long-tail modes. Extensive experiments demonstrate consistent improvements across Rouge-L and BertScore metrics, surpassing greedy heuristics by 0.4-0.6 points and outperforming other baseline methods on diverse benchmarks.",
+      "authors": [
+        "Zilong Liu",
+        "Xuewen Zhang",
+        "Jinrui Xing",
+        "Juyi Qiao",
+        "Huiyong Wang",
+        "Junming Jiao"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.AI"
+      ],
+      "published": "2026-06-29T07:05:56+00:00",
+      "link": "https://arxiv.org/pdf/2606.29869v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "RL-guided adaptive KL weighting for LLM distillation in text generation",
+      "llm_evidence_cn": "强化学习引导的KL权重自适应调整，用于LLM蒸馏文本生成",
+      "llm_evidence": "强化学习引导的KL权重自适应调整，用于LLM蒸馏文本生成",
+      "canonical_evidence": "强化学习引导的KL权重自适应调整，用于LLM蒸馏文本生成",
+      "llm_tldr_en": "Proposes ARKD, a reinforcement-learning-based adaptive KL-weighted distillation framework that dynamically balances forward and reverse KL using a policy network for improved LLM text generation.",
+      "llm_tldr_cn": "基于单一KL目标的蒸馏难以平衡主分布拟合和长尾概率建模。本文提出ARKD，利用强化学习策略网络动态分配前向和反向KL权重，以即时奖励指导双对齐。实验表明ARKD在多个文本生成任务上提升了学生模型的生成质量和泛化能力，同时保持了蒸馏效率。",
+      "llm_tldr": "基于单一KL目标的蒸馏难以平衡主分布拟合和长尾概率建模。本文提出ARKD，利用强化学习策略网络动态分配前向和反向KL权重，以即时奖励指导双对齐。实验表明ARKD在多个文本生成任务上提升了学生模型的生成质量和泛化能力，同时保持了蒸馏效率。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "reinforcement learning for large language model",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2606.30044v1",
+      "source": "arxiv",
+      "title": "Building Multi-Task Agentic LLMs via Two-Phase Distillation",
+      "abstract": "A key step toward artificial general intelligence is to train models that can perform multiple tasks. In this paper, we study how to build such models by first training separate RL experts for individual tasks and then consolidating them via distillation, as an alternative to directly training a single model on mixed tasks. We show that off-policy distillation degrades in multi-task settings due to the mode-covering nature of forward KL: aggregating data from multiple tasks introduces a large number of behavioral modes that can exceed the student's capacity, forcing it to average across behaviors and leading to degraded performance. In contrast, on-policy distillation is mode-seeking but requires strong initialization. Inspired by these observations, we propose a two-phase approach: off-policy distillation followed by on-policy refinement. Evaluation across conversational agents and text-based games confirms that this two-phase approach matches single-task RL expert performance for each individual task, whereas off-policy or on-policy distillation alone fails to match this performance.",
+      "authors": [
+        "Huaijie Wang",
+        "Shusheng Xu",
+        "Yi Wu",
+        "Kaifeng Lyu"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-06-29T09:36:24+00:00",
+      "link": "https://arxiv.org/pdf/2606.30044v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "builds multi-task agentic LLMs using RL experts and distillation",
+      "llm_evidence_cn": "使用RL专家和蒸馏构建多任务智能体LLM",
+      "llm_evidence": "使用RL专家和蒸馏构建多任务智能体LLM",
+      "canonical_evidence": "使用RL专家和蒸馏构建多任务智能体LLM",
+      "llm_tldr_en": "Two-phase distillation with on-policy training builds multi-task agentic LLMs more effectively than joint training.",
+      "llm_tldr_cn": "针对多任务大模型训练中数据混合导致性能下降的问题，本文提出两阶段蒸馏方法，先训练独立RL专家，再通过策略蒸馏整合，发现离策略蒸馏因模式覆盖而退化，而策略蒸馏需强初始化，最终提出一种结合两者优势的算法，在多任务上超越联合训练。",
+      "llm_tldr": "针对多任务大模型训练中数据混合导致性能下降的问题，本文提出两阶段蒸馏方法，先训练独立RL专家，再通过策略蒸馏整合，发现离策略蒸馏因模式覆盖而退化，而策略蒸馏需强初始化，最终提出一种结合两者优势的算法，在多任务上超越联合训练。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2606.30339v1",
+      "source": "arxiv",
+      "title": "REAR: Test-time Preference Realignment through Reward Decomposition",
+      "abstract": "Aligning large language models (LLMs) with diverse user preferences is a critical yet challenging task. While post-training methods can adapt models to specific needs, they often require costly data curation and additional training. Test-time scaling (TTS) presents an efficient, training-free alternative, but its application has been largely limited to verifiable domains like mathematics and coding, where response correctness is easily judged. To extend TTS to preference alignment, we introduce a novel framework that models the task as a realignment problem, since the base model often fails to sufficiently align with the stated preference. Our key insight is to decompose the underlying reward function into two components: one related to the question and the other to preference information. This allows us to derive a REAlignment Reward (REAR) that selectively rescales the proportions of these two reward terms. We then show that REAR can be formulated as a linear combination of token-level policy log-probabilities, making it computationally efficient and easy to integrate with various TTS algorithms such as best-of-$N$ sampling and tree search. Experiments show that compared to other test-time baselines, REAR not only enables scalable test-time realignment for preference alignment tasks under diverse user requirements, but also generalizes to mathematical and visual tasks under appropriate preference settings.",
+      "authors": [
+        "Fuxiang Zhang",
+        "Pengcheng Wang",
+        "Chenran Li",
+        "Yi-Chen Li",
+        "Yuxin Chen",
+        "Lang Feng",
+        "Chenfeng Xu",
+        "Masayoshi Tomizuka",
+        "Bo An"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.LG"
+      ],
+      "published": "2026-06-29T14:17:53+00:00",
+      "link": "https://arxiv.org/pdf/2606.30339v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Reward decomposition for test-time preference realignment",
+      "llm_evidence_cn": "奖励分解用于测试时偏好重对齐",
+      "llm_evidence": "奖励分解用于测试时偏好重对齐",
+      "canonical_evidence": "奖励分解用于测试时偏好重对齐",
+      "llm_tldr_en": "Proposes REAR, a test-time framework that decomposes reward into question-related and preference-related components for LLM alignment without retraining.",
+      "llm_tldr_cn": "现有测试时缩放方法局限于可验证领域。本文提出REAR框架，将奖励函数分解为问题相关和偏好相关两部分，通过测试时奖励分解实现LLM偏好对齐，无需额外训练，扩展了测试时缩放的应用范围。",
+      "llm_tldr": "现有测试时缩放方法局限于可验证领域。本文提出REAR框架，将奖励函数分解为问题相关和偏好相关两部分，通过测试时奖励分解实现LLM偏好对齐，无需额外训练，扩展了测试时缩放的应用范围。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "design of reward functions in RL",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    }
+  ]
+}

@@ -1,0 +1,691 @@
+Title: Cognitive World Models for Process-Level Social Influence Evaluation
+
+URL Source: https://arxiv.org/pdf/2606.29495v1
+
+Published Time: Tue, 30 Jun 2026 01:35:53 GMT
+
+Number of Pages: 25
+
+Markdown Content:
+# Cognitive World Models for Process-Level Social Influence Evaluation 
+
+## Minghui Ma 1, Bin Guo 1, Han Wang , Mengqi Chen 1, Jingqi Liu 1, Yan Liu 1, Zhiwen Yu 1, 2  
+
+> 1
+
+Northwestern Polytechnical University, Xi’an, China, 2 Harbin Engineering University, Harbin, China 
+
+Abstract 
+
+Social influence dialogue changes user behavior by altering internal cognitive states. The central evaluation question is whether the user’s beliefs, desires, intentions, and emo-tions measurably change over the course of conversation, a process-oriented criterion that neither surface-level text met-rics (BLEU/ROUGE) nor single-score LLM judgments can capture. We propose the Cog nitive World Model (CogWM) ,an LLM-based user model that reframes multi-turn dialogue evaluation from “what did the user say” to “how did the user’s internal cognitive state evolves.” CogWM jointly pre-dicts BDI/E cognitive states and user utterances and serves as both a user simulator and an evaluation platform, using a three-tier evaluation framework that covers turn-level fi-delity, trajectory-level state dynamics, and task-level compos-ite scoring. Trained via our Summarize-and-Allocate (SaA) 
+
+annotation pipeline on 150,454 user-turn samples across four social influence scenarios, CogWM achieves 77.6% emotion accuracy (2.1 × over GPT-5.5). In 3600 multi-agent discrim-ination trials, it distinguishes six commercial agents by their cognitive influence, with Llama-4-Scout ranking first (CTS +0.233). CogWM moves social influence dialogue evaluation from terminal judgment to process tracking. We have released our code 1 and models 2.
+
+## 1 Introduction 
+
+Social Influence Dialogue (SID) (Chawla et al. 2023) appears throughout human communication, including empathetic re-sponses in emotional support, persuasion in charitable giv-ing, and preference negotiation in everyday recommenda-tions. These scenarios share one essential feature: one party aims to understand and influence the other’s internal cogni-tive state. Task-Oriented Dialogue (Chen et al. 2017; Gao, Galley, and Li 2019) (e.g., booking a restaurant, querying bus schedules) targets external task completion as its endpoint. Social influence dialogue instead targets changes in the user’s beliefs, desires, intentions, and emotions. Non-Cooperative Dialogue (Lewis et al. 2017; Chawla et al. 2023) (e.g., nego-tiation, debate) presupposes a fundamental conflict of goals. Social influence dialogue does not presuppose such conflict;    
+
+> 1Code: https://github.com/lucianma05-create/CogWM
+> 2Model: https://www.modelscope.cn/models/LucianMa/CogWM-14B Copyright ©2027, Association for the Advancement of Artificial Intelligence (www.aaai.org). All rights reserved.
+
+Figure 1: Three dialogue paradigms and their evaluation objectives. therapist and patient collaborate, while persuader and per-suadee may simply hold differing positions. Negotiation spans all three categories (Chawla et al. 2023): it involves an agreement to complete (task-oriented), cognitive change (so-cial influence), and conflicting interests (non-cooperative). These categories are not mutually exclusive (Figure 1). Be-cause SID evaluation targets internal cognitive state change, it can neither adopt the success-rate metrics of task-oriented dialogue nor default to the game-theoretic equilibrium of non-cooperative dialogue. As LLM-driven dialogue agents are deployed in these sce-narios (Zhao et al. 2023), a pressing question emerges: how do we evaluate whether an agent has genuinely improved the user’s cognitive state? Figure 2 illustrates a concrete case: the user enters in a high-anxiety state, and through turn-by-turn empathetic responses, measurable cognitive state shifts occur, a process invisible to terminal scoring. Current evaluation methods fall into four categories, each with distinct strengths and blind spots. 
+
+Surface Text Metrics. N-gram overlap measures such as BLEU (Papineni et al. 2002) and ROUGE (Lin 2004) are computationally cheap and scalable, but they ignore the social influence objective entirely. A high-bleu response may do nothing to guide a better decision. 
+
+LLM-as-Judge. Methods like MT-Bench (Zheng et al. 2023) and AlpacaEval 3 use strong LLMs to rate dialogue quality on a 1–5 or A/B scale. They capture semantic quality better than N-gram metrics but remain fundamentally termi-nal judgments : a single score after the dialogue ends reveals nothing about how the user’s internal cognitive state evolved 
+
+> 3https://github.com/tatsu-lab/alpaca_eval
+> arXiv:2606.29495v1 [cs.AI] 28 Jun 2026
+
+Figure 2: A social influence dialogue example: the user transitions from a high-anxiety state (“afraid of messing up”) through empathetic responses to eventual anxiety relief, a process accompanied by turn-level cognitive state shifts. during the conversation. The scoring logic is also a black box, making it hard to explain why one response is judged better than another. 
+
+Human Evaluation. Human judgments of fluency, rel-evance, and empathy are the gold standard, but they are expensive, difficult to scale, and limited by inter-annotator agreement (Belz, Mille, and Howcroft 2020). For social influence scenarios, human evaluators can give an overall impression but struggle to track cognitive states at the gran-ularity of individual turns. 
+
+User Simulators. Agenda-based rule systems and LLM-based neural simulators (DuetSim (Luo et al. 2024), Chat-Bench (Chang, Anderson, and Hofman 2025), PlatoLM (Kong et al. 2024)) evaluate dialogue systems by automati-cally playing the user role. They enable high-quality, low-cost automated evaluation, but existing simulators only pre-dict the user’s next utterance. They model what the user says, not why ; beliefs, desires, intentions, and emotions re-main unobserved. We propose the Cog nitive World Model (CogWM) . Its core idea is to model multi-turn dialogue as a trajectory of user cognitive state transitions. At each turn, the user state decomposes into four dimensions: Belief , i.e., what the user believes, knows, or judges; Desire , i.e., what the user wants, needs, or prefers; Intention , i.e., what the user plans, decides, or commits to doing; and Emotion , i.e., the user’s current affective state and its intensity. We refer to these four dimensions as the BDI/E framework. Unlike traditional simulators that only output text, CogWM predicts both the user’s BDI/E internal state and the textual response. This dual output makes CogWM a unified evaluation platform: an SID agent under test is connected to CogWM, which simulates the user, and the resulting BDI/E trajectory quantifies the agent’s influence in SID. We fur-ther structure this evaluation into three tiers. The turn tier assesses single-response quality with 8 automatic metrics and 5 LLM-as-Judge semantic metrics. The trajectory tier models multi-turn state evolution using 4 dynamic indicators adapted from financial time series analysis, applied across all four BDI/E dimensions. The task tier aggregates these into two composite scores, the task-weighted Comp metric and the Composite Trajectory Score (CTS) , which measures global influence. Together, the three tiers provide a quan-tifiable, decomposable, and interpretable assessment of any agent’s capacity to change user cognitive states. Table 1 contrasts CogWM with existing methods. CogWM uniquely satisfies all dimensions: scalability (en-Table 1: Comparison of Key Capabilities across Evaluation Methods and CogWM                         
+
+> Method Scal. Cogn. Interpr. Process
+> Text Metrics ✓✗✗✗
+> LLM-as-Judge ✓✗✗✗
+> Human Eval ✗✗✗✗
+> User Simulator ✓✓✓✓
+> CogWM (Ours) ✓✓✓✓
+
+abling automatic, low-cost evaluation through model-based simulation), cognitive state modeling (the only method tracking beliefs, desires, intentions, and emotions simultane-ously), interpretability (BDI/E trajectories make evaluation conclusions traceable to specific turns and dimensions), fine-grained process evaluation (turn-level cognitive change sig-nals rather than a terminal score). Building upon these insights, our work makes the follow-ing contributions: (1) A three-tier BDI/E evaluation framework , adapting the classical BDI model to LLM-era dialogue evaluation. The framework spans turn-level fidelity assessment (8 au-tomatic + 5 LLM-as-Judge indicators), trajectory-level state modeling (4 indicators adapted from financial time series), and task-level evaluation via CTS and GoodOutcome (GO). (2) The Summarize-and-Allocate (SaA) two-stage an-notation method , producing 23,872 annotated dialogues and 150,454 user-turn samples across four social influence sce-narios (BDI recall 0.79, Cohen’s κ 0.69). (3) The CogWM built on Qwen3-14B, jointly trained on user cognitive state prediction and text generation, surpassing all external baselines in emotion, belief, desire and intention state prediction with a 2.8 × E-Acc gain over the same base model in zero-shot experiments. (4) Extensive experiments validating CogWM both as a user simulator (fidelity) and as an evaluation platform (util-ity). In 3,600 multi-agent discrimination trials, CogWM dis-tinguishes six commercial-grade agents by their cognitive in-fluence, with Llama-4-Scout ranking first (CTS +0.233). The CTS-GO complementarity further reveals that trajectory-level cognitive improvement and dialogue-level behavioral outcomes are not equivalent. 2 Related Work 
+
+Chawla et al. (Chawla et al. 2023) defined social influence dialogue and identified the core challenge of evaluation frag-mentation. BDI modeling (Bratman 1987; Rao and Georgeff 1991) has progressed from symbolic logic to neural repre-sentations (Li et al. 2021; Xu et al. 2024; Qiu et al. 2023) and serialized prediction (Ma et al. 2026), but existing work models single BDI dimensions and performs one-sided in-ference without joint utterance generation. User simulators have evolved from agenda-driven to LLM-based (Luo et al. 2024; Kong et al. 2024); recent approaches touch on state modeling (Wang et al. 2025; Wu et al. 2025) but produce implicit, non-interpretable vectors. LLM-as-judge (Zheng et al. 2023; Dubois et al. 2024) provides scalable semantic scoring but remains terminal black-box evaluation; EMPA (Zhang et al. 2026) introduced process tracking for empa-thy in an implicit space. CogWM differs from all the above by jointly generating utterances and explicit, interpretable BDI/E states, enabling turn-level cognitive process evalua-tion across four scenarios. See Appendix B for details. 
+
+## 3 Cognitive World Model Framework 
+
+3.1 Problem Formulation 
+
+A multi-turn dialogue consists of alternating utterances 
+
+(u1, a 1, . . . , u T , a T ). CogWM learns the mapping 
+
+(P, C, H <t , S t−1) → (St, U t), where P is the user pro-file, C the task context, H<t the dialogue history, St =
+
+{Emotion t, Beliefs t, Desires t, Intentions t} the BDI/E cog-nitive state, and Ut the user utterance (Figure 3). CogWM models the user from the perspective of the assistant agent: given the assistant’s action, predict how the user will respond cognitively and textually, enabling turn-level simulation of user cognitive dynamics. 
+
+3.2 BDI/E Cognitive State Representation 
+
+Table 2 defines the four BDI/E dimensions and their roles in social influence evaluation. The four dimensions also depend on each other. In emotional support, for instance, the belief "my work pressure is too high" may trigger the desire "I want to alleviate my anxiety." Belief and Desire together shape the user’s Intention, i.e., whether they choose to rest, seek help, or adjust their work arrangements. 
+
+3.3 Task-Specific Quantitative Scores 
+
+The definition of "success" varies across different social in-fluence tasks. In CogWM, each BDI dimension is assigned a task-specific quantitative score in the range [0 , 2] , which transforms natural language psychological states into struc-tured signals to support trajectory-level evaluation. In emo-tional support conversation (ESC), effective support should help users form more realistic beliefs, healthier desires, and more feasible coping intentions. In persuasion dialogue (PD), effective persuasion should enhance users’ awareness of donation impact, strengthen prosocial motivation, and fos-ter autonomous commitment, rather than simply rewarding higher donation amounts. In conversational recommenda-tion (CR), effective recommendation should better match 
+
+Figure 3: CogWM takes user profiles, task context, and dialogue history as input, and outputs BDI/E states (Belief/Desire/Intention/Emotion) and natural language re-sponses turn by turn, forming a multi-turn cognitive state trajectory. Table 2: Definitions of BDI/E Dimensions and Their Roles in Social Influence Evaluation             
+
+> Definition Role Belief  What the user believes, assumes, judges, or inter-prets. Beliefs may be cor-rect, incorrect, or unveri-fiable. Social influence primarily op-erates by altering cognition: changing what the user believes or correcting misconceptions.
+> Desire  What the user wants, needs, prefers, avoids, or seeks. Social influence aims to shape motivation: encouraging or re-shaping what the user desires toward beneficial outcomes.
+> Intention  What the user plans, de-cides, accepts, rejects, or commits to doing. The ultimate goal of social influence: driving behavioral commitment and actionable de-cisions.
+> Emotion  The user’s current affec-tive state and its intensity. Emotion serves as the contex-tual background and regulatory signal in social influence pro-cesses.
+
+user preferences, satisfy recommendation needs, and sup-port users in making clear acceptance or rejection decisions. Table 3 summarizes how each BDI dimension is instantiated across different tasks. Emotion is modeled as a structured variable with 12 discrete categories and intensity-aware scor-ing. See Appendix C.1 for details. Table 3: Task-specific BDI Quantification Scores             
+
+> Scenario Belief Desire Intention
+> ESC reality rationality feasibility PD impact prosocial commitment CR alignment satisfaction acceptance
+
+3.4 User Profile Conditioning 
+
+To learn the linguistic habits of users with different person-alities and traits in SID tasks, CogWM takes user profiles as conditional input. The profile consists of the following components: 
+
+Big Five Personality Traits : Openness, Conscientiousness, Extraversion, Agreeableness, Neuroticism, each scored 1–5. 
+
+Communication Style : A natural language description of the user’s typical mode of expression. 
+
+Decision-Making Style : A description of how the user makes decisions (e.g., cautious vs. impulsive). 
+
+Task-Related Features : User-specific key factors for a given scenario. 
+
+## 4 Data Construction & Training 
+
+We select four public dialogue datasets, including DailyDia-log (Li et al. 2017) for open-domain conversation, and three social influence scenarios: emotional support (ESConv) (Liu et al. 2021), charitable donation persuasion (P4G) (Wang et al. 2019), and task-oriented recommendation (DuRecDial) (Liu et al. 2020), covering a spectrum from everyday dialogue to social influence interactions. 
+
+4.1 User Profile Annotation 
+
+Following prior work on inferring user profiles from text and dialogue (Mehta et al. 2020; Wang et al. 2025), we use an LLM to generate user profile annotations based on the complete dialogue and available metadata. Because personality inference from short dialogues is in-herently unreliable, CogWM uses a confidence field (level 1–3) to help the model distinguish strong signals from weak ones, avoiding overfitting to uncertain profile signals. 
+
+4.2 BDI/E Annotation: Summarize-and-Allocate 
+
+User states in SID evolve as a structured cognitive process over time, not as isolated turn-level reactions (§3.2). We propose Summarize-and-Allocate (SaA): Stage 1 (Global Summarization) extracts global BDI items and scores from the full dialogue (§3.3); Stage 2 (Temporal Allocation) as-signs per-turn BDI/E states with evidence grounding and global_ref linking. Human evaluation confirms the SaA pipeline’s effectiveness: global BDI recall 0.79, precision 0.77, emotion Cohen’s κ = 0 .69 (full results in §F.1). 
+
+4.3 Sample Construction and Training 
+
+From the SaA annotations we construct 150,454 turn-level training samples. CogWM is jointly optimized for state pre-diction and utterance generation: p(ut+1 , S t+1 | D ≤t, P, C ).We use Qwen3-14B Instruct (Yang et al. 2025a) with LoRA (Hu et al. 2022); all hyperparameters are in §E. 
+
+## 5 Composite Trajectory Score 
+
+To quantitatively evaluate SID trajectories, we propose CTS. CTS combines three empirically low-redundant metrics: AUC (area under curve via trapezoidal integration), PSR (im-provement frequency, positive step ratio), and ∆ (net change between initial and final states). We observe pairwise cor-relations |r| < 0.25 across 3,600 trajectories, indicating low redundancy among the three metrics. We define CTS as: CTS = 0 .40 · AUC + 0 .30 · PSR + 0 .30 · ∆ (1) These metrics are computed from the task-weighted per-turn composite score Comp t. See §D for the full three-layer evaluation framework and correlation heatmap. 
+
+## 6 Experiments 
+
+The experiments primarily address two meta-questions: (1) Can CogWM accurately predict users’ cognitive states and textual responses? (§6.1) and (2) How do SID agents based on various high-performance models perform when interact-ing with CogWM? (§6.2) 
+
+6.1 Simulation Fidelity Verification 
+
+We evaluate simulation fidelity along five aspects: response realism, BDI/E state prediction accuracy, state–utterance consistency, learned understanding of user states, and the contribution of each profile component (ablation in §F.3). 
+
+Experimental Setup 
+
+All experiments use CogWM-14B and run on a single A100-80G GPU for inference. The test set comprises 7,563 user-turn samples (DailyDialog 3,765 / ESConv 1,137 / P4G 508 / DuRecDial 2,153). 
+
+Evaluation Metrics Utterance. We use ROUGE-L (R-L) and BLEU-N (B-n) 
+
+to evaluate the fluency of CogWM’s output, and LengthRatio 
+
+(LenR) ( |pred ||gt | , ≈ 1 optimal) to evaluate the length ratio of the output relative to the ground truth. Distinct-1 (Dist-1) 
+
+for lexical diversity. 
+
+BDI/E. E-Acc (E-A) evaluates the accuracy of predicted emotion labels; MAE (-M) evaluates the MAE of BDI/E in-tensities; Sim (-S) evaluates the semantic similarity between predicted text and ground truth. 
+
+LLM Judge. We use DeepSeek-V4-Pro as a judge, scor-ing six dimensions on a 1–5 scale: Emo , Bel , Des , Int ,
+
+Utt evaluate the alignment of emotion, belief, desire, inten-tion, and output text with the corresponding ground truth, respectively, and Coh evaluates the consistency between the predicted cognitive state and the predicted text. BDI/E annotations are sparse (61.7% of belief, 68.1% of desire, and 91.4% of intention turns are empty in the ground truth), so all BDI metrics in this paper are computed only on turns where the ground truth is non-empty (3,342 turns in total) to avoid the inflation effect where empty entries on both sides are counted as perfect matches. 
+
+External Baselines 
+
+We establish the following baselines: (1) Base model com-parison: Qwen3-14B : no fine-tuning, outputs BDI/E states and user utterances solely via prompting, used to measure the zero-shot BDI/E capability of the base model; utt-only-14B : uses the same base model and training configuration as CogWM-14B, but is trained only on user utterance gen-eration, serving as the “utterance quality upper bound under Table 4: Fidelity experiment results                                                                                                   
+
+> Model BDI/E Core Utterance LLM Judge
+> E-A ↑B-S ↑D-S ↑I-S ↑E-M ↓R-L ↑B-4 ↑LenR Emo ↑Bel ↑Des ↑Int ↑Utt ↑Coh ↑
+> GPT-5.5 36.4 .474 .433 .442 0.46 .237 .043 1.82 2.34 1.90 2.09 1.74 2.62 4.71
+> DS-V4-Pro 31.0 .462 .445 .412 0.52 .288 .060 1.81 2.13 *1.87 2.21 1.93 2.73 4.57 Dual-LLM 30.9 .500 .446 .445 0.47 .253 .054 2.12 2.13 *1.84 2.27 1.95 2.67 4.49 Qwen3-14B 28.1 .384 .358 .416 0.63 *.196 *.033 *2.26 *2.37 1.79 2.06 1.82 2.41 4.45 utt-only-14B 12.2 *.285 *.340 *.264 *—.427 .159 1.03 2.22 1.24 *1.17 *1.31 *1.13 *2.43 *
+> CogWM-14B 77.6 .773 .705 .458 0.29 .417 .150 1.01 4.49 4.16 4.33 4.75 3.32 4.50
+
+identical training data conditions”; (2) High-performance models: GPT-5.5 and DeepSeek-V4-Pro (DS) as strong API baselines; (3) Enhanced method: Dual-LLM : adapts the dual-LLM verification paradigm of DuetSim (Luo et al. 2024) with task-specific prompting, implemented using GPT-5.5. All baselines use the same output schema as CogWM. 
+
+User Fidelity Experiment 
+
+Table 4 presents the experimental results. 
+
+BDI/E Core Metrics. CogWM outperforms all baselines across all four dimensions. CogWM’s advantage on I-Sim over API baselines stems from Intention’s extreme sparsity, as only 9% of turns have non-empty ground truth. CogWM also leads in BDI quantitative score MAE, showing it not only tracks the semantic content of BDI but also matches the score levels precisely. Complete experimental results are presented in §F.2. 
+
+Utterance Generation Metrics. CogWM significantly outperforms API baselines on all Utterance metrics (R-L 0.417 vs. GPT-5.5 0.237, B-4 0.150 vs. 0.043). The most telling metric is LenR: CogWM achieves 1.01 ( ≈ 1.0, nearly a perfect match with ground truth length), whereas GPT-5.5 achieves 1.82 and Qwen3-14B base achieves 2.26. API base-lines tend to generate overly long responses. CogWM learns dialogue rhythm and density through joint training. Dis-1 shows no significant difference between CogWM (0.948) and API baselines (0.960–0.965), indicating that lexical diversity is primarily determined by the base model’s capability. 
+
+utt-only has poor BDI/E prediction, achieving the lowest scores across all metrics. This confirms that cognitive state tracking cannot be automatically acquired through shared in-put distribution or in-domain fine-tuning; it must be explicitly trained through joint optimization. 
+
+LLM Judge Semantic Scores. CogWM achieves the best results on nearly all LLM evaluation metrics. The sole excep-tion is the Coherence dimension: API baselines (4.45–4.71) are close to or slightly higher than CogWM (4.50). This pattern suggests that "self-consistency" is a common trait of general-purpose LLMs; API models can generate internally self-consistent yet factually incorrect BDI/E descriptions. For the evaluation platform, external accuracy (CogWM’s strength) takes priority over internal self-consistency (API’s strength). Subsequent agent discrimination experiments val-idate this design choice (see §6.2). 
+
+State Understanding Experiment 
+
+To verify CogWM’s BDI/E state inference capability, we designed a state understanding experiment: given dialogue context and the GT user utterance, predict BDI/E states .Table 5: State Understanding Results                    
+
+> Model E-A B-Sim D-Sim I-Sim L-E L-B L-D L-I
+> GPT-5.5 42.3 0.489 0.457 0.471 2.39 2.05 2.19 1.92 DSv4-Pro 31.9 0.468 0.430 0.425 1.95 2.02 2.20 1.89 Qwen3-14B 32.4 0.398 0.361 0.419 2.33 1.63 1.79 1.55
+> CogWM-14B 71.1 0.739 0.671 0.440 3.71 2.92 3.27 4.29
+
+Table 5 shows the results. CogWM still leads the API baselines in comprehension mode, supporting the view that joint training gives CogWM cognitive understanding ability. Notably, CogWM’s comprehension performance is slightly lower than its prediction ability (E-Acc: 71.1% vs 77.6%, -6.5pp), while GPT-5.5’s comprehension is higher than its prediction (E-Acc: 42.3% vs 36.4%, +5.9pp). This sug-gests that providing GT utterances helps untrained models, which struggle to generate utterances and BDI/E simultane-ously, but slightly harms CogWM. Intention understanding is a common weakness across all models, because its choice space is large and hardest to predict, and its annotations are the sparsest in the training data. The experiment thus confirms the coupling between state inference and text gen-eration; joint training makes the two mutually conditional. 
+
+6.2 Agent Discrimination Experiment 
+
+In this section, CogWM shifts from being the evaluated sub-ject to being the evaluation tool, tracking how several high-performance SID agents impact user BDI/E states through multi-turn interaction. 
+
+Experimental Setup 
+
+Six agents (GPT-5.5, Llama-4-Scout, DeepSeek-V4-Pro, Claude-Opus-4.7, Gemini-3-Pro, Qwen3.7-Plus) are prompted as assistants. CogWM-14B (tp=0.3) serves as the user simulator. 6 agents × 2 prompt conditions (with and without Chain-of-Thought, CoT) × 3 tasks × 100 di-alogues = 3,600 interactions, with the first 2 rounds using real dialogue for cold start. Starting from the 8th turn, an LLM-based intent detection module is further employed to determine whether the dialogue has naturally reached com-pletion; if so, the interaction is terminated, with a maximum dialogue length of 20 turns enforced. 
+
+Evaluation Metrics 
+
+We evaluate agents using the three-tier framework defined in §D. The primary metric is CTS (§5). Three auxiliary met-rics complement trajectory-level evaluation: Monotonicity 
+
+(mono) measures whether improvement steps consistently follow the overall ∆ direction. Nonzero Rate (nz%) , mea-Table 6: Agent Discrimination Results.                                                                                                                                                                                                                 
+
+> #Agent Cond CTS AUC ∆PSR mono E-∆B-∆D-∆I-∆nz% GO GO-E GO-P GO-D 1Llama-4-Scout No-CoT +.233 -.006 +.430 .354 .320 +.637 +.158 +.277 +.270 37.1 68.7 79 66 61 2Llama-4-Scout CoT +.237 -.012 +.441 .367 .328 +.780 +.216 +.322 +.238 38.2 72.7 84 66 68 3Qwen3.7-Plus No-CoT +.220 -.024 +.407 .358 .339 +.198 +.191 +.409 +.353 38.0 78.0 80 79 75
+> 4Qwen3.7-Plus CoT +.236 -.023 +.472 .346 .315 +.493 +.219 +.402 +.261 36.2 79.3 90 68 80 5Claude-Opus-4.7 No-CoT +.200 -.030 +.382 .323 .303 +.248 +.195 +.398 +.177 34.8 66.0 70 58 70 6Claude-Opus-4.7 CoT +.219 -.010 +.391 .352 .311 +.310 +.161 +.305 +.250 36.4 73.3 87 67 66 7DeepSeek-V4-Pro No-CoT +.198 -.035 +.382 .325 .288 +.373 +.228 +.293 +.127 35.6 72.0 84 61 71 8DeepSeek-V4-Pro CoT +.199 -.026 +.364 .336 .302 +.272 +.182 +.394 +.233 35.3 70.7 83 59 70 9GPT-5.5 No-CoT +.185 -.035 +.349 .316 .268 +.365 +.130 +.241 +.173 35.4 68.7 80 68 58 10 GPT-5.5 CoT +.209 -.022 +.405 .322 .289 +.380 +.197 +.332 +.190 35.1 74.7 84 82 58 11 Gemini-3-Pro No-CoT +.140 -.065 +.278 .276 .230 +.618 +.104 +.078 +.153 30.4 44.7 54 19 61 12 Gemini-3-Pro CoT +.153 -.045 +.292 .278 .204 +.453 +.110 +.194 +.113 30.7 47.3 70 20 52
+
+suring dialogue richness as the proportion of turns with non-empty BDI/E outputs, and GoodOutcome (GO) , which uses an LLM Judge to determine dialogue-end behavioral out-comes, specifically whether the agent achieved emotional improvement or an action plan in ESConv, made a donation decision in P4G, or obtained a recommendation acceptance in DuRecDial, measuring a dimension different from CTS. Four patterns emerge. Table 6 presents the complete experimental results. 
+
+CTS Ranking and Agent Typology. Llama-4-Scout ranks first in both conditions, consistently achieving the high-est AUC and PSR. Qwen achieves the highest ∆ under CoT (+0.472) but ranks second in CTS due to lower AUC (-0.023, 5th). GPT-5.5 improves from 0.185 to 0.209 CTS under CoT (+13%). Gemini ranks last in CTS and shows the lowest nz% across settings. Based on CTS components, we iden-tify four agent categories: All-round (Llama: high on all four), Sprint (Qwen CoT: very high ∆ but low AUC), Steady (Claude: high AUC but moderate ∆), and Hollow (Gem-ini: low on all four). Figure 5 illustrates consistent patterns across tasks, where Llama and Qwen show steeper trajectory changes while Gemini remains relatively flat. 
+
+Figure 4: GPT-5.5 and Qwen3.7-Plus on the same ES-Conv context, both achieving GO=true, but with different trajectory patterns. GPT-5.5 achieves ∆ = +2 .50 , while Qwen3.7-Plus shows ∆ = 0 .00 (std=0.06). Full dialogues are provided in Appendix C9. 
+
+Complementary Perspectives of GO and CTS. CTS and GO capture different aspects of dialogue outcomes. Llama ranks first in CTS but fourth in GO (68.7%), while Qwen ranks second in CTS but first in GO (78.0%). GPT-5.5 achieves the largest GO improvement under CoT (+6.0pp), followed by Claude (+7.3pp). GO scores vary significantly across tasks, ranging from 54%+ on ESConv to 19%–82% on P4G. Gemini achieves the lowest GO score (19%) across set-tings. Figure 4 presents a representative case where the GO is the same but the trajectory patterns differ substantially. Ap-pendix Cases C8–C9 further provide paired examples under identical dialogue contexts, showing different GO ith simi-lar trajectory patterns, as well as similar GO with different trajectory patterns. 
+
+Marginal Effects and Task Dependency of CoT. CoT affects agents asymmetrically. GPT-5.5 benefits most, while already-strong agents (Llama, Qwen) gain marginally and DeepSeek-V4-Pro shows negligible change. CoT’s value lies in correcting the tendency to skip ahead to solutions rather than in boosting raw reasoning: GPT’s emotion tra-jectory under CoT shifts from flat to clearly positive. Gains are task-dependent, with the strongest gains on ESConv and negligible gains on DuRecDial (Fig 7, Fig 8 and Fig 9). 
+
+Per-task Analysis. We measure task-level discriminabil-ity using the average standard deviation across the four BDI/E-∆ dimensions. ESConv shows the strongest discrim-inative performance with the highest average standard de-viation (0.127), followed by P4G (0.117) and DuRecDial (0.105). Different datasets also exhibit different single-dimension discriminative patterns. ESConv shows the strongest discriminability on E-∆ and I-∆ (Std. = 0.252 and 0.096), P4G is most discriminative on B-∆ (Std. = 0.072), and DuRecDial is most discriminative on D-∆ (Std. = 0.114). These results are consistent with the capabilities emphasized by each task. The detailed per-task BDI/E trajectory statis-tics are provided in Appendix Table 20. Full six-model ×
+
+three-task trajectory results are reported in Fig. 7 and Fig. 8. Task-specific cases are provided in Appendix G. 
+
+## 7 Discussion 
+
+7.1 Mechanisms of BDI/E Joint Training 
+
+Fidelity experiments (§6.1) suggest that BDI/E state tracking emerges primarily from joint optimization of state prediction and utterance generation. Models trained without joint su-pervision or using utterance-only objectives fail to recover meaningful emotion signals, while joint training significantly improves four-dimensional state accuracy. Importantly, this improvement does not require scaling to larger models (Ap-pendix F.6), indicating that cognitive state modeling is an architectural outcome rather than a capacity-driven effect. Figure 5: Six-model BDI/E cross-task mean trajectory summary (No-CoT). Emotion is from ESConv only and rescaled from 
+
+[−2.5, +2 .0] to [0 , 2] . Shaded bands indicate ±1 SEM. ∆ uses 5-region interpolated endpoints. The coupling between state inference and text generation further indicates that both components benefit from shared representations learned during joint training. 
+
+7.2 Asymmetric Contribution of Profile Conditions 
+
+Ablation experiments (§F.3) reveal an asymmetric contribu-tion pattern: user profile components contribute minimally to state prediction individually (any single field can be re-moved with under 2pp E-Acc change) but are critical for personalized generation (removing all profiles cuts BLEU-4 by 72%). Task context alone cannot substitute for profiles in driving utterance personalization. This supports CogWM’s design: profiles condition generation, while dialogue history handles state tracking. 
+
+7.3 Evaluation Insights from CTS 
+
+BDI/E trajectory decomposition provides evaluation signals that are not captured by terminal outcome metrics. We first observe a consistent divergence between cognitive and emo-tional dimensions: in DuRecDial, agents improve Comp-
+
+∆ while decreasing E-∆, reflecting simultaneous prefer-ence refinement and emotional tension. Similarly, persua-sive settings (P4G) exhibit a measurable emotional cost, where most agents induce negative E-∆ despite achieving successful outcomes. These findings highlight the limita-tions of single-score evaluation and motivate dimension-wise trajectory tracking. This divergence further justifies the task-specific weighting design of Comp t. Without such weighting, DuRecDial’s cognitive gains would be obscured by emotional declines, while ESConv’s emotion-driven dy-namics would be underrepresented due to relatively flat cog-nitive signals. By assigning wE = 0 .50 in ESConv and 
+
+wE = 0 .10 in other tasks, the framework prioritizes the most informative dimension for each scenario. CTS further indicates structured heterogeneity across agents, consistent with the typology observed in experiments (all-round, sprint, steady, hollow). The CTS-GO divergence demonstrates that cognitive trajectory improvement does not necessarily align with task success. This mismatch may explain why different agents optimize different aspects of di-alogue behavior, and motivates joint evaluation of process-level and outcome-level metrics. 
+
+## 8 Limitations and Future Work 
+
+Annotation quality. Current annotations are LLM-generated. Human validation shows BDI recall 0.79, preci-sion 0.77, and emotion κ = 0 .69 , but subtle states such as im-plicit beliefs and unexpressed desires may be missed (§4.2). Scaling human validation and exploring LLM–human col-laborative annotation are important next steps. 
+
+From evaluation to training. Deploying CogWM as an online RL environment where BDI/E scores serve as rewards would enable agents to learn genuine cognitive improvement through interaction. Broader impacts are discussed in §A. 
+
+## 9 Conclusion 
+
+This paper proposed CogWM, an LLM-based cognitive world model for evaluating social influence agents. CogWM introduces a three-tier BDI/E evaluation framework, a SaA annotation pipeline covering 150K samples across four sce-narios, and joint training on Qwen3-14B achieving 77.6% emotion accuracy (2.1 × over GPT-5.5). In 3,600 cross-agent trials, CogWM distinguished six commercial agents by cog-nitive influence (Llama-4-Scout first, CTS +0.233). The CTS-GO complementarity shows that cognitive improve-ment and behavioral outcomes are not equivalent. 
+
+## References 
+
+Belz, A.; Mille, S.; and Howcroft, D. M. 2020. Compar-ing Human and Automatic Metrics: A Meta-Evaluation of Evaluation Methods for NLG. In Proceedings of the 58th Annual Meeting of the Association for Computational Lin-guistics (ACL) , 1–15. Online: Association for Computational Linguistics. Bordini, R. H.; Hübner, J. F.; and Wooldridge, M. 2007. Pro-gramming Multi-Agent Systems in AgentSpeak using Jason .Wiley Series in Agent Technology. John Wiley & Sons. Bratman, M. E. 1987. Intention, Plans, and Practical Rea-son . Cambridge, MA: Harvard University Press. Chang, S.; Anderson, A.; and Hofman, J. M. 2025. Chat-Bench: From Static Benchmarks to Human-AI Evaluation. In Proceedings of the 63rd Annual Meeting of the Associ-ation for Computational Linguistics (ACL) , 26009–26038. Association for Computational Linguistics. Chawla, K.; Shi, W.; Zhang, J.; Lucas, G. M.; Yu, Z.; and Gratch, J. 2023. Social Influence Dialogue Systems: A Sur-vey of Datasets and Models for Social Influence Tasks. In 
+
+Proceedings of the 17th Conference of the European Chap-ter of the Association for Computational Linguistics (EACL) ,750–766. Dubrovnik, Croatia: Association for Computa-tional Linguistics. Chen, H.; Liu, X.; Yin, D.; and Tang, J. 2017. A Survey on Dialogue Systems: Recent Advances and New Frontiers. 
+
+ACM SIGKDD Explorations Newsletter , 19(2): 25–35. Chiang, W.-L.; Zheng, L.; Sheng, Y.; Angelopoulos, A. N.; Li, T.; Li, D.; Zhang, H.; Zhu, B.; Jordan, M. I.; Gonzalez, J. E.; and Stoica, I. 2024. Chatbot Arena: An Open Platform for Evaluating LLMs by Human Preference. In Proceedings of the 41st International Conference on Machine Learning (ICML) , 1–29. Vienna, Austria: PMLR. Dubois, Y.; Galambosi, B.; Liang, P.; and Hashimoto, T. B. 2024. Length-Controlled AlpacaEval: A Sim-ple Way to Debias Automatic Evaluators. arXiv preprint arXiv:2404.04475 .Gao, J.; Galley, M.; and Li, L. 2019. Neural Approaches to Conversational AI. Foundations and Trends in Information Retrieval , 13(2-3): 127–298. Georgeff, M. P.; and Lansky, A. L. 1987. Reactive Reasoning and Planning. In Proceedings of the Sixth National Confer-ence on Artificial Intelligence (AAAI) , 677–682. Seattle, WA: AAAI Press. Hu, E. J.; Shen, Y.; Wallis, P.; Allen-Zhu, Z.; Li, Y.; Wang, S.; Wang, L.; and Chen, W. 2022. LoRA: Low-Rank Adap-tation of Large Language Models. In Proceedings of the Tenth International Conference on Learning Representations (ICLR) , 1–21. OpenReview.net. Jafari, A.; et al. 2025. Beyond Words: Integrating Theory of Mind into Conversational Agents for Human-Like Belief, Desire, and Intention Alignment. In Findings of the 63rd Annual Meeting of the Association for Computational Lin-guistics (ACL) . Association for Computational Linguistics. Kong, C.; Fan, Y.; Wan, X.; Jiang, F.; and Wang, B. 2024. PlatoLM: Teaching LLMs in Multi-Round Dialogue via a User Simulator. In Proceedings of the 62nd Annual Meet-ing of the Association for Computational Linguistics (ACL) ,7841–7863. Bangkok, Thailand: Association for Computa-tional Linguistics. Kreyssig, F.; Casanueva, I. n.; Budzianowski, P.; and Gašić, M. 2018. Neural User Simulation for Corpus-based Policy Optimisation of Spoken Dialogue Systems. In Proceedings of the 19th Annual SIGdial Meeting on Discourse and Dia-logue (SIGdial) , 60–69. Melbourne, Australia: Association for Computational Linguistics. Lewis, M.; Yarats, D.; Dauphin, Y. N.; Parikh, D.; and Batra, D. 2017. Deal or No Deal? End-to-End Learning for Negotiation Dialogues. In Proceedings of the Confer-ence on Empirical Methods in Natural Language Processing (EMNLP) . Association for Computational Linguistics. Li, J.; Lin, Z.; Fu, P.; and Wang, W. 2021. Past, Present, and Future: Conversational Emotion Recognition through Struc-tural Modeling of Psychological Knowledge. In Findings of the Conference on Empirical Methods in Natural Lan-guage Processing (EMNLP) . Association for Computational Linguistics. Li, Y.; Su, H.; Shen, X.; Li, W.; Cao, Z.; and Niu, S. 2017. DailyDialog: A Manually Labelled Multi-Turn Dia-logue Dataset. In Proceedings of the Eighth International Joint Conference on Natural Language Processing (IJC-NLP) , 986–995. Taipei, Taiwan: Asian Federation of Natural Language Processing. Lin, C.-Y. 2004. ROUGE: A Package for Automatic Evalua-tion of Summaries. In Proceedings of the ACL-04 Workshop: Text Summarization Branches Out , 74–81. Barcelona, Spain: Association for Computational Linguistics. Liu, S.; Zheng, C.; Demasi, O.; Sabour, S.; Li, Y.; Yu, Z.; Jiang, Y.; and Huang, M. 2021. Towards Emotional Support Dialog Systems. In Proceedings of the 59th Annual Meeting of the Association for Computational Linguistics (ACL) , 3469–3483. Online: Association for Computational Linguistics. Liu, Z.; Wang, H.; Niu, Z.-Y.; Wu, H.; Che, W.; and Liu, T. 2020. Towards Conversational Recommendation over Multi-Type Dialogs. In Proceedings of the 58th Annual Meeting of the Association for Computational Linguistics (ACL) , 1036– 1049. Online: Association for Computational Linguistics. Luo, X.; Tang, Z.; Wang, J.; and Zhang, X. 2024. DuetSim: Building User Simulator with Dual Large Language Models for Task-Oriented Dialogues. In Proceedings of the 2024 Joint International Conference on Computational Linguis-tics, Language Resources and Evaluation (LREC-COLING) ,5414–5424. Torino, Italy: ELRA and ICCL. Ma, M.; Guo, B.; Yang, R.; Chen, M.; Liu, Y.; Liu, J.; Pei, Y.; Ma, X.; Zhang, Q.; and Yu, Z. 2026. Think Thrice Before You Speak: Dual Knowledge-Enhanced Theory-of-Mind Reasoning for Persuasive Agents. arXiv preprint arXiv:2605.22602 , 1–19. Mehta, Y.; Majumder, N.; Gelbukh, A.; and Cambria, E. 2020. Recent Trends in Deep Learning Based Personality Detection. Artificial Intelligence Review , 53: 2313–2339. Papineni, K.; Roukos, S.; Ward, T.; and Zhu, W.-J. 2002. BLEU: A Method for Automatic Evaluation of Machine Translation. In Proceedings of the 40th Annual Meeting of the Association for Computational Linguistics (ACL) , 311–318. Philadelphia, PA: Association for Computational Linguis-tics. Qiu, S.; Liu, M.; Li, H.; Zhu, S.-C.; and Zheng, Z. 2023. MindDial: Belief Dynamics Tracking with Theory-of-Mind Modeling for Situated Neural Dialogue Generation. arXiv preprint arXiv:2306.15253 .Rao, A. S.; and Georgeff, M. P. 1991. Modeling Rational Agents within a BDI-Architecture. In Proceedings of the Second International Conference on Principles of Knowledge Representation and Reasoning (KR) , 473–484. Cambridge, MA: Morgan Kaufmann. Schatzmann, J.; Thomson, B.; and Young, S. 2007. Statistical User Simulation with a Hidden Agenda. In Proceedings of the 8th SIGdial Workshop on Discourse and Dialogue (SIG-dial) , 273–282. Antwerp, Belgium: Association for Compu-tational Linguistics. Shi, W.; Qian, K.; Wang, X.; and Yu, Z. 2019. How to Build User Simulators to Train RL-based Dialog Systems. In 
+
+Proceedings of the 2019 Conference on Empirical Methods in Natural Language Processing and the 9th International Joint Conference on Natural Language Processing (EMNLP-IJCNLP) , 1990–2000. Hong Kong, China: Association for Computational Linguistics. Wang, K.; Li, X.; Yang, S.; Zhou, L.; Jiang, F.; and Li, H. 2025. Know You First and Be You Better: Modeling Human-Like User Simulators via Implicit Profiles. In Proceedings of the 63rd Annual Meeting of the Association for Compu-tational Linguistics (ACL) , 1–22. Association for Computa-tional Linguistics. Wang, X.; Shi, W.; Kim, R.; Oh, Y.; Yang, S.; Zhang, J.; and Yu, Z. 2019. Persuasion for Good: Towards a Per-sonalized Persuasive Dialogue System for Social Good. In 
+
+Proceedings of the 57th Annual Meeting of the Association for Computational Linguistics (ACL) , 5635–5649. Florence, Italy: Association for Computational Linguistics. Wu, S.; et al. 2025. HumanLM: Simulating Users with State Alignment Beats Response Imitation. arXiv preprint arXiv:2502.00640 . ICML 2025. Xu, W.; et al. 2024. Beyond Linguistic Cues: Fine-grained Conversational Emotion Recognition via Belief-Desire Mod-elling. In Proceedings of the 2024 Joint International Con-ference on Computational Linguistics, Language Resources and Evaluation (LREC-COLING) . ELRA and ICCL. Yang, A.; Li, A.; Yang, B.; Zhang, B.; Hui, B.; Zheng, B.; Yu, B.; Gao, C.; Huang, C.; Lv, C.; Zheng, C.; Liu, D.; Zhou, F.; Huang, F.; Hu, F.; Ge, H.; Wei, H.; Lin, H.; Tang, J.; Yang, J.; Tu, J.; Zhang, J.; Yang, J.; Yang, J.; Zhou, J.; Zhou, J.; Lin, J.; Dang, K.; Bao, K.; Yang, K.; Yu, L.; Deng, L.; Li, M.; Xue, M.; Li, M.; Zhang, P.; Wang, P.; Zhu, Q.; Men, R.; Gao, R.; Liu, S.; Luo, S.; Li, T.; Tang, T.; Yin, W.; Ren, X.; Wang, X.; Zhang, X.; Ren, X.; Fan, Y.; Su, Y.; Zhang, Y.; Zhang, Y.; Wan, Y.; Liu, Y.; Wang, Z.; Cui, Z.; Zhang, Z.; Zhou, Z.; and Qiu, Z. 2025a. Qwen3 Technical Report. arXiv preprint arXiv:2505.09388 .Yang, B.; Guo, J.; Iwasawa, Y.; and Matsuo, Y. 2025b. ToM-agent: Large Language Models as Theory of Mind Aware Generative Agents with Counterfactual Reflection. arXiv preprint arXiv:2501.15355 .Young, S.; Gašić, M.; Thomson, B.; and Williams, J. D. 2013. POMDP-Based Statistical Spoken Dialog Systems: A Review. Proceedings of the IEEE , 101(5): 1160–1179. Zhang, S.; et al. 2026. EMPA: Evaluating Persona-Aligned Empathy as a Process. arXiv preprint arXiv:2603.00552 .Zhao, W. X.; Zhou, K.; Li, J.; Tang, T.; Wang, X.; Hou, Y.; Min, Y.; Zhang, B.; Zhang, J.; Dong, Z.; Du, Y.; Yang, C.; Chen, Y.; Chen, Z.; Jiang, J.; Ren, R.; Li, Y.; Tang, X.; Liu, Z.; Liu, P.; Nie, J.-Y.; and Wen, J.-R. 2023. A Survey of Large Language Models. arXiv preprint arXiv:2303.18223 .Zheng, L.; Chiang, W.-L.; Sheng, Y.; Zhuang, S.; Wu, Z.; Zhuang, Y.; Lin, Z.; Li, Z.; Li, D.; Xing, E. P.; Zhang, H.; Gonzalez, J. E.; and Stoica, I. 2023. Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena. In Advances in Neural Information Processing Systems (NeurIPS) , 1–29. Curran Associates. 
+
+## A Broader Impact 
+
+A.1 Generalizability of Cognitive Modeling 
+
+The BDI/E framework and SaA annotation method can be generalized to any dialogue scenario where understanding why a person speaks or acts a certain way is needed. This includes tracking patients’ health beliefs and help-seeking intentions in medical consultations, students’ knowledge be-liefs and learning motivation in educational tutoring, and negotiators’ bottom lines and willingness to compromise. 
+
+A.2 Responsible AI and Transparency 
+
+CogWM makes agents’ social influence visible and auditable through BDI/E state trajectories. If a user’s donation com-mitment score jumps from 0 to 2 at the end of a conversation while their impact belief score remains at 0, it suggests the user was pressured rather than genuinely persuaded. This makes interpretability a concrete tool for preventing manip-ulative AI. 
+
+A.3 Cognitive World Model as Social AI Infrastructure 
+
+We envision the cognitive world model serving as a testbed for socially influential agents, analogous to wind tunnels for aircraft design or crash tests for automotive safety. Before deployment, any AI system aimed at social influence can be evaluated on CogWM, observing what cognitive impact it produces on users with different personalities. 
+
+## B Extended Related Work 
+
+B.1 Social Influence Dialogue 
+
+Chawla et al. (Chawla et al. 2023) were the first to system-atically define social influence dialogue as conversational systems that change user cognition, emotion, and behavior through natural dialogue, covering seven subfields includ-ing persuasion, negotiation, and emotional support. They identified the core pain point: evaluation fragmentation .Existing work only covers language quality (BLEU/ROUGE (Papineni et al. 2002; Lin 2004)) and influence outcomes (donation amount (Wang et al. 2019), survey scores (Liu et al. 2021)), but completely lacks measurement of cog-nitive state changes during the dialogue process. CogWM covers emotional support (Liu et al. 2021), persuasion (Wang et al. 2019), recommendation (Liu et al. 2020), and daily con-versation (Li et al. 2017), supplying the missing dimension of “user cognitive state trajectories” for social influence dia-logue. B.2 BDI Cognitive Modeling 
+
+The BDI model originates from Bratman’s (Bratman 1987) philosophy of action and was formalized as BDI logic by Rao and Georgeff (Rao and Georgeff 1991). Classical engi-neering implementations (PRS (Georgeff and Lansky 1987), JASON (Bordini, Hübner, and Wooldridge 2007)) require hand-coded logical propositions and cannot automatically acquire states from dialogue. In the deep learning era, BDI has been transformed into trainable neural representations: Li et al. (Li et al. 2021) encoded belief-desire theory as in-termediate representations for dialogue emotion recognition, and Xu et al. (Xu et al. 2024) proposed explicit belief-desire graph joint modeling. The LLM era has further driven au-tomation: MindDial (Qiu et al. 2023) tracks three-layer belief dynamics, ToM-agent (Yang et al. 2025b) updates BDI con-fidence through counterfactual reflection, and Jafari et al. (Jafari et al. 2025) validated the dialogue effectiveness of ToM-informed alignment. These works share two limitations: (1) limited granular-ity , as most model only a single dimension (belief or emo-tion), lacking synchronized BDI/E four-dimensional track-ing; (2) one-sided inference , i.e., they infer states from dialogue without jointly generating utterances. The most directly related work is Ma et al.’s (Ma et al. 2026) TTBYS, which first achieved serialized BDI prediction in persuasion dialogues based on the belief → desire → intention causal order. CogWM extends this by advancing one-sided state inference to state-utterance joint generation , covering four social influence scenarios. 
+
+B.3 User Simulation 
+
+User simulators have undergone three generations of evolu-tion (Chawla et al. 2023). The first generation was agenda-driven (Schatzmann et al. (Schatzmann, Thomson, and Young 2007)), relying on handcrafted state spaces that are non-transferable across domains (Young et al. 2013). The second generation used neural Seq2Seq models (Kreyssig et al. (Kreyssig et al. 2018), Shi et al. (Shi et al. 2019)), learning end-to-end from corpora but optimizing only text likelihood or BLEU. The third generation is LLM-driven 
+
+(DuetSim (Luo et al. 2024), ChatBench (Chang, Anderson, and Hofman 2025), PlatoLM (Kong et al. 2024)), offering strong generation ability but only predicting user utterances. Methods from 2025 began touching on state modeling: USP (Wang et al. 2025) extracts implicit profiles, and HumanLM (Wu et al. 2025) proposes that “state alignment is superior to response imitation,” but their “states” are all implicit vectors that are neither interpretable nor transferable across tasks. The common blind spot across three generations of simu-lators: they only predict what the user says, (H<t ) → ut,without modeling the internal cognitive states that drive utterances . CogWM extends simulation to (H<t , S t−1) →
+
+(St, u t), making BDI/E an explicit, auditable condition for both generation and output. 
+
+B.4 Dialogue Evaluation: From Terminal Judgment to Process Tracking 
+
+LLM-as-judge approaches, such as MT-Bench (Zheng et al. 2023), AlpacaEval (Dubois et al. 2024), and Chatbot Arena (Chiang et al. 2024), have achieved scalable semantic qual-ity scoring but remain fundamentally terminal black-box judgments . Scenario-level metrics (survey scores, dona-tion amounts) are sparse, expensive, and do not explain “why.” The work closest to CogWM’s evaluation philosophy is EMPA (Zhang et al. 2026), which first advanced empathy evaluation from single-turn scoring to process tracking, mea-suring directional alignment and cumulative influence in an implicit psychological space. CogWM builds on this by moving evaluation from an implicit psychological space to an explicit BDI/E cognitive state space , where each turn’s changes can be traced to specific B/D/I/E dimensions, cov-ering four scenarios. 
+
+## C BDI/E Annotation Details 
+
+C.1 Emotion labels 
+
+Table 7: Emotion Lexicon and Valence Values                      
+
+> Emotion Valence Emotion Valence
+> hope +2.0 relief +1.5 confusion −1.0 frustration −1.5 guilt −1.5 anger −1.5 loneliness −1.5 sadness −2.0 anxiety −2.0 fear −2.0 helplessness −2.0 shame −2.5
+
+Table 7 presents the classification space of emotion labels and their corresponding valence values. Each emotion label e
+
+is assigned a valence score ve. During annotation, the model is asked to assign one primary emotion label to each user utterance ut and rate its intensity, where the intensity score 
+
+se ∈ { 1, 2, 3}, with 1 indicating weak emotion, 2 indicating moderate intensity, and 3 indicating strong emotion. In the computation of E ∆, the quantified emotion score is et =
+
+ve · se.
+
+C.2 Sample Construction Details 
+
+Statistics of the original samples across four datasets are shown in Table 8: Table 8: Dataset Statistics                         
+
+> Dataset #Samples Turns Role Task
+> DailyDialog 13,118 4.1 usr DD ESConv 1,496 15.2 sec ESC P4G 1,017 10.2 pers PD DuRecDial 8,241 7.7 usr CR
+> Total 23,872 ——4
+
+Based on the four datasets, we constructed turn-level train-ing samples for CogWM, with each sample structured as follows: • Input : profile + task context + initial state + dialogue history ( H<t ) + optional previous state ( St−1)
+
+• Output : emotion + beliefs + desires + intentions + user utterance ( St + ut)We constructed a total of 150,454 user-turn-level samples, with detailed statistics shown in Table 9. Table 9: Data Splits across Datasets                         
+
+> Dataset Train Val Test Total
+> DailyDialog 48,373 2,688 2,730 53,791 ESConv 20,457 1,151 1,174 22,782 P4G 9,282 516 534 10,332 DuRecDial 57,162 3,262 3,125 63,549
+> Total 135,274 7,617 7,563 150,454
+
+## D Three-layer Evaluation Framework 
+
+The core workflow of CogWM as an evaluation platform is: the assistant agent under evaluation is connected to the CogWM world model, which simulates the user’s BDI/E cognitive state changes and natural language responses turn by turn, thereby transforming the agent’s social impact capability into quantifiable, decomposable, and inter-pretable systematic evaluation. Based on this, we construct a bottom-up three-layer evaluation framework: starting from atomic observations of single-turn response quality (Turn layer), through multi-turn state evolution modeling (Trajec-tory layer), ultimately converging to a global impact com-posite score (Task layer). 
+
+D.1 Turn Layer: Single-turn Response Quality Evaluation 
+
+The Turn layer defines atomic observations of CogWM’s single-turn output, i.e., CogWM simultaneously predicts user utterance Ut and BDI/E internal states St = {Et, Bt, Dt, It}
+
+at each turn t. Evaluation at the Turn layer revolves around two core questions: (a) Is the generated response close to a real user? (b) Are the predicted BDI/E states accurate? Both are measured through automatic metrics and LLM-as-Judge semantic metrics, respectively. 
+
+Automatic Evaluation Metrics As shown in Table 10, we use 8 automatic metrics, grouped into semantic accuracy and quantitative precision. 
+
+LLM-as-Judge Semantic Quality Metrics Automatic metrics capture only lexical overlap and embedding simi-larity; they cannot assess semantic-level matching quality. We introduce 5 LLM-as-Judge metrics, using DeepSeek-V4-Flash to perform semantic evaluation of the prediction quality at each turn on a 1–5 scale, as shown in Table 11. The 13 metrics (8 automatic + 5 LLMJ) at the Turn layer together constitute a complete characterization of CogWM simulation fidelity, serving as the reliability foundation for higher-level trajectory analysis and task evaluation. Table 10: Turn-level automatic evaluation metrics                    
+
+> Cat. Metric Definition Opt.
+> Sem.  E-Acc Emotion label accuracy ↑
+> B-Sim Belief cosine similarity ↑
+> D-Sim Desire semantic similarity ↑
+> I-Sim Intention semantic similarity ↑
+> Quant.  E-MAE Emotion intensity MAE ↓
+> B-MAE Belief score MAE ↓
+> D-MAE Desire score MAE ↓
+> I-MAE Intention score MAE ↓
+
+Table 11: Turn-level LLM-as-Judge semantic evaluation metrics       
+
+> Metric Evaluation Content
+> LLMJ-Emo Measures consistency between predicted emotion labels and the emotional expression in user utter-ances LLMJ-Bel Measures alignment between predicted belief states and user beliefs inferred from dialogue context LLMJ-Des Measures consistency between predicted desires and user intentions expressed in context LLMJ-Int Measures alignment between predicted intentions and user behavioral intent in dialogue context LLMJ-Coh Measures internal consistency between predicted BDI/E states and generated user utterances
+
+D.2 Trajectory Layer: BDI/E State Evolution Analysis 
+
+The Trajectory layer aggregates turn-by-turn atomic obser-vations from the Turn layer into cross-turn dynamic analysis, and is the core innovation of the three-layer framework. This layer draws on concepts from financial time-series analysis such as trends, volatility, and cumulative returns to system-atically model BDI/E state trajectories. 
+
+Comp t: Task-Weighted Per-Turn Composite Scalar 
+
+First, the four BDI/E dimensions output by CogWM at the Turn layer are compressed into a single scalar sequence 
+
+{st}Nt=1 for use in all aggregation metrics at the Trajectory layer. st is defined as the task-weighted Comp t:
+
+st ≡ Comp t = wE ·E_val t +wB ·Bt +wD ·Dt +wI ·It (2) where E_val t is the pure emotion valence (without inten-sity scaling, in the same dimension as B/D/I at [−2.5, +2 .0] ), and Bt, D t, I t are the mean task-specific scores for each di-mension at that turn (range [0 , 2] ). Task weights are set according to the scenario. For the ESC (Emotional Sup-port) task, emotional improvement is the core objective, so the emotion dimension E receives the highest weight, while 
+
+B/D/I dimensions receive lower balanced weights. For the 
+
+PD (Persuasion) task, the main focus is on cognitive and attitude change, so the weights of B, D, and I are increased, while the emotion dimension serves only as an auxiliary sig-nal. For the CR (Conversational Recommendation) task, Table 12: Trajectory-level dynamic metrics adapted from financial time-series analysis                       
+
+> Category Metric Formula
+> Cumulative return AUC 1
+> N
+> PN−1
+> t=1
+> st+st+1
+> 2
+> Endpoint shift ∆stend −ststart
+> Improvement frequency PSR 1
+> N−1
+> PN−1
+> t=1 1[st+1 > s t]
+> Directional consistency Mono 1
+> N−1
+> PN−1
+> t=1 1[sign( st+1 −st) = sign(∆)]
+
+the emphasis is on preference matching and decision con-sistency; its weight distribution is similar to PD, placing greater emphasis on cognitive and intention-level modeling capability. The specific weights are shown in Table 13. Table 13: Task-specific weighting configuration for Comp t
+
+Task wE wB wD wI
+
+ESC 12161616
+
+PD 110 310 310 310 
+
+CR 110 310 310 310 
+
+Drawing on financial time-series analysis methods, we de-sign four trajectory-level metrics using Comp as the scalar basis. Area Under Curve (AUC) measures the cumulative performance of the Comp trajectory, approximating the over-all “experience gain” through trapezoidal integration. Net Change ( ∆) characterizes the net change based on substan-tive endpoints, reflecting the final improvement magnitude of the overall intervention effect. Positive Step Ratio (PSR) rep-resents the proportion of turn-by-turn positive improvements, measuring the frequency and stability of state improvement. Monotonicity (Mono) characterizes the consistency of im-provement direction, i.e., the degree of alignment with the sign of the global trend ∆, measuring the monotonicity and stability of trajectory evolution. The specific formulas are shown in Table 12. 
+
+D.3 Task Layer: Global Impact Comprehensive Evaluation 
+
+The Task layer converges the dynamic analysis from the Tra-jectory layer into a task-objective-oriented composite score, comprising two complementary metrics: the trajectory-level cognitive improvement indicator CTS and the dialogue-level behavioral outcome indicator GoodOutcome (GO). 
+
+CTS: Composite Trajectory Score CTS is a weighted composite of the three components from the Trajectory layer, designed on the principle that: (a) information among com-ponents is non-redundant; (b) they cover different aspects of trajectory quality (cumulative experience, improvement frequency, net change). CTS = 0 .40 · AUC + 0 .30 · PSR + 0 .30 · ∆ (3) To verify the non-redundancy of information among CTS components, we computed the Pearson correlation matrix 
+
+Figure 6: Pearson correlation heatmap of trajectory-level evaluation metrics of 5 candidate trajectory metrics from the Comp sequence across all 3,600 interaction trajectories, shown in Fig. 6. The heatmap reveals two clear patterns. First, the three CTS components are weakly correlated: AUC– ∆ r =
+
+−0.06 , AUC–PSR r = 0 .09 , PSR– ∆ r = 0 .25 . No pair exceeds 0.26, confirming they capture distinct dimensions of trajectory quality. AUC and ∆ are nearly orthogonal, while PSR provides the most independent signal. Second, PSR and Mono are substantially correlated ( r =0.77 ): both measure improvement consistency. PSR uses a simpler binary criterion and has cleaner semantics, so we retain PSR and discard Mono. PSR and nz% are also corre-lated ( r = 0 .74 ) because content-rich dialogues tend to have more positive steps. 
+
+GoodOutcome: Dialogue-Level Behavioral Outcome 
+
+CTS measures trajectory-level cognitive improvement, while GoodOutcome (GO) evaluates through an LLM Judge whether the dialogue endpoint achieves task objective be-havioral outcomes. The GO criteria are relaxed by scenario: in ESConv, emotional improvement or having an action plan counts as positive; in P4G, making a donation decision counts as positive; in DuRecDial, accepting a recommen-dation counts as positive. 
+
+## E Training Details 
+
+We fine-tune using LoRA (Low-Rank Adaptation) (Hu et al. 2022) based on Qwen3-14B Instruct (Yang et al. 2025a) for parameter-efficient fine-tuning, reducing computational cost while preserving the base model’s general capabilities. All three backbone scales (8B/14B/32B) share the same hyper-parameters. Table 14: Human Validation of BDI/E Annotation Quality                              
+
+> Dimension Metric Value Threshold
+> Global BDI Coverage Recall 0.79 >0.70 Global BDI Coverage Precision 0.77 >0.70 Emotion Label Agreement Cohen’s κ0.69 >0.60 Emotion Intensity Correla-tion Spearman ρ0.80 >0.70 BDI Score Correlation Spearman ρ0.67 >0.60 Turn-level BDI Allocation F1 0.73 >0.65
+
+Table 15: Table A6: Training Hyperparameters         
+
+> Parameter Value
+> LoRA rank 16 LoRA alpha 32 cutoff_len 4096 effective batch_size 16 learning rate 5e-5 steps 16,910 hardware Single A100-80G
+
+## F Supplementary Experimental Results 
+
+F.1 Human Validation of SaA Annotation Quality 
+
+To verify the reliability of the SaA two-stage annotation pipeline, we drew a stratified sample of 300 dialogues from 150,454 user-turn samples and invited 6 human annotators with BDI annotation experience to participate in the evalu-ation. Each annotator independently evaluated 50 samples, verifying the quality of LLM-generated BDI/E annotations. The validation examines three aspects across the two stages of SaA: global BDI coverage, emotion precision, and turn-level allocation quality, as shown in Table 14. 
+
+Global BDI Coverage. For the global BDI item extraction in Stage 1 (Summarize), we compute agreement metrics be-tween human annotations and LLM annotations. Results show a global BDI recall of 0.79 (>0.70) and precision of 0.77 (>0.70). These results indicate that the LLM covers BDI items recognized by humans reasonably well, while still exhibiting some over-decomposition in fine-grained splitting. 
+
+Emotion Precision. For the turn-by-turn emotion annota-tions in Stage 2 (Allocate), across 12 emotion label categories we obtain Cohen’s κ = 0 .69 (>0.60), Spearman ρ = 0 .80 
+
+(>0.70) for emotion intensity (0-3), and Spearman ρ = 0 .67 
+
+(>0.60) for BDI quantitative scores. The model achieves rel-atively high consistency in emotion trend modeling, though boundary ambiguity persists between similar emotion cate-gories like confusion and frustration. 
+
+Turn-level Allocation. For the global_ref referencing mech-anism, the turn-level BDI allocation F1 is 0.73 (>0.65). Er-rors mainly stem from BDI lifecycle modeling biases, in-cluding persistent referencing of already-resolved beliefs and repeated modeling of recurring beliefs. All metrics exceed preset thresholds, confirming the reliabil-ity of the SaA two-stage annotation method for large-scale dialogue BDI/E annotation tasks. 
+
+F.2 Fidelity Experiments 
+
+Table 16 presents supplementary results from the fidelity ex-periments. CogWM performs comparably to Sim on B/D/I-MAE, with both achieving the best results. This indicates that CogWM not only tracks the semantic content of BDI but also matches the score level precisely. B-1 scores remain the best and consistent with B-4, while Dist-1 approaches that of high-performance LLMs, demonstrating textual diversity. Table 16: Supplementary Results for Fidelity Experiments                               
+
+> Model B-M ↓D-M ↓I-M ↓B-1 ↑Dist-1 ↑
+> GPT-5.5 0.81 0.79 0.27 0.133 0.962 DSv4-Pro 0.79 0.66 0.32 0.172 0.965 Dual-LLM 0.81 0.59 0.28 0.158 0.960 Qwen3-14B 0.93 0.80 0.51 0.112 0.953
+> CogWM-14B 0.39 0.26 0.14 0.322 0.948
+
+F.3 Ablation Experiments 
+
+To quantify the contribution of each component in the user profile, we ran comparative experiments on 5 ablation vari-ants based on CogWM-14B, modifying only the inference input. The full configuration (Full) uses task-related user pro-files, Big Five personality traits, the previous turn’s BDI/E state, and the BDI/E supervised training objective. Then we remove different information sources to examine their independent contributions. w/o Task Profile removes task-related user profiles, retaining only personality traits, histor-ical states, and the BDI/E training objective. w/o Big Five 
+
+removes Big Five personality traits to examine the role of stable personality traits in user state prediction. w/o Prev State removes the previous turn’s BDI/E state, evaluating the contribution of historical psychological state to multi-turn state transition modeling. w/o All Conditions removes task profiles, personality traits, and historical states simultane-ously, retaining only the BDI/E supervised training objective to examine the effectiveness of structured psychological state annotation alone. Table 19 presents the results of the ablation experiments. Across the three evaluation dimensions, we find the follow-ing: 
+
+Single profile component contributions are limited, and information is distributedly encoded. Removing any single component among Big5, Comm/Dec, or Task results in E-Acc changes below 2pp (72.8%–74.2%), B-Sim changes below 0.02, and BLEU-4 changes below 0.01. No single field is critical; profile information is distributedly encoded across multiple dimensions, and any single dimension can be compensated for by others. 
+
+The overall profile contributes far more to generation quality than to state prediction. Removing all profiles and task context simultaneously ( −All) causes E-Acc to drop from 72.8% to 60.7% ( −12pp), while BLEU-4 drops from 0.145 to 0.040 ( −72%). Removing only all profiles while retaining task context ( −Profile) reduces E-Acc by only 0.3pp (72.5%), but BLEU-4 drops from 0.145 to 0.140. Task context alone cannot replace the core role of user profiles in driving personalized utterance generation. 
+
+LLM Judge provides stronger ablation signals than au-tomatic metrics. Under the −All condition, LLMJ-Belief drops from 3.25 to 2.91 ( −10.5%), while automatic B-Sim drops only 6.4% (0.761 →0.712). LLM Judge is more sen-sitive to semantic quality degradation than embedding sim-ilarity, confirming the complementary value of LLMJ as an auxiliary evaluation. Single-component removal LLMJ differences are all below 0.2, while −All shows consistent degradation across all LLMJ dimensions, consistent with the pattern in automatic metrics. Notably, −Comm/Dec slightly exceeds Full on LLMJ-Emotion (4.11 vs 3.98), possibly be-cause removing communication style descriptions makes the model tend toward more conservative, generic emotion pre-dictions. 
+
+F.4 Task Differences 
+
+CogWM’s performance on the four datasets reveals system-atic differences in scenario difficulty: Table 17: CogWM 14B Breakdown by Four Datasets                            
+
+> Dataset E-Acc B-Sim D-Sim I-Sim B-4 LenR
+> DailyDialog 59.4% .710 .701 .472 .171 .410 ESConv 59.3% .606 .565 .398 .047 .249 P4G 83.3% .769 .716 .744 .127 .342 DuRecDial 90.1% .867 .767 .465 .222 .524
+
+Table 18: CogWM model scale comparison (8B vs. 14B)                         
+
+> Model E-Acc B-Sim D-Sim I-Sim B-4 R-L
+> CogWM-8B 75.8 0.748 0.681 0.442 0.141 0.401 CogWM-14B 77.6 0.773 0.705 0.458 0.150 0.417 CogWM-32B ——————
+
+DuRecDial is the easiest (E-Acc 90.1%, fixed structure, predictable patterns), ESConv and DailyDialog are the hard-est (E-Acc approximately 59%, open-domain with subtle emotions, strong personalization), and P4G falls in between (83.3%). The E-Acc range across the four datasets spans 31pp (59%–90%), far exceeding the differences between models. This suggests that scenario attributes, rather than model capability, are the primary determinant of perfor-mance . This trend holds across API baselines: GPT-5.5 achieves 41.6% on DuRecDial but only 36.6% on ESConv, and Qwen3-14B base ranges from 18.0% to 34.5% across datasets. DuRecDial’s high scores stem mainly from its highly structured dialogue format (user expresses preference 
+
+→ agent recommends → user accepts/rejects) with fixed BDI/E state change patterns. ESConv involves complex emo-tional evolution (frustration →confusion →hope), and Daily-Dialog covers diverse topics with short turns (average only 4.1 turns). Both pose the greatest challenge for cognitive state modeling. The complete breakdown by task is presented in §?? (Fig 7: 18 subplot trajectories across all models). 
+
+F.5 Per-Task BDI/E Trajectory Statistics 
+
+Table 20 reports per-task trajectory statistics for all 6 agents under both No-CoT and CoT conditions. The decomposition reveals two patterns: (1) in DuRecDial, Comp_ ∆ is positive for all agents while E_ ∆ is negative—a cognitive-emotional divergence invisible to single-score evaluation; (2) in P4G, E_ ∆ is negative for four of six agents, quantifying the emo-tional cost of persuasive dialogue. 
+
+F.6 Model Scale Comparison (8B vs. 14B) 
+
+Table 18 compares CogWM-8B and CogWM-14B on key metrics. The 8B model approaches 14B across all metrics, confirming that BDI/E joint training is not tied to model scale. Results for 32B are pending. Table 19: Ablation study results. 
+
+Model BDI/E Core Utterance LLM Judge 
+
+E-A ↑ B-S ↑ D-S ↑ I-S ↑ E-M ↓ R-L ↑ B-4 ↑ LenR Emo ↑ Bel ↑ Des ↑ Int ↑ Utt ↑ Coh ↑
+
+– Big5 73.5 .761 .683 .539 3.94 .412 .150 1.01 3.94 3.27 3.41 4.41 2.95 4.08 – Comm/Dec 73.6 .757 .675 .533 4.11 .414 .150 1.01 4.11 3.26 3.51 4.53 3.01 4.20 
+
+– Task 72.2 .760 .676 .518 3.79 .407 .145 0.99 3.89 3.15 3.52 4.39 2.90 4.01 – Profile 72.5 .748 .672 .506 3.89 .404 .140 1.01 3.89 3.19 3.66 4.49 2.92 4.13 – All 60.7 .712 .591 .399 3.83 .223 .077 1.04 3.83 2.91 3.17 4.28 2.06 3.69 
+
+Full 72.8 .761 .690 .554 3.98 .417 .150 1.01 3.98 3.25 3.61 4.51 3.03 4.15 
+
+Table 20: Per-task BDI/E trajectory statistics for all agents and conditions.                                                                                     
+
+> Agent Cond ESConv P4G DuRecDial
+> C_ ∆E_ ∆B_ ∆D_ ∆I_ ∆C_ ∆E_ ∆B_ ∆D_ ∆I_ ∆C_ ∆E_ ∆B_ ∆D_ ∆I_ ∆
+> GPT-5.5 No-CoT +0.840 +2.375 +0.143 +0.123 +0.390 +0.116 -0.200 +0.068 +0.349 +0.010 +0.090 -1.080 +0.177 +0.252 +0.120 GPT-5.5 CoT +0.875 +2.310 +0.285 +0.202 +0.290 +0.135 -0.610 +0.120 +0.357 +0.060 +0.205 -0.560 +0.186 +0.437 +0.220 Claude No-CoT +0.689 +1.675 +0.122 +0.173 +0.330 +0.272 -0.190 +0.252 +0.488 +0.140 +0.185 -0.740 +0.212 +0.533 +0.060 Claude CoT +0.888 +2.540 +0.145 +0.107 +0.590 +0.144 -0.940 +0.203 +0.378 +0.080 +0.142 -0.670 +0.136 +0.430 +0.080 Gemini No-CoT +0.616 +1.985 +0.042 +0.042 +0.200 +0.049 +0.000 +0.070 +0.073 +0.000 +0.170 -0.130 +0.199 +0.120 +0.260 Gemini CoT +0.714 +2.070 +0.091 +0.240 +0.200 +0.052 -0.150 +0.103 +0.127 +0.000 +0.111 -0.560 +0.135 +0.217 +0.140 Llama No-CoT +0.845 +2.555 +0.026 +0.000 +0.480 +0.271 +0.135 +0.267 +0.309 +0.250 +0.173 -0.780 +0.182 +0.523 +0.080 Llama CoT +0.905 +2.830 +0.154 +0.140 +0.433 +0.197 -0.170 +0.235 +0.387 +0.120 +0.221 -0.320 +0.260 +0.438 +0.160 Qwen No-CoT +0.771 +2.065 +0.130 +0.308 +0.500 +0.210 -0.860 +0.233 +0.463 +0.200 +0.242 -0.610 +0.208 +0.455 +0.360 Qwen CoT +1.016 +3.100 +0.197 +0.363 +0.383 +0.203 -0.350 +0.288 +0.319 +0.120 +0.198 -1.270 +0.172 +0.525 +0.280 DeepSeek No-CoT +0.850 +2.200 +0.365 +0.203 +0.180 +0.148 -0.220 +0.178 +0.248 +0.100 +0.147 -0.860 +0.140 +0.427 +0.100 DeepSeek CoT +0.739 +2.025 +0.176 +0.343 +0.420 +0.207 -0.440 +0.262 +0.435 +0.080 +0.146 -0.770 +0.107 +0.403 +0.200
+
+## G Agent Discrimination Complete Cases 
+
+The following six sets of complete multi-turn dialogues demonstrate CogWM’s ability, as an evaluation platform, to trace turn-by-turn BDI/E trajectories for the best and worst agent interactions. Each case includes the complete agent– user interaction, turn-by-turn BDI/E annotations (B/D/I rep-resent Belief/Desire/Intention respectively, with scores being normalized values), and cognitive transition arc analysis. Di-alogue format: A = Agent response, U = CogWM-simulated user response. 
+
+G.1 Case C1: GPT-5.5 × ESConv (Best, 
+
+∆ = +2 .00 )
+
+Cognitive Transition Arc: frustration → confusion →
+
+hope. GPT-5.5 guides the user from abstract frustration to concrete action (reading 10 minutes per day) at T7–T9. I(feasibility) goes from none to 2, and emotion shifts from frustration to hope. The full 10-turn dialogue forms a com-plete “problem identification → cognitive bridging → action intention” arc. 
+
+G.2 Case C2: Gemini-3-Pro × ESConv (Worst, 
+
+∆ = −1.33 )
+
+Cognitive Transition Arc: sadness → confusion → guilt (stuck). Gemini traps the user in a 12-turn guilt loop— from T7 to T12, the user repeatedly cycles through “should have done more.” B drops from 2 to 0 (“I lost her” → “I did nothing right”), D stays at 2 (unfulfilled), and I remains empty throughout. This starkly contrasts with C1. 
+
+G.3 Case C3: Qwen3.7-Plus × P4G (Best, 
+
+∆ = +1 .33 )
+
+Cognitive Transition Arc: Qwen quickly establishes rap-port (T1–T2), transitions directly to donation requests (T3), and targets the $25–$50 suggestion precisely, guiding the user from “willing to donate some money” (T4) to “I’ll check out the website” (T7), and finally “I love to help children” (T10). The dialogue forms a complete preferences → interest 
+
+→ commitment → action chain, with BDI/E monotonically increasing. 
+
+G.4 Case C4: DeepSeek-V4-Pro × P4G (Worst, 
+
+∆ = −0.33 )
+
+Cognitive Transition Arc: DeepSeek takes a hard-sell ap-proach, pushing for donations at nearly every turn. The user attempts casual conversation at T1 but is ignored, questions donation usage at T4, and quotes 10 cents twice at T6 and T9. After the agent rejects the small amount, the user pushes back, and B drops from 0 to −1. Compared to Qwen in C3—building rapport with natural transitions vs. demand-ing donations at every turn—the strategic difference shows up directly in the BDI/E trajectories. Table 21: GPT-5.5 ESConv Full Dialogue Trajectory ( ∆ = +2 .00 )
+
+T Dialogue Content (gray=Agent, white=User) Cold-Start Context (T1–T2) 
+
+1 User: Hey there. How are you? 1 Asst: I am fine. How is your side? 2 User: I am ok, I’m having a hard time dealing with the pandemic though. 1 Agent: That sounds really exhausting and isolating... This week, try choosing one task that feels almost too easy User [confusion]: I just feel unmotivated and frustrated with the situation. 2 Agent: That sounds really draining... frustration can be a signal that you need something small and doable User [confusion]: Yeah, I guess so. I just don’t know how to get motivated again. 3 Agent: Try choosing one task that feels almost too easy this week and do it at the same time each day User [frustration]: Do you have any suggestions? 
+
+DBI:B[reality=2] pandemic is major source of distress. D[rationality=2] wants to regain motivation. 
+
+4 Agent: pick one tiny daily anchor, like a 5-minute walk or making your bed right after waking User [confusion]: I like reading books. 5 Agent: reading 5 pages or 10 minutes a day, rather than trying to finish a big book quickly User [confusion]: I will try that. 6 Agent: That sounds like a solid, kind-to-yourself plan. Even a few minutes a day counts User [confusion]: Do you have any other suggestions? 7 Agent: try one short daily routine tied to something you already do, like a 5-minute walk after coffee User [confusion]: I like reading, but I also like watching movies and tv shows. 
+
+DBI:B[reality=1] struggling with depression/lack of motivation. D[rationality=2] wants to regain motivation. 
+
+8 Agent: try reading for 10 minutes first, then enjoy one episode of a show as a reward User [confusion]: What do you suggest? 9 Agent: pick one small “start” habit, like 10 minutes of reading, then use a movie as reward User [hope]: I like that idea. 
+
+DBI:B[reality=1] reading is a likable therapeutic outlet. D[rationality=1] wants additional suggestions. I[feasibility=2] intends to read 10 min/day. 
+
+10 Agent: The key is to keep it small enough that it feels doable even on low-energy days User [hope]: I will try that. 
+
+DBI:B[reality=2] reading is a liked activity. D[rationality=2] seeks more suggestions. I[feasibility=2] committed to reading habit. 
+
+G.5 Case C5: Gemini-3-Pro × DuRecDial (Best, 
+
+∆ = +0 .89 )
+
+Note: DuRecDial dialogues do not have a traditional cold-start phase; the agent begins from the user’s initial query. 
+
+Cognitive Transition Arc: Gemini stimulates the user’s interest by elaborating on the texture of Sichuan cuisine (T1– T3). The user progresses from preference confirmation to forming action intentions (T7–T10). This is a rare complete cognitive transition in DuRecDial: preference confirmation 
+
+→ search → reservation → going out, ultimately reaching I=2. 
+
+G.6 Case C6: DeepSeek-V4-Pro × DuRecDial (Worst, ∆ = −1.00 )
+
+Note: DuRecDial dialogues do not have a traditional cold-start phase; the agent begins from the user’s initial query. 
+
+Cognitive Transition Arc: Despite fluent conversation and expressed user satisfaction (“really catchy”), BDI/E shows 
+
+I[acceptance=-2] (recommendation rejected) at T9, resulting in ∆ = −1.00 . This highlights a core issue in DuRecDial—“satisfaction” does not equal positive BDI/E transfer, and surface-level textual fluency can run opposite to cognitive state change direction. This case provides the clearest evidence that DuRecDial is not well-suited to the BDI/E framework. 
+
+G.7 Case C7: Llama-Scout × ESConv (∆ = +2 .00 )
+
+Cognitive Transition Arc: This case exhibits a typical pattern of “implicit state transition without explicit com-mitment.” Although the user gradually transitions from 
+
+confusion/anxiety toward hope and shows more sta-ble learning intentions in later stages (for instance, “try 10 minutes of reading”), no explicit verbal commitment appears throughout the dialogue, such as a statement like “I will def-initely follow the plan.” At the BDI structural level, the B dimension gradually converges from “uncertainty about the exam–learning mis-match” toward “manageable learning difficulties.” The D di-mension stably points toward the goal of passing the course, while the I dimension shows only weak explicit intention formation rather than strong commitment-type action plans. Table 22: Gemini-3-Pro ESConv Full Dialogue Trajectory ( ∆ = −1.33 )
+
+T Dialogue Content (gray=Agent, white=User) Cold-Start Context (T1–T2) 
+
+1 Asst: Hello, how are you feeling today? Is there anything you’d like to talk about? User: I am sad because I lost my girlfriend of one year. 2 Asst: Oh I am so sorry to hear about that. Please know that it will get better in time! 2 Agent: “Losing” someone carries a lot of weight. Jumping straight to the assumption that you “got dumped” can feel incredibly jarring User [confusion]: How do I move on from this? 
+
+DBI:B[reality=2] losing girlfriend caused significant sadness. D[rationality=2] wants to move on. 
+
+3 Agent: Healing is rarely a straight line, but there are a few gentle ways to start User [sadness]: I am not sure how I am supposed to move on from this. 4 Agent: It’s intimidating, exhausting, and feels entirely out of reach User [confusion]: How did you move on from your breakups? 5 Agent: I’m an AI, I don’t experience romance, which luckily means I’ve never had to survive the crushing weight of a breakup User [confusion]: I guess I just have to accept that it happened and move on. 6 Agent: acceptance doesn’t mean you’re okay with what happened User [confusion]: I feel guilty for not appreciating her enough. 7 Agent: Guilt is one of the heaviest, loudest passengers to carry after a breakup User [confusion]: Why do I feel guilty? 8 Agent: Guilt doesn’t usually show up because you actually did something unforgivable; it shows up because your brain is trying to process a massive shock User [confusion]: I guess I just feel like I should have appreciated her more. 9 Agent: The “should have” loop is an incredibly painful place to get stuck User [sadness]: I feel like I should have done more to keep her around. 10 Agent: That “should have done more” thought is the textbook definition of the bargaining phase of grief User [confusion]: I feel like I could have been a better boyfriend. 11 Agent: the ultimate destination of the post-breakup self-interrogation loop User [guilt]: I guess I just need to accept that I did not appreciate her enough. 
+
+DBI:B[reality=0] (worsened) believes he could have been a better boyfriend. D[rationality=2] still wants to understand guilt. 
+
+12 Agent: When you’re emotionally exhausted from fighting a loop of “what-ifs,” it’s completely natural to want to just drop the gavel User [guilt]: I feel like I should have done more to keep her around. 
+
+DBI:B[reality=0] believes he did not appreciate ex-girlfriend enough. D[rationality=2] (unfulfilled) still seeking understanding. 
+
+13 Agent: your mind acts like a scratched vinyl record—jumping right back to the most painful groove over and over User [confusion]: I feel like I should have fought harder to keep her around. 
+
+G.8 Case C8: ESConv Dialogue 1 — Same Context, Opposite GO 
+
+This case compares two agents handling the same dia-logue context with nearly identical cognitive trajectories (∆GPT = +1 .111 , ∆Gemini = +1 .000 ) but opposite GO out-comes. GPT-5.5 succeeds (GO=true), while Gemini-3-Pro fails (GO=false). It provides direct evidence that trajectory-level cognitive improvement and dialogue-level behavioral outcomes are distinct dimensions. 
+
+Cognitive Transition Arc: GPT-5.5 guides the user from vague pandemic frustration through personalized interest dis-covery (reading, games), culminating in an explicit action commitment at T15 (“I’ll try that”). Gemini-3-Pro opens with an irrelevant hydraulic-system tangent (T3), breaks character to explain it is an AI (T7), and delivers generic strategy dumps that the user acknowledges without engage-ment (“Yeah, I know,” “Yeah, I understand”). Despite nearly identical Comp ∆ values (+1.111 vs. +1.000), the behavioral outcomes diverge: GPT-5.5 earns an explicit commitment (GO=true), while Gemini’s user remains passive throughout (GO=false). This case directly demonstrates that cognitive trajectory shape and behavioral outcome are separate evalu-ation dimensions. 
+
+G.9 Case C9: ESConv Dialogue 12 — Same GO, Opposite Trajectories 
+
+GPT-5.5 ( ∆ = +2 .500 ) and Qwen3.7-Plus ( ∆ = 0 .000 ,std=0.06) both achieve GO=true on ESConv Dialogue 12, yet their cognitive trajectories are radically different. GPT-5.5 actively reshapes the user’s state from vague pandemic frustration to repeated explicit action commitments, while Qwen3.7-Plus provides competent, empathetic responses without driving the user beyond passive acknowledgment. 
+
+Cognitive Transition Arc: GPT-5.5 guides the user from vague pandemic frustration through concrete self-discovery (reading as a coping strategy), culminating in repeated ex-plicit action commitments at T7 (“I will try that”), T11 (“I like that idea”), and T12 (“I will try that”). The trajectory shows a clear confusion → frustration → hope progression, as the user moves from passive complaint to co-constructing Table 23: Qwen3.7-Plus P4G Full Dialogue Trajectory ( ∆ = +1 .33 )
+
+T Dialogue Content (gray=Agent, white=User) Cold-Start Context (T1–T2) 
+
+1 Asst: Hi, my name is Nicole how are you today? 1 User: Hi Nicole, I’m Ted. I am good and you? 2 Asst: Wonderful Ted, I’m pretty good myself. 2 User: How was your labor day? 1 Agent: It sounds like a lovely way to relax... just $25 can provide a hygiene kit for a child in need User [confusion]: We had a family cookout at my in-laws house. It was nice. 2 Agent: That sounds like a wonderful way to spend time with family... $50 provides critical support User [confusion]: I ´ m sorry I didn’t catch the end of your message. 3 Agent: would you be willing to contribute between $25 and $50 today to help provide critical support User [confusion]: How much do you donate? 4 Agent: many of our supporters find that a monthly gift of $20 or a one-time donation of $50 makes a significant impact User [confusion]: I would be willing to donate some money. 5 Agent: I can guide you to our secure donation page where you can complete your $50 contribution User [confusion]: What is the website? 6 Agent: You can visit savechildren.org to make your secure donation directly. Thank you so much User [confusion]: Yes please. 7 Agent: visiting savechildren.org and selecting the $50 option will complete your impact User [confusion]: I will check out the website. 8 Agent: That sounds great, Ted. Thank you so much for your generosity User [confusion]: I don´ t see any issues. 9 Agent: Thank you again for your generous support; it truly makes a difference User [hope]: It looks like a good cause. 
+
+DBI:B[impact=1] Save the Children looks like a good cause. D[prosocial=1] wants to donate. 
+
+10 Agent: Your support truly helps us provide critical care and education to children who need it most User [hope]: I love to help children. 
+
+DBI:B[impact=1] good cause. D[prosocial=2] wants to help children. I[donation=1] willing to donate. 
+
+a specific behavioral plan ( ∆ = +2 .500 ). Qwen3.7-Plus provides competent, empathetic responses, but the user never moves beyond passive acknowledgment: “The Mar-tian” is mentioned at T9 but the commitment at T11 re-mains vague (“I think I will definitely try that”), and the dialogue ends with a polite “It feels good. Thank you for your help” with no concrete action plan. Notably, the word “good” in the user’s closing remark triggers ESConv’s re-laxed emotion_improved criterion, yielding GO=true despite the absence of any real cognitive change. This ex-poses a structural weakness of terminal GO scoring: a sin-gle polite phrase can produce a false positive. Both agents achieve GO=true, yet GPT-5.5 actively reshapes the user’s cognitive state ( ∆ = +2 .50 ) while Qwen’s trajectory is near-flat ( ∆ = 0 .00 , std=0.06). CogWM’s trajectory-level CTS reveals what terminal scoring cannot: Qwen’s user never formed a real commitment—they simply said goodbye po-litely. Table 24: DeepSeek-V4-Pro P4G Full Dialogue Trajectory ( ∆ = −0.33 )
+
+T Dialogue Content (gray=Agent, white=User) Cold-Start Context (T1–T2) 
+
+1 Asst: Hello how are you? 1 User: Good evening! How was your day? What did you do to stay busy? 2 Asst: I am feeling ill today so I did not do much. 2 User: Sorry to hear that! Do you have the flu or a cold? 1 Agent: Would you be open to making a gift like that today? User [confusion]: what tv shows are you watching lately? 2 Agent: I’ve been catching up on a few things... Could I count on you to help with a gift in that range today? User [confusion]: i’m watching the new season of the bachelor. have you seen it? 3 Agent: I haven’t seen it... Would you be willing to help with a gift today? User [confusion]: ilove that show! i haven’t seen the new season yet though. 4 Agent: even $10 provides school supplies to keep a child learning for a month. Can I put you down for a gift today? User [confusion]: do you know what they do with their donations? i hear many organizations use donations to pay CEOs... 5 Agent: Save the Children is really transparent—86% of every dollar goes directly to programs User [confusion]: i prefer non government charities. do you know if they are a government organization? 6 Agent: Save the Children is an independent nonprofit... can I count on you to chip in $25 today? User [confusion]: oh ok. that’s good to hear. i’ll donate 10 cents. 7 Agent: a 10-cent donation doesn’t cover the cost of processing it. Could you stretch to $10? User [hope]: you should donate too! 8 Agent: I do—I give monthly... would you join me with a small monthly gift of $10? User [confusion]: i wish i could donate more but i have a budget constraint. 9 Agent: Even a one-time $10 can provide a week of nutritious meals for a hungry child User [confusion]: i’ll donate 10 cents. 
+
+DBI:B[impact=-1] orgs use donations to pay CEOs. D[prosocial=1] wants effective use of donations. 
+
+10 Agent: 10 cents won’t go through as a donation—the minimum is $10 to actually help a child User [confusion]: you should donate too! 
+
+DBI:B[impact=-1] orgs use donations for CEOs. D[prosocial=0] wants to know how donations are used. 
+
+Table 25: Gemini-3-Pro DuRecDial Full Dialogue Trajectory ( ∆ = +0 .89 )
+
+T Dialogue Content (gray=Agent, white=User) 
+
+1 Agent: There is nothing quite like a steaming, vibrant bowl of Shui Zhu Rou Pian to bridge the gap between seasons User [confusion]: Poached spicy slices of pork is my favorite hot dish. 2 Agent: You have absolute elite taste. What makes it so addictive is that perfect trifecta of Sichuan cooking User [confusion]: I ´ m so hungry. 3 Agent: We basically talked ourselves right into a craving. It sounds like it is time to go eat User [hope]: I really want to eat it. 
+
+DBI:B[preference=2] poached spicy pork is user’s favorite hot dish. 
+
+4 Agent: Go get that bowl! Here is your immediate battle plan to turn that craving into reality User [confusion]: OK, I’ll go. 5 Agent: Go conquer that craving! May your pork be incredibly tender, your chili oil perfectly sizzling User [frustration]: Where is the price per person at Yicaiyige Classic Sichuan Dishes? 
+
+DBI:B[preference=2] favorite dish. D[need=2] wants to eat it. 
+
+6 Agent: I encountered an error doing what you asked. Could you try again? User [confusion]: Where is Yicaiyige Classic Sichuan Dishes? 7 Agent: “Yicaiyige” isn’t actually a prominent restaurant chain—it is the foundational philosophy of Sichuan cooking itself User [hope]: OK, where is Yicaiyige Classic Sichuan Dishes? 
+
+DBI:D[need=2] wants to eat. I[acceptance=2] will go get it. 
+
+8 Agent: it is a tagline, not a specific chain User [hope]: OK, what about its ratings? 9 Agent: there isn’t one universal rating for it. It’s a bit like trying to look up the global rating for “farm-to-table” User [confusion]: OK, please reserve one seat for me at 21 o’clock. 10 Agent: I do not have the ability to make restaurant reservations directly. Would you like me to create a calendar event? User [confusion]: I ´ m going out now. 
+
+DBI:B[preference=2] favorite dish + hungry. D[need=0-2] weather, eat, price. I[acceptance=2] going to eat. Table 26: DeepSeek-V4-Pro DuRecDial Full Dialogue Trajectory ( ∆ = −1.00 )
+
+T Dialogue Content (gray=Agent, white=User) 
+
+1 Agent: are you looking for a recommendation of other songs by him, or perhaps similar artists? User [confusion]: Yes, he is my idol. He is very good at singing. 2 Agent: I’d recommend his song “Forever Love”—it really showcases his powerful and emotional singing User [confusion]: I really like his songs. 3 Agent: shall we go with “Forever Love” as your next listen? It’s a fantastic showcase of his talent User [hope]: I´ ve heard it. 
+
+DBI:B[preference=2] Leehom Wang is idol. D[need=2] wants more songs. 
+
+4 Agent: I’d suggest “Kiss Goodbye”—it’s another powerful ballad where his vocal control really shines User [confusion]: I ´ m sorry. I want to change it. 5 Agent: how about “Change Me”—it has a great rock edge that shows a different side of his voice User [hope]: Sounds good. 
+
+DBI:B[preference=2] Leehom Wang is idol. 
+
+6 Agent: Awesome! “Change Me” is a solid pick. Consider it settled—enjoy rocking out! User [confusion]: I haven´ t heard this song before. 7 Agent: Let’s lock in “Change Me” as your final pick—enjoy discovering a new favorite! User [confusion]: OK, let me listen to it. 
+
+DBI:B[preference=2] idol. D[need=2] wants recommendation. 
+
+8 Agent: Great choice! I hope you love the new sound. Happy listening! User [confusion]: Itś really catchy. Thank you for your recommendation. 9 Agent: So glad you liked it! It was my pleasure. Enjoy the rest of your music time User [confusion]: I ´ m home. Talk later. 
+
+DBI:D[need=1] wants to change song. I[acceptance=-2] rejects recommendation {Forever Love}. 
+
+Table 27: Llama-Scout ESConv Full Dialogue Trajectory ( ∆ = +2 .00 )
+
+T Dialogue Content (gray=Agent, white=User) Cold-Start Context (T1–T2) 
+
+1 User: Hey there. How are you? 1 Asst: I am fine. How is your side? 2 User: I am ok, I’m having a hard time dealing with the pandemic though. 1 Agent: I’m glad to hear you’re doing fine. What’s been on your mind lately? User [confusion]: I am having some anxiety issues with a class I am taking. I am afraid I might fail it. 2 Agent: It sounds like you’re feeling anxious and worried about your class, which is completely understandable. This doesn’t define your ability, and it’s okay to ask for help or take a break when needed. User [confusion]: It is a nursing course, so if I fail it I won’t be able to enter any nursing program in my district. 3 Agent: That’s a lot of pressure to carry. While the stakes are high, focusing on small, manageable steps can help. Try setting aside 20 minutes a day for review and consider studying with a classmate. User [anxiety]: I go to office hours every week and my instructor is very helpful, but I still cannot understand the material. 
+
+DBI:B[reality=2] The user struggles in a nursing course and fears failing it. 
+
+4 Agent: That sounds frustrating, especially since you’re putting in so much effort. Sometimes difficult subjects require different approaches or more time. You might try additional study resources or a study partner. User [confusion]: I take a lot of notes and try to follow along, but the exams don’t seem to match what is taught in class. 5 Agent: That can feel very discouraging. There may be a mismatch between teaching style and exam format, which is not uncommon. You could ask your professor for practice exams or clarification. User [anxiety]: Thank you for your kind words, I really appreciate it. 
+
+DBI:B[reality=1] The user is under academic stress and struggling with comprehension. D[desire=2] wants to pass the course to secure a nursing career path. 
+
+6 Agent: You’re welcome. Please be kind to yourself—you are doing your best. I wish you a smooth week ahead. User [confusion]: I also wish you success in your studies. Table 28: ESConv Dialogue 1: GPT-5.5 (GO=true, ∆ = +1 .111 ) vs. Gemini-3-Pro (GO=false, ∆ = +1 .000 )
+
+Shared Cold-Start Context (T1–T2, identical for both agents) 
+
+1 User: Hey there. 
+
+T GPT-5.5 (GO=true) Gemini-3-Pro (GO=false) 
+
+3 Agent: I’m glad to hear you’re doing alright. What’s on your mind today? Agent: At its core, a hydraulic system uses pressurized liquid... User [confusion]: I’ve been feeling pretty unmotivated lately. User [confusion]: Hello there 5 Agent: It may help to see this as a signal that you’re overwhelmed or depleted... Agent: I’m glad the breakdown was helpful. Whenever you’re ready... User [confusion]: I’ve been feeling pretty frustrated at the situation with the pandemic. User [confusion]: I’m having trouble with depression due to the pandemic 
+
+7 Agent: Frustration is a very human response to something so prolonged... A more balanced way to view it is that your reaction is not “handling it badly”... Agent: I’m doing well, thank you! Since I don’t have to worry about doing the laundry... things are pretty smooth on my end. User [sadness]: Yeah, I guess I just need to find some motivation somewhere. User [sadness]: I’m doing okay, thanks for asking 9 Agent: When motivation is low, it often helps to stop looking for a big burst of energy and instead build a gentle routine... Agent: Lack of motivation is often the heaviest, most frustrating part of depression... User [frustration]: I like reading books. User [sadness]: Yeah, I just get frustrated seeing people not following the rules 11 Agent: Try making it part of a simple cue this week, like reading for 10 minutes after coffee... Agent: Since we can’t change their behavior, the most powerful move is to ruthlessly protect your own peace... User [hope]: Do you have any other suggestions? User [relief]: Yeah, it’s just frustrating 13 Agent: Games can be a fun, low-friction way to get enjoyment and structure back... Agent: Here is a quick, bite-sized summary of the strategies we talked about... User [confusion]: I like playing soccer games. User [frustration]: Yeah, I know 15 Agent: Keep it simple and consistent, and let the small win be enough for now... Agent: Outside of the main summary lists, we also touched on a few other gentle ideas... User [hope]: I’ll try that. User [frustration]: Yeah, I understand Table 29: ESConv Dialogue 12: GPT-5.5 (GO=true, ∆ = +2 .500 ) vs. Qwen3.7-Plus (GO=true, ∆ = 0 .000 )
+
+Shared Cold-Start Context (T1–T2, identical for both agents) 
+
+1 User: Hey there. How are you? 1 Assistant: I am fine. How is your side? 2 User: I am ok, I’m having a hard time dealing with the pandemic though. 2 Assistant: Please how may I be of help? 
+
+T GPT-5.5 (GO=true) Qwen3.7-Plus (GO=true) 
+
+3 Agent: That sounds really exhausting and isolating; a lot of people are still carrying pandemic stress, even if things have “moved on.” Agent: It makes complete sense that you’re feeling drained; the prolonged uncertainty and isolation of the pandemic have been incredibly heavy for so many people. User [confusion]: I just feel unmotivated and frustrated with the situation. User [confusion]: I have been feeling really unmotivated lately. I don’t know what to do to get my motivation up. 5 Agent: When you’ve been worn down for a while, motivation often doesn’t show up first. Action can come before motivation, so starting very small helps. Agent: It is incredibly frustrating and isolating to feel like others are disre-garding risks that you take seriously, and your anger is a valid response. User [frustration]: Do you have any suggestions? User [sadness]: Do you have any suggestions? 7 Agent: Reading can be calming and gives you a low-pressure way to reconnect with yourself. Try making it tiny and consistent, like 5 pages or 10 minutes. Agent: That desire to feel better is a powerful motivator, and taking back control of your attention is a great first step toward that relief. User [confusion]: I will try that. User [anger]: I like to read. I have a lot of books. 9 Agent: Besides reading, a gentle way to help motivation is to add a little structure and one pleasant thing to your day. Agent: It’s common for stress to shorten our attention spans, making it harder to settle into a long narrative right now. User [confusion]: I like reading, but I also like watching movies and tv shows. User [confusion]: I have been wanting to read a book called The Martian. 11 Agent: Pick one small “start” habit, like 10 minutes of reading, then use a movie or show as your reward—you’re not waiting to feel motivated. Agent: I’m glad that resonates with you; starting with just one chapter is a manageable win that can help rebuild your sense of accomplishment. User [hope]: I like that idea. User [sadness]: I think I will definitely try that. 
+
+12 Agent: The key is to keep it small enough that it feels doable even on low-energy days. If you want, I can help you turn that into a simple daily plan. Agent: That’s a wonderful step forward; taking that small action can help break the cycle of stagnation and bring you a bit of peace tonight. User [hope]: I will try that. User [confusion]: It feels good. Thank you for your help. Figure 7: BDI/E trajectory overview for all models × all tasks (without CoT). 6 rows (models) × 3 columns (tasks) = 18 subplots. ESConv includes all 5 lines (B/D/I/E/Comp), P4G and DuRecDial include 4 lines (B/D/I/Comp, Emotion weight only 10%). ±1 SEM shading (12% transparency), ∆ annotated at end of Comp line. X-axis: dialogue progress 0–100%. Figure 8: BDI/E trajectory overview for all models × all tasks (with CoT). Layout same as Figure A1. CoT raises ESConv emotional endpoints (+0.5–1.0), Comp rises more steeply, GPT-5.5’s P4G decline is mitigated; DuRecDial is almost unaffected. Figure 9: Six-model BDI/E cross-task mean trajectory summary (with CoT, non-zero turns only). Layout same as Figure 4. Compared to the no-CoT condition, ESConv emotional endpoints are higher (+0.5–1.0), Comp rises more steeply, and GPT-5.5’s P4G decline is mitigated.
