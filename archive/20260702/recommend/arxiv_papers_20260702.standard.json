@@ -1,0 +1,54 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-02T21:50:03.204147+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 1,
+    "deep_cap": 6,
+    "deep_selected": 1,
+    "quick_candidates": 0,
+    "quick_skim_target": 11,
+    "quick_selected": 0
+  },
+  "deep_dive": [
+    {
+      "id": "2607.00483v1",
+      "source": "arxiv",
+      "title": "VLM-AR3L: Vision-Language Models for Absolute and Relative Rewards in Reinforcement Learning",
+      "abstract": "Designing effective reward functions remains a major challenge in reinforcement learning (RL), particularly in open-ended environments where task goals are abstract and difficult to quantify. In this work, we present VLM-AR3L, a framework that leverages Vision-Language Models (VLMs) to provide both absolute and relative rewards for RL. VLM-AR3L interprets an agent's visual observations in the context of a natural language task goal, and learns both absolute and relative rewards from VLM-generated preference labels. The absolute reward model predicts scalar evaluations for individual states, while the relative reward model compares consecutive observations to infer progress or regression toward the task goal. Their integration combines the stability of state-based evaluation with the robustness of comparative supervision. We evaluate VLM-AR3L across benchmarks spanning classic control, manipulation, and open-world embodied tasks, with a particular focus on Minecraft given its visual complexity and long-horizon decision-making requirements. Experimental results show that VLM-AR3L consistently outperforms prior VLM-based reward learning methods.",
+      "authors": [
+        "Kuan-Chen Chen",
+        "Winston Chen",
+        "Wei-Fang Sun",
+        "Min-Chun Hu"
+      ],
+      "primary_category": "cs.RO",
+      "categories": [
+        "cs.RO"
+      ],
+      "published": "2026-07-01T06:11:59+00:00",
+      "link": "https://arxiv.org/pdf/2607.00483v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "VLM-based absolute and relative reward functions for RL",
+      "llm_evidence_cn": "基于VLM的绝对和相对奖励函数设计",
+      "llm_evidence": "基于VLM的绝对和相对奖励函数设计",
+      "canonical_evidence": "基于VLM的绝对和相对奖励函数设计",
+      "llm_tldr_en": "Presents VLM-AR3L that leverages Vision-Language Models to provide both absolute and relative rewards for reinforcement learning in open-ended environments, significantly improving sample efficiency.",
+      "llm_tldr_cn": "强化学习中奖励函数设计困难，尤其在开放式环境。本文提出VLM-AR3L框架，利用视觉语言模型根据自然语言目标解释智能体视觉观察，学习绝对和相对奖励。绝对奖励评估单状态，相对奖励比较连续观察。两者结合在模拟机器人任务上显著提升学习效率和最终性能。",
+      "llm_tldr": "强化学习中奖励函数设计困难，尤其在开放式环境。本文提出VLM-AR3L框架，利用视觉语言模型根据自然语言目标解释智能体视觉观察，学习绝对和相对奖励。绝对奖励评估单状态，相对奖励比较连续观察。两者结合在模拟机器人任务上显著提升学习效率和最终性能。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "design of reward functions in RL",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": []
+}

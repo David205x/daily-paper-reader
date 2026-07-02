@@ -1,6 +1,9 @@
 * <a class="dpr-sidebar-root-link" href="#/">首页</a>
 * <a class="dpr-sidebar-root-link dpr-sidebar-noactive-link" href="javascript:void(0)" data-dpr-hash="#/tutorial/README">使用教程</a>
 * Daily Papers
+  * 2026-07-02 <!--dpr-date:20260702-->
+    * 精读区
+      * <a class="dpr-sidebar-item-link dpr-sidebar-item-structured" href="#/202607/02/2607.00483v1-vlm-ar3l-vision-language-models-for-absolute-and-relative-rewards-in-reinforcement-learning" data-sidebar-item="{&quot;title&quot;: &quot;VLM-AR3L: Vision-Language Models for Absolute and Relative Rewards in Reinforcement Learning&quot;, &quot;link&quot;: &quot;https://arxiv.org/abs/2607.00483v1-vlm-ar3l-vision-language-models-for-absolute-and-relative-rewards-in-reinforcement-learning&quot;, &quot;score&quot;: &quot;9.0&quot;, &quot;tags&quot;: [{&quot;kind&quot;: &quot;query&quot;, &quot;label&quot;: &quot;rl&quot;}], &quot;evidence&quot;: &quot;基于VLM的绝对和相对奖励函数设计&quot;}">VLM-AR3L: Vision-Language Models for Absolute and Relative Rewards in Reinforcement Learning</a>
   * 2026-07-01 <!--dpr-date:20260701-->
     * 精读区
       * <a class="dpr-sidebar-item-link dpr-sidebar-item-structured" href="#/202607/01/2606.29745v1-echo-learning-epistemically-adaptive-language-agents-with-turn-level-credit" data-sidebar-item="{&quot;title&quot;: &quot;ECHO: Learning Epistemically Adaptive Language Agents with Turn-Level Credit&quot;, &quot;link&quot;: &quot;https://arxiv.org/abs/2606.29745v1-echo-learning-epistemically-adaptive-language-agents-with-turn-level-credit&quot;, &quot;score&quot;: &quot;9.0&quot;, &quot;tags&quot;: [{&quot;kind&quot;: &quot;query&quot;, &quot;label&quot;: &quot;rl&quot;}], &quot;evidence&quot;: &quot;基于信念状态的多轮强化学习自适应语言智能体&quot;}">ECHO: Learning Epistemically Adaptive Language Agents with Turn-Level Credit</a>

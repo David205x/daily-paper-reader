@@ -1,0 +1,24 @@
+{
+  "label": "2026-07-02",
+  "date": "2026-07-02",
+  "generated_at": "2026-07-02T21:51:25",
+  "count": 1,
+  "papers": [
+    {
+      "paper_id": "202607/02/2607.00483v1-vlm-ar3l-vision-language-models-for-absolute-and-relative-rewards-in-reinforcement-learning",
+      "section": "deep",
+      "title_en": "VLM-AR3L: Vision-Language Models for Absolute and Relative Rewards in Reinforcement Learning",
+      "authors": "Kuan-Chen Chen, Winston Chen, Wei-Fang Sun, Min-Chun Hu",
+      "date": "2026-07-01",
+      "pdf": "https://arxiv.org/pdf/2607.00483v1",
+      "score": "9.0",
+      "evidence": "基于VLM的绝对和相对奖励函数设计",
+      "tldr": "强化学习中奖励函数设计是一大挑战，尤其在任务目标抽象的开放环境。VLM-AR3L框架利用视觉语言模型从偏好标签中学习两种奖励：绝对奖励评估单状态，相对奖励比较连续观察以判断进度。两者结合兼顾稳定性与比较监督的鲁棒性。在经典控制、操作和开放世界任务上，尤其是Minecraft，该方法超越先前基于VLM的奖励学习方法，展示了其在复杂视觉和长时域决策中的有效性。",
+      "tags": "query:rl",
+      "abstract_en": "Designing effective reward functions remains a major challenge in reinforcement learning (RL), particularly in open-ended environments where task goals are abstract and difficult to quantify. In this work, we present VLM-AR3L, a framework that leverages Vision-Language Models (VLMs) to provide both absolute and relative rewards for RL. VLM-AR3L interprets an agent's visual observations in the context of a natural language task goal, and learns both absolute and relative rewards from VLM-generated preference labels. The absolute reward model predicts scalar evaluations for individual states, while the relative reward model compares consecutive observations to infer progress or regression toward the task goal. Their integration combines the stability of state-based evaluation with the robustness of comparative supervision. We evaluate VLM-AR3L across benchmarks spanning classic control, manipulation, and open-world embodied tasks, with a particular focus on Minecraft given its visual complexity and long-horizon decision-making requirements. Experimental results show that VLM-AR3L consistently outperforms prior VLM-based reward learning methods.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}
