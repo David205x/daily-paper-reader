@@ -1,0 +1,93 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-04T21:24:16.141607+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 1,
+    "deep_cap": 6,
+    "deep_selected": 1,
+    "quick_candidates": 1,
+    "quick_skim_target": 11,
+    "quick_selected": 1
+  },
+  "deep_dive": [
+    {
+      "id": "2606.29354v1",
+      "source": "arxiv",
+      "title": "When LLMs Develop Languages: Symbolic Communication for Efficient Multi-Agent Reasoning",
+      "abstract": "Chain-of-Thought (CoT) improves large language models (LLMs) on difficult reasoning tasks, but it often incurs long natural-language rationales that are poorly aligned with efficient machine reasoning. We propose Communicative Language Symbolism Routing (CLSR), a test-time framework in which multiple LLM agents autonomously invent, evolve, and share compact Language Symbolism Frameworks (LSFs), while a latent-free router adaptively selects and composes these languages per query to optimize the accuracy-token trade-off. Unlike prompt optimization that refines surface instructions, CLSR treats each LSF as a reusable symbolic protocol with compact symbols, usage rules, and a message-passing contract, and improves it through an evolutionary loop driven by correctness and token cost. At inference time, the router may invoke a single low-cost LSF call, ensemble multiple LSFs, or execute a multi-round LSF composition protocol on harder queries. Across challenging benchmarks, CLSR reduces latency-oriented generated token completion by $3\\sim 6\\times$ compared to standard CoT while maintaining accuracy. We further derive an information-theoretic lower bound on token cost under arbitrary symbolism and show that, under an interpreter-realizability premise, multi-round LSF protocols conditionally subsume program-execution pipelines. Code is publicly available (https://github.com/pzqpzq/LSF_MDia).",
+      "authors": [
+        "Zhengqi Pei",
+        "Qingming Huang",
+        "Shuhui Wang"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI",
+        "cs.NE"
+      ],
+      "published": "2026-06-28T12:02:42+00:00",
+      "link": "https://arxiv.org/pdf/2606.29354v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "multi-agent LLM reasoning via symbolic communication for task automation",
+      "llm_evidence_cn": "通过符号通信实现多智能体LLM推理用于任务自动化",
+      "llm_evidence": "通过符号通信实现多智能体LLM推理用于任务自动化",
+      "canonical_evidence": "通过符号通信实现多智能体LLM推理用于任务自动化",
+      "llm_tldr_en": "Proposes CLSR framework where LLM agents autonomously invent and evolve symbolic languages for efficient multi-agent reasoning, optimizing accuracy-token trade-off.",
+      "llm_tldr_cn": "本文针对链式思维推理中自然语言冗长且不适于机器高效推理的问题，提出通信性语言符号路由（CLSR）框架。该框架允许多个LLM代理自主发明、演化并共享紧凑的符号语言框架，并通过潜在自由路由器根据查询自适应选择组合这些语言，从而优化准确率与令牌消耗的折中。实验显示，CLSR在保持甚至提升推理准确率的同时大幅减少了令牌使用，为多智能体高效推理提供了新范式。",
+      "llm_tldr": "本文针对链式思维推理中自然语言冗长且不适于机器高效推理的问题，提出通信性语言符号路由（CLSR）框架。该框架允许多个LLM代理自主发明、演化并共享紧凑的符号语言框架，并通过潜在自由路由器根据查询自适应选择组合这些语言，从而优化准确率与令牌消耗的折中。实验显示，CLSR在保持甚至提升推理准确率的同时大幅减少了令牌使用，为多智能体高效推理提供了新范式。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2606.28943v1",
+      "source": "arxiv",
+      "title": "A3M: Adaptive, Adversarial and Multi-Objective Learning for Strategic Bidding in Repeated Auctions",
+      "abstract": "Learning to bid in repeated multi-unit auctions with bandit feedback poses a fundamental challenge. Existing methods often rely on rigid explore-then-exploit schedules, assume stationary adversaries, and optimize solely for bidder utility, thereby limiting adaptability and strategic robustness. To address these limitations, we introduce the A3M framework, which integrates adaptive deep reinforcement learning (DRL), explicit adversarial reasoning, and principled multi-objective reward design for online auction strategy optimization. A3M employs an actor-critic DRL backbone to dynamically balance exploration and exploitation, an opponent model for fictitious play against non-stationary adversaries, and a composite reward function to jointly maximize utility, auctioneer revenue, and fairness. We provide the first comprehensive empirical evaluation of this integrated approach against established baselines in both discriminatory and uniform price auctions. Results show that A3M reduces final regret by 30--40\\% in standard settings, maintains robust performance against adversarial strategy shifts, scales favorably with the number of units $K$, and enables tunable multi-objective trade-offs. An extensive ablation study confirms the necessity of each core component. Our work establishes A3M as a powerful and flexible framework for learning in complex auction environments.",
+      "authors": [
+        "Junhan Li",
+        "Yuxin Zhang",
+        "Haoran Wang",
+        "Minghao Chen"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.LG"
+      ],
+      "published": "2026-06-27T14:30:43+00:00",
+      "link": "https://arxiv.org/pdf/2606.28943v1",
+      "tags": [
+        "keyword:rl"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "adaptive deep RL with multi-objective reward design for auction bidding",
+      "llm_evidence_cn": "自适应深度强化学习与多目标奖励设计用于拍卖出价",
+      "llm_evidence": "自适应深度强化学习与多目标奖励设计用于拍卖出价",
+      "canonical_evidence": "自适应深度强化学习与多目标奖励设计用于拍卖出价",
+      "llm_tldr_en": "Integrates adaptive DRL, adversarial reasoning, and composite reward design for online auction bidding, demonstrating transferable reward design methodology.",
+      "llm_tldr_cn": "本文针对重复拍卖中现有方法依赖固定探索调度、假设平稳对手且仅优化单一效用的问题，提出自适应、对抗和多目标学习（A3M）框架。该框架以演员-评论家DRL为骨干动态平衡探索与利用，采用对手模型进行虚拟博弈，并设计复合奖励函数实现多目标优化。实验表明A3M在动态和对抗性拍卖环境中显著优于基线方法，展示了RL奖励设计的通用性。",
+      "llm_tldr": "本文针对重复拍卖中现有方法依赖固定探索调度、假设平稳对手且仅优化单一效用的问题，提出自适应、对抗和多目标学习（A3M）框架。该框架以演员-评论家DRL为骨干动态平衡探索与利用，采用对手模型进行虚拟博弈，并设计复合奖励函数实现多目标优化。实验表明A3M在动态和对抗性拍卖环境中显著优于基线方法，展示了RL奖励设计的通用性。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "design of reward functions in RL",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}

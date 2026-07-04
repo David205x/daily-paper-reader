@@ -6,46 +6,28 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-07-03
-- 运行时间：2026-07-03 21:51:15 UTC
+- 最新运行日期：2026-07-04
+- 运行时间：2026-07-04 21:27:31 UTC
 - 运行状态：成功
-- 本次总论文数：8
-- 精读区：5
-- 速读区：3
+- 本次总论文数：2
+- 精读区：1
+- 速读区：1
 
 ### 今日简报（AI）
-今日精选8篇论文，重点解读视觉语言模型赋能强化学习奖励设计与LLM置信度校准两大方向。  
-两篇高分精读分别提出VLM-AR3L（融合绝对/相对奖励的强化学习框架）和Scaling with Confidence（自适应测试时扩展的置信度校准方法）。  
-建议关注这些方法如何提升AI系统的安全性与推理效率，适合对RL、LLM优化感兴趣的读者深入阅读。
-- 详情：[/202607/03/README](/202607/03/README)
+今日聚焦：多智能体推理中的符号语言演化与拍卖竞价策略研究  
+最值得关注：LLM能自发形成高效符号语言用于多智能体推理（分数8.0），为协作AI提供新思路  
+建议读者优先精读LLM语言演化论文，其结论对理解AI自主通信机制有启发
+- 详情：[/202607/04/README](/202607/04/README)
 
 ### 精读区论文标签
-1. [VLM-AR3L: Vision-Language Models for Absolute and Relative Rewards in Reinforcement Learning](/202607/03/2607.00483v2-vlm-ar3l-vision-language-models-for-absolute-and-relative-rewards-in-reinforcement-learning)  
-   标签：评分：9.0/10、query:rl
-   evidence：基于视觉语言模型的绝对和相对奖励设计
-2. [Scaling with Confidence: Calibrating Confidence of LLMs for Adaptive Test Time Scaling](/202607/03/2607.01612v1-scaling-with-confidence-calibrating-confidence-of-llms-for-adaptive-test-time-scaling)  
-   标签：评分：9.0/10、query:rl
-   evidence：面向LLM置信度校准的RL奖励设计
-3. [CoRe: Combined Rewards with Vision-Language Model Feedback for Preference-Aligned Reinforcement Learning](/202607/03/2607.01721v1-core-combined-rewards-with-vision-language-model-feedback-for-preference-aligned-reinforcement-learning)  
-   标签：评分：9.0/10、query:rl
-   evidence：提出CoRe混合框架，结合形式化奖励和残差奖励以及视觉语言模型反馈用于强化学习
-4. [Evidence-State Rewards for Long-Context Reasoning](/202607/03/2607.02073v1-evidence-state-rewards-for-long-context-reasoning)  
-   标签：评分：9.0/10、query:rl
-   evidence：长上下文推理中的强化学习奖励设计
-5. [Multi-Objective Exploration and Preference Optimization via Mutual Information](/202607/03/2607.01392v1-multi-objective-exploration-and-preference-optimization-via-mutual-information)  
+1. [When LLMs Develop Languages: Symbolic Communication for Efficient Multi-Agent Reasoning](/202607/04/2606.29354v1-when-llms-develop-languages-symbolic-communication-for-efficient-multi-agent-reasoning)  
    标签：评分：8.0/10、query:rl
-   evidence：基于互信息的多元偏好优化用于LLM对齐
+   evidence：通过符号通信实现多智能体LLM推理用于任务自动化
 
 ### 速读区论文标签
-1. [Neuron-Aware Data Selection for Annotation-Free LLM Self-Distillation](/202607/03/2607.02460v1-neuron-aware-data-selection-for-annotation-free-llm-self-distillation)  
-   标签：评分：7.0/10、query:rl
-   evidence：基于奖励的在线RL用于LLM自蒸馏
-2. [Agent Safety Is Action Alignment](/202607/03/2606.28739v1-agent-safety-is-action-alignment)  
+1. [A3M: Adaptive, Adversarial and Multi-Objective Learning for Strategic Bidding in Repeated Auctions](/202607/04/2606.28943v1-a3m-adaptive-adversarial-and-multi-objective-learning-for-strategic-bidding-in-repeated-auctions)  
    标签：评分：6.0/10、query:rl
-   evidence：在LLM智能体任务自动化的背景下讨论智能体安全，提出行动对齐
-3. [Inverse reinforcement learning reveals action-oriented value signals in naturalistic decision making](/202607/03/biorxiv-10-64898-2026-06-24-733779-v1-inverse-reinforcement-learning-reveals-action-oriented-value-signals-in-naturalistic-decision-making)  
-   标签：评分：6.0/10、query:rl
-   evidence：逆强化学习用于推断奖励函数
+   evidence：自适应深度强化学习与多目标奖励设计用于拍卖出价
 
 
 <div class="dpr-home-promo-card">

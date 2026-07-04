@@ -1,0 +1,738 @@
+Title: A3M: Adaptive, Adversarial and Multi-Objective Learning for Strategic Bidding in Repeated Auctions
+
+URL Source: https://arxiv.org/pdf/2606.28943v1
+
+Published Time: Tue, 30 Jun 2026 00:45:32 GMT
+
+Number of Pages: 23
+
+Markdown Content:
+# A3M: Adaptive, Adversarial and Multi-Objective Learning for Strategic Bidding in Repeated Auctions 
+
+Junhan Li 
+
+Department of Computer Science Nanjing University 
+
+Yuxin Zhang 
+
+Department of Computer Science Nanjing University 
+
+Haoran Wang 
+
+Department of Computer Science Nanjing University 
+
+Minghao Chen 
+
+Department of Computer Science Nanjing University 
+
+## Abstract 
+
+Learning to bid in repeated multi-unit auctions with bandit feedback poses a fun-damental challenge. Existing methods often rely on rigid explore-then-exploit schedules, assume stationary adversaries, and optimize solely for bidder utility, thereby limiting adaptability and strategic robustness. To address these limitations, we introduce the A3M framework, which integrates adaptive deep reinforcement learning (DRL), explicit adversarial reasoning, and principled multi-objective re-ward design for online auction strategy optimization. A3M employs an actor-critic DRL backbone to dynamically balance exploration and exploitation, an opponent model for fictitious play against non-stationary adversaries, and a composite reward function to jointly maximize utility, auctioneer revenue, and fairness. We provide the first comprehensive empirical evaluation of this integrated approach against established baselines in both discriminatory and uniform price auctions. Results show that A3M reduces final regret by 30–40% in standard settings, maintains robust performance against adversarial strategy shifts, scales favorably with the number of units K, and enables tunable multi-objective trade-offs. An extensive ablation study confirms the necessity of each core component. Our work estab-lishes A3M as a powerful and flexible framework for learning in complex auction environments. 
+
+## 1 Introduction 
+
+Uniform-price and discriminatory-price auctions are fundamental market mechanisms for allocating multiple identical items, widely used in domains such as electricity markets and treasury bill sales. Both allocate items to the highest bids, but they differ critically in how winning bidders pay, which has prompted extensive theoretical and empirical comparisons of their efficiency, revenue, and strategic properties. In repeated auctions, bidders can refine their strategies over time via online learning—a problem known as learning to bid —where performance is typically measured by regret against the best fixed bid in hindsight. This regret framework offers a principled lens for quantifying and comparing the inherent difficulty of bidding optimally under different auction formats. Prior work on learning in repeated multi-unit auctions has focused largely on settings with adversarial opposing bids. For both uniform and discriminatory auctions, these studies establish worst-case regret rates of ˜O(√T ) under full-information feedback and ˜O(T 2/3) under bandit feedback, which are generally tight. Yet the adversarial setting conflates the intrinsic complexity of the auction mechanism with the strategic complexity of facing adaptive opponents. As a result, a systematic comparison 
+
+> Preprint.
+> arXiv:2606.28943v1 [cs.CL] 27 Jun 2026
+
+Figure 1: Motivation of this work. Repeated auctions exhibit non-stationarity, strategic opponents, and multiple competing objectives, motivating a unified learning framework that is adaptive, adversarial-aware, and multi-objective. of the two auction formats under a stochastic opponent model—which isolates the mechanism’s inherent learning difficulty—remains an open question. This work fills this gap by conducting a comprehensive regret-based comparison of repeated uniform and discriminatory auctions against stochastic opposing bids. Our core methodological contribution is the A3M (Adaptive, Adversarial & Multi-objective) framework, which departs from earlier estimate-then-commit approaches. Inspired by recent advances in reinforcement learning Song et al. [2025a], Qi et al. [2022], Wu et al. [2020], Tian et al. [2025], A3M integrates deep reinforcement learning for adaptive strategy optimization, explicit opponent modeling for adversarial reasoning, and a principled multi-objective reward design. This integrated architecture enables dynamic exploration– exploitation balancing and strategic adaptation beyond stationary i.i.d. assumptions. Our analysis yields several key insights. First, we establish that both auction formats admit tight worst-case regret rates of ˜Θ( √T ) and ˜Θ( T 2/3) under full-information and bandit feedback, respectively, in the stochastic setting. Notably, we provide the first matching lower bound of Ω( T 2/3) for uniform-price auctions under bandit feedback, thereby completing the characterization of worst-case regret scaling. Second, beyond worst-case analysis, we identify and formalize families of instances where the two mechanisms exhibit a separation in achievable regret. For example, when opponents are symmetric and unit-demand, or when their bid distributions are well-separated, the uniform-price auction can achieve ˜O(√T ) regret while the discriminatory auction remains at Ω( T 2/3).Chen et al. [2025a], You et al. [2026], Chen et al. [2025c], Zhang et al. [2026a], Zhao et al. [2026], Huang et al. [2026], Chen et al. [2025b] Empirically, we show that the proposed A3M framework sets a new state-of-the-art adaptive base-line that significantly outperforms prior approaches Qu and Ma [2025], Wu et al. [2024a,b], Lin [2025b,a,c]. It attains lower regret than conventional algorithms in standard stochastic settings, displays stronger robustness against non-stationary adversaries, scales more favorably with the num-ber of units K, and effectively exploits easy instance structures (e.g., ∆-separated distributions). Moreover, building upon these foundational works, A3M’s multi-objective reward design enables tunable trade-offs between bidder utility and auctioneer revenue that extends beyond existing base-lines. An extensive ablation study confirms the critical role of each core module—adaptive learning, adversarial reasoning, and multi-objective design—in the framework’s overall performance.Zhang et al. [2025b,e,c,d,a], Mo et al. [2026], Yu et al. [2026], Zhang et al. [2026b] The remainder of the paper is organized as follows. Section 2 reviews related work. Section 3 presents the A3M framework in detail. Section 4 analyzes learning with bandit feedback, including theoretical results and the A3M baseline. Section 5 extends the analysis beyond worst-case settings. Section 6 provides comprehensive ablation studies. Section 7 presents additional empirical evaluations. We conclude in Section 8. 2Figure 2: Overview of the A3M algorithm architecture. The framework encodes auction states, integrates adaptive learning, adversarial reasoning, and multi-objective optimization, and iteratively updates the bidding policy via online feedback. 
+
+## 2 Related Work 
+
+We review the literature on the simultaneous auction of multiple identical items, a standard model encompassing formats such as uniform-price, discriminatory-price, and Vickrey-Clarke-Groves (VCG) auctions Vickrey [1961], Clarke [1971], Groves [1973], Yang et al. [2025], He et al. [2025], Zhou et al. [2025]. Empirical and theoretical comparisons of these mechanisms have primarily focused on their revenue generation Ausubel et al. [2014], Brenner et al. [2009], Nyborg and Sundaresan [1996], Cao et al. [2025a,b], Xin et al. [2025a] and social welfare performance Krishna [2009], Milgrom [2004], Xin et al. [2025b, 2024], Yu [2025], with significant attention given to symmetric and unit-demand settings Milgrom and Weber [1982], Xiang et al. [2025], Wang et al. [2013], Bai et al. [2025]. The study of repeated auctions has increasingly utilized online learning tools to analyze dynamic strategic behavior Weed et al. [2016], Balseiro and Gur [2019], Wei et al. [2025a], Mu-Jiang-shan et al. [2010], Wang et al. [2011]. Early work in this line focused on the auctioneer’s problem of learning optimal reserve prices Kanoria and Nazerzadeh [2021], Pan et al. [2024], Wang et al. [2012, 2025]. Subsequent research shifted to the bidder’s perspective, introducing and analyzing the problem of learning to bid in various repeated single-item auction formats Han et al. [2024], Feng et al. [2018], Amin et al. [2013], Yan et al. [2025], Niu et al. [2024a], Wang et al. [2024b]. Building upon these foundations, recent work has extended online learning to federated and privacy-preserving settings Wu et al. [2022, 2024c], Wang et al. [2023], Zhang et al. [2025f], Niu et al. [2024b]. The problem of learning to bid in repeated multi-unit auctions is a more recent development. Initial results were provided for uniform-price auctions by Golrezaei et al. [2021], Yu et al. [2025], Bi et al. [2025]. For discriminatory auctions, Badanidiyuru et al. [2021], Xu et al. [2025], Han et al. [2025] established regret rates of ˜O(K√T ) and ˜O(KT 2/3) under full-information and bandit feedback, respectively. Extending these baselines with modern deep learning techniques, recent advances in transformer architectures and learning technologies Song et al. [2025b], Wu et al. [2024b], Wei et al. [2025b], You et al. [2025] have opened new avenues for sequence modeling in strategic settings that achieve better sample complexity and adaptive performance. In particular, patch-based Transformer encoders with explicit channel–time attention have been shown to improve long-horizon modeling by capturing both temporal dependencies and inter-variable (inter-channel) correlations in multivariate sequences. In the full-information setting for uniform-price auctions, recent work Balseiro et al. [2017], Wang [2025, 2024] derived a ˜O(K3/2√T ) regret bound, alongside sub-optimal bandit results. For the bandit setting under a Last Accepted Bid (LAB) pricing rule, Ai et al. [2022], Wang and Sayil [2024], Deng [2025] proposed an algorithm achieving ˜O(K4/3T 2/3) regret and proved this rate to be tight for the LAB rule; however, a matching lower bound for the standard First Rejected Bid (FRB) rule remains an open question. In a related setting with return-on-investment constraints, prior work obtained a regret bound of ˜O(K5/3T 2/3) for uniform-price auctions. 33 The A3M Framework 
+
+We propose the A3M framework, a paradigm shift from the conventional estimate-then-optimize approach for repeated auctions. A3M integrates deep reinforcement learning (DRL) for adaptive online strategy optimization, adversarial reasoning via population game dynamics, and a principled multi-objective reward design aligned with broader mechanism design goals. This section details its core components. 
+
+3.1 Model Reformulation and Structured Policy Representation 
+
+We reformulate the learner’s problem as follows. At each round t, the learner observes a state st ∈ S ,encoding relevant history. Specifically, st = ( ht, ξ t), where ht is a compressed representation of past bids, allocations, and payments (e.g., via an LSTM or moving averages), and ξt denotes exogenous context (e.g., market index; included for generality but unused in the baseline). Instead of directly outputting a K-dimensional vector bt, the policy πθ parameterizes a bidding function ϕ(·; ψt) : [ K] → [0 , 1] . For item k, the bid is btk = ϕ(k; ψt). Parameters ψt ∈ Rd are generated by a neural network (the actor ) conditioned on the state: ψt = f actor θ (st). This structured representation enforces inductive biases such as smoothness in k and enhances interpretability, as ϕ
+
+can be visualized. The actor and bidding formulations are given by: Actor: ψt = fθ (st), (1) Bidding: btk = ϕ(k; ψt), ∀k ∈ [K]. (2) Common choices for ϕ include monotonic neural networks or piecewise-linear functions, which satisfy the non-increasing bid constraint ( btk ≥ btk+1 ) by construction. 
+
+3.2 Adversarial Reasoning via Opponent Modeling 
+
+To reason about the adversary’s evolving behavior, A3M maintains an explicit opponent model. The repeated auction is conceptualized as a game between the learner (policy πθ ) and a population of opponents, with aggregate behavior characterized by a distribution Pϕ(β|zt). Here, zt ∈ Z is a latent state representing the current “population strategy,” and ϕ denotes learnable parameters of the opponent model. After observing the adversary’s bid vector βt (full-info) or partial feedback ωt (bandit), we update the latent state: 
+
+zt+1 = gϕ(zt, βt or ωt, bt). (3) The function gϕ can be a recurrent network. In the bandit setting, ωt is the observed allocation and price vector, and an inference network estimates a posterior over βt.The learner’s policy is optimized against the best-response to the current estimated opponent model, not merely the historical average. The objective becomes: 
+
+max  
+
+> θ
+
+Eβ∼Pϕ(·| zt),b∼πθ (·| st) [R(b, β; λ)] , (4) where R is the multi-objective reward defined below. This induces a form of fictitious play Brown [1951], Heinrich et al. [2015], driving the system toward a Nash equilibrium in policy space. 
+
+3.3 Multi-Objective Reward Design 
+
+A3M’s core innovation replaces single-dimensional utility with a composite reward signal reflecting mechanism design desiderata. The per-round reward is defined as: 
+
+R(b, β; λ) := λu · u(b, β)
+
+| {z }
+
+> Efficiency (Bidder Utility)
+
++ λr · Rev (b, β)
+
+| {z }
+
+> Auctioneer Revenue
+
+− λf · L fair (b, β)
+
+| {z }
+
+> Fairness Penalty
+
+. (5) The components are as follows. The Bidder Utility is u(b, β) = Px(b,β) 
+
+> l=1
+
+[vl − p(b, β)( l)] ,as originally defined. The Auctioneer Revenue is Rev (b, β) = PKl=1 p(b, β)( l) ·
+
+4Algorithm 1 The A3M Algorithm (Bandit Feedback Setting) 
+
+Require: Time horizon T , discount factor γ, reward weights λ, actor network fθ , critic network Vξ ,opponent model gϕ. 
+
+> 1:
+
+Initialize parameters θ, ξ, ϕ , replay buffer B, latent state z1. 
+
+> 2:
+
+for t = 1 to T do  
+
+> 3:
+
+Observe state st (computed from history ht).  
+
+> 4:
+
+Actor: Generate bidding parameters ψt = fθ (st), form bids bt via Eq. 2.  
+
+> 5:
+
+Submit bid bt, observe allocation xt and price vector pt. 
+
+> 6:
+
+Reward: Compute composite reward Rt using Eq. 5. ▷ Multi-Objective Core  
+
+> 7:
+
+Infer & Update Opponent Model: Estimate posterior ˆβt from (xt, pt, bt). Update zt+1 =
+
+gϕ(zt, ˆβt, bt). ▷ Adversarial Reasoning  
+
+> 8:
+
+Observe new state st+1 . 
+
+> 9:
+
+Store transition (st, bt, R t, s t+1 ) in B. 
+
+> 10:
+
+if It’s time to update then  
+
+> 11:
+
+Sample batch from B. 
+
+> 12:
+
+Critic Update: Minimize ∥Rt + γV ξ (st+1 ) − Vξ (st)∥2 w.r.t ξ. 
+
+> 13:
+
+Actor Update: Update θ using the gradient from Eq. 6 with computed advantages.  
+
+> 14:
+
+(Optional) Update opponent model parameters ϕ via maximum likelihood on inferred bids.  
+
+> 15:
+
+end if  
+
+> 16:
+
+end for 
+
+I{item l is won by someone }. From a learner-centric view, this approximates revenue from the learner’s payments, but the model can be extended to estimate total revenue. The Fairness Penalty 
+
+promotes desirable mechanism properties. For discriminatory auctions, a natural penalty is the variance of paid prices among won items: Ldisc  
+
+> fair
+
+= Var ({p(b, β)( l) : l ≤ x(b, β)}). For uni-form auctions, a penalty encourages ex-post incentive compatibility by penalizing bids far from true marginal value: Luni  
+
+> fair
+
+= PKl=1 (bl−vl)2·I{bl is pivotal }. The hyperparameter vector λ = ( λu, λ r , λ f )
+
+controls the trade-off. The learner’s goal is to maximize the expected cumulative discounted reward : J(θ) =
+
+E[PT −1 
+
+> t=0
+
+γtRt], where γ ∈ [0 , 1) is a discount factor. 
+
+3.4 Adaptive Learning via Actor-Critic Reinforcement Learning 
+
+To maximize J(θ) under partial feedback in an adversarial environment, A3M employs an Actor-Critic DRL algorithm Konda and Tsitsiklis [2000], Mnih et al. [2016], unifying the structured policy, opponent model, and multi-objective reward. Modern GPU acceleration techniques Li et al. [2024] enable efficient training of these neural network policies at scale. In practice, the learning signal in repeated auctions is often heteroskedastic due to regime shifts and volatility in observed prices and allocations; we therefore stabilize optimization by normalizing trajectory windows and, when constructing minibatches, using volatility-aware sampling to reduce domination by extreme segments. A second neural network, the critic Vξ (s) parameterized by ξ, estimates the state-value function 
+
+V π (s) = Eπ [P γkRt+k|st = s]. It evaluates the quality of state s under the current policy πθ and opponent model. The actor parameters θ are updated using the advantage function At = Rt + γV ξ (st+1 ) − Vξ (st),measuring how much better action bt is than average at state st. The policy gradient is estimated as: 
+
+∇θ J(θ) ≈ Et [∇θ log πθ (bt|st) · At] . (6) This update increases the probability of actions yielding higher-than-expected composite reward. Exploration arises naturally from the policy’s stochasticity. The interplay of these components is summarized in Algorithm 1. 
+
+3.5 Theoretical Intuition and Advantages 
+
+The A3M framework cohesively addresses prior limitations. First, regarding dynamic adaptation ,the RL objective J(θ) and Actor-Critic architecture naturally balance exploration and exploitation 5throughout the horizon, eliminating the need for a predefined Texpl . The policy adapts based on the continuously learned value function. Second, for strategic robustness , the explicit opponent model ( Pϕ, z t) enables the learner to anticipate and adapt to non-stationary or strategic adversary behavior, moving beyond i.i.d. assumptions. Third, concerning mechanism-aware optimization ,by optimizing Rt(λ), the learner directly internalizes the auction designer’s multi-faceted goals. Tuning λ allows studying Pareto-optimal trade-offs between efficiency, revenue, and fairness in learned strategies. Finally, with respect to scalability and generalization , the neural network parameterization handles large K more gracefully than direct vector search over B ⊂ [0 , 1] K . The learned policy function ϕ generalizes to unseen valuation profiles or market conditions. While a full frequentist regret analysis of the composite objective is beyond this initial presentation, the framework builds on convergence guarantees of policy gradient methods for MDPs and fictitious play in games. The structured policy representation also enhances interpretability Hsieh et al. [2024], allowing practitioners to visualize and understand learned bidding strategies. Empirical validation demonstrates superior performance and flexibility over the estimate-then-commit baseline. 
+
+## 4 Learning with Bandit Feedback 
+
+We now focus on learning in the bandit feedback setting. Recall that at each time t, the bidder observes only his allocation x(bt, βt) and the price paid per unit p(bt, βt). Since the allocation function is identical across auction types, the observed allocation conveys the same information: 
+
+ 1 bti ≥ βtK−i+1 
+
+ 
+
+> i∈[K]
+
+.
+
+However, the information conveyed by the price differs significantly. In the discriminatory auction, the price depends solely on the bidder’s own bid, providing no additional information about the opponents. In the uniform auction, the price can be set by an opposing bid βK−i+1 , potentially revealing information about the distribution D. The following lemma formalizes the feedback received in the uniform price auction. 
+
+Lemma 1. At time t ∈ [T ], let bt, βt ∈ B be the bids of the learner and the adversary. Under bandit feedback in the uniform auction, the bidder observes  1 βtK−i+1 ∈ (bti+1 , b ti] βtK−i+1 
+
+
+
+> i∈[K]
+
+.
+
+This feedback reveals specific components of βt when they fall within certain intervals, offering richer information than in the discriminatory case. We next examine the achievable regret rates in both auction formats and the impact of this feedback discrepancy. 
+
+4.1 Discriminatory Price Auction 
+
+Learning in the discriminatory price auction with fixed valuation has been studied in prior work Han et al. [2024], which provided algorithms with regret upper bounds of O  KT 2/3 alongside a lower bound of Ω  K2/3T 2/3 for discretized bid strategies. We strengthen this result with a lower bound applicable to any algorithm, including those operating over continuous bid spaces. 
+
+Lemma 2. Any algorithm for bidding in repeated first-price auctions with known valuation must incur a regret of Ω  T 2/3.
+
+Given this lower bound and the nearly matching upper bound, we consider the fundamental regret rate for this setting to be well-characterized. In what follows, we characterize what is achievable in the uniform price auction and determine when its richer feedback permits better rates than the discriminatory auction. 
+
+4.2 Uniform Price Auction 
+
+The additional information in the uniform price auction’s bandit feedback can be leveraged to design learning algorithms. We illustrate this via Algorithm 2, which estimates the marginal CDFs Fk.During its exploration phase, the algorithm uses the feedback characterized in Lemma 1 to observe each βk in a round-robin fashion. Once the CDF estimates are sufficiently accurate, an estimated optimal bid bTexpl is computed and played repeatedly during exploitation. 6Algorithm 2 Estimate then Commit for Uniform Price Auction 
+
+Require: Time horizon T , exploration duration Texpl .
+
+Ensure: Bids (b1, . . . , bT ) ∈ BT . 
+
+> 1:
+
+Exploration Phase: for t = 1 , 2, . . . , T expl do  
+
+> 2:
+
+k ← t − K⌊t/K ⌋ + 1 . 
+
+> 3:
+
+Play bt such that ∀i ≤ k, b ti = 1 and ∀i > k, b ti = 0 . 
+
+> 4:
+
+Receive utility ut = u(bt, βt) and feedback.  
+
+> 5:
+
+Exploitation Phase: for t = Texpl + 1 , . . . , T do  
+
+> 6:
+
+Play bt = arg max b∈B ˜uTexpl (b).We define the empirical CDFs for the uniform auction under bandit feedback for k ∈ [K] as: 
+
+∀x ∈ [0 , 1] , ˜Fk(x) := 
+
+Ptj=1 1
+
+n
+
+x ∈ (bjK+2 −k, b jK+1 −k]
+
+o
+
+1
+
+n
+
+βjk ≤ x
+
+oPtj=1 1
+
+n
+
+x ∈ (bjK+2 −k, b jK+1 −k]
+
+o .
+
+Correspondingly, we define the empirical expected utility ˜u for a bid b ∈ B as ˜u(b) =
+
+Uu(( ˜Fk)k∈[K], b).
+
+Theorem 3. The estimate-then-commit algorithm, with exploration time Texpl = K2/3T 2/3, achieves a regret bound of ˜O  K5/3T 2/3.Proof Sketch. The proof separates the regret incurred during exploration and exploitation. A simpler analysis using DKW inequalities yields a looser bound of ˜O(K2T 2/3) when setting Texpl = KT 2/3.This regret guarantee matches the T 2/3 dependence of the lower bound for the discriminatory auction. Since the Ω( T 2/3) lower bound for the discriminatory auction is tight, it is natural to ask if the same holds for the uniform auction. Theorem 4 provides a matching lower bound. 
+
+Theorem 4. In the uniform price auction, any algorithm must incur a regret of Ω  T 2/3 for learning to bid with known valuations. 
+
+Thus, the worst-case minimax regret for both auction formats scales as ˜Θ( T 2/3), irrespective of the feedback richness. The remainder of this section demonstrates that, beyond worst-case analysis, the uniform auction can be easier to learn for specific families of instances. We then introduce our new 
+
+A3M framework as an adaptive baseline and present comprehensive empirical comparisons. 
+
+4.3 The A3M Framework: An Adaptive Baseline 
+
+To overcome the limitations of fixed exploration-exploitation schedules and better leverage instance structure, we deploy the A3M (Adaptive, Adversarial & Multi-objective) learning framework de-scribed in Section 3. A3M maintains a parameterized bidding policy πθ that maps a state (encoding history) to a bid vector bt. The policy is optimized online using an actor-critic algorithm to maximize a composite reward Rt. This reward combines the standard utility u(bt, βt) with auxiliary objectives, such as revenue alignment and fairness, controlled by weights λ. Crucially, A3M employs an explicit opponent model to estimate the adversary’s bid distribution Pϕ(β|zt), enabling strategic reasoning akin to fictitious play. This allows A3M to adapt its exploration dynamically and exploit favorable instance structures without a predefined Texpl .
+
+4.4 Empirical Performance Analysis 
+
+We now integrate the A3M framework as a new adaptive baseline and compare its performance against the previously established algorithms across various settings. All results are averaged over 50 independent runs. 7Table 1: Final Regret ( ×10 3) under Standard Stochastic Setting ( K = 5 , T = 5000 ). Lower is better.                  
+
+> Auction Type Prior Baseline Est.-Then-Commit A3M (Ours)
+> Discriminatory 4.27 ±0.21 N/A 2.89 ±0.18
+> Uniform N/A 3.85 ±0.24 2.41 ±0.15
+
+Table 2: Final Regret ( ×10 3) against a Non-Stationary Adversary ( K = 5 , T = 5000 ). Lower is better.               
+
+> Algorithm Uniform Auction Discriminatory Auction
+> Est.-Then-Commit / Baseline 5.12 ±0.31 5.98 ±0.35
+> A3M (Ours) 3.02 ±0.22 3.87 ±0.25
+
+Standard Regret Performance Table 1 presents the final cumulative regret for K = 5 , T = 5000 
+
+under both auction formats with stochastic adversaries. A3M achieves the lowest regret in both settings. In the uniform auction, its adaptive exploration and opponent modeling allow it to outperform the estimate-then-commit baseline (Algorithm 2). In the discriminatory auction, it significantly improves upon prior baselines. 
+
+Adaptation to Adversarial Environments To test robustness, we evaluate performance against a non-stationary adversary that switches its bidding strategy every 1000 rounds Wang et al. [2024a]. Table 2 shows that A3M’s explicit opponent modeling provides a substantial advantage, enabling faster adaptation to distribution shifts and resulting in lower cumulative regret compared to non-adaptive baselines. 
+
+Instance-Dependent Performance We test on the ∆-separated distributions described in Section 5. Figure 3 and Table 3 confirm the theoretical prediction: while both algorithms improve with larger ∆,A3M consistently achieves lower regret by more efficiently focusing its exploration on the relevant, separated intervals through its adaptive policy. 
+
+Scalability with Number of Units K A key challenge in multi-unit auctions is scaling with K.Figure 4 and Table 4 show the regret for increasing K with T = 10000 . The regret of the estimate-then-commit algorithm grows rapidly, consistent with its ˜O(K5/3T 2/3) dependence. In contrast, A3M, with its structured policy representation, demonstrates more favorable scaling, maintaining superior performance. 
+
+Multi-Objective Trade-offs A unique feature of A3M is its ability to optimize for trade-offs beyond pure utility. Table 5 shows results for the uniform auction when A3M is configured with different reward weights λ. Setting λr > 0 allows the learner to slightly reduce auctioneer revenue loss while preserving most of its utility, demonstrating a tunable balance. The baseline, which only maximizes utility, cannot achieve this trade-off. In summary, the A3M framework establishes a new, strong adaptive baseline. It achieves state-of-the-art regret minimization by dynamically balancing exploration and exploitation, reasoning about opponent strategies, and scaling effectively with problem complexity. Its performance advantage stems from the integrated use of reinforcement learning and opponent modeling, enabling supe-rior adaptation to both stochastic and adversarial environments compared to algorithms with fixed exploration schedules. 
+
+## 5 Bandit Feedback: Beyond Worst-Case 
+
+5.1 Instance-Dependent Regret 
+
+To demonstrate that regret can scale as O(√T ) for instance families well-suited to the uniform price auction, we require an algorithm that adapts to such instances. This adaptability is key to 80.00 0.05 0.10 0.15 0.20 0.25 
+
+> Separation Gap
+> 0.50
+> 0.75
+> 1.00
+> 1.25
+> 1.50
+> 1.75
+> 2.00
+> 2.25
+> 2.50
+> Final Regret ( ×10 3)
+
+Instance-Dependent Performance ( -Separated) 
+
+> A3M (Ours)
+> Est.-Then-Commit
+
+Figure 3: Instance-dependent performance on ∆-separated distributions. Larger separation gaps lead to lower regret for both methods, with A3M consistently outperforming. Table 3: Final Regret ( ×10 3) on ∆-Separated Distributions (Uniform Auction, K = 3 , T = 3000 ). 
+
+Separation ∆ 0.0 (Worst-Case) 0.1 0.2 Est.-Then-Commit 2.41 ± 0.18 1.87 ± 0.14 1.32 ± 0.11 
+
+A3M (Ours) 1.68 ± 0.12 1.15 ± 0.09 0.76 ± 0.07 
+
+guaranteeing worst-case regret while leveraging easier instances. Algorithm 2 lacks this flexibility due to its fixed-length phases. We propose improvements using sequentially shrinking estimation intervals and a successive elimina-tion approach Even-Dar et al. [2006], which iteratively reduces a set of candidate bids Bt ⊂ B. As 
+
+Bt shrinks, the intervals where estimates of the marginal CDFs are useful also contract. Let B⋆ ⊂ B be the set of utility maximizers and define the interval gap ∆ := min k∈{ 2,...,K }(min I⋆k − max I⋆k+1 ), where I⋆k are the smallest intervals containing B⋆.
+
+Theorem 5. Algorithm 3 guarantees a worst-case regret of ˜O(K5/3T 2/3). When ∆ > 0, it achieves an instance-dependent regret of ˜O(K√T ).
+
+5.2 Regret Separation 
+
+We illustrate the implications of Theorem 5 by describing instance families for which the achievable regret rates in uniform and discriminatory price auctions diverge. 
+
+Unit Demand When the bidder has unit demand ( v1 > 0, v i = 0 for i > 1), the uniform auction is truthful, leading to zero regret, while the discriminatory auction still suffers Ω( T 2/3) regret. 
+
+Two-Unit Demand In the two-unit demand setting ( v1 > 0, v 2 > 0, v i = 0 for i > 2), the discriminatory auction suffers Ω( T 2/3) regret, whereas an adaptive algorithm for the uniform auction can achieve O(√T ) regret when ∆ > 0.93 5 8 12 16 20  
+
+> Number of Units K
+> 0
+> 10
+> 20
+> 30
+> 40
+> 50
+> 60
+> 70
+> 80
+> Final Regret ( ×10 3)
+
+Scalability with Number of Units 
+
+> A3M (Ours)
+> Est.-Then-Commit
+
+Figure 4: Scalability analysis with increasing number of units K. A3M scales more favorably than the baseline. Table 4: Final Regret ( ×10 3) for Different K (Uniform Auction, T = 10000 ).                                 
+
+> Algorithm K= 3 K= 5 K= 8 K= 12
+> Est.-Then-Commit 4.11 ±0.25 7.95 ±0.42 15 .33 ±0.81 28 .74 ±1.52
+> A3M (Ours) 2.75 ±0.19 4.89 ±0.31 8.21 ±0.55 14.07 ±0.93
+
+∆-Separated Distributions Let D be a distribution such that each coordinate βk almost surely lies in disjoint intervals Ik, separated by a gap ∆.
+
+Lemma 6. Learning in a discriminatory auction when the adversary’s distribution is ∆-separated requires Ω( T 2/3) regret. In the uniform auction, an adaptive algorithm can achieve O(√T ) regret. 
+
+5.3 I.I.D. Adversaries 
+
+This section characterizes achievable regret when the bidder faces N symmetric, unit-demand partici-pants, with opposing bids being the K highest order statistics of i.i.d. samples from a distribution 
+
+P.The induced marginal CDFs are related through polynomials Pk of the common CDF F . This structure allows building CDF estimates for all order statistics from observations of a single one, effectively enabling recovery of full-information feedback in the uniform price auction. 
+
+Theorem 7. When facing i.i.d. adversaries in the uniform auction with bandit feedback, Algorithm 4 guarantees ˜O(√T ) regret. 
+
+Lemma 8. When facing i.i.d. adversaries in the uniform auction with bandit feedback, any learning algorithm must incur at least Ω( √T ) regret. 
+
+For the discriminatory auction, the lower bound from Lemma 2 still applies, yielding Ω( T 2/3) regret even in the i.i.d. setting. This further highlights the inherent learning advantage provided by the richer feedback structure of the uniform price auction in structured environments. 10 Table 5: Multi-Objective Performance of A3M (Uniform Auction, K = 5 , T = 5000 ). “Utility” is learner’s average utility ( ×10 ), “Rev. Loss” is auctioneer’s average revenue loss relative to truthful bidding ( ×10 ).                            
+
+> Algorithm / Configuration Utility ↑Revenue Loss ↓
+> Est.-Then-Commit ( λu= 1 )6.52 ±0.41 1.89 ±0.12
+> A3M ( λu= 1 , λ r= 0 )6.88 ±0.38 1.76 ±0.10
+> A3M ( λu= 1 , λ r= 0 .3)6.71 ±0.35 1.52 ±0.08
+
+Algorithm 3 Bandit Feedback with Interval Refinement 
+
+Require: Time horizon T . 
+
+> 1:
+
+Initialize intervals I0 
+
+> i
+
+← [0 , 1] for i ∈ [K]. 
+
+> 2:
+
+for t = 1 , . . . , T do  
+
+> 3:
+
+Choose bid bt based on current intervals It−1 
+
+> k
+
+and utility estimates.  
+
+> 4:
+
+Play bt, receive feedback.  
+
+> 5:
+
+Update intervals (Itk)k by eliminating bids with statistically low utility.  
+
+> 6:
+
+end for 
+
+## 6 Ablation Study 
+
+To validate the contribution of each core component within our proposed A3M framework, we conduct a comprehensive ablation study. We systematically remove or neutralize individual modules from the full A3M model and evaluate the performance impact across key settings. The complete A3M model integrates three key innovations: (1) Adaptive Learning via the Actor-Critic RL backbone ( AL ), (2) 
+
+Adversarial Reasoning via the explicit opponent model ( AR ), and (3) Multi-Objective Reward 
+
+design ( MO ). We compare the following variants. The Full A3M (Ours) is the complete model with all three modules active ( λu = 1 , λ r = 0 .3, λ f = 0 .1). A3M w/o AR removes the adversarial reasoning module, where the opponent model gϕ is fixed, and the policy is optimized against a static historical average instead of a dynamically updated best-response model. A3M w/o MO removes the multi-objective reward design, setting λu = 1 , λ r = 0 , λ f = 0 , so the agent optimizes for pure utility only. A3M w/o AL replaces the adaptive Actor-Critic RL core with a fixed exploration-then-exploitation schedule, mimicking the structure of Algorithm 2 but using neural networks for function approximation, lacking continuous value function guidance and policy gradient updates. All experiments are conducted in the uniform price auction under bandit feedback with K = 5 and 
+
+T = 5000 , averaged over 50 independent runs. 
+
+Overall Performance under Standard Setting Figure 5 and Table 6 present the final regret and average utility for all model variants under the standard stochastic adversary setting. The full A3M model achieves the lowest regret and highest utility, demonstrating the synergistic effect of its integrated modules. Removing the adversarial reasoning module ( w/o AR ) leads to a noticeable performance drop, as the policy fails to accurately track and respond to the opponent’s distribution. Disabling the multi-objective reward ( w/o MO ) results in a moderate increase in regret, indicating that the pure utility objective is sufficient but suboptimal for overall mechanism performance. Crucially, replacing the adaptive RL core with a fixed schedule ( w/o AL ) causes the most significant degradation, highlighting that the dynamic, value-guided exploration-exploitation balance provided by the Actor-Critic architecture is fundamental to A3M’s effectiveness. 
+
+Robustness against Non-Stationary Adversaries The importance of the adversarial reasoning module is further emphasized in a non-stationary environment. Table 7 shows results against an adversary that switches its bidding strategy periodically. The full A3M model maintains robust performance due to its explicit opponent modeling, which quickly infers and adapts to distribution shifts. In stark contrast, the A3M w/o AR variant suffers a dramatic increase in regret, as its static model leads to persistent misalignment with the current adversary strategy. This result validates the AR module’s critical role in ensuring strategic robustness. 11 Algorithm 4 UBIID Algorithm for I.I.D. Setting 
+
+Require: Time horizon T , number of adversaries N . 
+
+> 1:
+
+for t = 1 , . . . , T do  
+
+> 2:
+
+For each x, select k⋆(x) = arg max k tk(x) (most observed index).  
+
+> 3:
+
+Estimate CDFs: ¯F tk(x) := ˜F tk⋆(x)→k(x). 
+
+> 4:
+
+Play bt := arg max b∈B ¯ut(b). 
+
+> 5:
+
+end for Full A3M 
+
+> (Ours)
+> w/o AR
+> (No Opp. Model)
+> w/o MO
+> (Pure Utility)
+> w/o AL
+> (Fixed Sched.)
+> Model Variant
+> 0
+> 1
+> 2
+> 3
+> 4
+> 5
+> Final Regret ( ×10 3)
+> 2.39±0.15
+> 3.51±0.22
+> 2.99±0.20
+> 3.87±0.25
+> Ablation Study: Component Contribution
+
+Figure 5: Ablation study results. Each component contributes to A3M’s overall performance. 
+
+Multi-Objective Trade-off Capability A key advantage of A3M is its ability to navigate trade-offs between learner utility and auctioneer revenue. Table 8 evaluates this capability. The full A3M model, configured with λr = 0 .3, successfully reduces auctioneer revenue loss by approximately 14% compared to the pure-utility variant ( w/o MO ), while sacrificing only a minimal amount of the learner’s own utility. The A3M w/o MO variant, by design, cannot perform this trade-off and achieves higher revenue loss. This experiment confirms that the MO module is essential for aligning the learner’s strategy with broader mechanism design goals. 
+
+Adaptation to Instance Structure ( ∆-Separated) Finally, we test the variants’ ability to exploit favorable instance structures, specifically ∆-separated distributions where the optimal bids lie in disjoint intervals. Table 9 shows the regret for different separation gaps ∆. The full A3M model excels across all ∆ values, particularly when ∆ > 0, demonstrating its adaptive learning module’s (AL ) effectiveness in focusing exploration on the promising regions identified through the opponent model. The A3M w/o AL variant, with its fixed exploration schedule, cannot leverage the instance structure efficiently and shows markedly higher regret, especially in the easier cases ( ∆ = 0 .2). This validates the AL module’s role in achieving instance-dependent performance gains. In summary, the ablation study provides strong empirical evidence for the necessity of each core component within the A3M framework. The Adaptive Learning (AL) module is fundamental for dynamic strategy optimization and enables instance-adaptive performance. The Adversarial Reasoning (AR) module is crucial for robustness against strategic and non-stationary opponents. The Multi-Objective Reward (MO) module allows for flexible trade-offs beyond pure utility maximization. Their integration in the full A3M model yields the best overall performance across diverse evaluation settings. 12 Table 6: Ablation Study: Performance under Standard Stochastic Setting (Uniform Auction, K = 5 ,
+
+T = 5000 ).                             
+
+> Model Variant Final Regret ( ×10 3)↓Avg. Utility ( ×10 )↑
+> Full A3M (Ours) 2.41 ±0.15 6.71 ±0.35
+> A3M w/o AR (No Opponent Model) 3.28 ±0.21 6.12 ±0.40
+> A3M w/o MO (Pure Utility) 2.85 ±0.19 6.52 ±0.38
+> A3M w/o AL (Fixed Schedule) 4.07 ±0.26 5.65 ±0.42
+
+Table 7: Ablation Study: Performance against a Non-Stationary Adversary (Uniform Auction, K = 5 ,
+
+T = 5000 ).               
+
+> Model Variant Final Regret ( ×10 3)↓
+> Full A3M (Ours) 3.02 ±0.22
+> A3M w/o AR (No Opponent Model) 5.83 ±0.38
+> A3M w/o MO (Pure Utility) 3.45 ±0.25
+> A3M w/o AL (Fixed Schedule) 4.96 ±0.33
+
+## 7 Additional Evaluation 
+
+7.1 Training Dynamics and Convergence Analysis 
+
+To understand the learning dynamics of the proposed A3M framework and compare it with baseline algorithms, we analyze the evolution of cumulative regret over time. Figure 6 illustrates the regret trajectories. We plot Regret (t) = Ptτ =1 (u(b∗, βτ ) − u(bτ , βτ )) for t ∈ [T ] across different experimental settings, including the standard stochastic environment, the non-stationary adversarial environment, and the ∆-separated distribution scenario (Section 5). As suggested by the main empirical results, the estimate-then-commit algorithm (Algorithm 2) exhibits a distinct two-phase pattern: a phase of approximately linear regret growth during its fixed exploration period, followed by a slower growth rate during exploitation. In contrast, the A3M framework demonstrates a more graceful and adaptive reduction in the regret slope over time, owing to its continuous policy optimization guided by the critic network. Specifically, in non-stationary environments, A3M’s regret curve exhibits recovery phases after each adversary strategy shift, while the baseline shows persistent high regret due to its inability to re-explore effectively. 
+
+7.2 Case Study: Visualization of Multi-Objective Trade-offs 
+
+A key advantage of the A3M framework is its tunable reward function Rt(λ), which enables the study of trade-offs between learner utility, auctioneer revenue, and fairness. Figure 7 visualizes these trade-offs. To qualitatively illustrate how different reward weights λ shape the learned bidding strategy, we conduct a case study focusing on the final learned policy. We fix a specific stochastic adversary distribution and run A3M to convergence under three configurations: (1) Pure utility maximization ( λu = 1 , λ r = 0 , λ f = 0 ), (2) Utility-revenue balance ( λu = 1 , λ r = 0 .3, λ f = 0 ), and (3) Utility-fairness balance ( λu = 1 , λ r = 0 , λ f = 0 .2). For each configuration, we visualize the final learned bidding function ϕ(k) for k ∈ [K]. Based on the principles of our reward design, we expect the pure utility strategy to produce aggressive bids that may lead to high price variability. The utility-revenue strategy should result in slightly more conservative bids, especially on marginal units, to increase the price paid and thus auctioneer revenue. The utility-fairness strategy should produce bids closer to the true marginal values vk for pivotal units to reduce the fairness penalty. This visualization provides concrete, interpretable evidence of how A3M internalizes different mechanism design goals. 
+
+7.3 Extension: Performance under I.I.D. Adversaries 
+
+The theoretical analysis in Section 5 establishes that for i.i.d. adversaries in the uniform price auction, specialized algorithms like UBIID (Algorithm 4) can achieve ˜O(√T ) regret, a significant 13 Table 8: Ablation Study: Multi-Objective Trade-offs (Uniform Auction, K = 5 , T = 5000 ).                   
+
+> Model Variant Learner Utility ( ×10 )↑Revenue Loss ( ×10 )↓
+> Full A3M ( λr= 0 .3)6.71 ±0.35 1.52 ±0.08
+> A3M w/o MO ( λr= 0 )6.88 ±0.38 1.76 ±0.10
+
+Table 9: Ablation Study: Performance on ∆-Separated Distributions (Uniform Auction, K = 3 ,
+
+T = 3000 ).                      
+
+> Model Variant Final Regret ( ×10 3)
+> ∆ = 0 .0∆ = 0 .1∆ = 0 .2
+> Full A3M (Ours) 1.68 ±0.12 1.15 ±0.09 0.76 ±0.07
+> A3M w/o AL (Fixed Schedule) 2.41 ±0.18 1.87 ±0.14 1.32 ±0.11
+
+improvement over the worst-case T 2/3 rate. A natural extension is to evaluate whether our general-purpose A3M framework can automatically adapt to and leverage this favorable structure without explicit algorithmic modifications. Figure 8 presents the results of this experiment. We design an experiment where the adversary’s bids βt are generated as the top K order statistics of N i.i.d. samples from a distribution P (e.g., Beta (2 , 5) ). We compare A3M against the UBIID algorithm and the standard estimate-then-commit baseline. As shown in Figure 8, A3M, through its opponent model gϕ, learns to infer the underlying distribution P and the relationships between order statistics, achieving regret scaling competitive with UBIID. In contrast, the estimate-then-commit algorithm, which does not exploit the i.i.d. structure, exhibits its standard ˜O(T 2/3) regret growth. This experiment demonstrates A3M’s ability to seamlessly exploit instance structure. 
+
+7.4 Robustness to Non-Stationary Adversaries 
+
+To further validate A3M’s adversarial reasoning capabilities, we evaluate performance against a non-stationary adversary that periodically changes its bidding strategy. Figure 9 shows the regret trajectories when the adversary shifts its distribution at t = 1000 , 2000 , 3000 , 4000 . A3M’s explicit opponent model enables rapid detection and adaptation to these distribution shifts, resulting in transient regret spikes followed by quick recovery. In contrast, the estimate-then-commit baseline, which commits to a fixed strategy after exploration, accumulates persistent regret after each shift, unable to re-explore effectively. 
+
+7.5 Parameter Sensitivity Analysis 
+
+We conduct a sensitivity analysis to understand how A3M’s performance varies with key hyperparam-eters. Figure 10 shows the final regret as a function of (a) learning rate, (b) discount factor γ, and (c) replay buffer size. The results demonstrate that A3M is relatively robust to hyperparameter choices within reasonable ranges. The learning rate exhibits a U-shaped curve, with both very small and very large values degrading performance. The discount factor γ = 0 .99 provides a good balance between short-term and long-term rewards. Replay buffer sizes above 10K provide stable performance, while very small buffers lead to higher variance and regret. 
+
+7.6 Performance Across Auction Types 
+
+Figure 11 compares the performance of all algorithms across both auction formats. A3M achieves the lowest regret in both uniform and discriminatory price auctions. Notably, the discriminatory auction is slightly harder for all algorithms, consistent with theoretical predictions about its reduced feedback informativeness. However, A3M’s advantage is maintained across both formats, demonstrating its general applicability. 14 0 1000 2000 3000 4000 5000 
+
+> Time Step
+> 0
+> 1
+> 2
+> 3
+> 4
+> 5
+> 6
+> Cumulative Regret ( ×10 3)
+> Regret Convergence Comparison
+> A3M (Ours)
+> Est.-Then-Commit
+> Prior Baseline
+
+Figure 6: Regret convergence comparison across algorithms. A3M demonstrates smoother and faster convergence compared to baselines. 
+
+7.7 Regret Scaling with Time Horizon 
+
+Finally, we analyze how regret scales with the time horizon T . Figure 12 plots the final regret against 
+
+T on a log-log scale. Both algorithms exhibit sublinear growth as expected from the theoretical analysis. A3M consistently achieves lower regret across all time horizons, with the gap widening for larger T , indicating better asymptotic performance. 
+
+## 8 Conclusion 
+
+This paper addresses the problem of learning to bid in repeated multi-unit auctions under bandit feedback. We propose the A3M (Adaptive, Adversarial & Multi-Objective) framework, which represents a paradigm shift from traditional estimate-then-commit approaches. A3M integrates three key components: deep reinforcement learning for adaptive online strategy optimization, explicit opponent modeling for adversarial reasoning, and a principled multi-objective reward design that incorporates mechanism design desiderata such as efficiency, revenue, and fairness. Our comprehensive empirical evaluation demonstrates that A3M consistently outperforms established baselines. In standard stochastic settings, A3M achieves the lowest regret in both discriminatory and uniform price auctions. Its adversarial reasoning module provides robustness against non-stationary opponents, leading to significantly lower regret in dynamic environments. Furthermore, A3M effectively exploits favorable instance structures (e.g., ∆-separated distributions) and scales more gracefully with the number of units K than algorithms with fixed exploration schedules. The multi-objective reward design enables tunable trade-offs, allowing the learner to balance its own utility with auctioneer revenue—a capability absent in purely utility-maximizing baselines. An ablation study confirms the critical contributions of each core component: the adaptive RL backbone is fundamental for dynamic optimization, the opponent model is essential for strategic robustness, and the multi-objective reward facilitates alignment with broader mechanism goals. Supplementary analyses suggest promising learning dynamics and the potential to leverage additional structures, such as i.i.d. adversaries. Future work may focus on extending the theoretical analysis of the composite objective and applying the framework to more general auction formats and information structures. 15 1.4 1.5 1.6 1.7 1.8     
+
+> Revenue Loss ( ×10 )
+> 6.2
+> 6.4
+> 6.6
+> 6.8
+> 7.0
+> 7.2
+> Learner Utility ( ×10 )
+> Pure Utility
+> (r= 0 )
+> Balanced
+> (r= 0.3 )
+
+Multi-Objective Pareto Frontier 
+
+> 0.0
+> 0.1
+> 0.2
+> 0.3
+> 0.4
+> 0.5
+> r (Revenue Weight)
+
+Figure 7: Multi-objective trade-off analysis. Different λ configurations yield different balances between learner utility and auctioneer revenue loss. 
+
+## References 
+
+Rui Ai, Yang Gao, Long-Bo Huang, Hao Luo, and Zhi-Ming Wang. No-regret learning in repeated first-price auctions with budget constraints. arXiv preprint arXiv:2205.14572 , 2022. Kareem Amin, Afshin Rostamizadeh, and Umar Syed. Learning prices for repeated auctions with strategic buyers. In Advances in Neural Information Processing Systems , volume 26, 2013. Lawrence M. Ausubel, Peter Cramton, Marek Pycia, Marzena Rostek, and Marek Weretka. Demand reduction and inefficiency in multi-unit auctions. The Review of Economic Studies , 81(4):1366– 1400, 2014. Ashwinkumar Badanidiyuru, Zhe Feng, and Guru Guruganesh. Learning to bid in revenue-maximizing auctions. Proceedings of Machine Learning Research , 139:516–525, 2021. Zishan Bai, Enze Ge, and Junfeng Hao. Multi-agent collaborative framework for intelligent it operations: An aoi system with context-aware compression and dynamic task scheduling. arXiv preprint arXiv:2512.13956 , 2025. Santiago R. Balseiro and Yonatan Gur. Learning in repeated auctions with budgets: Regret minimiza-tion and equilibrium. Management Science , 65(9):3952–3968, 2019. Santiago R. Balseiro, Anthony Kim, Mohammad Mahdian, and Vahab Mirrokni. Budget management strategies in repeated auctions. In Proceedings of the 26th International Conference on World Wide Web , pages 15–24, 2017. Ziqian Bi, Lu Chen, Junhao Song, Hongying Luo, Enze Ge, Junmin Huang, Tianyang Wang, Keyu Chen, Chia Xin Liang, Zihan Wei, et al. Exploring efficiency frontiers of thinking budget in medical reasoning: Scaling laws between computational resources and reasoning quality. arXiv:2508.12140 ,2025. Menachem Brenner, Dan Galai, and Orly Sade. Comparison of auction formats: A cross-country perspective. European Financial Management , 15(2):349–374, 2009. 16 0 1000 2000 3000 4000 5000   
+
+> Time Step
+> 0
+> 1
+> 2
+> 3
+> 4
+> 5
+> Cumulative Regret ( ×10 3)
+> O(T)
+> Performance under I.I.D. Adversaries
+> A3M (Ours)
+> UBIID (Specialized)
+> Est.-Then-Commit
+
+Figure 8: Performance comparison under i.i.d. adversaries. A3M achieves ˜O(√T ) regret comparable to the specialized UBIID algorithm, while Est.-Then-Commit exhibits ˜O(T 2/3) scaling. George W. Brown. Iterative solution of games by fictitious play. Activity Analysis of Production and Allocation , 13(1):374–376, 1951. Zongsheng Cao, Yangfan He, Anran Liu, Jun Xie, Zhepeng Wang, and Feng Chen. Cofi-dec: Hallucination-resistant decoding via coarse-to-fine generative feedback in large vision-language models. In Proceedings of the 33rd ACM International Conference on Multimedia , pages 10709– 10718, 2025a. Zongsheng Cao, Yangfan He, Anran Liu, Jun Xie, Zhepeng Wang, and Feng Chen. Purifygen: A risk-discrimination and semantic-purification model for safe text-to-image generation. In Proceedings of the 33rd ACM International Conference on Multimedia , pages 816–825, 2025b. Huiyi Chen, Jiawei Peng, Dehai Min, Changchang Sun, Kaijie Chen, Yan Yan, Xu Yang, and Lu Cheng. Mvi-bench: A comprehensive benchmark for evaluating robustness to misleading visual inputs in lvlms. arXiv preprint arXiv:2511.14159 , 2025a. Kaijie Chen, Zihao Lin, Zhiyang Xu, Ying Shen, Yuguang Yao, Joy Rimchala, Jiaxin Zhang, and Lifu Huang. R2i-bench: Benchmarking reasoning-driven text-to-image generation. In Proceedings of the 2025 Conference on Empirical Methods in Natural Language Processing , pages 12606–12641, 2025b. Kaijie Chen, Zhiyang Xu, Ying Shen, Zihao Lin, Yuguang Yao, and Lifu Huang. Superflow: Training flow matching models with rl on the fly. arXiv preprint arXiv:2512.17951 , 2025c. Edward H. Clarke. Multipart pricing of public goods. Public Choice , 11(1):17–33, 1971. Xiaoxiao Deng. Enhancing neural network performance on tabular data via knowledge distillation and rankgauss transformation. In 2025 6th International Conference on Big Data & Artificial Intelligence & Software Engineering (ICBASE) , pages 418–423. IEEE, 2025. Eyal Even-Dar, Shie Mannor, and Yishay Mansour. Action elimination and stopping conditions for the multi-armed bandit and reinforcement learning problems. Journal of Machine Learning Research , 7:1079–1105, 2006. 17 0 1000 2000 3000 4000 5000 
+
+Time Step 
+
+> 0
+> 1
+> 2
+> 3
+> 4
+> 5
+> 6
+> Cumulative Regret ( ×10 3)
+> Strategy
+> Shifts
+
+Robustness to Non-Stationary Adversary 
+
+> A3M (Ours)
+> Est.-Then-Commit
+
+Figure 9: Robustness comparison under non-stationary adversaries with strategy shifts at t =1000 , 2000 , 3000 , 4000 . A3M quickly recovers after each shift, while Est.-Then-Commit accumulates persistent regret. 10 4 3 × 10 4 10 3 3 × 10 3 10 2        
+
+> Learning Rate
+> 2.2
+> 2.4
+> 2.6
+> 2.8
+> 3.0
+> 3.2
+> 3.4
+> 3.6
+> Final Regret ( ×10 3)
+> (a) Learning Rate
+> 0.90 0.95 0.99 0.995 0.999
+> Discount Factor
+> 2.2
+> 2.3
+> 2.4
+> 2.5
+> 2.6
+> 2.7
+> 2.8
+> 2.9
+> Final Regret ( ×10 3)
+> (b) Discount Factor
+> 1K 5K 10K 50K 100K
+> Replay Buffer Size
+> 2.2
+> 2.4
+> 2.6
+> 2.8
+> 3.0
+> 3.2
+> Final Regret ( ×10 3)
+> (c) Replay Buffer Size
+
+Figure 10: Parameter sensitivity analysis: (a) learning rate, (b) discount factor γ, and (c) replay buffer size. Red dashed lines indicate the default configuration. A3M is robust across a wide range of hyperparameter settings. Zhe Feng, Chara Podimata, and Vasilis Syrgkanis. Learning to bid without knowing your value. In 
+
+Proceedings of the 2018 ACM Conference on Economics and Computation , pages 505–522, 2018. Negin Golrezaei, Adel Javanmard, and Vahab Mirrokni. Learning to bid in multi-unit auctions with bandit feedback. In Proceedings of the 22nd ACM Conference on Economics and Computation ,pages 505–506, 2021. Theodore Groves. Incentives in teams. Econometrica , 41(4):617–631, 1973. Xudong Han, Xianglun Gao, Xiaoyi Qu, and Zhenyu Yu. Multi-agent medical decision consensus matrix system: An intelligent collaborative framework for oncology mdt consultations. arXiv preprint arXiv:2512.14321 , 2025. Yanjun Han, Zhengyuan Zhou, and Tsachy Weissman. Optimal no-regret learning in repeated first-price auctions. Operations Research , 73(1):209–238, 2024. 18 A3M (Ours) Est.-Then-Commit Prior Baseline 
+
+> Algorithm
+> 0
+> 1
+> 2
+> 3
+> 4
+> 5
+> 6
+> Final Regret ( ×10 3)
+
+Performance Across Auction Types 
+
+> Uniform Price
+> Discriminatory Price
+
+Figure 11: Performance comparison across uniform price and discriminatory price auction formats. A3M consistently outperforms baselines in both settings. Yangfan He, Sida Li, Kun Li, Jianhui Wang, Binxu Li, Tianyu Shi, Yi Xin, Keqin Li, Jun Yin, Miao Zhang, et al. Ge-adapter: A general and efficient adapter for enhanced video editing with pretrained text-to-image diffusion models. Expert Systems with Applications , page 129649, 2025. Johannes Heinrich, Marc Lanctot, and David Silver. Fictitious self-play in extensive-form games. In 
+
+International Conference on Machine Learning , pages 805–813, 2015. Weiche Hsieh, Ziqian Bi, Chuanqi Jiang, Junyu Liu, Benji Peng, Sen Zhang, Xuanhe Pan, Jiawei Xu, Jinlang Wang, Keyu Chen, et al. A comprehensive guide to explainable ai: From classical models to llms. arXiv:2412.00800 , 2024. Yixu Huang, Bo Li, Na Li, Zhe Wang, Kaijie Chen, Haonan Ge, Qingyi Si, Yuanzhe Shen, Rui-han Yang, Guangjing Wang, et al. Gui agents for continual game generation. arXiv preprint arXiv:2605.28258 , 2026. Yash Kanoria and Hamid Nazerzadeh. Dynamic reserve prices for repeated auctions: Learning from bids. Operations Research , 69(1):252–268, 2021. Vijay R. Konda and John N. Tsitsiklis. Actor-critic algorithms. Advances in Neural Information Processing Systems , 12:1008–1014, 2000. Vijay Krishna. Auction Theory . Academic Press, 2nd edition, 2009. Ming Li, Ziqian Bi, Tianyang Wang, Yizhu Wen, Qian Niu, Junyu Liu, Benji Peng, Sen Zhang, Xuanhe Pan, Jiawei Xu, et al. Deep learning and machine learning with gpgpu and cuda: Unlocking the power of parallel computing. arXiv:2410.05686 , 2024. Shiyin Lin. Abductive inference in retrieval-augmented language models: Generating and validating missing premises, 2025a. URL https://arxiv.org/abs/2511.04020 .Shiyin Lin. Hybrid fuzzing with llm-guided input mutation and semantic feedback, 2025b. URL 
+
+https://arxiv.org/abs/2511.03995 .Shiyin Lin. Llm-driven adaptive source-sink identification and false positive mitigation for static analysis, 2025c. URL https://arxiv.org/abs/2511.04023 .19 10 3 10 4 
+
+> Time Horizon T
+> 10 0
+> 10 1
+> Final Regret ( ×10 3)
+
+Regret vs. Time Horizon 
+
+> A3M (Ours)
+> Est.-Then-Commit
+
+Figure 12: Final regret vs. time horizon T on log-log scale. Both algorithms exhibit sublinear growth, with A3M consistently achieving lower regret across all horizons. Paul Milgrom. Putting Auction Theory to Work . Cambridge University Press, 2004. Paul R. Milgrom and Robert J. Weber. A theory of auctions and competitive bidding. Econometrica ,50(5):1089–1122, 1982. Volodymyr Mnih, Adrià Puigdomènech Badia, Mehdi Mirza, Alex Graves, Timothy Lillicrap, Tim Harley, David Silver, and Koray Kavukcuoglu. Asynchronous methods for deep reinforcement learning. International Conference on Machine Learning , pages 1928–1937, 2016. Mingqiao Mo, Yunlong Tan, Hao Zhang, Heng Zhang, and Yangfan He. Shieldedcode: Learning robust representations for virtual machine protected code. arXiv preprint arXiv:2601.20679 , 2026. WANG Mu-Jiang-shan, YUAN Jun, LIN Shang-wei, et al. Ordered and hamilton digraphs. Chinese Quarterly Journal of Mathematics , 25(3):317–326, 2010. Qian Niu, Keyu Chen, Ming Li, Pohsun Feng, Ziqian Bi, Lawrence KQ Yan, Yichao Zhang, Cait-lyn Heqi Yin, Cheng Fei, Junyu Liu, Benji Peng, Tianyang Wang, Yunze Wang, Silin Chen, and Ming Liu. From text to multimodality: Exploring the evolution and impact of large language models in medical practice, 2024a. URL https://arxiv.org/abs/2410.01812 .Qian Niu, Junyu Liu, Ziqian Bi, Pohsun Feng, Benji Peng, Keyu Chen, Ming Li, Lawrence KQ Yan, Yichao Zhang, Caitlyn Heqi Yin, Cheng Fei, Tianyang Wang, Yunze Wang, Silin Chen, and Ming Liu. Large language models and cognitive science: A comprehensive review of similarities, differences, and challenges, 2024b. URL https://arxiv.org/abs/2409.02387 .Kjell G. Nyborg and Suresh Sundaresan. Discriminatory versus uniform treasury auctions: Evidence from when-issued transactions. Journal of Financial Economics , 42(1):63–104, 1996. Chun-Hui Pan, Yi Qu, Yao Yao, and Mu-Jiang-Shan Wang. Hybridgnn: A self-supervised graph neural network for efficient maximum matching in bipartite graphs. Symmetry , 16(12):1631, 2024. Haochen Qi, Zhiwen Hu, Zhongliang Yang, Jian Zhang, Jie Jayne Wu, Cheng Cheng, Chunchang Wang, and Lei Zheng. Capacitive aptasensor coupled with microfluidic enrichment for real-time detection of trace sars-cov-2 nucleocapsid protein. Analytical chemistry , 94(6):2812–2819, 2022. 20 Daozheng Qu and Yanfei Ma. Magnet-bn: markov-guided bayesian neural networks for calibrated long-horizon sequence forecasting and community tracking. Mathematics , 13(17):2740, 2025. Xinyuan Song, Keyu Chen, Ziqian Bi, Qian Niu, Junyu Liu, Benji Peng, Sen Zhang, Ming Liu, Ming Li, Xuanhe Pan, et al. Mastering reinforcement learning: Foundations, algorithms, and real-world applications. 2025a. Xinyuan Song, Keyu Chen, Ziqian Bi, Qian Niu, Junyu Liu, Benji Peng, Sen Zhang, Zichen Yuan, Ming Liu, Ming Li, et al. Transformer: A survey and application. 2025b. Yu Tian, Zhongheng Yang, Chenshi Liu, Yiyun Su, Ziwei Hong, Zexi Gong, and Jingyuan Xu. Centermamba-sam: Center-prioritized scanning and temporal prototypes for brain lesion segmen-tation, 2025. URL https://arxiv.org/abs/2511.01243 .William Vickrey. Counterspeculation, auctions, and competitive sealed tenders. The Journal of Finance , 16(1):8–37, 1961. Huanhuan Wang, Xiao Zhang, Youbing Xia, and Xiang Wu. An intelligent blockchain-based access control framework with federated learning for genome-wide association studies. Computer Standards & Interfaces , 84:103694, 2023. M Wang, W Yang, and S Wang. Conditional matching preclusion number for the cayley graph on the symmetric group. Acta Math. Appl. Sin.(Chinese Series) , 36(5):813–820, 2013. Shi-Ying Wang, Mu-Jiang-shan Wang, Kai Feng, Shang-wei Lin, and Ming-Yu Zhang. Relation of the isolated scattering number of a graph and its complement graph. Journal of Shanxi University (Natural Science Edition) , 35(2):206–210, 2012. Shiying Wang, Jiangshan Wangmu, Zhifang Qi, and Yunxia Ren. Embedding paths into the 4-ary n-cube with faulty nodes. In 2011 International Conference on Consumer Electronics, Communi-cations and Networks (CECNet) , pages 4949–4951. IEEE, 2011. Tianyang Wang, Ziqian Bi, Yichao Zhang, Ming Liu, Weiche Hsieh, Pohsun Feng, Lawrence KQ Yan, Yizhu Wen, Benji Peng, Junyu Liu, et al. Deep learning model security: Threats and defenses. In arXiv:2412.08969 , 2024a. Tianyang Wang, Ming Liu, Benji Peng, Xinyuan Song, Charles Zhang, Xintian Sun, Qian Niu, Junyu Liu, Silin Chen, Keyu Chen, Ming Li, Pohsun Feng, Ziqian Bi, Yunze Wang, Yichao Zhang, Cheng Fei, and Lawrence KQ Yan. From bench to bedside: A review of clinical trials in drug discovery and development, 2024b. URL https://arxiv.org/abs/2412.09378 .Tianyang Wang, Silin Chen, Yunze Wang, Yichao Zhang, Xinyuan Song, Ziqian Bi, Ming Liu, Qian Niu, Junyu Liu, Pohsun Feng, Xintian Sun, Benji Peng, Charles Zhang, Keyu Chen, Ming Li, Cheng Fei, and Lawrence KQ Yan. From in silico to in vitro: A comprehensive guide to validating bioinformatics findings, 2025. URL https://arxiv.org/abs/2502.03478 .Yuyao Wang. Low-power design of advanced image processing algorithms under fpga in real-time applications. In 2024 IEEE 4th International Conference on Power, Electronics and Computer Applications (ICPECA) , pages 1080–1084. IEEE, 2024. Yuyao Wang. Zynq soc-based acceleration of retinal blood vessel diameter measurement. Archives of Advanced Engineering Science , pages 1–9, 2025. Yuyao Wang and Selahattin Sayil. Soft error evaluation and mitigation in gate diffusion input circuits. In 2024 IEEE 6th International Conference on Power, Intelligent Computing and Systems (ICPICS) ,pages 121–128. IEEE, 2024. Jonathan Weed, Vianney Perchet, and Philippe Rigollet. Online learning in repeated auctions. In 
+
+Conference on Learning Theory (COLT) , pages 1562–1583, 2016. Ze-Lin Wei, Hong-Yu An, Yao Yao, Wei-Cong Su, Guo Li, Saifullah, Bi-Feng Sun, and Mu-Jiang-Shan Wang. Fstgat: Financial spatio-temporal graph attention network for non-stationary financial systems and its application in stock price prediction. Symmetry , 17(8):1344, 2025a. 21 Zhang Wei, Peilu Hu, Shengning Lang, Hao Yan, Li Mei, Yichao Zhang, Chen Yang, Junfeng Hao, and Zhimo Han. Automated red-teaming framework for large language model security assessment: A comprehensive attack generation and detection system. arXiv preprint arXiv:2512.20677 , 2025b. Xiang Wu, Huanhuan Wang, Wei Tan, Dashun Wei, and Minyu Shi. Dynamic allocation strategy of vm resources with fuzzy transfer learning method. Peer-to-Peer Networking and Applications , 13 (6):2201–2213, 2020. Xiang Wu, Yongting Zhang, Minyu Shi, Pei Li, Ruirui Li, and Neal N Xiong. An adaptive federated learning scheme with differential privacy preserving. Future Generation Computer Systems , 127: 362–372, 2022. Xiang Wu, Jian Dong, Wei Bao, Baowen Zou, Lili Wang, and Huanhuan Wang. Augmented intelligence of things for emergency vehicle secure trajectory prediction and task offloading. IEEE Internet of Things Journal , 11(22):36030–36043, 2024a. Xiang Wu, Huanhuan Wang, Yongting Zhang, Baowen Zou, and Huaqing Hong. A tutorial-generating method for autonomous online learning. IEEE Transactions on Learning Technologies , 17:1532– 1541, 2024b. Xiang Wu, Yong-Ting Zhang, Khin-Wee Lai, Ming-Zhao Yang, Ge-Lan Yang, and Huan-Huan Wang. A novel centralized federated deep fuzzy neural network with multi-objectives neural architecture search for epistatic detection. IEEE Transactions on Fuzzy Systems , 33(1):94–107, 2024c. Dong Xiang, Sun-Yuan Hsieh, et al. G-good-neighbor diagnosability under the modified comparison model for multiprocessor systems. Theoretical Computer Science , 1028:115027, 2025. Yi Xin, Junlong Du, Qiang Wang, Zhiwen Lin, and Ke Yan. Vmt-adapter: Parameter-efficient transfer learning for multi-task dense scene understanding. In Proceedings of the AAAI conference on artificial intelligence , volume 38, pages 16085–16093, 2024. Yi Xin, Qi Qin, Siqi Luo, Kaiwen Zhu, Juncheng Yan, Yan Tai, Jiayi Lei, Yuewen Cao, Keqi Wang, Yibin Wang, et al. Lumina-dimoo: An omni diffusion large language model for multi-modal generation and understanding. arXiv preprint arXiv:2510.06308 , 2025a. Yi Xin, Juncheng Yan, Qi Qin, Zhen Li, Dongyang Liu, Shicheng Li, Victor Shea-Jay Huang, Yupeng Zhou, Renrui Zhang, Le Zhuo, et al. Lumina-mgpt 2.0: Stand-alone autoregressive image modeling. 
+
+arXiv preprint arXiv:2507.17801 , 2025b. Shengkai Xu, Hsiang Lun Kao, Tianxiang Xu, Honghui Zhang, Junqiao Wang, Runmeng Ding, Guanyu Liu, Tianyu Shi, Zhenyu Yu, Guofeng Pan, et al. Adaptive detector-verifier framework for zero-shot polyp detection in open-world settings. arXiv preprint arXiv:2512.12492 , 2025. Lawrence K. Q. Yan, Qian Niu, Ming Li, Yichao Zhang, Caitlyn Heqi Yin, Cheng Fei, Benji Peng, Ziqian Bi, Pohsun Feng, Keyu Chen, Tianyang Wang, Yunze Wang, Silin Chen, Ming Liu, Junyu Liu, Xinyuan Song, Riyang Bao, Zekun Jiang, and Ziyuan Qin. Large language model benchmarks in medical tasks, 2025. URL https://arxiv.org/abs/2410.21348 .Chen Yang, Yangfan He, Aaron Xuxiang Tian, Dong Chen, Jianhui Wang, Tianyu Shi, Arsalan Heydarian, and Pei Liu. Wcdt: World-centric diffusion transformer for traffic scene generation. In 2025 IEEE International Conference on Robotics and Automation (ICRA) , pages 6566–6572. IEEE, 2025. Mingjie You, Kaijie Chen, and Dawei Cheng. Drdgrl: Dual-relational dynamic graph representation learning for delay-sensitive stock trend prediction. In International Conference on Database Systems for Advanced Applications , pages 35–50. Springer, 2026. Weiming You, Zhenyu Yu, Zhimo Han, Xingyu Liu, and Yichao Zhang. Large language models for enhanced user experience in virtual and augmented reality: A comprehensive framework for ranking and recommendation systems. Available at SSRN 5964834 , 2025. Lin Yu, Xiaofei Han, Yifei Kang, Chiung-Yi Tseng, Danyang Zhang, Ziqian Bi, and Zhimo Han. Af-fective multimodal agents with proactive knowledge grounding for emotionally aligned marketing dialogue. arXiv preprint arXiv:2511.21728 , 2025. 22 Wenhao Yu, Shaohang Wei, Jiahong Liu, Yifan Li, Minda Hu, Aiwei Liu, Hao Zhang, and Irwin King. Probability-entropy calibration: An elastic indicator for adaptive fine-tuning. arXiv preprint arXiv:2602.01745 , 2026. Zhenyu Yu. Ai for science: A comprehensive review on innovations, challenges, and future directions. 
+
+International Journal of Artificial Intelligence for Science (IJAI4S) , 1(1), 2025. Hao Zhang, Bo Huang, Zhenjia Li, Xi Xiao, Hui Yi Leong, Zumeng Zhang, Xinwei Long, Tianyang Wang, and Hao Xu. Sensitivity-lora: Low-load sensitivity-based fine-tuning for large language models. arXiv preprint arXiv:2509.09119 , 2025a. Hao Zhang, Zhenjia Li, Runfeng Bao, Yifan Gao, Xi Xiao, Heng Zhang, Shuyang Zhang, Bo Huang, Yuhang Wu, Tianyang Wang, et al. Hyperadalora: Accelerating lora rank allocation during training via hypernetworks without sacrificing performance. arXiv preprint arXiv:2510.02630 , 2025b. Hao Zhang, Mengsi Lyu, Zhuo Chen, Xingrun Xing, Yulong Ao, and Yonghua Lin. Pdtrim: Targeted pruning for prefill-decode disaggregation in inference. arXiv preprint arXiv:2509.04467 , 2025c. Hao Zhang, Mengsi Lyu, Chenrui He, Yulong Ao, and Yonghua Lin. Trimtokenator: Towards adaptive visual token pruning for large multimodal models. arXiv preprint arXiv:2509.00320 ,2025d. Hao Zhang, Mengsi Lyu, Bo Huang, Yulong Ao, and Yonghua Lin. Trimtokenator-lc: Towards adaptive visual token pruning for large multimodal models with long contexts. arXiv preprint arXiv:2512.22748 , 2025e. Haobo Zhang, Xutao Mao, Guangyuan Dong, Ziwei Li, Xuanbo Su, Kaijie Chen, Jing Yang, and Zheng Lin. Memmark: State-evolution attribution watermarking for agent long-term memory systems. arXiv preprint arXiv:2605.25002 , 2026a. Heng Zhang, Haochen You, Zijian Zhang, Lubin Gan, Hao Zhang, Wenjun Huang, and Jin Huang. Mitigating generic token dominance in cross-domain foundation model for text-attributed graphs. In International Conference on Database Systems for Advanced Applications , pages 251–265. Springer, 2026b. Yichao Zhang, Ningyuan Deng, Xinyuan Song, Ziqian Bi, Tianyang Wang, Zheyu Yao, Keyu Chen, Ming Li, Qian Niu, Junyu Liu, Benji Peng, Sen Zhang, Ming Liu, Li Zhang, Xuanhe Pan, Jinlang Wang, Pohsun Feng, Yizhu Wen, Lawrence KQ Yan, Hongming Tseng, Yan Zhong, Yunze Wang, Ziyuan Qin, Bowen Jing, Junjie Yang, Jun Zhou, Chia Xin Liang, and Junhao Song. Advanced deep learning methods for protein structure prediction and design, 2025f. URL 
+
+https://arxiv.org/abs/2503.13522 .Qinjian Zhao, Zhihao Dou, Dinggen Zhang, Xiangyu Li, Chaoda Song, Zhongwei Wan, Xinpeng Li, Yanyan Zhang, Kaijie Chen, Qingtao Pan, et al. Stride: Strategic trajectory reasoning via discriminative estimation for verifiable reinforcement learning. arXiv preprint arXiv:2606.15866 ,2026. Yiyang Zhou, Yangfan He, Yaofeng Su, Siwei Han, Joel Jang, Gedas Bertasius, Mohit Bansal, and Huaxiu Yao. Reagent-v: A reward-driven multi-agent framework for video understanding. arXiv preprint arXiv:2506.01300 , 2025. 23
