@@ -1,0 +1,136 @@
+Title: Be Faithful When Response: Returning Fluent and Grounded Answers for Vision-Language Models Reinforcement Learning
+
+URL Source: https://arxiv.org/pdf/2606.29984v1
+
+Published Time: Tue, 30 Jun 2026 01:57:41 GMT
+
+Number of Pages: 6
+
+Markdown Content:
+# Be Faithful When Response: Returning Fluent and Grounded Answers for Vision-Language Models Reinforcement Learning 
+
+Peng 1, Lee 2, Yin Zhang 3, Yanglin Zhang 3, Haonan Wu 3, Zishan Liu 3, Ruoxi Zang 3, Xin Zhu 3,Jiayin Zheng 3, Jian Yao 3, Zefeng Ji 3,∗, Fei Ma 11GMLab, 2Hong Kong Polytechnic University, 3XPENG Robotics, ∗Project leader 
+
+Abstract 
+
+Reinforcement Learning (RL) is an important paradigm for improving the reasoning capa-bilities of Vision-Language Models (VLMs). However, directly applying RL to rollout mul-timodal reasoning can lead to instability, due to the exploitation of language priors, the ne-glect of visual evidence, and the generation of reasoning traces that are fluent yet not visually grounded. The question arises: Can initially steer the policy toward visually faithful rea-soning regime before applying reinforcement learning? To this end, we propose a Faithful Warm-Start (FWS) strategy that first curates samples with explicit vision-language causal re-lationships from six general VQA benchmarks to construct the FaithfulQA dataset, where each of the image-question pairs gains a cer-tain degree of visual observations, question re-quirements, commonsense knowledge, domain knowledge, and the final answer. Subsequently, a VLM-based judge is employed to further pu-rify the dataset, ensuring strong causal consis-tency and visual faithfulness. This warm-start stage equips the model with the capability to understand causally grounded vision-language patterns before subsequent RL optimization un-der sparse answer-level rewards. Experimental results show that such faithful supervision im-proves answer accuracy, stabilizes RL training, and reduces visually unsupported reasoning. 
+
+1 Introduction 
+
+Vision-Language Models (VLMs) have demon-strated strong performance across a wide range of multimodal tasks, from visual question answer-ing to complex visual reasoning (Lee et al., 2025b; Zhang et al., 2024). Recent advances further sug-gest that reinforcement learning (RL) is a promis-ing paradigm for directly optimizing task-level re-wards, thereby enhancing reasoning capabilities in a data-driven manner (Liu et al., 2025). How-ever, applying RL in the vision-language domain remains challenging, as reward signals are typically sparse and only evaluate final outcomes (Wu et al., 2025). As a result, models obtains high rewards by exploiting spurious cues rather than following faithful and visually grounded reasoning processes (Pan et al., 2026; Wang et al., 2025). This issue is particularly severe in vision-language reasoning tasks, where models often rely on dataset biases, language priors, or shortcut cor-relations, producing reasoning traces that function more as post-hoc rationalizations than genuine step-by-step derivations (Moll et al., 2025; Kargupta et al., 2025). During RL training, models can generate increasingly confident or verbose expla-nations without corresponding improvements in visual grounding. This ultimately leads to a fun-damental misalignment between answer-level opti-mization and faithful multimodal reasoning, where the optimization objective prioritizes reward maxi-mization over true reasoning consistency and visual adherence (Luo et al., 2026; Zheng et al., 2025). In this work, we argue that the initial policy state is a pre-condition (Li et al., 2025) for successful vision-language RL (Akarajaradwong and Chak-sangchaichot, 2025; Wei et al., 2025), yet often being overlooked. Directly initiating RL from a vanilla instruction-tuned VLM may place the pol-icy in a suboptimal region of the optimization land-scape, characterized by weak visual grounding and unstable reasoning trajectories. Starting from such a state, sparse rewards can further exacerbate short-cut learning, rather than encouraging genuine rea-soning. To address this issue, we introduce a Faith-ful Warm-Start (FWS) strategy grounded in faith-ful visual reasoning traces. Specifically, as illus-trated in Fig. 1, FWS first constructs a raw Faith-fulQA dataset from six general VQA benchmarks through a four-stage reasoning pipeline: ① Visual Grounding, ② Question Requirement, ③ Intermedi-ate Inference, and ④ Final Prediction, enabling the model to learn causally grounded vision-language        
+
+> arXiv:2606.29984v1 [cs.AI] 29 Jun 2026 61.92
+> 20.96
+> 7.6
+> 4.41
+> 4.13 0.98
+> PlotQA ChartQA AI2D
+> ScienceQA TQA Geo3K
+> Answer
+> Why is the road wet? Question
+> Image
+> QR: Question Requirement ；
+> CR: Contextual Reliance;
+> VG: Visual Grounding;
+> VN: Visual Neglect;
+> Commonsense; Language Priors;
+> Domain Knowledge;
+> “If the road is wet, a high
+> probability to be rainy” “Road;wet”
+> Direct R ollout
+> VG
+> Sunny weather;
+> No dark cloud;
+> Road sprinkler;
+> wet road;
+> “Road;wet” QR
+> Faithful Reasoning Trace Construction
+> “Road sprinkler
+> lead to wet road”
+> Policy
+> Reward
+> RL
+> No dark cloud -> a high probability to no rain;
+> Sunny -> Definitely no rainy days;
+> Road wet -> Could be rainy;
+> Road sprinkler -> Could lead to wet road
+> VG
+> QR
+> Blue sky;
+> Wet road;
+> Water; VN
+> CR
+> Environment
+> Faithful Reason
+> VLM
+> “Because it rained”
+> SFT
+> ①
+> ④
+> ②
+> ③
+> FaithfulQA
+> FaithfulQA
+> VLM Judge
+
+Figure 1: Pipeline of the proposed Faithful Workflow Strategy (FWS). Direct rollout typically suffers from a lack of visual grounding, leading to highly confident but erroneous outputs. FWS addresses this by eliciting faithful reasoning traces. Recognizing that standard VQA triplets often fail to convey true causal effects between vision and language, FWS screens six benchmarks to filter out data with weak causal links, composing the FaithfulQA dataset ( ①∼④). After four stages of faithful trace elicitation, a advanced VLM judge evaluates and refines these traces during SFT based on their causal dependence on visual evidence. The resulting high-confidence, faithfully grounded dataset prevents the VLM from drifting into degenerate reasoning during subsequent RL training. 
+
+reasoning patterns. Subsequently, a VLM-based judge further refines these reasoning traces through rigorous filtering for visual faithfulness and logi-cal consistency, thereby establishing a faithful ini-tialization prior to RL optimization. Through ex-tensive experiments on visual question answering and multimodal reasoning benchmarks, FWS im-proves answer accuracy, stabilizes RL training, and produces reasoning traces that are more faithfully grounded in visual evidence. These results suggest that faithful warm-start initialization is not merely a formatting choice, but a crucial prerequisite for effective reinforcement learning in VLMs. Our contributions are summarized as follows: • Highlighting the importance of policy initial-ization in vision-language RL and show that poor initialization promotes shortcut learning under sparse rewards. • The proposed FWS strategy compose a Faith-fulQA dataset, having it as a data-driven man-ner to have the model understand the causual patterns prior to RL optimization. • Empirical results show that FWS improves accuracy, training stability, and visual faithful-ness across multimodal reasoning tasks. 
+
+2 Related Work 
+
+VLMs have demonstrated strong capabilities in complex multimodal reasoning tasks (Zhu et al., 2025; Lee et al., 2025a). Recent works further explore RL to enhance such reasoning abilities through sparse rewards based on final answer cor-rectness (Kancheti et al., 2026; Tamo et al., 2026; Liu et al., 2026). However, directly applying RL to rollout multimodal reasoning in Fig. 1 often leads to training instability and shortcut learning, where models rely on language priors or dataset biases rather than visual evidence (Zhang et al., 2026; Li et al., 2026). As a result, ensuring faithful reasoning remains a fundamental challenge (Cao et al., 2025; Uppaal et al., 2026). Existing methods mainly focus on reward design during RL, while overlooking the importance of policy initialization. We argue that weakly grounded initial policies can drive optimization toward degenerate reasoning be-haviors under sparse rewards. Motivation . We propose that a faithful supervised warm-start is cru-cial for establishing a visually grounded and stable reasoning regime before RL optimization begins. 
+
+3 Methodology 
+
+The FWS strategy illustrated in Fig. 1 aims to equip the a baseline VLM (Qwen3-VL-2B-Instruct) with faithful reasoning traces, preventing the model from drifting toward degenerate reasoning behav-iors during RL optimization. To encourage the model to learn causally grounded vision-language patterns, FWS first curates samples from six gen-eral VQA benchmarks and constructs faithful rea-soning traces through four stages of faithful trace construction ( ①∼④). These traces are then rigor-ously verified for their causal dependence on visual evidence, and subsequently refined through SFT under the guidance of Qwen3VL-8B-Thinking (Bai et al., 2025), having it to be a VLM-based judge, ultimately constructing a high-confidence dataset of faithful multimodal reasoning traces. We claim that FaithfulQA is used solely for warm-start stage, while the original benchmark datasets are strictly preserved for inference and evaluation. 
+
+3.1 Faithful Trace Construction Rollout and pre-Filtering The rollout stage ex-ternalizes the model’s latent reasoning behavior into explicit reasoning trajectories. Given an im-age, a multimodal question, and candidate options, the VLM is prompted to generate a comprehen-sive reasoning process within <think> tags before producing the final prediction within <answer> 
+
+tags. To facilitate fine-grained causal analysis, each reasoning trajectory is further decomposed into a sequence of structured ①∼④“Reasoning Units” . Each unit corresponds to an atomic reason-ing operation and is explicitly categorized into one of four categories: ①“Visual Grounding” (direct evidence observed from the image), ②“Question Requirement” (external commonsense or domain knowledge), ③“Intermediate Inference” (interme-diate logical steps derived from facts and rules), and ④“Final Prediction” (the final derivation sup-porting the chosen answer). Following the rollout phase, we perform an initial filtering stage based on answer correctness, retaining only trajectories that lead to correct predictions, ensuring subse-quent causal analysis is focused on decomposing the logic behind successful decisions, effectively isolating “right for the right reasons” traces from spurious successes. 
+
+3.2 Faith Consistency Examination Unit-level Causal Intervention The core of our approach lies in verifying whether the generated reasoning units are functionally necessary for the model’s final decision, rather than being mere post-hoc narrations. For a correct reasoning trace con-sisting of N units, we perform N separate inter-vention trials. In each trial, we remove exactly one reasoning unit to form a “partial reasoning trace” . Having it alongside with the original image and question, are re-fed into the VLM to obtain a new answer. By observing how the model’s per-formance degrades when a specific piece of infor-mation is withheld, we can empirically quantify the causal weight of each unit. We define a pri-mary metric, num_correct_to_wrong , to capture the causal impact of the reasoning units. This met-ric represents the number of times the model’s pre-diction transitions from correct to incorrect upon the removal of a reasoning unit. A non-zero value for this metric provides direct causal evidence that the reasoning units are not redundant descriptions but are actively grounding the final decision. 
+
+3.3 Faithful Trace Selection Judging and post-Filtering To ensure high data quality, we employ the Qwen3VL-8B-Thinking as the judge to evaluate refined rea-soning traces across four critical dimensions, each scored on a scale of 0 to 2. The evalua-tion includes: visual_grounding_score , mea-suring dependence on actual visual evidence; 
+
+unit_causality_score , assessing the logical and causal necessity of reasoning units based on in-tervention results; non_contradiction_score ,checking internal logical consistency and consis-tency with the image; and faithfulness_score ,which provides an overall assessment of whether the reasoning chain faithfully explains the deci-sion process. The final faithful reasoning traces are obtained through strict post-filtering, requiring a perfect score of 2 across all four dimensions and a causal metric strictly greater than zero. Finally, when multiple candidate rollouts are available for the same question, we perform deduplication by se-lecting the trace with the strongest causal evidence and highest alignment scores. This procedure en-sures a diverse yet high-quality FaithfulQA dataset at warmup stage for RL optimization. 
+
+4 Experiments 
+
+Extensive experiments are conducted to compre-hensively evaluate the effectiveness of the FWS strategy. Specifically, our study focuses on the following research questions: (1) Can FWS effec-tively improve the visual faithfulness and causal grounding of reasoning traces? (2) How does FWS influence the stability and robustness of the subse-quent RL training process? 
+
+4.1 Experimental Setup Datasets . We construct FaithfulQA from six representative multimodal reasoning benchmarks, including AI2D (Kembhavi et al., 2016), Text-bookQA (Kembhavi et al., 2017), PlotQA (Methani et al., 2020), ScienceQA (Lu et al., 2022), Table 1: Comparison ( w. and w/o. RL ) of different SFT data scales on five multimodal reasoning benchmarks.                                                       
+
+> Model AI2D TQA PlotQA SciQA ChartQA Avg.
+> w/o. RL
+> Base model 60.33 69.49 56.72 78.38 89.64 70.91 20K-SFT 68.94 74.09 70.77 86.56 94.64 79.00
+> 40K-SFT 68.71 74.80 68.41 86.26 94.68 78.57 60K-SFT 69.43 75.01 67.76 87.65 94.80 78.93
+> w. RL
+> Base model 60.00 69.77 57.95 78.18 89.48 71.07 20K-SFT 69.23 74.61 70.80 86.81 96.12 79.51
+> 40K-SFT 69.23 75.28 68.78 86.86 96.08 79.24 60K-SFT 69.36 75.28 67.97 87.90 96.60 79.42
+
+ChartQA (Masry et al., 2022), and Geo3K (Lu et al., 2021), resulting in a total of 137,568 sam-ples. These datasets cover diverse reasoning sce-narios, such as chart comprehension, diagram rea-soning, scientific question answering, and geom-etry problem solving. For each image–question pair, we first generate reasoning traces, yielding 121,866 samples after pre-filtering (§3.1). We then perform answer-correctness filtering based on unit-level interventions using a VLM-based judge un-der the SFT policy, ultimately retaining 60,000 high-quality samples after post-filtering (§3.3). In addition, to evaluate whether the proposed warm-start strategy can improve subsequent reinforce-ment learning, we sample another 20,000 non-overlapping instances from the remaining data pool after SFT data selection and use them exclusively for the RL stage. Final model evaluation is still conducted on the original benchmark datasets. 
+
+Baselines . We use Qwen3-VL-Instruct (Bai et al., 2025) as backbone. Unless otherwise spec-ified, all methods are initialized from the same pretrained checkpoint to ensure fair comparison. FWS is applied prior to RL optimization, while all methods share the same reward design and training settings during the RL stage. 
+
+4.2 Main Results 
+
+Results in Table 1 evaluate whether FWS improves both SFT and subsequent RL optimization under three faithful SFT data scales (20K, 40K, and 60K). FWS consistently improves the base model across all benchmarks, with even 20K samples yielding clear gains, demonstrating the effective-ness of faithful reasoning supervision prior to RL. Increasing the SFT scale further enhances per-formance, while 60K-SFT approaches saturation on most benchmarks. Moreover, RL training ini-tialized from FWS-supervised checkpoints consis-
+
+Figure 2: Reward dynamics of Basemodel-RL (A) and 60K-SFT-RL (B). 
+
+tently outperforms the base RL model, highlight-ing the importance of faithful warm-start initial-ization. Rather than learning grounded reasoning solely from sparse rewards, FWS first steers the model into a more faithful reasoning regime, pro-viding a stronger and more stable starting point for subsequent RL optimization. Overall, these re-sults support the hypothesis that faithful supervised warm-start is critical for effective VLMs RL. 
+
+4.3 Analysis of Reasoning Faithfulness 
+
+We further analyze the reward dynamics during RL training to understand the impact of faithful warm-start initialization. In Fig. 2A, RL directly initial-ized from the base model exhibits only gradual improvements, with rewards increasing in the early stage but eventually saturating at a relatively low plateau accompanied by noticeable fluctuations. In contrast, Fig. 2B shows RL initialized from the 60K faithful SFT checkpoint follows a markedly different trajectory, where rewards remain low dur-ing an initial adaptation phase, after which they rise sharply and rapidly converge to a higher and more stable plateau. This behavior suggests that faithful SFT encodes informative reasoning priors that can be effectively activated and refined by RL, enabling the policy to more efficiently discover reward-aligned reasoning trajectories and achieve superior optimization performance. 
+
+5 Future Work 
+
+In future work, we plan to further extend FWS by integrating the reasoning dynamics acquired dur-ing the SFT stage into the RL reward modeling process. Instead of relying exclusively on outcome-level supervision based on final answer correctness, we aim to incorporate process-level rewards that explicitly encourage visually grounded, causally coherent, and logically consistent intermediate rea-soning trajectories. Such a design has the potential to further enhance the stability and faithfulness of multimodal reinforcement learning. References 
+
+Pawitsapak Akarajaradwong and Chompakorn Chak-sangchaichot. 2025. Cold starts and hard cases: A two-stage sft-rlvr approach for legal machine trans-lation (just-nlp l-mt shared task). In Proceedings of the 1st Workshop on NLP for Empowering Justice (JUST-NLP 2025) , pages 101–106. Shuai Bai, Yuxuan Cai, Ruizhe Chen, Keqin Chen, Xionghui Chen, Zesen Cheng, Lianghao Deng, Wei Ding, Chang Gao, Chunjiang Ge, and 1 others. 2025. Qwen3-vl technical report. arXiv preprint arXiv:2511.21631 .Huangsen Cao, Qin Mei, Zhiheng Li, Yuxi Li, Zhan Meng, Ying Zhang, Chen Li, Zhimeng Zhang, Xin Ding, Yongwei Wang, and 1 others. 2025. Reveal: Reasoning-enhanced forensic evidence analysis for explainable ai-generated image detection. arXiv preprint arXiv:2511.23158 .Sai Srinivas Kancheti, Aditya Kanade, Rohit Sinha, Vi-neeth N Balasubramanian, and Tanuja Ganu. 2026. Faithful grpo: Improving visual spatial reasoning in multimodal language models via constrained policy optimization. arXiv preprint arXiv:2604.08476 .Priyanka Kargupta, Shuyue Stella Li, Haocheng Wang, Jinu Lee, Shan Chen, Orevaoghene Ahia, Dean Light, Thomas L Griffiths, Max Kleiman-Weiner, Jiawei Han, and 1 others. 2025. Cognitive foundations for reasoning and their manifestation in llms. arXiv preprint arXiv:2511.16660 .Aniruddha Kembhavi, Mike Salvato, Eric Kolve, Min Joon Seo, Hannaneh Hajishirzi, and Ali Farhadi. 2016. A diagram is worth a dozen images. In Com-puter Vision - ECCV 2016 - 14th European Confer-ence, Amsterdam, The Netherlands, October 11-14, 2016, Proceedings, Part IV , Lecture Notes in Com-puter Science, pages 235–251. Springer. Aniruddha Kembhavi, Minjoon Seo, Dustin Schwenk, Jonghyun Choi, Ali Farhadi, and Hannaneh Ha-jishirzi. 2017. Are you smarter than a sixth grader? textbook question answering for multimodal machine comprehension. In Proceedings of the IEEE Confer-ence on Computer Vision and Pattern Recognition (CVPR) .Yujian Lee, Peng Gao, Zailong Chen, Wentao Fan, Guquan Jing, and Yiyang Hu. 2025a. Boosting audio-visual segmentation via triple-modalities alignment. In 2025 IEEE International Conference on Multime-dia and Expo (ICME) , pages 1–6. IEEE. Yujian Lee, Peng Gao, Yongqi Xu, and Wentao Fan. 2025b. How do optical flow and textual prompts collaborate to assist in audio-visual semantic seg-mentation? In Proceedings of the IEEE/CVF In-ternational Conference on Computer Vision , pages 23342–23352. Senyu Li, Zipeng Sun, Jiayi Wang, Xue Liu, Pontus Stenetorp, Siva Reddy, and David Ifeoluwa Ade-lani. 2025. Warmup generations: A task-agnostic approach for guiding sequence-to-sequence learning with unsupervised initial state generation. In Pro-ceedings of the 63rd Annual Meeting of the Associa-tion for Computational Linguistics (Volume 1: Long Papers) , pages 8870–8880. Yantao Li, Qiang Hui, Chenyang Yan, Kanzhi Cheng, Fang Zhao, Chao Tan, Huanling Gao, Jianbing Zhang, Kai Wang, Xinyu Dai, and 1 others. 2026. Palmr: Towards faithful visual reasoning via multimodal pro-cess alignment. arXiv preprint arXiv:2603.06652 .Yu Liu, Wenxiao Zhang, Cong Cao, Fangfang Yuan, Weizhuo Chen, Cheng Hu, Pin Xu, Yuling Yang, Kun Peng, Diandian Guo, and 1 others. 2026. Craft: Calibrated reasoning with answer-faithful traces via reinforcement learning for multi-hop question an-swering. arXiv preprint arXiv:2602.01348 .Ziyu Liu, Zeyi Sun, Yuhang Zang, Xiaoyi Dong, Yuhang Cao, Haodong Duan, Dahua Lin, and Jiaqi Wang. 2025. Visual-rft: Visual reinforcement fine-tuning. In Proceedings of the IEEE/CVF International Con-ference on Computer Vision , pages 2034–2044. Pan Lu, Ran Gong, Shibiao Jiang, Liang Qiu, Siyuan Huang, Xiaodan Liang, and Song-Chun Zhu. 2021. Inter-GPS: Interpretable geometry problem solving with formal language and symbolic reasoning. In 
+
+Proceedings of the 59th Annual Meeting of the Asso-ciation for Computational Linguistics and the 11th International Joint Conference on Natural Language Processing (Volume 1: Long Papers) , pages 6774– 6786, Online. Association for Computational Lin-guistics. Pan Lu, Swaroop Mishra, Tony Xia, Liang Qiu, Kai-Wei Chang, Song-Chun Zhu, Oyvind Tafjord, Peter Clark, and Ashwin Kalyan. 2022. Learn to explain: Multimodal reasoning via thought chains for science question answering. In The 36th Conference on Neu-ral Information Processing Systems (NeurIPS) .Romy Luo, Zihui Sherry Xue, Alex Dimakis, and Kris-ten Grauman. 2026. When thinking drifts: Evidential grounding for robust video reasoning. Advances in Neural Information Processing Systems , 38:83696– 83727. Ahmed Masry, Do Xuan Long, Jia Qing Tan, Shafiq Joty, and Enamul Hoque. 2022. ChartQA: A benchmark for question answering about charts with visual and logical reasoning. In Findings of the Association for Computational Linguistics: ACL 2022 , pages 2263– 2279, Dublin, Ireland. Association for Computational Linguistics. Nitesh Methani, Pritha Ganguly, Mitesh M. Khapra, and Pratyush Kumar. 2020. Plotqa: Reasoning over scientific plots. In Proceedings of the IEEE/CVF Win-ter Conference on Applications of Computer Vision (WACV) .Johannes Moll, Markus Graf, Tristan Lemke, Nico-las Lenhart, Daniel Truhn, Jean-Benoit Delbrouck, Jiazhen Pan, Daniel Rueckert, Lisa C Adams, and Keno K Bressem. 2025. Evaluating reason-ing faithfulness in medical vision-language mod-els using multimodal perturbations. arXiv preprint arXiv:2510.11196 .Pei-Chi Pan, Yingbin Liang, and Sen Lin. 2026. Re-ward modeling for reinforcement learning-based llm reasoning: Design, challenges, and evaluation. arXiv preprint arXiv:2602.09305 .J Ben Tamo, Yuxing Lu, Benoit L Marteau, Micky C Nnamdi, and May D Wang. 2026. Evidencerl: Re-inforcing evidence consistency for trustworthy lan-guage models. arXiv preprint arXiv:2603.19532 .Rheeya Uppaal, Phu Mon Htut, Min Bai, Nikolaos Pap-pas, Zheng Qi, and Sandesh Swamy. 2026. Journey before destination: On the importance of visual faith-fulness in slow thinking. In Proceedings of the 19th Conference of the European Chapter of the Associa-tion for Computational Linguistics (Volume 1: Long Papers) , pages 4147–4168. Yanbo Wang, Yongcan Yu, Jian Liang, and Ran He. 2025. A comprehensive survey on trustworthiness in reasoning with large language models. arXiv preprint arXiv:2509.03871 .Lai Wei, Yuting Li, Kaipeng Zheng, Chen Wang, Yue Wang, Linghe Kong, Lichao Sun, and Weiran Huang. 2025. Advancing multimodal reasoning via rein-forcement learning with cold start. arXiv preprint arXiv:2505.22334 .Weijia Wu, Chen Gao, Joya Chen, Kevin Qinghong Lin, Qingwei Meng, Yiming Zhang, Yuke Qiu, Hong Zhou, and Mike Zheng Shou. 2025. Reinforcement learning for large model: A survey. arXiv preprint arXiv:2508.08189 .Can Zhang, Ziheng Wu, Zhenghao Chen, Yufei Zhan, Yifan Li, Zhao Zhang, Xian Wang, Minghui Qiu, and 1 others. 2026. Seeing is believing? mitigating ocr hallucinations in multimodal large language models. 
+
+Advances in Neural Information Processing Systems ,38:74230–74248. Jingyi Zhang, Jiaxing Huang, Sheng Jin, and Shijian Lu. 2024. Vision-language models for vision tasks: A survey. IEEE transactions on pattern analysis and machine intelligence , 46(8):5625–5644. Ziwei Zheng, Michael Yang, Jack Hong, Chenxiao Zhao, Guohai Xu, Le Yang, Chao Shen, and Xing Yu. 2025. Deepeyes: Incentivizing" thinking with images" via reinforcement learning. arXiv preprint arXiv:2505.14362 .Jinguo Zhu, Weiyun Wang, Zhe Chen, Zhaoyang Liu, Shenglong Ye, Lixin Gu, Hao Tian, Yuchen Duan, Weijie Su, Jie Shao, and 1 others. 2025. Internvl3: Exploring advanced training and test-time recipes for open-source multimodal models. arXiv preprint arXiv:2504.10479 .

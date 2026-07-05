@@ -1,0 +1,390 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-05T20:09:33.903592+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 3,
+    "deep_cap": 6,
+    "deep_selected": 3,
+    "quick_candidates": 6,
+    "quick_skim_target": 11,
+    "quick_selected": 6
+  },
+  "deep_dive": [
+    {
+      "id": "2606.29984v1",
+      "source": "arxiv",
+      "title": "Be Faithful When Response: Returning Fluent and Grounded Answers for Vision-Language Models Reinforcement Learning",
+      "abstract": "Reinforcement Learning (RL) is an important paradigm for improving the reasoning capabilities of Vision-Language Models (VLMs). However, directly applying RL to rollout multimodal reasoning can lead to instability, due to the exploitation of language priors, the neglect of visual evidence, and the generation of reasoning traces that are fluent yet not visually grounded. The question arises: Can initially steer the policy toward visually faithful reasoning regime before applying reinforcement learning? To this end, we propose a Faithful Warm-Start (FWS) strategy that first curates samples with explicit vision-language causal relationships from six general VQA benchmarks to construct the FaithfulQA dataset, where each of the image-question pairs gains a certain degree of visual observations, question requirements, commonsense knowledge, domain knowledge, and the final answer. Subsequently, a VLM-based judge is employed to further purify the dataset, ensuring strong causal consistency and visual faithfulness. This warm-start stage equips the model with the capability to understand causally grounded vision-language patterns before subsequent RL optimization under sparse answer-level rewards. Experimental results show that such faithful supervision improves answer accuracy, stabilizes RL training, and reduces visually unsupported reasoning.",
+      "authors": [
+        "Peng",
+        "Lee",
+        "Yin Zhang",
+        "Yanglin Zhang",
+        "Haonan Wu",
+        "Zishan Liu",
+        "Ruoxi Zang",
+        "Xin Zhu",
+        "Jiayin Zheng",
+        "Jian Yao",
+        "Zefeng Ji",
+        "Fei Ma"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-06-29T08:58:33+00:00",
+      "link": "https://arxiv.org/pdf/2606.29984v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "RL for vision-language models to improve reasoning faithfulness",
+      "llm_evidence_cn": "对视觉-语言模型应用强化学习以提高推理忠实度",
+      "llm_evidence": "对视觉-语言模型应用强化学习以提高推理忠实度",
+      "canonical_evidence": "对视觉-语言模型应用强化学习以提高推理忠实度",
+      "llm_tldr_en": "Proposes Faithful Warm-Start (FWS) to steer VLM policy toward visually grounded reasoning before applying RL, improving stability.",
+      "llm_tldr_cn": "直接对视觉语言模型应用RL进行多模态推理会导致不稳定和视觉证据忽略。本文提出忠实预热启动（FWS）策略，先通过因果对齐样本构建FaithfulQA数据集引导策略走向视觉忠实推理，再应用RL，有效提升推理稳定性和忠实度。",
+      "llm_tldr": "直接对视觉语言模型应用RL进行多模态推理会导致不稳定和视觉证据忽略。本文提出忠实预热启动（FWS）策略，先通过因果对齐样本构建FaithfulQA数据集引导策略走向视觉忠实推理，再应用RL，有效提升推理稳定性和忠实度。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "reinforcement learning for large language model",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.31846v1",
+      "source": "arxiv",
+      "title": "Z-1: Efficient Reinforcement Learning for Vision-Language-Action Models",
+      "abstract": "Vision-Language-Action (VLA) models offer a promising framework for robotic manipulation by connecting language instructions, visual observations, and continuous control. However, most existing policies remain limited by behavior cloning or supervised fine-tuning (SFT) from fixed demonstrations, which provides limited opportunity to improve from the policy's own failures. In this paper, we present Z-1, a reinforcement learning (RL) post-training framework for flow-based VLA models. Built on top of $π_{0.5}$, Z-1 uses only publicly released RoboCasa demonstrations for SFT and then applies a task-wise Group Relative Policy Optimization (GRPO) strategy across $24$ standard RoboCasa tasks. To improve the efficiency and stability of online optimization, Z-1 combines shared-prefix rollout construction, tree-structured trajectory branching, completion-aware reward calibration, and selective joint training of VLM and Action Expert. Across all $24$ RoboCasa tasks, Z-1 achieves an average success rate of $80.6\\%$, improving over its SFT initialization by $13.2\\%$ points and outperforms the published sota models. These results show that systematic GRPO post-training can substantially improve flow-based VLA policies without additional private demonstrations.",
+      "authors": [
+        "Lang Cao",
+        "Renhong Chen",
+        "Luyi Li",
+        "Peng Wang",
+        "Mofan Peng",
+        "Yitong Li"
+      ],
+      "primary_category": "cs.RO",
+      "categories": [
+        "cs.RO",
+        "cs.AI"
+      ],
+      "published": "2026-06-30T15:46:57+00:00",
+      "link": "https://arxiv.org/pdf/2606.31846v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "reinforcement learning for VLA models using GRPO",
+      "llm_evidence_cn": "针对视觉-语言-动作模型的强化学习，使用GRPO策略优化",
+      "llm_evidence": "针对视觉-语言-动作模型的强化学习，使用GRPO策略优化",
+      "canonical_evidence": "针对视觉-语言-动作模型的强化学习，使用GRPO策略优化",
+      "llm_tldr_en": "Proposes Z-1, a RL post-training framework for VLA models using task-wise GRPO, improving policy from own failures.",
+      "llm_tldr_cn": "针对视觉-语言-动作模型，现有方法多依赖行为克隆和固定演示，无法从失败中学习。本文提出Z-1，一个基于强化学习的后训练框架，在流式VLA模型上应用逐任务分组相对策略优化（GRPO），在24个机器人任务上提升策略效率和稳定性，展现了RL在具身大模型中的潜力。",
+      "llm_tldr": "针对视觉-语言-动作模型，现有方法多依赖行为克隆和固定演示，无法从失败中学习。本文提出Z-1，一个基于强化学习的后训练框架，在流式VLA模型上应用逐任务分组相对策略优化（GRPO），在24个机器人任务上提升策略效率和稳定性，展现了RL在具身大模型中的潜力。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "reinforcement learning for large language model",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.30406v1",
+      "source": "arxiv",
+      "title": "MOPD: Multi-Teacher On-Policy Distillation for Capability Integration in LLM Post-Training",
+      "abstract": "Modern large language models (LLMs) rely on reinforcement learning during post-training to push specific capabilities, yet integrating multiple capabilities into one model remains hard. Existing methods, such as Off-Policy Finetune and Mix-RL, are either inefficient or lose performance. In this work, we propose Multi-teacher On-Policy Distillation (MOPD), a post-training paradigm for combining the capabilities of multiple domain RL teachers: we first run per-domain specialised RL to obtain a set of domain teachers, then distill these teachers into the student on its own rollouts. This eliminates exposure bias and provides a dense optimization signal. On Qwen3-30B-A3B, MOPD outperforms Mix-RL, Cascade RL, Off-Policy Finetune, and Param-Merge baselines, inheriting nearly all of each teacher's capability. MOPD also enables parallel, independent development of domain teachers, removing the cross-domain coupling typical of multi-domain post-training. MOPD has been deployed in the post-training of MiMo-V2-Flash, an industrial-scale frontier model, demonstrating its practical value for capability integration in frontier-scale LLMs.",
+      "authors": [
+        "Wenhan Ma",
+        "Jianyu Wei",
+        "Liang Zhao",
+        "Hailin Zhang",
+        "Bangjun Xiao",
+        "Lei Li",
+        "Qibin Yang",
+        "Bofei Gao",
+        "Yudong Wang",
+        "Rang Li",
+        "Jinhao Dong",
+        "Zhifang Sui",
+        "Fuli Luo"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.LG"
+      ],
+      "published": "2026-06-29T14:51:28+00:00",
+      "link": "https://arxiv.org/pdf/2606.30406v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "on-policy distillation of multiple RL teachers for LLM capability integration",
+      "llm_evidence_cn": "通过同策略蒸馏整合多个RL教师能力的LLM后训练方法",
+      "llm_evidence": "通过同策略蒸馏整合多个RL教师能力的LLM后训练方法",
+      "canonical_evidence": "通过同策略蒸馏整合多个RL教师能力的LLM后训练方法",
+      "llm_tldr_en": "MOPD combines multiple domain-specialized RL teachers via on-policy distillation for LLM post-training, outperforming Mix-RL and Cascade RL.",
+      "llm_tldr_cn": "针对大语言模型后训练中难以整合多种能力的问题，MOPD提出多教师同策略蒸馏范式：先对各个领域进行专门RL训练得到教师，然后在学生自身轨迹上蒸馏这些教师，消除曝光偏差并提供密集优化信号。在Qwen3-30B-A3B上，MOPD优于混合RL、级联RL等方法。",
+      "llm_tldr": "针对大语言模型后训练中难以整合多种能力的问题，MOPD提出多教师同策略蒸馏范式：先对各个领域进行专门RL训练得到教师，然后在学生自身轨迹上蒸馏这些教师，消除曝光偏差并提供密集优化信号。在Qwen3-30B-A3B上，MOPD优于混合RL、级联RL等方法。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "reinforcement learning for large language model",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2606.29700v1",
+      "source": "arxiv",
+      "title": "Toward Secure and Reliable PDDL Formalization of Large Language Models with Planner-in-the-Loop Feedback",
+      "abstract": "Planning often requires symbolic specifications that are both executable and verifiable. For large language models deployed in autonomous or decision-support systems, failures in such formalization may lead to unverifiable decisions, execution failures, or unsafe downstream behavior. We present NL-PDDL-Bench, a multi-domain benchmark for natural-language-to-PDDL specification construction with planner-verified executability and controlled difficulty scaling by object count. We further propose a planner-in-the-loop framework that uses validator and planner diagnostics to revise non-executable specifications through localized edits. Building on this infrastructure, we develop a planner-grounded optimization recipe that combines parameter-efficient Low-Rank Adaptation supervised fine-tuning, offline planner-derived preference pairs for Direct Preference Optimization, and inference-time planner-in-the-loop repair, without requiring online planner calls during training. We also provide a unified evaluation suite for parseability, solvability, specification similarity, and outcome-aware plan-level consistency against planner references. Experiments on representative model families show substantial gains in planner success and plan-level agreement, with improved robustness under difficulty scaling and cross-domain variation. These results highlight the value of externally verifiable formalization for reliable deployment of LLMs in safety- or security-sensitive planning systems. Code and data are available at: https://github.com/ibasicplan/NL-PDDL-Bench",
+      "authors": [
+        "Jiamei Jiang",
+        "Jiajing Zhang",
+        "Feifei Mo",
+        "Linjing Li",
+        "Daniel Zeng"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-06-29T02:08:30+00:00",
+      "link": "https://arxiv.org/pdf/2606.29700v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "LLM agent planning and formalization for task automation",
+      "llm_evidence_cn": "大语言模型智能体规划与形式化用于任务自动化",
+      "llm_evidence": "大语言模型智能体规划与形式化用于任务自动化",
+      "canonical_evidence": "大语言模型智能体规划与形式化用于任务自动化",
+      "llm_tldr_en": "NL-PDDL-Bench and a planner-in-the-loop framework enable LLMs to generate executable PDDL specifications, improving reliability for autonomous task automation.",
+      "llm_tldr_cn": "为了解决大语言模型在自主决策系统中形式化规划失败导致执行不安全的问题，本文提出NL-PDDL-Bench基准和规划器在环框架。该框架利用验证器和规划器诊断反馈来修正不可执行的规划，从而提升LLM在任务自动化中的可靠性和安全性。",
+      "llm_tldr": "为了解决大语言模型在自主决策系统中形式化规划失败导致执行不安全的问题，本文提出NL-PDDL-Bench基准和规划器在环框架。该框架利用验证器和规划器诊断反馈来修正不可执行的规划，从而提升LLM在任务自动化中的可靠性和安全性。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2606.28715v1",
+      "source": "arxiv",
+      "title": "SEATauBench: Adapting Tool-Agent-User Evaluation Into Low-Resource Southeast Asian Languages",
+      "abstract": "While AI development and evaluation for Southeast Asia (SEA) has grown rapidly, agent capabilities in regional languages are still poorly understood despite its importance to sovereign AI. To fill this gap, we introduce SEATauBench, the first agent-focused evaluation framework for SEA sovereign AI. SeaTau adapts TauBench to five languages -- Mandarin, Vietnamese, Thai, Indonesian, and Filipino -- and evaluates agents across progressively localized settings that vary the language of user-agent interaction, tool specifications, and task domains. Across three recent models, we find that English agent capabilities transfer reasonably well when only the conversation language changes, but quality and robustness degrade sharply as more task contexts are localized, with the largest losses in full domain adaptation. We also the limits of English-only agent assessment for measuring agent capabilities in SEA languages. More broadly, SeaTau provides a diagnostic benchmark and reusable adaptation pipeline for building reliable multilingual agents for linguistically diverse regions. Data and code can be accessed at github.com/SEACrowd/SEATauBench.",
+      "authors": [
+        "My Chiffon Nguyen",
+        "Aulia Adila",
+        "Saksorn Ruangtanusak",
+        "Kittiphat Leesombatwathana",
+        "Vissuta Gunawan Lim",
+        "Patomporn Payoungkhamdee",
+        "Samuel Cahyawijaya"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.AI"
+      ],
+      "published": "2026-06-27T03:44:00+00:00",
+      "link": "https://arxiv.org/pdf/2606.28715v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "adapts agent evaluation framework to low-resource languages, relevant to LLM agent assessment",
+      "llm_evidence_cn": "将智能体评估框架适配到低资源语言，涉及LLM智能体评估",
+      "llm_evidence": "将智能体评估框架适配到低资源语言，涉及LLM智能体评估",
+      "canonical_evidence": "将智能体评估框架适配到低资源语言，涉及LLM智能体评估",
+      "llm_tldr_en": "Introduces SEATauBench, the first agent-focused evaluation benchmark for Southeast Asian languages, assessing LLM agent capabilities in tool-use and task automation across localization levels.",
+      "llm_tldr_cn": "大语言模型智能体在低资源语言上的能力评估尚属空白。本文构建SEATauBench，首个面向东南亚语言的智能体评估基准，覆盖五种语言，逐步本地化用户交互、工具规范和任务领域。实验表明仅改变对话语言时英语能力迁移尚可，但更深层本地化后性能急剧下降。该工作为多语言智能体任务自动化评估提供了重要工具，直接服务于需求4中的LLM智能体评估。",
+      "llm_tldr": "大语言模型智能体在低资源语言上的能力评估尚属空白。本文构建SEATauBench，首个面向东南亚语言的智能体评估基准，覆盖五种语言，逐步本地化用户交互、工具规范和任务领域。实验表明仅改变对话语言时英语能力迁移尚可，但更深层本地化后性能急剧下降。该工作为多语言智能体任务自动化评估提供了重要工具，直接服务于需求4中的LLM智能体评估。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2606.29892v1",
+      "source": "arxiv",
+      "title": "Trust Your Instincts: Confidence-Driven Test-Time RL for Vision-Language-Action Models",
+      "abstract": "Reinforcement learning (RL) has become indispensable for pushing Vision-Language-Action Models (VLAs) beyond static imitation learning. However, existing RL methods typically require external environmental feedback, relying on predefined success signals to guide policy updates. In this work, we show that VLA models possess useful internal evaluative capabilities: in discrete-action VLAs, trajectories with higher generation confidence are significantly more likely to succeed. Based on this observation, we introduce T^2VLA (Test-time VLA), an architecture-agnostic test-time RL framework that enables VLA models to achieve self-bootstrapping policy improvement. Instead of relying on external rewards, T^2VLA leverages trajectory-level similarity to high-confidence expert demonstrations as an intrinsic reward signal. In addition, we propose a Confidence-Driven Dual Expert Bootstrapping mechanism, which dynamically balances a Local Pseudo-Expert for exploration and a Global Expert Pool for training stability. Extensive experiments on the LIBERO and RoboTwin benchmarks show that T^2VLA consistently outperforms supervised baselines and approaches oracle RL performance with ground-truth rewards, achieving effective improvement without external reward feedback. Furthermore, T^2VLA adapts to distinct VLA paradigms, including both OpenVLA-OFT and the pi series.",
+      "authors": [
+        "Siyao Chen",
+        "Jiakang Yuan",
+        "Jiaxin Wang",
+        "Tao Chen"
+      ],
+      "primary_category": "cs.RO",
+      "categories": [
+        "cs.RO",
+        "cs.AI"
+      ],
+      "published": "2026-06-29T07:31:41+00:00",
+      "link": "https://arxiv.org/pdf/2606.29892v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "test-time RL for VLAs using internal confidence without external rewards",
+      "llm_evidence_cn": "利用内部置信度进行测试时RL，无需外部奖励的VLA模型",
+      "llm_evidence": "利用内部置信度进行测试时RL，无需外部奖励的VLA模型",
+      "canonical_evidence": "利用内部置信度进行测试时RL，无需外部奖励的VLA模型",
+      "llm_tldr_en": "T^2VLA enables test-time RL for vision-language-action models by using trajectory-level confidence as an internal reward signal, avoiding external feedback.",
+      "llm_tldr_cn": "针对VLA模型在测试时依赖外部环境奖励的问题，T^2VLA发现离散动作VLA中高置信度轨迹更可能成功，从而提出无需外部奖励的测试时强化学习框架。通过轨迹级相似度引导策略提升，实现了自我引导的策略改进，在多个机器人任务上取得了显著效果。",
+      "llm_tldr": "针对VLA模型在测试时依赖外部环境奖励的问题，T^2VLA发现离散动作VLA中高置信度轨迹更可能成功，从而提出无需外部奖励的测试时强化学习框架。通过轨迹级相似度引导策略提升，实现了自我引导的策略改进，在多个机器人任务上取得了显著效果。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "reinforcement learning for large language model",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2606.31958v1",
+      "source": "arxiv",
+      "title": "Adapting Generalist Robot Policies with Semantic Reinforcement Learning",
+      "abstract": "Generalist robot policies learn a diverse repertoire of behaviors from large-scale pretraining. In principle, this makes them excellent priors for downstream adaptation via reinforcement learning (RL). In practice, however, standard RL methods leveraging this prior optimize directly over robot actions, requiring the base policy's action distribution to be close to that of a performant policy from the start. This assumption breaks down for complex or long-horizon tasks that fall outside the pretraining distribution. Our key insight is that, for sufficiently expressive generalist policies, language prompts are an effective alternative space for learning to solve such tasks: modulating language inputs elicits skills already within the policy's repertoire, which can be composed to solve tasks beyond its zero-shot capabilities. We propose Semantic Action Reinforcement Learning (SARL), which learns to optimize this prompt space through online interaction, treating the generalist policy as a controllable skill prior. Importantly, leveraging pretrained skills rather than learning new ones from scratch yields structured, semantically meaningful exploration and highly efficient online improvement, and learning to modulate prompts through experience grounds them in induced real-world behaviors for robust task-solving. Across real-world settings and simulated benchmarks, we show SARL unlocks fundamentally new capabilities -- adapting VLA behavior to solve complex, long-horizon tasks -- and significantly outperforms existing approaches for improving robot behavior in deployment.",
+      "authors": [
+        "Jagdeep Singh Bhatia",
+        "Andrew Wagenmaker",
+        "William Chen",
+        "Sergey Levine"
+      ],
+      "primary_category": "cs.RO",
+      "categories": [
+        "cs.RO"
+      ],
+      "published": "2026-06-30T17:00:33+00:00",
+      "link": "https://arxiv.org/pdf/2606.31958v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Semantic RL using language prompts for policy adaptation",
+      "llm_evidence_cn": "使用语言提示的语义强化学习进行策略自适应",
+      "llm_evidence": "使用语言提示的语义强化学习进行策略自适应",
+      "canonical_evidence": "使用语言提示的语义强化学习进行策略自适应",
+      "llm_tldr_en": "Semantic RL adapts generalist robot policies by optimizing language prompts instead of actions, enabling effective adaptation for complex tasks outside pretraining distribution.",
+      "llm_tldr_cn": "通用机器人策略通过RL适应复杂任务时，因动作空间差异而难以优化。本文提出语义强化学习，将语言提示作为替代优化空间：通过强化学习调整语言输入，从而激活策略中已有的技能。实验在多个长程复杂任务上验证，该方法能高效适配超出预训练分布的任务。该工作为RL在语言空间中的应用提供了新思路，可迁移至语言生成等领域。",
+      "llm_tldr": "通用机器人策略通过RL适应复杂任务时，因动作空间差异而难以优化。本文提出语义强化学习，将语言提示作为替代优化空间：通过强化学习调整语言输入，从而激活策略中已有的技能。实验在多个长程复杂任务上验证，该方法能高效适配超出预训练分布的任务。该工作为RL在语言空间中的应用提供了新思路，可迁移至语言生成等领域。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "policy gradient methods for language generation",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2606.30185v1",
+      "source": "arxiv",
+      "title": "Dynamo: Dynamic Skill-Tool Evolution for Vision-Language Agents",
+      "abstract": "Improving vision-language models (VLMs) on visual reasoning typically requires retraining or hand-designed prompts and tools. We present Dynamo, a training-free framework that adapts a frozen VLM without any weight updates. On a small labeled training subset, the agent inspects its own correct and incorrect attempts and evolves two complementary capabilities: reusable reasoning skills for cognitive bottlenecks, and executable visual tools for perceptual ones. Each generated tool is paired with a skill that specifies when to invoke it, and both capability types accumulate in a persistent library. Across four visual reasoning benchmarks and five VLM backbones, Dynamo improves direct inference on all 20 model--benchmark settings (avg. +5.6 acc). When the tool set is given in advance, the framework learns when to call each tool, and per-step tool choice improves on every tested backbone. Against task-specific RL (VTool-R1, DeepEyes), Dynamo closes 65--99% of the RL gap at a fraction of the compute, and combines additively with RL when available.",
+      "authors": [
+        "Yutao Sun",
+        "Yanting Miao",
+        "Hao-Xuan Ma",
+        "Mengyu Zhou",
+        "Mingshuai Chen",
+        "Tiancheng Zhao",
+        "Dexin Wang",
+        "Lei Lv",
+        "Li Xu",
+        "Xiaoxi Jiang",
+        "Guanjun Jiang"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-06-29T11:59:01+00:00",
+      "link": "https://arxiv.org/pdf/2606.30185v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Vision-language agent with dynamic skill-tool evolution for task automation",
+      "llm_evidence_cn": "面向任务自动化的视觉语言智能体动态技能工具演化",
+      "llm_evidence": "面向任务自动化的视觉语言智能体动态技能工具演化",
+      "canonical_evidence": "面向任务自动化的视觉语言智能体动态技能工具演化",
+      "llm_tldr_en": "Dynamo adapts frozen VLMs for visual reasoning by evolving reusable skills and tools from self-inspection, achieving +5.6 acc on 20 settings without retraining.",
+      "llm_tldr_cn": "针对视觉语言模型在视觉推理中需要重新训练或手工设计提示和工具的问题，本文提出Dynamo框架，无需权重更新即可适配冻结的VLM。通过在小标注子集上自我检查正确和错误尝试，智能体演化出可复用的推理技能和可执行视觉工具，并存入持久库。在四个视觉推理基准和五个VLM骨干上平均提升5.6个准确点。",
+      "llm_tldr": "针对视觉语言模型在视觉推理中需要重新训练或手工设计提示和工具的问题，本文提出Dynamo框架，无需权重更新即可适配冻结的VLM。通过在小标注子集上自我检查正确和错误尝试，智能体演化出可复用的推理技能和可执行视觉工具，并存入持久库。在四个视觉推理基准和五个VLM骨干上平均提升5.6个准确点。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2606.31371v1",
+      "source": "arxiv",
+      "title": "Calibrating the Evaluator: Does Probability Calibration Mitigate Preference Coupling in LLM Agent Feedback Loops?",
+      "abstract": "When large language model (LLM) agents adapt their behavior through evaluator feedback, systematic evaluator biases propagate into the agent's learned strategy distribution - a phenomenon termed evaluator preference coupling. Prior work has documented this coupling and established a diagnostic framework (EPC) to measure it, but has not investigated whether calibration techniques can mitigate the effect. We present the first study of evaluator calibration as mitigation: applying probability calibration to the evaluator's pairwise judgments to reduce spurious preference propagation. In a controlled within-subjects experiment (N=5) comparing standard binary TTRL (win/loss) with confidence-calibrated TTRL (probability-weighted updates) using DeepSeek-V4-Pro as executor and GLM5.2 as evaluator, we find that calibration reduces the coupling coefficient gamma by 20-49% and Jensen-Shannon divergence by 45-67%. A symmetric-LR control confirms the effect is not due to reduced update asymmetry. We release the calibrated TTRL protocol and recommend it as a lightweight mitigation for LLM-as-judge deployment pipelines.",
+      "authors": [
+        "Zewen Liu"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI",
+        "cs.CL"
+      ],
+      "published": "2026-06-30T09:03:24+00:00",
+      "link": "https://arxiv.org/pdf/2606.31371v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "calibrating evaluator rewards to mitigate preference coupling in RL feedback loops",
+      "llm_evidence_cn": "校准评估器奖励以减轻RL反馈循环中的偏好耦合",
+      "llm_evidence": "校准评估器奖励以减轻RL反馈循环中的偏好耦合",
+      "canonical_evidence": "校准评估器奖励以减轻RL反馈循环中的偏好耦合",
+      "llm_tldr_en": "Studies probability calibration of evaluator judgments to reduce preference propagation in LLM agent RL feedback loops.",
+      "llm_tldr_cn": "大语言模型智能体在强化学习反馈循环中，评估器偏差会传播到策略分布。本文首次研究概率校准作为缓解措施，将校准应用于二元TTRL的成对判断，实验表明校准可减少虚假偏好传播，提升反馈信号质量。",
+      "llm_tldr": "大语言模型智能体在强化学习反馈循环中，评估器偏差会传播到策略分布。本文首次研究概率校准作为缓解措施，将校准应用于二元TTRL的成对判断，实验表明校准可减少虚假偏好传播，提升反馈信号质量。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "design of reward functions in RL",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    }
+  ]
+}
