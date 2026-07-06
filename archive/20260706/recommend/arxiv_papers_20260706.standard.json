@@ -1,0 +1,298 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-06T21:08:23.721912+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 5,
+    "deep_cap": 6,
+    "deep_selected": 5,
+    "quick_candidates": 2,
+    "quick_skim_target": 11,
+    "quick_selected": 2
+  },
+  "deep_dive": [
+    {
+      "id": "2606.29315v1",
+      "source": "arxiv",
+      "title": "Hierarchical Experimentalist Agents",
+      "abstract": "Large language models (LLMs) are increasingly used to take actions in the real world and support human decision-making, yet most agents rely on parametric knowledge, fixed post-training data, retrieval, or search. This paradigm breaks down in novel domains and for sophisticated queries that cannot be answered from prior knowledge alone. Knowing the laws of physics, for instance, does not by itself enable LLMs to answer queries or complete long-horizon tasks in a complex physical system. To address this, we introduce Hierarchical Experimentalist Agents (HExA), an in-context self-improvement framework to learn from active experimentation. HExA iteratively designs and refines query-relevant experiments, learns a reusable library of composable skills from experience, and integrates experimental evidence to answer queries or take actions. HExA is training-free, compatible with any black-box model, and does not require external supervision, oracles, or offline data. To evaluate active experimentation, we introduce Interphyre, a tool-calling benchmark built on the PHYRE 2D procedural physics environment, where agents propose interventions and test hypotheses through simulation APIs. Experiments show that current LLM agents struggle in these settings, especially on the hardest levels of Interphyre. Claude Sonnet 4.6 achieves only 2% success, while HExA improves the same model to up to 77% success. HExA also improves open-weight models and outperforms agentic baselines such as ReAct and Reflexion. Moreover, using only skills learned from easier levels and transferred without active experimentation, HExA achieves 44% success, demonstrating the reusability and generalization of its learned skills. Overall, HExA shows that learning through active experimentation can help agents discover useful knowledge, acquire reusable skills, and make efficient progress on novel long-horizon tasks.",
+      "authors": [
+        "Abhranil Chandra",
+        "Sankaran Vaidyanathan",
+        "Utsav Dhanuka",
+        "Varun Gandhi",
+        "Scott Niekum"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI",
+        "cs.LG"
+      ],
+      "published": "2026-06-28T10:21:55+00:00",
+      "link": "https://arxiv.org/pdf/2606.29315v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "LLM agent learning through active experimentation for task automation",
+      "llm_evidence_cn": "LLM智能体通过主动实验学习以实现任务自动化",
+      "llm_evidence": "LLM智能体通过主动实验学习以实现任务自动化",
+      "canonical_evidence": "LLM智能体通过主动实验学习以实现任务自动化",
+      "llm_tldr_en": "HExA enables LLM agents to learn from active experimentation, building a reusable skill library for long-horizon tasks.",
+      "llm_tldr_cn": "现有LLM智能体依赖先验知识，无法处理新颖复杂物理任务。本文提出层次化实验智能体（HExA），通过主动设计实验、学习可复用技能库，实现自改进。在物理推理和长时域任务中，HExA显著优于传统方法，展示了智能体通过交互学习扩展能力边界的潜力。",
+      "llm_tldr": "现有LLM智能体依赖先验知识，无法处理新颖复杂物理任务。本文提出层次化实验智能体（HExA），通过主动设计实验、学习可复用技能库，实现自改进。在物理推理和长时域任务中，HExA显著优于传统方法，展示了智能体通过交互学习扩展能力边界的潜力。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "biorxiv-10-64898-2026-03-19-713030-v3",
+      "source": "biorxiv",
+      "title": "TogoMCP: Natural Language Querying of Life-Science Knowledge Graphs via Schema-Guided LLMs and the Model Context Protocol",
+      "abstract": "Querying the RDF Portal knowledge graph maintained by DBCLS, which aggregates approximately 60 life-science databases, requires proficiency in both SPARQL and database-specific RDF schemas, placing this resource beyond the reach of most researchers. Large Language Models (LLMs) can, in principle, translate natural-language questions into executable SPARQL, but without schema-level context, they frequently fabricate non-existent predicates or fail to resolve entity names to database-specific identifiers. We present TogoMCP, a system that recasts the LLM as a protocol-driven inference engine orchestrating specialized tools via the Model Context Protocol (MCP). Two mechanisms are essential to its design: (i) the MIE (Metadata-Interoperability-Exchange) file, a concise YAML document that dynamically supplies the LLM with each target database's structural and semantic context at query time; and (ii) a two-stage workflow separating entity resolution via external REST APIs from schema-guided SPARQL generation. On a benchmark of 50 biologically grounded questions spanning five types and 23 databases, TogoMCP achieved a large improvement over an unaided baseline (Cohen's d = 1.82, Wilcoxon p < 0.001), with win rates exceeding 80% for question types with precise, verifiable answers. An ablation study shows that all component configurations deliver significant improvements, with MIE schema files providing the largest marginal contribution on mean per-question score ({Delta} = +0.50 relative to a no-MIE condition, two-sided Wilcoxon p = 0.067; 90% bootstrap CI [+0.04, +0.94] excludes zero); a one-line instruction to load the relevant MIE file recovers the same mean improvement as a full procedural protocol, while the protocol additionally reduces downside risk (loss rate 1.6% vs. 4.8%, Fisher p = 0.036). These results suggest a general design principle: concise, dynamically delivered schema context is more valuable than complex orchestration logic for mean-score performance, while procedural guidance plays a complementary role in narrowing variance.",
+      "authors": [
+        "Kinjo, A. R.",
+        "Yamamoto, Y.",
+        "Bustamante-Larriet, S.",
+        "Labra-Gayo, J. E.",
+        "Fujisawa, T."
+      ],
+      "primary_category": "bioinformatics",
+      "categories": [
+        "bioinformatics"
+      ],
+      "published": "2026-07-06T00:00:00+00:00",
+      "link": "https://www.biorxiv.org/content/10.64898/2026.03.19.713030v3.full.pdf",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "RAG system using LLM for knowledge graph querying",
+      "llm_evidence_cn": "使用LLM进行知识图谱查询的RAG系统",
+      "llm_evidence": "使用LLM进行知识图谱查询的RAG系统",
+      "canonical_evidence": "使用LLM进行知识图谱查询的RAG系统",
+      "llm_tldr_en": "TogoMCP enables natural-language querying of life-science knowledge graphs via schema-guided LLMs and the Model Context Protocol.",
+      "llm_tldr_cn": "生命科学知识图谱的SPARQL查询需要专业知识。本文提出TogoMCP，利用LLM通过MCP协议调度专门工具，结合模式引导避免虚假谓词。系统显著提高了查询转换的成功率，使非专家也能有效访问大型知识库，展示了RAG在知识密集型任务中的价值。",
+      "llm_tldr": "生命科学知识图谱的SPARQL查询需要专业知识。本文提出TogoMCP，利用LLM通过MCP协议调度专门工具，结合模式引导避免虚假谓词。系统显著提高了查询转换的成功率，使非专家也能有效访问大型知识库，展示了RAG在知识密集型任务中的价值。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "retrieval augmented generation for knowledge intensive tasks",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.29812v1",
+      "source": "arxiv",
+      "title": "Consistency as Inductive Bias: Learning Cross-View Invariance for Robust Multimodal Reasoning",
+      "abstract": "Inductive biases steer learning toward generalizable solutions by encoding task structure. In this work, we identify a crucial missing bias in MLLMs: cross-view consistency, \\textit{i.e.}, semantically invariant views of the same instance should lead to the same answer. Standard reinforcement learning with verifiable rewards (RLVR) objectives do not impose this constraint, but instead assign pointwise rewards to each visual input. Even with data augmentation (DA), transformed views are typically rewarded independently, providing little signal once within-view rewards saturate. We propose \\textbf{ConsistRoll}, a simple but effective method that injects cross-view consistency into RLVR training by reusing the group-sampling mechanism of GRPO. Specifically, ConsistRoll places original and semantically invariant transformed views in the same generation group, and assigns a joint reward only when paired completions are both correct and consistent. In this way, ConsistRoll turns consistency into an online credit-assignment signal, \\textbf{without extra generation overhead and annotations}. Theoretically, we show that cross-view consistency is a valid inductive bias, and ConsistRoll introduces a cross-view correction term absent from DA, penalizing view dependence and alleviating advantage collapse. Comprehensive benchmarks across math, general-purpose, hallucination domains confirm that ConsistRoll achieves robust improvements in multimodal reasoning.",
+      "authors": [
+        "Xin Zou",
+        "Haolin Deng",
+        "Yibo Yan",
+        "Shuliang Liu",
+        "Kening Zheng",
+        "Zhiwei Jin",
+        "Chen Chen",
+        "Haonan Lu",
+        "Xuming Hu"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-06-29T05:45:18+00:00",
+      "link": "https://arxiv.org/pdf/2606.29812v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "cross-view consistency reward for RLVR",
+      "llm_evidence_cn": "面向RLVR的跨视角一致性奖励设计",
+      "llm_evidence": "面向RLVR的跨视角一致性奖励设计",
+      "canonical_evidence": "面向RLVR的跨视角一致性奖励设计",
+      "llm_tldr_en": "Proposes ConsistRoll to inject cross-view consistency into RLVR training for robust multimodal reasoning.",
+      "llm_tldr_cn": "针对多模态大模型在RLVR训练中缺乏跨视角一致性的问题，提出ConsistRoll方法，通过群体采样机制注入一致性诱导偏差，提升多模态推理的鲁棒性和泛化能力。实验表明该方法有效克服了点级奖励的局限性。",
+      "llm_tldr": "针对多模态大模型在RLVR训练中缺乏跨视角一致性的问题，提出ConsistRoll方法，通过群体采样机制注入一致性诱导偏差，提升多模态推理的鲁棒性和泛化能力。实验表明该方法有效克服了点级奖励的局限性。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "design of reward functions in RL",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.01897v1",
+      "source": "arxiv",
+      "title": "Rank-Then-Act: Reward-Free Control from Frame-Order Progress",
+      "abstract": "We introduce Rank-Then-Act (RTA), a framework for learning control policies from expert video demonstrations without environment rewards. RTA trains a Vision-Language Model (VLM) offline as a progress-based ordinal scorer, using a Group Relative Policy Optimization (GRPO) objective over shuffled frame sequences, which forces the model to recover temporal ordering from visual semantics rather than trivial time cues. Importantly, instead of using the scorer directly as a scalar reward model, we propose a correlation-based reward function for reinforcement learning: at each interaction window, we compute the Spearman rank correlation between predicted progress rankings and true temporal indices, yielding a bounded, scale-invariant learning signal. This design decouples reward learning from absolute calibration and enables stable transfer across tasks and environments. We evaluate RTA on discrete control benchmarks (PyBoy: Catrap, Kirby) and continuous control tasks (PointMaze, MetaWorld). RTA consistently matches or outperforms prior video-based reward learning methods and rank-based baselines, while demonstrating strong cross-task reuse of a single pretrained progress scorer. Our results suggest that correlation-structured supervision over video-derived ordinal signals is sufficient for policy learning, offering a scalable alternative to explicit reward design.",
+      "authors": [
+        "Yuriy Maksyuta",
+        "George Bredis",
+        "Ruslan Rakhimov",
+        "Daniil Gavrilov"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-07-02T08:50:32+00:00",
+      "link": "https://arxiv.org/pdf/2607.01897v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "novel correlation-based reward function for RL using GRPO and Spearman rank correlation",
+      "llm_evidence_cn": "提出基于GRPO和斯皮尔曼等级相关的新颖奖励函数用于强化学习",
+      "llm_evidence": "提出基于GRPO和斯皮尔曼等级相关的新颖奖励函数用于强化学习",
+      "canonical_evidence": "提出基于GRPO和斯皮尔曼等级相关的新颖奖励函数用于强化学习",
+      "llm_tldr_en": "Rank-Then-Act (RTA) trains a VLM as a progress scorer using GRPO, then uses Spearman rank correlation between predicted and true progress as a reward signal for RL, enabling reward-free control from videos.",
+      "llm_tldr_cn": "针对缺乏环境奖励的机器人控制问题，本文提出RTA框架。它利用GRPO离线训练VLM作为帧顺序评分器，并创新地使用斯皮尔曼等级相关系数作为RL奖励信号，避免了传统标量奖励的偏差和尺度依赖。实验表明该方法能从专家视频中有效学习控制策略，且奖励函数设计具有尺度不变性和有界性。该工作为从排序信息中设计奖励函数提供了新范例，对无奖励RL场景具有重要启示。",
+      "llm_tldr": "针对缺乏环境奖励的机器人控制问题，本文提出RTA框架。它利用GRPO离线训练VLM作为帧顺序评分器，并创新地使用斯皮尔曼等级相关系数作为RL奖励信号，避免了传统标量奖励的偏差和尺度依赖。实验表明该方法能从专家视频中有效学习控制策略，且奖励函数设计具有尺度不变性和有界性。该工作为从排序信息中设计奖励函数提供了新范例，对无奖励RL场景具有重要启示。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "design of reward functions in RL",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.02262v1",
+      "source": "arxiv",
+      "title": "CheckRLM: Effective Knowledge-Thought Coherence Checking in Retrieval-Augmented Reasoning",
+      "abstract": "Reasoning Language Models (RLMs) have significantly improved performance on complex tasks by extending the reasoning chain. However, these chains are prone to containing factual errors, particularly in knowledge-intensive tasks. To address this issue, we propose CheckRLM, a framework that improves the reliability of the reasoning process through Retrieval-Augmented Generation (RAG) by timely checking and correcting factual errors. Specifically, CheckRLM extracts factual claims from the reasoning chain to identify and localize subtle knowledge inconsistencies during inference. Upon detection of errors, a refinement mechanism performs minimal-cost yet precise corrections by leveraging external knowledge, ensuring coherence between the reasoning chain and correct knowledge. Extensive experiments demonstrate that CheckRLM substantially outperforms existing baselines, exhibiting a strong capability to mitigate error accumulation in long-horizon reasoning with lower costs. The code and data are available at https://github.com/AI9Stars/CheckRLM.",
+      "authors": [
+        "Dingling Xu",
+        "Ruobing Wang",
+        "Qingfei Zhao",
+        "Yukun Yan",
+        "Zhichun Wang",
+        "Daren Zha",
+        "Shi Yu",
+        "Zhenghao Liu",
+        "Shuo Wang",
+        "Xu Han",
+        "Maosong Sun"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-07-02T14:50:25+00:00",
+      "link": "https://arxiv.org/pdf/2607.02262v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "CRL framework uses RAG to check and correct factual errors in reasoning chains",
+      "llm_evidence_cn": "CheckRLM使用检索增强生成来检查和纠正推理链中的事实错误",
+      "llm_evidence": "CheckRLM使用检索增强生成来检查和纠正推理链中的事实错误",
+      "canonical_evidence": "CheckRLM使用检索增强生成来检查和纠正推理链中的事实错误",
+      "llm_tldr_en": "CheckRLM extracts factual claims from reasoning chains, uses RAG to detect and correct errors, improving reliability of knowledge-intensive tasks.",
+      "llm_tldr_cn": "针对推理语言模型在知识密集型任务中推理链容易包含事实错误的问题，本文提出CheckRLM。它在推理过程中提取事实声明，利用检索增强生成（RAG）检测并精确定位知识不一致，然后进行最小成本的精确修正。实验表明该方法显著提高推理可靠性，尤其在需要外部知识的任务上。该工作将RAG与推理验证结合，提升了LLM在知识密集型场景下的可信度。",
+      "llm_tldr": "针对推理语言模型在知识密集型任务中推理链容易包含事实错误的问题，本文提出CheckRLM。它在推理过程中提取事实声明，利用检索增强生成（RAG）检测并精确定位知识不一致，然后进行最小成本的精确修正。实验表明该方法显著提高推理可靠性，尤其在需要外部知识的任务上。该工作将RAG与推理验证结合，提升了LLM在知识密集型场景下的可信度。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "retrieval augmented generation for knowledge intensive tasks",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2606.30851v1",
+      "source": "arxiv",
+      "title": "Test-Time Verification for Text-to-SQL via Outcome Reward Models",
+      "abstract": "Improving the reliability of large language models (LLMs) at inference time is a central challenge in structured reasoning tasks such as Text-to-SQL. Common test-time inference strategies, including Best-of-N sampling and Majority Voting, rely on heuristic signals such as execution success or output frequency, which provide limited semantic discrimination across candidate outputs. In this work, we study Outcome Reward Models (ORMs) as learned semantic scoring functions for test-time verification in Text-to-SQL. While ORMs have been previously explored for test-time scaling and alignment, their application to structured query generation remains underexplored. We introduce GradeSQL, a scalable framework for training task-specific ORMs via automated candidate generation and execution-based labeling, enabling verifier training without manual annotation. We integrate ORMs into a verification-driven Best-of-N pipeline and evaluate our approach on the BIRD and Spider benchmarks across multiple open-source LLM families. ORM-based selection consistently outperforms execution-based Best-of-N and Majority Voting, with gains of up to +4.33% on BIRD and +2.10% on Spider. We further show that ORMs scale effectively with larger candidate sets and yield stronger improvements on complex queries. Overall, our results demonstrate that ORM-based verification provides a simple, effective, and scalable alternative to heuristic test-time selection strategies for Text-to-SQL. Code datasets and models are publicly available.",
+      "authors": [
+        "Mattia Tritto",
+        "Giuseppe Farano",
+        "Dario Di Palma",
+        "Gaetano Rossiello",
+        "Fedelucio Narducci",
+        "Dharmashankar Subramanian",
+        "Tommaso Di Noia"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.AI",
+        "cs.DB"
+      ],
+      "published": "2026-06-29T19:31:39+00:00",
+      "link": "https://arxiv.org/pdf/2606.30851v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Outcome Reward Models for test-time verification",
+      "llm_evidence_cn": "使用结果奖励模型进行测试时验证",
+      "llm_evidence": "使用结果奖励模型进行测试时验证",
+      "canonical_evidence": "使用结果奖励模型进行测试时验证",
+      "llm_tldr_en": "Proposes GradeSQL, a framework using Outcome Reward Models (ORMs) as learned scoring functions for test-time verification in Text-to-SQL, improving semantic discrimination over heuristic signals.",
+      "llm_tldr_cn": "针对Text-to-SQL任务中测试时验证依赖启发式信号（如执行成功）导致语义区分不足的问题，本文提出GradeSQL框架，训练任务特定的结果奖励模型（ORM）作为语义评分函数。ORM通过自动化候选生成与标注训练，在多个数据集上显著优于最佳-of-N采样和多数投票，展示了奖励模型在结构化推理中的有效性。",
+      "llm_tldr": "针对Text-to-SQL任务中测试时验证依赖启发式信号（如执行成功）导致语义区分不足的问题，本文提出GradeSQL框架，训练任务特定的结果奖励模型（ORM）作为语义评分函数。ORM通过自动化候选生成与标注训练，在多个数据集上显著优于最佳-of-N采样和多数投票，展示了奖励模型在结构化推理中的有效性。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "design of reward functions in RL",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "biorxiv-10-64898-2026-06-29-735386-v3",
+      "source": "biorxiv",
+      "title": "GeneBench-Pro: Evaluating Multistage Statistical Reasoning in Genomics, Quantitative Biology, and Translational Biomedicine",
+      "abstract": "We introduce GeneBench-Pro, an expanded and improved version of GeneBench that comprises harder problems across a wider breadth of domains. GeneBench-Pro is a benchmark for AI agents performing realistic multi-stage scientific analyses in genomics, quantitative biology, and translational biomedicine which seeks to capture the complexity of real-world problems that computational life scientists face when tasked with producing a conclusion upon which a downstream scientific or translational decision is contingent. The benchmark comprises 129 evaluations targeting quantities of direct practical relevance across 10 primary domains and 21 terminal subdomains, with a genomics-centered core. Similarly to GeneBench, each problem provides the agent with brief context, a target estimand, and minimal guidance otherwise; the agent must then navigate multiple dependent decision points; i.e., substantive inferential forks where a plausible wrong choice changes the downstream analysis, to identify and execute the correct analysis workflow and arrive at the correct answer. Relative to GeneBench, GeneBench-Pro adds 29 new problems, drops three, and introduces significantly redesigned versions of 54 of the remaining 100 overlapping problems. 82 of the 129 problems were reviewed by external domain experts, whose findings led to prompt/data modifications and redesign of those problems whose targets were not sufficiently identifiable. Ten externally reviewed problems are released publicly, 50 held-out problems were provided to Artificial Analysis for independent third-party model benchmarking, and the remainder are retained as an internal holdout. In evaluations over the full 129-problem suite, GPT-5.6 Sol reaches an eval-level pass rate of 28.7% at the max reasoning level, and GPT-5.6 Sol Pro reaches 31.5% in separately reported GPT Pro runs. GPT-5.5 reaches 12.0%, GPT-5.4 reaches 8.9%, and the strongest non-GPT baseline, Claude Opus 4.8, reaches 16.0%. As with GeneBench, models often complete substantial portions of the workflow but exhibit a consistent gap between noticing and acting by identifying local diagnostic signals but failing to propagate the implications to the corresponding analysis decision. As a result, models often select wrong estimators or persist on initially plausible but incorrect analysis paths. GeneBench-Pro therefore measures an emerging capability of long-horizon biological reasoning that remains unreliable.\n\n\n\nO_FIG O_LINKSMALLFIG WIDTH=200 HEIGHT=46 SRC=\"FIGDIR/small/735386v2_ufig1.gif\" ALT=\"Figure 1\">\nView larger version (13K):\norg.highwire.dtl.DTLVardef@f7c80org.highwire.dtl.DTLVardef@b6e5b1org.highwire.dtl.DTLVardef@1a1df6corg.highwire.dtl.DTLVardef@5361a2_HPS_FORMAT_FIGEXP  M_FIG C_FIG",
+      "authors": [
+        "Li, J. H.",
+        "Ho, A. J."
+      ],
+      "primary_category": "genomics",
+      "categories": [
+        "genomics"
+      ],
+      "published": "2026-07-02T00:00:00+00:00",
+      "link": "https://www.biorxiv.org/content/10.64898/2026.06.29.735386v3.full.pdf",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "benchmark for AI agents performing multistage scientific reasoning in genomics",
+      "llm_evidence_cn": "用于AI代理在基因组学中进行多阶段科学推理的基准",
+      "llm_evidence": "用于AI代理在基因组学中进行多阶段科学推理的基准",
+      "canonical_evidence": "用于AI代理在基因组学中进行多阶段科学推理的基准",
+      "llm_tldr_en": "GeneBench-Pro is a benchmark of 129 evaluations for AI agents performing multistage statistical reasoning in genomics and related biomedical domains.",
+      "llm_tldr_cn": "该论文针对现有AI代理基准未能充分模拟真实科学分析中多步推理的问题，提出了GeneBench-Pro基准。该基准包含129个评估任务，覆盖10个主要领域和21个子领域，以基因组学为核心。它为评估AI代理在复杂科学研究中的多阶段推理能力提供了更贴近实际的框架，有助于推动科学智能体的发展。",
+      "llm_tldr": "该论文针对现有AI代理基准未能充分模拟真实科学分析中多步推理的问题，提出了GeneBench-Pro基准。该基准包含129个评估任务，覆盖10个主要领域和21个子领域，以基因组学为核心。它为评估AI代理在复杂科学研究中的多阶段推理能力提供了更贴近实际的框架，有助于推动科学智能体的发展。",
+      "llm_tags": [
+        "query:rl:composite"
+      ],
+      "matched_query_tag": "query:rl:composite",
+      "matched_query_text": "Papers central to 查找大模型检索推理智能体、大模型强化学习领域的文章, especially work that connects or combines: reinforcement learning for large language model; design of reward functions in RL; policy gradient methods for language generation; large language model agents for task automation; reinforcement learning from human feedback for llm alignment; reinforcement learning for multi turn dialogue systems; application of reinforcement learning in large language model reasoning; retrieval augmented generation for knowledge intensive tasks; policy optimization methods for multi step reasoning in llms.",
+      "matched_requirement_id": "req-composite-rl",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}
