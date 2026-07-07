@@ -1,0 +1,192 @@
+Title: Reward Granularity in RLVR: Comparing Process and Outcome Reward Structures for Mathematical Reasoning in Small Language Models
+
+URL Source: https://arxiv.org/pdf/2607.02869v1
+
+Published Time: Tue, 07 Jul 2026 00:47:55 GMT
+
+Number of Pages: 8
+
+Markdown Content:
+# Reward Granularity in RLVR: Comparing Process and Outcome Reward Structures for Mathematical Reasoning in Small Language Models 
+
+Anagha Radhakrishna Palandye 
+
+New York University 
+
+ap8884@nyu.edu 
+
+Rebecca Glick 
+
+New York University 
+
+rmg9724@nyu.edu 
+
+Osheen Kaul 
+
+New York University 
+
+ok684@nyu.edu 
+
+Abstract 
+
+Reinforcement Learning with Verifiable Re-wards (RLVR) has emerged as a promising paradigm for improving mathematical reason-ing in language models. Yet most RLVR work rewards only the final answer (outcome-based rewards), leaving the impact of step-level pro-cess supervision (process rewards) underex-plored especially for small models that lack the capacity to self-correct under sparse feedback. We systematically compare five reward condi-tions applied to Qwen2.5-0.5B fine-tuned with Group Relative Policy Optimization (GRPO) on GSM8K: a no-RL baseline, process-only ,
+
+outcome-only , and three hybrid weightings (λ ∈ { 0.9, 0.5, 0.1} process weight). Process-only supervision achieves 63.73% test accuracy versus 53.75% for outcome-only, a nearly 10-percentage point gap while yielding reasoning traces with higher step validity and lower devi-ation from ground-truth chain length. Hybrid rewards generally correlate positively with pro-cess weight, with one notable anomaly: the low-process / high-outcome configuration ( λ=0 .1)
+
+underperforms pure outcome supervision, sug-gesting conflicting optimization signals. Error analysis using GPT-4o as a judge reveals dis-tinct failure mode distributions: process mod-els generate structurally inconsistent but arith-metically grounded traces, while outcome mod-els produce concise but derivation-error-prone chains. Our results demonstrate that reward granularity is a first-order design decision for RLVR, with process-level supervision substan-tially improving both accuracy and trace fi-delity in small language models. 
+
+1 Introduction 
+
+Improving the reasoning ability of language mod-els remains an open challenge. Even when mod-els are prompted with Chain-of-Thought (CoT) in-structions, an approach demonstrated by Wei et al. (2023) to improve transparency and interpretability, small LLMs frequently generate incorrect, incon-sistent, or logically incoherent intermediate steps, even when reaching the correct final answer. This recurring mismatch highlights a broader question in modern LLM research: 
+
+Are improvements in mathematical and symbolic reasoning driven by genuine gains in reasoning quality, or are mod-els simply better at sampling plausible answers? 
+
+A growing body of work attempts to address this through Reinforcement Learning with Verifiable Rewards (RLVR), where models receive reward sig-nals derived from mechanical correctness checks 
+
+rather than human preferences. RLVR has proved especially promising in domains like math where solutions can be validated automatically (Wen et al., 2025; Tang et al., 2025). The GSM8K dataset, with its stepwise arithmetic reasoning structure, is partic-ularly suitable for evaluating these kinds of reward functions. A central but under-explored dimension of RLVR is reward granularity. Rewards can be given at the process level, where every intermediate step is evaluated and rewarded, or at the outcome level, where only the final predicted answer receives a re-ward. We refer to these as process rewards (process-based feedback) and outcome rewards (outcome-based feedback). While outcome-based rewards have been extensively studied in RLHF and RLVR contexts, less is concretely understood about how process, step-level rewards shift a model’s reason-ing behavior, or how the two types interact when combined. This gap is especially important for small models that lack the ability to internally miti-gate noisy or insufficient supervision. 
+
+Research question Do process rewards improve the coherence and validity of reasoning traces, and does combining process + outcome rewards yield 
+
+> arXiv:2607.02869v1 [cs.LG] 3 Jul 2026
+
+more stable and accurate reasoning than either alone? 
+
+Contributions We make the following contribu-tions. First, we provide a controlled comparison of five reward conditions for RLVR fine-tuning of Qwen2.5-0.5B on GSM8K using GRPO, cov-ering process-only, outcome-only, and three hy-brid weightings. Second, we evaluate beyond final-answer accuracy by assessing trace validity, chain-length deviation, and process step ratio on a strat-ified 45-question evaluation slice. Third, we con-duct an LLM-as-a-judge error analysis (GPT-4o) characterizing the failure mode distributions in-duced by each reward regime. Finally, we iden-tify a hybrid reward anomaly: the low-process / high-outcome configuration ( λ=0 .1) underper-forms pure outcome supervision, indicating con-flicting rather than additive optimization dynamics. 
+
+2 Background and Prior Work 
+
+2.1 Chain-of-Thought Reasoning 
+
+Advances in LLM reasoning are moving beyond supervised fine-tuning and RLHF-style prefer-ence models toward verifiable reward frameworks, where a model is rewarded when its output is checked by an external tool (Wen et al., 2025). Wen et al. (2025) show that purely final-answer rewards can still influence reasoning traces, intro-ducing CoT-Pass@K, which evaluates whether any of K sampled chains of thought produce the correct answer and maintain a valid reasoning trajectory, thereby jointly measuring answer accuracy and trace validity. Building on this verifiable frame-work, Tang et al. (2025) demonstrate how such verifiable rewards can be scaled using Jensen-style lower bounds, replacing the intractable expectation over many sampled solutions with a tractable proxy objective that lower-bounds the true expected re-ward. These developments intersect with a broader lit-erature on CoT prompting. CoT prompting (Wei et al., 2023) encourages models to decompose prob-lems into explicit intermediate steps. Although this leads to better interpretability and often better accuracy, later work has shown that CoT outputs can be misleading or structurally unsound (Turpin et al., 2023; Saparov and He, 2023). Small LLMs in particular tend to generate hallucinated steps or irrelevant justifications, commit arithmetic errors early and carry them through, and jump between steps without maintaining logical consistency. This has motivated a shift toward evaluating reasoning quality independently of answer correctness, using dedicated reasoning metrics or LLM-as-a-judge assessments of trace integrity. 
+
+2.2 Process vs. Outcome Supervision 
+
+Most reinforcement-learning approaches for rea-soning tasks, including RLHF, rely solely on outcome-level rewards. While this improves final-answer accuracy (Ziegler et al., 2020), it provides no guidance about the internal reasoning process. Models can learn to exploit shortcuts such as mem-orized patterns, spurious correlations, and surface-level cues unrelated to correct reasoning. By con-trast, process-based supervision, explored in early form by Lightman et al. (2023) and expanded in more recent RLVR work, offers dense feedback at each stage of the reasoning chain. This encour-ages explicit incremental computation, more faith-ful stepwise reasoning, and a stronger grounding in arithmetic operations. However, process-based feedback can also amplify instability, producing overly long or unnecessary reasoning chains if not paired with global constraints. This highlights an important theme also present in RLVR research: the granularity of supervision shapes the coherence of model reasoning, with each option carrying dis-tinct tradeoffs in stability and reasoning fidelity. 
+
+2.3 Reinforcement Learning with Verifiable Rewards (RLVR) 
+
+RLVR differs from RLHF by allowing exact, pro-grammatically computed rewards rather than rely-ing on human judgment. In mathematical domains, these rewards can directly verify solution quality by checking numeric equality between predicted and gold solutions, evaluating intermediate arith-metic, and penalizing invalid formats or logical inconsistencies. Wei et al. (2023) show that prompting for step-by-step rationales improves model performance, while Uesato et al. (2022) compare outcome-based and process-based supervision for math word prob-lems, finding that outcome-only training is label-efficient but often produces “flaky” reasoning, whereas process-level supervision substantially re-duces trace errors. Recent RLVR studies report improvements in both accuracy and reasoning structure (Wen et al., 2025; Tang et al., 2025), yet they almost exclusively reward the final answer. Consequently, the impact of introducing process, step-level rewards remains an open question. Samineni et al. (2025) take a step toward this direction by analyzing whether RLVR-trained Qwen2.5-0.5B models exhibit lo-cal coherence or merely achieve globally correct solutions on GSM8K, but their evaluation still cen-ters on final-answer rewards and does not vary re-ward granularity. Our work directly addresses this gap. Using the RLVR setup with Qwen2.5-0.5B on GSM8K employed by Samineni et al. (2025), and drawing on insights from Uesato et al. (2022), we systematically vary reward granularity. We com-pare outcome-only, process-only, and variations of combined process + outcome reward regimes to study how verifiable reward design influences co-herence and validity of generated reasoning traces in addition to final-answer accuracy. 
+
+3 Dataset and Evaluation Strategy 
+
+We use GSM8K (Cobbe et al., 2021), a widely adopted benchmark containing 8,792 grade-school math word problems. These tasks are designed to require stepwise arithmetic reasoning, making them ideal for evaluating changes in CoT behavior. Because reasoning characteristics differ across levels of problem difficulty, we curated a balanced 45-question evaluation slice drawn from the 1,319-question test set: 15 easy (2–3 steps), 15 medium (4–5 steps), and 15 hard (6–11 steps). Difficulty is defined by the ground-truth number of steps in the solution, which provides a more objective stratifi-cation than surface-level heuristics. This balanced setup enables us to analyze whether reward struc-tures affect reasoning differently across problem tiers, as summarized in Table 1.            
+
+> Steps in Ground Truth Count of GSM8K Questions
+> 2326 3370 4298 5174 688 740 820 9211 1Total 1,319
+> Table 1: Test set distribution by ground-truth solution step count.
+
+4 Model Setup and Reward Structures 
+
+4.1 Base Model and Baseline 
+
+All experiments use Qwen2.5-0.5B (Yang et al., 2024), a compact transformer model whose limited capacity makes reasoning failures easy to observe. As a baseline, we evaluate the pre-trained model in a direct-answer (no CoT) setting, which relies on pattern-based inference without explicit reasoning, achieving 33.13% on the test set (437/1,319). The baseline reflects patterns observed in prior findings that CoT generation, without proper supervision, does not guarantee coherent reasoning (Saparov and He, 2023). 
+
+4.2 Training Setup and Implementation 
+
+All RLVR experiments were conducted using Group Relative Policy Optimization (GRPO) (Shao et al., 2024), a variant of Proximal Policy Opti-mization (PPO) designed for language model fine-tuning. We utilized the VERL (Volcano Engine Reinforcement Learning) library, which provides efficient implementations of RL algorithms for large-scale language model training. Hyperparam-eters are held constant across all reward conditions: batch size 64, mini-batch size 8, learning rate 1 ×
+
+10 −6, KL coefficient 0.001, 5 epochs (580 steps), temperature 0.6, and 5 rollouts per prompt using vLLM. Maximum sequence lengths are 512 tokens (prompt) and 1,024 tokens (response). All runs use a single A100 80GB GPU. Following VERL’s evaluation protocol, test set accuracy is reported as val-core/math/reward/mean@1 , evalu-ated on the GSM8K test split after each training epoch. Full hyperparameter details are provided in Appendix Table 4. 
+
+4.3 Reward Structures 
+
+Figure 1 illustrates the end-to-end training pipeline. We evaluate three forms of reward supervision. 
+
+Process rewards (process supervision) Process rewards evaluate each intermediate step of the CoT. In our implementation, we extract the ground-truth reasoning steps from GSM8K solutions which in-clude step-by-step calculations and compare the model’s generated steps against these references. A step receives a reward of 1 if it matches the ex-pected intermediate calculation (within numerical tolerance of 1 × 10 −5), and 0 otherwise. The total process reward is the proportion of correct steps: 
+
+Rprocess = correct steps total steps (1) Figure 1: Overview of the RLVR training pipeline. The base model Qwen2.5-0.5B generates rollouts via vLLM, which are evaluated by the reward function (process, outcome, or hybrid) and used to update the policy via GRPO within the VERL framework. 
+
+To discourage excessive verbosity, we apply a penalty when the generated chain exceeds 1.5×
+
+the ground-truth step count. This step-level super-vision encourages the model to break computations into finer-grained components, maintain stepwise numeric correctness, output interpretable reason-ing that mirrors ground-truth solutions, and explic-itly show variable definitions and intermediate cal-culations. However, because each correct step is independently rewarded, the model can become incentivized to overproduce steps or to explore un-necessarily detailed paths, aligning with concerns raised by Lightman et al. (2023) regarding stepwise supervision in RL settings. 
+
+Outcome rewards (outcome supervision) Out-come rewards evaluate only the final numeri-cal answer. We extract the final answer from the model’s response (supporting formats like 
+
+\boxed{answer} , #### answer , and natu-ral language patterns) and compare it to the ground-truth solution. The reward is binary: 
+
+Routcome =
+
+(
+
+1 if |ˆa − a∗| < ϵ 
+
+0 otherwise , ϵ = 10 −5
+
+(2) where ˆa is the model’s predicted answer and a∗ is the ground-truth answer. This outcome-level supervision pushes the model to reach correct outcomes efficiently, skip intermediate noise when possible, rely on internal shortcuts or pattern-matching behavior, and opti-mize for answer correctness regardless of reasoning path. Outcome-only rewards can improve overall accuracy, but they often leave the reasoning chain underdetermined, brittle, or logically inconsistent – an issue documented in Wen et al. (2025). 
+
+Hybrid rewards For hybrid reward configura-tions, we implemented weighted combinations of process and outcome rewards: 
+
+R = λ · Rprocess + (1 − λ) · Routcome (3) where λ is the process reward weight. We evaluate three mixtures: 0.9 process + 0.1 outcome (heavily process-focused with light outcome guidance), 0.5 process + 0.5 outcome (balanced supervision of both process and outcome), and 0.1 process + 0.9 outcome (primarily outcome-focused with minimal process supervision). The hypothesis, following Tang et al. (2025), is that hybrid signals can en-courage coherent intermediate reasoning without sacrificing final-answer correctness. 
+
+5 Quantitative Results 
+
+5.1 Final-Answer Accuracy 
+
+Process rewards achieved the largest gains in ac-curacy, outperforming outcome-only supervision and significantly improving over both baselines, as shown in Table 2, supporting the view that dense reward signals provide more informative guidance for small models than sparse outcome-level feed-back.                
+
+> Regime Test Acc. Improvement (%) over Baseline (%)
+> Base (no training) 33.13 –Process Only 63.73 +30.60 Outcome Only 53.75 +20.62 Process (0.5) + Outcome (0.5) 57.40 +24.27 Process (0.9) + Outcome (0.1) 61.10 +27.97 Process (0.1) + Outcome (0.9) 49.30 +16.17
+> Table 2: Test set accuracy and improvement over base-line across all reward regimes on GSM8K. Process-only achieves the highest accuracy (63.73%), with Process (0.9) + Outcome (0.1) as the best hybrid configuration (61.10%).
+
+Results are reported using final-answer accu-racy on the full 1,319-question test set. All hybrid weightings improve over baseline, though none match process-only’s peak performance. 
+
+5.2 Reasoning Fidelity and Stability 
+
+Beyond final-answer accuracy, we analyze how rea-soning differs between regimes on the 45-question evaluation slice using four metrics. 
+
+CoT-Pass@1 This measures whether the model’s single sampled reasoning trace leads to a correct fi-nal answer, capturing end-to-end reasoning success without sampling multiple trajectories. 
+
+Trace Validity This assesses whether the reason-ing chain is logically well-formed and free of struc-tural inconsistencies such as contradictions, invalid transformations, or unsupported jumps – a trace can be invalid even if the final answer is correct. 
+
+Chain Length Deviation This quantifies how much the model’s reasoning length differs from the ground-truth number of steps, where large posi-tive deviations indicate unnecessary or hallucinated steps and negative deviations signal skipped or missing reasoning. 
+
+Process Step Ratio This computes the propor-tion of intermediate steps that receive a positive process reward under the RLVR framework, serv-ing as a proxy for how often the model produces steps that align with ground-truth intermediate rea-soning. Table 3 summarizes these metrics across four conditions. On the full test set, Process Only achieves the highest CoT-Pass@1 (0.64), substan-tially outperforming the base model (0.33) and con-firming that process reward training provides mean-ingful gains in end-to-end reasoning success. The Process (0.9) + Outcome (0.1) configura-tion achieves the highest Trace Validity (0.60) and Process Step Ratio (0.84). Process Only exhibits the largest Chain Length Deviation (6.49), reflect-ing its tendency toward verbose reasoning chains. Outcome-only produces more concise traces (devi-ation 3.64) but scores lower on step alignment. 
+
+5.3 Qualitative Behavior Analysis 
+
+Qualitative examination of model outputs high-lights the behavioral signature of each reward regime. Process-only models typically produce de-tailed arithmetic decompositions. They often solve problems correctly, but their CoT traces can be-come overly verbose, sometimes duplicating steps or drifting off-path before returning to the correct computation. Outcome-only models tend to “jump” more aggressively between reasoning points, pro-ducing short chains that may omit key logical tran-sitions. These models occasionally reach correct answers through opportunistic reasoning but lack consistency and robustness. Hybrid models, espe-cially the Process (0.9) + Outcome (0.1) configu-ration, exhibit the most human-like reasoning flow. Their chains are neither overexpanded nor under-explained, and they maintain continuity between steps while avoiding unnecessary detours. Figure 2 illustrates the reasoning traces of our four regimes applied to the same geometry word problem. The Base and Outcome regimes incor-rectly calculate the area (300 sq ft), while the Pro-cess and Process+Outcome regimes correctly iden-tify the need for perimeter (70 ft). The process regime mitigates reasoning errors by forcing ex-plicit variable definition (length/width) prior to cal-culation, whereas the base regime rushes to a for-mulaic application ( L × W ). 
+
+5.4 LLM-as-a-Judge Error Analysis 
+
+We use GPT-4o to annotate common reasoning error types: incorrect derivation, calculator error, missing step, contradiction, formatting issues, or no error. The error distribution reveals clear dis-tinctions. Process-only models frequently intro-duce structural inconsistencies and contradictions, likely due to extended chain length, suggesting that token-level rewards can encourage locally plausi-ble but globally inconsistent reasoning. Outcome-only models show derivation and arithmetic errors, reflecting weak intermediate grounding and a ten-Regime CoT-Pass@1* Trace Validity Chain Length Dev. Process Step Ratio                   
+
+> Base 0.33 0.56 3.00 0.79 Process Only 0.64 0.22 6.49 0.64 Outcome Only 0.54 0.40 3.64 0.77 Process (0.9) + Outcome (0.1) 0.61 0.60 3.49 0.84
+> Table 3: Reasoning fidelity metrics for four conditions. *CoT-Pass@1 is reported on the full 1,319-question test set; Trace Validity, Chain Length Deviation, and Process Step Ratio are computed on the 45-question stratified evaluation slice. Bold = best result among RLVR-trained conditions. Higher is better for CoT-Pass@1, Trace Validity, and Process Step Ratio; lower is better for Chain Length Deviation.
+> Figure 2: Example reasoning chains across four reward regimes for an easy GSM8K geometry problem, illus-trating the qualitative differences in reasoning structure across the four regimes.
+
+dency to optimize for outcome-level correctness at the expense of intermediate steps. The base model generates relatively coherent traces but still accu-mulates rule- and derivation-related errors. Hybrid models exhibit fewer catastrophic errors and the most even error distribution. Taken together, these patterns illustrate how different reward schemes meaningfully shape the reasoning behaviors of Qwen2.5-0.5B, as shown in Figure 3, corroborat-ing claims in RLVR literature that reward structure strongly shapes not just accuracy but the failure modes of model reasoning. 
+
+6 Discussion 
+
+Integrating our analyses, a clear picture emerges. Process rewards strengthen stepwise correctness and improve accuracy but can destabilize reasoning trajectories. Outcome rewards focus the model on final outcomes but leave reasoning opaque and error-prone. Hybrid rewards effectively blend both signals, producing coherent reasoning with strong outcome performance. 
+
+7 Limitations 
+
+Several limitations qualify our findings. All re-ported results are from single training runs with-out multiple seeds, and we do not report variance estimates or confidence intervals. The observed accuracy differences, including the approximately 10-point gap between process-only and outcome-only supervision, should therefore be interpreted as indicative rather than statistically confirmed. Step-level verification is easier in math than in open-ended domains. Qwen2.5-0.5B’s small size makes it sensitive to reward noise. Our 45-problem eval-uation slice, though balanced, remains relatively small; further, LLM-as-a-Judge findings must be taken with a grain of salt as they may not reflect human evaluation. 
+
+8 Future Work 
+
+Promising extensions include applying pro-cess/outcome reward structures to harder datasets such as MATH, SVAMP, and AQuA-RAT; studying multi-hop reasoning via datasets like HotpotQA, where verifying intermediate reasoning is more complex; experimenting with partial-credit reward schemes or learned verifiers to provide richer su-pervisory signals; and scaling to larger Qwen or Llama models to assess whether hybrid rewards provide increasing returns with model capacity. Be-yond accuracy, future work should also investigate whether reward granularity shapes reasoning be-havior differently across problem domains, model architectures, and training regimes, with the goal of establishing more generalizable design principles for process supervision in RLVR. 
+
+9 Conclusion 
+
+This work demonstrates that reward granular-ity (process vs. outcome rewards) fundamentally shapes the structure, coherence, and correctness of CoT reasoning in small language models. To develop models that not only answer correctly, but also reason reliably, it is essential to supervise both the process and the outcome of reasoning. The nearly 10-point accuracy gap between process-only and outcome-only supervision underscores that re-Figure 3: Error type distribution across reward regimes annotated by GPT-4o on the 45-question evaluation slice, broken down by error type. 
+
+ward granularity is not a minor implementation detail, but a primary lever for reasoning quality in small models. While our results are specific to GSM8K and a 0.5B-parameter model, they moti-vate broader investigation into reward granularity as models and tasks scale. Code and evaluation data will be released upon publication. 
+
+Acknowledgments 
+
+Training was conducted on Lightning.ai A100 GPU instances. We thank the VERL and vLLM open-source communities. 
+
+References 
+
+Karl Cobbe, Vineet Kosaraju, Mohammad Bavarian, Mark Chen, Heewoo Jun, Lukasz Kaiser, Matthias Plappert, Jerry Tworek, Jacob Hilton, Reiichiro Nakano, Christopher Hesse, and John Schulman. 2021. Training verifiers to solve math word prob-lems. Preprint , arXiv:2110.14168. Hunter Lightman, Vineet Kosaraju, Yura Burda, Harri Edwards, Bowen Baker, Teddy Lee, Jan Leike, John Schulman, Ilya Sutskever, and Karl Cobbe. 2023. Let’s verify step by step. Preprint ,arXiv:2305.20050. Soumya Rani Samineni, Durgesh Kalwar, Vardaan Gan-gal, Siddhant Bhambri, and Subbarao Kambham-pati. 2025. Local coherence or global validity? in-vestigating rlvr traces in math domains. Preprint ,arXiv:2510.18176. Abulhair Saparov and He He. 2023. Language models are greedy reasoners: A systematic formal analysis of chain-of-thought. Preprint , arXiv:2210.01240. Zhihong Shao, Peiyi Wang, Qihao Zhu, Runxin Xu, Junxiao Song, Xiao Bi, Haowei Zhang, Mingchuan Zhang, Y. K. Li, Y. Wu, and Daya Guo. 2024. Deepseekmath: Pushing the limits of mathemati-cal reasoning in open language models. Preprint ,arXiv:2402.03300. Yunhao Tang, Sid Wang, Lovish Madaan, and Rémi Munos. 2025. Beyond verifiable rewards: Scaling reinforcement learning for language models to unver-ifiable data. Preprint , arXiv:2503.19618. Miles Turpin, Julian Michael, Ethan Perez, and Samuel R. Bowman. 2023. Language models don’t always say what they think: Unfaithful ex-planations in chain-of-thought prompting. Preprint ,arXiv:2305.04388. Jonathan Uesato, Nate Kushman, Ramana Kumar, Fran-cis Song, Noah Siegel, Lisa Wang, Antonia Creswell, Geoffrey Irving, and Irina Higgins. 2022. Solving math word problems with process- and outcome-based feedback. Preprint , arXiv:2211.14275. Jason Wei, Xuezhi Wang, Dale Schuurmans, Maarten Bosma, Brian Ichter, Fei Xia, Ed Chi, Quoc Le, and Denny Zhou. 2023. Chain-of-thought prompting elic-its reasoning in large language models. Preprint ,arXiv:2201.11903. Xumeng Wen, Zihan Liu, Shun Zheng, Shengyu Ye, Zhi-rong Wu, Yang Wang, Zhijian Xu, Xiao Liang, Junjie Li, Ziming Miao, Jiang Bian, and Mao Yang. 2025. Reinforcement learning with verifiable rewards im-plicitly incentivizes correct reasoning in base llms. 
+
+Preprint , arXiv:2506.14245. An Yang, Baosong Yang, Binyuan Hui, Bo Zheng, Bowen Yu, Chang Zhou, Chengpeng Li, Chengyuan Li, Dayiheng Liu, Fei Huang, Guanting Dong, Hao-ran Wei, Huan Lin, Jialong Tang, Jialin Wang, Jian Yang, Jianhong Tu, Jianwei Zhang, Jianxin Ma, and 43 others. 2024. Qwen2 technical report. Preprint ,arXiv:2407.10671. Daniel M. Ziegler, Nisan Stiennon, Jeffrey Wu, Tom B. Brown, Alec Radford, Dario Amodei, Paul Chris-tiano, and Geoffrey Irving. 2020. Fine-tuning lan-guage models from human preferences. Preprint ,arXiv:1909.08593. A Additional Figures 
+
+Figure 4: Training curves for all five reward condi-tions on GSM8K. Process-only converges to the highest validation accuracy (63.73%), while Process (0.1) + Outcome (0.9) consistently underperforms all other con-ditions including pure outcome supervision, illustrating the hybrid reward anomaly identified in Section 5.1. Table 4: GRPO training hyperparameters on GSM8K. 
+
+Parameter Value 
+
+Model Qwen2.5-0.5B (494M params) Train samples 7,473 Test samples 1,319 Max prompt / response 512 / 1,024 tokens Batch size / mini-batch 64 / 8 Learning rate 1 × 10 −6
+
+KL coefficient 0.001 Epochs / total steps 5 / 580 Rollouts / temperature (train) 5 / 0.6 GPU 1× A100 80GB Framework VERL, vLLM
