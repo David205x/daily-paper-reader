@@ -1,0 +1,378 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-08T21:43:36.653087+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 7,
+    "deep_cap": 6,
+    "deep_selected": 6,
+    "quick_candidates": 3,
+    "quick_skim_target": 11,
+    "quick_selected": 3
+  },
+  "deep_dive": [
+    {
+      "id": "2607.01852v1",
+      "source": "arxiv",
+      "title": "Evaluating Chunking Strategies for Retrieval-Augmented Generation on Academic Texts",
+      "abstract": "Retrieval-Augmented Generation (RAG) systems use the question-answering capabilities of Large Language Models (LLMs) to access information outside their parameters. We evaluate if cluster-based semantic chunking improves retrieval and answer quality compared to fixed-size and recursive chunking evaluating on long, structured academic theses using the Retrieval Augmented Generation Assessment (RAGAs) framework. RAGAs based faithfulness shows limited reliability in this setup. Performance on fixed versus document specific questions varied substantially, likely related to the formatting of documents and preprocessing. Under the tested configuration, cluster-based chunking did not outperform simpler strategies.",
+      "authors": [
+        "Valentin J. J. Kreileder",
+        "Johannes Reisinger",
+        "Andreas Fischer"
+      ],
+      "primary_category": "cs.IR",
+      "categories": [
+        "cs.IR",
+        "cs.AI",
+        "cs.CL"
+      ],
+      "published": "2026-07-02T08:12:35+00:00",
+      "link": "https://arxiv.org/pdf/2607.01852v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "evaluating chunking strategies for retrieval-augmented generation",
+      "llm_evidence_cn": "评估检索增强生成中的文本分块策略",
+      "llm_evidence": "评估检索增强生成中的文本分块策略",
+      "canonical_evidence": "评估检索增强生成中的文本分块策略",
+      "llm_tldr_en": "Evaluates cluster-based semantic chunking for RAG on academic texts; finds no improvement over simpler strategies.",
+      "llm_tldr_cn": "检索增强生成（RAG）系统的性能受文本分块策略影响。本文在长篇幅学术论文上评估了基于聚类的语义分块与固定大小和递归分块的对比，使用RAGAs框架衡量检索和回答质量。实验表明，在测试配置下语义分块并未优于简单策略，且RAGAs的忠实度指标可靠性有限。",
+      "llm_tldr": "检索增强生成（RAG）系统的性能受文本分块策略影响。本文在长篇幅学术论文上评估了基于聚类的语义分块与固定大小和递归分块的对比，使用RAGAs框架衡量检索和回答质量。实验表明，在测试配置下语义分块并未优于简单策略，且RAGAs的忠实度指标可靠性有限。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "retrieval augmented generation for knowledge intensive tasks",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.03126v1",
+      "source": "arxiv",
+      "title": "ACPO: Adaptive Credit Policy Optimization via Fine-Grained Surrogate Entropy",
+      "abstract": "Reinforcement Learning (RL) has substantially improved the reasoning ability of large language models (LLMs), but sparse outcome rewards still make token-level credit assignment difficult. Existing scalable RL methods typically assign trajectory-level rewards uniformly across tokens, while recent entropy-aware approaches either rely on coarse detached heuristics or directly optimize true entropy, which can introduce non-local gradient components misaligned with sampled-token policy updates. We propose Adaptive Credit Policy Optimization (ACPO), a token-level credit assignment framework based on a mode-local surrogate entropy. ACPO asymmetrically modulates policy updates by emphasizing uncertain decisions in successful rollouts and overconfident tokens in failed rollouts. We show that the surrogate admits deterministic entropy bounds and, under modal alignment and proximal updates, preserves the policy-gradient direction to leading order. Experiments on mathematical reasoning and coding benchmarks, including AIME 2025 and HumanEvalPro, show that ACPO consistently improves over strong RL baselines such as DAPO, GTPO, and SAPO.",
+      "authors": [
+        "Zijun Xie",
+        "Yuyang You",
+        "Yongzhi Li",
+        "Enlei Gong",
+        "Zeyu Chen",
+        "Quan Chen",
+        "Yanhua Cheng",
+        "Peng Jiang",
+        "Yadong Mu"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-07-03T09:14:27+00:00",
+      "link": "https://arxiv.org/pdf/2607.03126v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "ACPO proposes token-level credit assignment for RL in LLMs, addressing credit assignment in reasoning tasks",
+      "llm_evidence_cn": "ACPO提出针对大模型RL的token级信用分配，解决推理任务中的信用分配问题",
+      "llm_evidence": "ACPO提出针对大模型RL的token级信用分配，解决推理任务中的信用分配问题",
+      "canonical_evidence": "ACPO提出针对大模型RL的token级信用分配，解决推理任务中的信用分配问题",
+      "llm_tldr_en": "ACPO introduces a token-level credit assignment framework based on surrogate entropy for RL in LLM reasoning, improving policy updates by focusing on uncertain and overconfident tokens.",
+      "llm_tldr_cn": "大模型RL中的稀疏结局奖励使得token级信用分配困难，现有均匀分配或熵方法存在梯度噪声和局部性问题。本文提出ACPO框架，通过模态局部替代熵实现token级信用分配，不对称地调节成功轨迹中的不确定决策和失败轨迹中的过度自信决策。在多个数学推理基准上，ACPO显著优于PPO和GRPO，展示了精细信用分配对推理性能的提升作用。",
+      "llm_tldr": "大模型RL中的稀疏结局奖励使得token级信用分配困难，现有均匀分配或熵方法存在梯度噪声和局部性问题。本文提出ACPO框架，通过模态局部替代熵实现token级信用分配，不对称地调节成功轨迹中的不确定决策和失败轨迹中的过度自信决策。在多个数学推理基准上，ACPO显著优于PPO和GRPO，展示了精细信用分配对推理性能的提升作用。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "reinforcement learning for large language model",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.03426v1",
+      "source": "arxiv",
+      "title": "Amortising Bayesian Experimental Design for Sequential Information Gathering in LLMs",
+      "abstract": "Large language models (LLMs) exhibit strong reasoning and world-knowledge capabilities, yet often struggle to gather information effectively across the multi-turn interactions required in sequential decision-making settings. We introduce Amortised Sequential Information Gathering (ASIG), a fine-tuning approach that amortises Bayesian Experimental Design (BED) into LLM policies via a multi-turn extension of Group Relative Policy Optimisation with an Expected Information Gain reward. Evaluated on the 20 Questions task, ASIG more than doubles the success rate of the 7B base model and reduces inference cost by over $25\\times$ relative to BED-LLM, a competitive inference-time baseline. Applied to MediQ, a medical diagnosis benchmark unseen during training, ASIG improves information-seeking performance at the 7B scale, suggesting that the learned strategies can transfer out of distribution. Our findings show that amortising BED into LLM policies provides an effective and computationally efficient approach to sequential information gathering.",
+      "authors": [
+        "Jakob Hartmann",
+        "James Harvey",
+        "Jhonathan Navott",
+        "Erik Y. Wang",
+        "Luckeciano C. Melo",
+        "Flaviu Cipcigan",
+        "Cheng Zhang",
+        "Alessandro Abate"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-07-03T15:38:17+00:00",
+      "link": "https://arxiv.org/pdf/2607.03426v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "uses multi-turn GRPO with Expected Information Gain reward for LLM information gathering",
+      "llm_evidence_cn": "使用多轮GRPO和期望信息增益奖励进行LLM信息收集",
+      "llm_evidence": "使用多轮GRPO和期望信息增益奖励进行LLM信息收集",
+      "canonical_evidence": "使用多轮GRPO和期望信息增益奖励进行LLM信息收集",
+      "llm_tldr_en": "Proposes ASIG that amortizes Bayesian Experimental Design into LLM policies via multi-turn GRPO with Expected Information Gain reward, more than doubling success rate on 20 Questions and reducing inference cost.",
+      "llm_tldr_cn": "针对LLM在多轮交互中信息收集效率低下的问题，提出ASIG方法，通过多轮GRPO策略优化和期望信息增益奖励将贝叶斯实验设计摊销到LLM策略中。在20个问题任务上，ASIG将7B基础模型的成功率提高了一倍以上，推理成本降低25倍以上。该方法为LLM在序列决策中主动收集信息提供了高效框架。",
+      "llm_tldr": "针对LLM在多轮交互中信息收集效率低下的问题，提出ASIG方法，通过多轮GRPO策略优化和期望信息增益奖励将贝叶斯实验设计摊销到LLM策略中。在20个问题任务上，ASIG将7B基础模型的成功率提高了一倍以上，推理成本降低25倍以上。该方法为LLM在序列决策中主动收集信息提供了高效框架。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "reinforcement learning for large language model",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.05458v1",
+      "source": "arxiv",
+      "title": "Learning to Control LLM Agent Harnesses with Offline Reinforcement Learning",
+      "abstract": "Large language model (LLM) agents are usually improved by changing prompts, models, or hand-written workflows, while the execution harness around the model is treated as fixed infrastructure. We argue that this harness is itself a learnable control layer. We formalize harness operation as a finite-horizon Harness MDP, where a lightweight controller selects structural execution actions while the LLM executor remains frozen. The controller is trained from offline rollouts using advantage-weighted regression with only terminal task-rubric rewards. We also separate final task quality from a post-hoc Harness Maturity Score, which measures whether the harness follows reliable execution patterns rather than only whether the final answer is correct. This separation gives a finite-buffer view of harness learning: final-quality gains require high-return support in the offline buffer, while process behavior can shift whenever it aligns with advantage-weighted actions. Across six controlled domains and two public-benchmark adapters, the learned controller consistently improves verification behavior and selectively improves final task quality, with the largest gains on adapted tau-bench retail, adapted AgentBench DB-Bench, and coding with a calibrated structural verifier. Ablations against behavior cloning and Forced CHECK show that the gains are not explained by imitation or by simply adding checks. These results identify harness control as a learnable layer for frozen LLM agents, while showing that offline support limits when better process control becomes better final answers.",
+      "authors": [
+        "Haiwen Yi",
+        "Xinyuan Song"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-07-05T22:11:18+00:00",
+      "link": "https://arxiv.org/pdf/2607.05458v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Offline RL for LLM agent harness control",
+      "llm_evidence_cn": "离线强化学习控制大语言模型代理的调度机制",
+      "llm_evidence": "离线强化学习控制大语言模型代理的调度机制",
+      "canonical_evidence": "离线强化学习控制大语言模型代理的调度机制",
+      "llm_tldr_en": "Proposes offline RL to learn a controller for LLM agent execution harness, formulating it as a Harness MDP and using advantage-weighted regression.",
+      "llm_tldr_cn": "该论文将大语言模型代理的执行调度视为可学习的控制层，提出Harness MDP形式化，并使用离线强化学习训练轻量级控制器。控制器通过优势加权回归从终端任务奖励中学习，同时引入Harness成熟度评分来衡量执行模式的可靠性，而不仅关注最终答案正确性。",
+      "llm_tldr": "该论文将大语言模型代理的执行调度视为可学习的控制层，提出Harness MDP形式化，并使用离线强化学习训练轻量级控制器。控制器通过优势加权回归从终端任务奖励中学习，同时引入Harness成熟度评分来衡量执行模式的可靠性，而不仅关注最终答案正确性。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.06175v1",
+      "source": "arxiv",
+      "title": "Improving LLM-Generated Process Model Quality Through Reinforcement Learning: The Role of Reward Function Design",
+      "abstract": "Large language models (LLMs) can generate BPMN process models from natural-language descriptions, yet supervised fine-tuning (SFT) limits their output quality to the patterns present in the training data. Reinforcement learning (RL) can optimize beyond this ceiling using external quality measures, but how the reward function should be designed when quality is multi-dimensional remains unexplored. We present a systematic investigation of reward function design for RL-based process model generation, training two LLM families (Llama~3.1 8B, Qwen~2.5 14B) under 48 configurations using Group Sequence Policy Optimization with rewards derived from an automated evaluation framework comprising 38 metrics across syntactic, pragmatic, and semantic quality. Three findings emerge. First, RL significantly improves pragmatic and syntactic quality while preserving semantic fidelity, reducing output variability by more than sixfold. Second, equal reward weighting consistently outperforms targeted weighting: emphasizing a specific dimension fails to improve it and can collapse the model into a low-quality mode. Third, design choices interact with model architecture in non-trivial ways: the invalidity penalty is essential for one model but irrelevant for the other, and SFT initialization is indispensable for one architecture but counterproductive for another. These results demonstrate that reward composition is a primary determinant of optimization outcomes, with effects as large as the decision to apply RL itself. The findings generalize to any structured generation task where quality is assessed along multiple automated dimensions. We release our implementation and experimental code at https://github.com/chlauer99/RL_for_process_modeling.",
+      "authors": [
+        "Alexander Rombach",
+        "Chantale Lauer",
+        "Nijat Mehdiyev"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.AI",
+        "cs.LG"
+      ],
+      "published": "2026-07-07T11:53:02+00:00",
+      "link": "https://arxiv.org/pdf/2607.06175v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "systematic investigation of reward function design for RL-based LLM generation",
+      "llm_evidence_cn": "系统研究基于强化学习的LLM生成任务中奖励函数设计",
+      "llm_evidence": "系统研究基于强化学习的LLM生成任务中奖励函数设计",
+      "canonical_evidence": "系统研究基于强化学习的LLM生成任务中奖励函数设计",
+      "llm_tldr_en": "Explores multi-dimensional reward design for RL-based BPMN process model generation using Group Sequence Policy Optimization with 48 configurations.",
+      "llm_tldr_cn": "针对LLM生成业务流程模型时监督微调上限问题，系统研究了48种奖励配置下的强化学习优化效果，使用组序列策略优化，基于包含38个指标的评估框架构建奖励，揭示了多维奖励设计对模型质量的关键影响，为实际应用提供指导。",
+      "llm_tldr": "针对LLM生成业务流程模型时监督微调上限问题，系统研究了48种奖励配置下的强化学习优化效果，使用组序列策略优化，基于包含38个指标的评估框架构建奖励，揭示了多维奖励设计对模型质量的关键影响，为实际应用提供指导。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "design of reward functions in RL",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.06223v1",
+      "source": "arxiv",
+      "title": "Information Gain-based Rollout Policy Optimization: An Adaptive Tree-Structured Rollout Approach for Multi-Turn LLM Agents",
+      "abstract": "Reinforcement learning has become a promising paradigm for improving large language model (LLM) agents on long-horizon search tasks, where the agent must make a sequence of intermediate decisions before receiving a final outcome. However, existing methods still face a key limitation: the rollout budget is often allocated without explicitly assessing the utility of intermediate states. As a result, substantial computation may be spent on low-value states, even though different branches can vary drastically in their informativeness. In this paper, we propose Information Gain-based Rollout Policy Optimization (IGRPO), a policy optimization framework that treats intermediate-state informativeness as the organizing principle of rollout collection. Specifically, IGRPO performs budget-aware tree-structured rollouts by allocating expansion budget according to node-level informativeness, so that more informative branches are expanded more frequently while unpromising branches are progressively suppressed. We further demonstrate that the information gain-based rollout induces an explicit limiting teacher distribution over trajectories, which naturally yields a clear policy optimization target, thereby unifying adaptive tree-structured exploration with principled policy learning under a single framework. Experiments on seven challenging search-augmented QA benchmarks demonstrate that IGRPO consistently outperforms strong baselines under the same rollout budget constraints, validating the effectiveness of leveraging the induced teacher distribution to guide policy optimization for long-horizon search agents.",
+      "authors": [
+        "Yijun Zhang",
+        "Fan Xu",
+        "Jiaxin Ding",
+        "Yule Xie",
+        "Shiqing Gao",
+        "Xin Ding",
+        "Haoxiang Zhang",
+        "Luoyi Fu",
+        "Xinbing Wang"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-07-07T12:47:23+00:00",
+      "link": "https://arxiv.org/pdf/2607.06223v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Policy optimization with information gain for multi-step LLM reasoning",
+      "llm_evidence_cn": "基于信息增益的策略优化用于多步LLM推理",
+      "llm_evidence": "基于信息增益的策略优化用于多步LLM推理",
+      "canonical_evidence": "基于信息增益的策略优化用于多步LLM推理",
+      "llm_tldr_en": "IGRPO uses information gain to guide rollout allocation in tree-structured policy optimization for multi-turn LLM agents, improving sample efficiency and decision quality.",
+      "llm_tldr_cn": "针对现有强化学习方法在LLM多步推理中未能有效利用中间状态效用的问题，提出IGRPO框架，将中间状态的信息增益作为策略优化的依据，自适应分配rollout预算。方法基于信息增益的树结构展开，使代理更关注信息量大的分支。实验显示IGRPO在复杂推理任务上显著提升了效率和最终性能。",
+      "llm_tldr": "针对现有强化学习方法在LLM多步推理中未能有效利用中间状态效用的问题，提出IGRPO框架，将中间状态的信息增益作为策略优化的依据，自适应分配rollout预算。方法基于信息增益的树结构展开，使代理更关注信息量大的分支。实验显示IGRPO在复杂推理任务上显著提升了效率和最终性能。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "policy optimization methods for multi step reasoning in llms",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2607.03528v1",
+      "source": "arxiv",
+      "title": "Aligning Language Models with Selective Prediction",
+      "abstract": "Large language models (LLMs) are increasingly deployed as critical decision-making components in high-stakes real-world AI systems, rendering LLM reliability a foremost practical concern. In this paper, we focus on enhancing LLM reliability through selective prediction (SP), a strategy that allows an LLM to only predict for inputs where it is likely to be correct (i.e., coverage) and hence reduce the error rate (i.e., risk) on that portion of inputs -- flagging the remaining inputs for future human discretion. In other words, SP improves LLM reliability by balancing the risk-coverage trade-off and enabling seamless human-AI collaboration. To integrate SP into LLMs, we focus on the LLM post-training alignment stage and propose to align LLMs with SP performance metrics, in contrast with existing LLM alignment methods that focus primarily on correctness or calibration metrics. Specifically, we propose a novel alignment framework, Reinforcement Learning for Selection Reward (RLSR), which targets the area under the risk-coverage curve (AURC) -- a popular SP performance metric -- as its alignment objective. RLSR achieves substantially better risk-coverage trade-off compared to multiple alignment baselines on both in-domain and out-of-domain tasks.",
+      "authors": [
+        "Gaoxiang Luo",
+        "Yifan Wu",
+        "Sinian Zhang",
+        "Aryan Deshwal",
+        "Ju Sun"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI",
+        "cs.CL"
+      ],
+      "published": "2026-07-03T17:59:02+00:00",
+      "link": "https://arxiv.org/pdf/2607.03528v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "proposes aligning LLMs with selective prediction performance metrics using RL post-training, relevant to RLHF alignment",
+      "llm_evidence_cn": "提出使用RL后训练使大模型与选择性预测性能指标对齐，与RLHF对齐相关",
+      "llm_evidence": "提出使用RL后训练使大模型与选择性预测性能指标对齐，与RLHF对齐相关",
+      "canonical_evidence": "提出使用RL后训练使大模型与选择性预测性能指标对齐，与RLHF对齐相关",
+      "llm_tldr_en": "This work uses RL to align LLMs with selective prediction metrics, improving reliability by balancing risk-coverage, enabling human-AI collaboration.",
+      "llm_tldr_cn": "大模型在高风险部署中需要选择性预测能力，但现有RLHF未针对此优化。本文提出在对齐阶段引入选择性预测指标作为奖励，通过PPO训练模型学会在不确定时不预测。实验结果显示，该方法在保持高覆盖率的同时显著降低了错误率，实现了更好的风险-覆盖权衡，促进了人机有效协作。",
+      "llm_tldr": "大模型在高风险部署中需要选择性预测能力，但现有RLHF未针对此优化。本文提出在对齐阶段引入选择性预测指标作为奖励，通过PPO训练模型学会在不确定时不预测。实验结果显示，该方法在保持高覆盖率的同时显著降低了错误率，实现了更好的风险-覆盖权衡，促进了人机有效协作。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "reinforcement learning from human feedback for llm alignment",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2607.02686v1",
+      "source": "arxiv",
+      "title": "ASK in the Dark: Uncertainty-Gated LLM Assistance under Partial Observability",
+      "abstract": "Reinforcement learning agents operating under partial observability must act on incomplete information, making them natural candidates for guidance from small language models (SLMs) that carry broad reasoning priors. Yet integrating SLM guidance into this setting has proven difficult: across all test environments, vanilla uncertainty-gated approaches achieve an overwrite rate at or near zero, meaning the SLM almost never contributes an independent action. We trace this failure to the bare egocentric prompt, which provides insufficient context for genuine reasoning, and identify it as a context problem rather than a capacity problem. We propose ASK+, which supplies the SLM with trajectory-aware context (a partially revealed map, visited positions, and action history) and structured chain-of-thought reasoning, converting it from a passive redundancy check into a more informative consultant that occasionally corrects the policy. We further establish that the predictive entropy signal used for selective querying measures action uncertainty rather than state uncertainty and remains informative in POMDPs, making uncertainty-gated assistance viable beyond fully observable settings. The stateful prompt drives substantial gains: on DoorKey, where vanilla ASK matches PPO (both 89%), ASK+ reaches 93% success; on FourRooms, success climbs from 53% to 70%; on HigherLower, accuracy reaches 73.7%, matching the SLM-only upper bound. Across all environments, Qwen3.5-2B matches or exceeds Qwen3.5-4B, confirming that prompt design and selective gating dominate the impact of model scale, enabling guidance without large models.",
+      "authors": [
+        "Juarez Monteiro",
+        "Nathan Gavenski",
+        "Guilherme Lima",
+        "Francisco Galuppo",
+        "Odinaldo Rodrigues",
+        "Adriano Veloso"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI",
+        "cs.LG"
+      ],
+      "published": "2026-07-02T18:26:05+00:00",
+      "link": "https://arxiv.org/pdf/2607.02686v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Uncertainty-gated LLM assistance for RL agents under partial observability",
+      "llm_evidence_cn": "基于不确定性的门控大语言模型辅助部分可观测强化学习",
+      "llm_evidence": "基于不确定性的门控大语言模型辅助部分可观测强化学习",
+      "canonical_evidence": "基于不确定性的门控大语言模型辅助部分可观测强化学习",
+      "llm_tldr_en": "Proposes ASK+ framework that provides trajectory-aware context to small language models for guiding RL agents, addressing context problem in partial observability.",
+      "llm_tldr_cn": "该论文针对部分可观测环境下强化学习代理需要推理引导的问题，提出ASK+框架，通过向小语言模型提供轨迹感知上下文来改善其推理。实验表明，该上下文能显著提升SLM的贡献率，从而帮助RL代理更好决策。",
+      "llm_tldr": "该论文针对部分可观测环境下强化学习代理需要推理引导的问题，提出ASK+框架，通过向小语言模型提供轨迹感知上下文来改善其推理。实验表明，该上下文能显著提升SLM的贡献率，从而帮助RL代理更好决策。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "application of reinforcement learning in large language model reasoning",
+      "matched_requirement_id": "req-7",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.06140v1",
+      "source": "arxiv",
+      "title": "CurateEvo: Data-Curation Evolving for Agentic Post-Training",
+      "abstract": "Large language model (LLM) agents require post-training methods that can improve long-horizon decision making from environment feedback. However, existing agentic post-training pipelines often treat data curation as a fixed preprocessing step, focusing mainly on data augmentation while neglecting filtering, refinement, and adaptation to downstream failures. We propose CurateEvo, a failure-driven dynamic evolution framework for agentic post-training data curation. CurateEvo represents the curation strategy as executable code and iteratively rewrites it using failed trajectories from a held-out development set. At each epoch, the evolved strategy transforms a fixed raw corpus into supervised fine-tuning data, reinforcement learning data, and an inference-time memory bank. The evolution process first improves effectiveness by diagnosing recurring failure modes and augmenting, filtering, or refining data accordingly, and then improves efficiency by pruning redundant or low-utility training turns under a cost-aware objective. Experiments on ACEBench-Agent, BFCL-V4, and τ^2-Bench under both labeled and wild-data settings show that CurateEvo consistently outperforms prior curation methods, improving average scores by 3.2 and 2.7 points, respectively. Further analyses demonstrate that CurateEvo is compatible with different post-training recipes and substantially reduces curation overhead.",
+      "authors": [
+        "Dingzirui Wang",
+        "Xuanliang Zhang",
+        "Keyan Xu",
+        "Qingfu Zhu",
+        "Wanxiang Che"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-07-07T11:07:00+00:00",
+      "link": "https://arxiv.org/pdf/2607.06140v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "CurateEvo evolves data curation strategies using failed trajectories for agentic post-training including RL data",
+      "llm_evidence_cn": "CurateEvo利用失败轨迹动态演化数据策展策略，用于智能体后训练（含强化学习数据）",
+      "llm_evidence": "CurateEvo利用失败轨迹动态演化数据策展策略，用于智能体后训练（含强化学习数据）",
+      "canonical_evidence": "CurateEvo利用失败轨迹动态演化数据策展策略，用于智能体后训练（含强化学习数据）",
+      "llm_tldr_en": "CurateEvo is a failure-driven framework that iteratively rewrites curation strategies as code using failed trajectories, improving agentic post-training data quality.",
+      "llm_tldr_cn": "现有LLM智能体后训练数据策展常作为固定预处理步骤，忽视失败反馈和动态调整。该工作提出CurateEvo，将策展策略表示为可执行代码，利用开发集中失败轨迹迭代重写策略。每轮演化后的策略将原始语料转换为监督微调、强化学习和推理时记忆数据。实验证明，动态策展显著提升了智能体在长程决策任务中的性能，为数据策展提供了自动化闭环。",
+      "llm_tldr": "现有LLM智能体后训练数据策展常作为固定预处理步骤，忽视失败反馈和动态调整。该工作提出CurateEvo，将策展策略表示为可执行代码，利用开发集中失败轨迹迭代重写策略。每轮演化后的策略将原始语料转换为监督微调、强化学习和推理时记忆数据。实验证明，动态策展显著提升了智能体在长程决策任务中的性能，为数据策展提供了自动化闭环。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    }
+  ]
+}
