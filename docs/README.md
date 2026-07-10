@@ -6,43 +6,41 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-07-09
-- 运行时间：2026-07-09 22:01:38 UTC
+- 最新运行日期：2026-07-10
+- 运行时间：2026-07-10 21:20:36 UTC
 - 运行状态：成功
 - 本次总论文数：7
-- 精读区：6
-- 速读区：1
+- 精读区：2
+- 速读区：5
 
 ### 今日简报（AI）
-今日聚焦全双工对话模型与多任务智能体强化学习两大方向，精选7篇论文中两篇高分研究。  
-最值得关注：通过强化学习解耦全双工对话动态（9.0分），以及熵节奏策略优化实现多任务智能体学习（9.0分）。  
-建议优先精读这两篇论文，其方法论对提升对话系统自然度和智能体多任务效率有直接参考价值。
-- 详情：[/202607/09/README](/202607/09/README)
+今日精选7篇论文，精读2篇高分作，聚焦强化学习与多模态教学新突破。最值得关注：Switch-Reasoner通过强化学习动态控制“思考时机”，以及多模态环境教学实现稳健奖励学习。建议优先精读这两篇，从混合任务推理与跨环境奖励设计入手提升研究方向。
+- 详情：[/202607/10/README](/202607/10/README)
 
 ### 精读区论文标签
-1. [Decoupling Conversational Dynamics in Full-Duplex Spoken Models through Reinforcement Learning](/202607/09/2607.07148v1-decoupling-conversational-dynamics-in-full-duplex-spoken-models-through-reinforcement-learning)  
+1. [Switch-Reasoner: Learn When to Think in Multitask Mixtures via Reinforcement Learning](/202607/10/2607.08572v1-switch-reasoner-learn-when-to-think-in-multitask-mixtures-via-reinforcement-learning)  
    标签：评分：9.0/10、query:rl
-   evidence：全双工口语对话中解耦说话时机和内容的RL框架
-2. [Entropy Pacing Policy Optimization for Multi-Task Agentic Reinforcement Learning](/202607/09/2607.07178v1-entropy-pacing-policy-optimization-for-multi-task-agentic-reinforcement-learning)  
-   标签：评分：9.0/10、query:rl
-   evidence：多任务智能体强化学习用于大语言模型任务
-3. [From Atomic Actions to Standard Operating Procedures: Iterative Tool Optimization for Self-Evolving LLM Agents](/202607/09/2607.07321v1-from-atomic-actions-to-standard-operating-procedures-iterative-tool-optimization-for-self-evolving-llm-agents)  
-   标签：评分：9.0/10、query:rl
-   evidence：通过迭代工具优化实现自进化LLM智能体
-4. [Single-Rollout Asynchronous Optimization for Agentic Reinforcement Learning](/202607/09/2607.07508v1-single-rollout-asynchronous-optimization-for-agentic-reinforcement-learning)  
-   标签：评分：9.0/10、query:rl
-   evidence：面向LLM智能体任务的异步RL优化
-5. [Selective Timestep Weighting and Advantage-Based Replay for Sample-Efficient Diffusion RLHF](/202607/09/2607.07693v1-selective-timestep-weighting-and-advantage-based-replay-for-sample-efficient-diffusion-rlhf)  
-   标签：评分：9.0/10、query:rl
-   evidence：扩散模型的样本高效RLHF，通过选择性时间步加权和优势重放
-6. [Interpretable Uncertainty for Adaptive Retrieval and Reasoning in Question Answering](/202607/09/2607.07380v1-interpretable-uncertainty-for-adaptive-retrieval-and-reasoning-in-question-answering)  
+   evidence：基于GRPO的强化学习框架，让多模态大模型自适应选择推理模式
+2. [Multi-Modal, Multi-Environment Machine Teaching for Robust Reward Learning](/202607/10/2607.08647v1-multi-modal-multi-environment-machine-teaching-for-robust-reward-learning)  
    标签：评分：8.0/10、query:rl
-   evidence：提出基于不确定性感知的自适应检索用于问答RAG
+   evidence：跨多环境的鲁棒奖励学习
 
 ### 速读区论文标签
-1. [Think Big, Search Small: Where Capacity Matters in Hierarchical Search Agents?](/202607/09/2607.07548v1-think-big-search-small-where-capacity-matters-in-hierarchical-search-agents)  
-   标签：评分：8.0/10、query:rl
-   evidence：大语言模型搜索代理在自动化任务分解与执行中的应用
+1. [TurnOPD: Making On-Policy Distillation Turn-Aware for Efficient Long-Horizon Agent Training](/202607/10/2607.05804v1-turnopd-making-on-policy-distillation-turn-aware-for-efficient-long-horizon-agent-training)  
+   标签：评分：7.0/10、query:rl
+   evidence：面向长周期智能体训练的高效在策略蒸馏方法
+2. [RSF-GLLM: Bridging the Semantic Gap in Multi-Hop Knowledge Graph QA via Recurrent Soft-Flow and Decoupled LLM Generation](/202607/10/2607.06527v1-rsf-gllm-bridging-the-semantic-gap-in-multi-hop-knowledge-graph-qa-via-recurrent-soft-flow-and-decoupled-llm-generation)  
+   标签：评分：7.0/10、query:rl
+   evidence：可微分图推理与LLM生成结合的知识密集型问答
+3. [Feedback Manipulation Regularization: Enabling Offline Agent Alignment for Imitation Learning](/202607/10/2607.07859v1-feedback-manipulation-regularization-enabling-offline-agent-alignment-for-imitation-learning)  
+   标签：评分：7.0/10、query:rl
+   evidence：利用评估性反馈作为正则化的离线智能体对齐
+4. [Guided Action Flow: Q-Guided Inference for Flow-Matching Vision-Language-Action Policies](/202607/10/2607.02092v1-guided-action-flow-q-guided-inference-for-flow-matching-vision-language-action-policies)  
+   标签：评分：6.0/10、query:rl
+   evidence：Q引导的流匹配视觉语言动作策略推断，实现了任务自动化中的测试时引导
+5. [Guided Action Flow: Q-Guided Inference for Flow-Matching Vision-Language-Action Policies](/202607/10/2607.02092v2-guided-action-flow-q-guided-inference-for-flow-matching-vision-language-action-policies)  
+   标签：评分：6.0/10、query:rl
+   evidence：Q引导的流匹配视觉语言动作策略推断，实现了任务自动化中的测试时引导
 
 
 <div class="dpr-home-promo-card">
