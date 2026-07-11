@@ -6,41 +6,55 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-07-10
-- 运行时间：2026-07-10 21:20:36 UTC
+- 最新运行日期：2026-07-11
+- 运行时间：2026-07-11 20:12:49 UTC
 - 运行状态：成功
-- 本次总论文数：7
-- 精读区：2
-- 速读区：5
+- 本次总论文数：11
+- 精读区：5
+- 速读区：6
 
 ### 今日简报（AI）
-今日精选7篇论文，精读2篇高分作，聚焦强化学习与多模态教学新突破。最值得关注：Switch-Reasoner通过强化学习动态控制“思考时机”，以及多模态环境教学实现稳健奖励学习。建议优先精读这两篇，从混合任务推理与跨环境奖励设计入手提升研究方向。
-- 详情：[/202607/10/README](/202607/10/README)
+1) 今日聚焦模型自进化、检索增强生成系统设计，以及工具使用与记忆机制的实证研究。  
+2) 重点推荐“Harness-Aware Self-Evolving”协同进化框架和“Candidate-Constrained RAG”长文本检索设计。  
+3) 可关注协同进化与记忆增强方法，并参考NLT工具复现结果验证其跨模型泛化性。
+- 详情：[/202607/11/README](/202607/11/README)
 
 ### 精读区论文标签
-1. [Switch-Reasoner: Learn When to Think in Multitask Mixtures via Reinforcement Learning](/202607/10/2607.08572v1-switch-reasoner-learn-when-to-think-in-multitask-mixtures-via-reinforcement-learning)  
+1. [Harness-Aware Self-Evolving: Co-Evolving Model Weights, Harness, and Task Solutions](/202607/11/2607.03935v1-harness-aware-self-evolving-co-evolving-model-weights-harness-and-task-solutions)  
    标签：评分：9.0/10、query:rl
-   evidence：基于GRPO的强化学习框架，让多模态大模型自适应选择推理模式
-2. [Multi-Modal, Multi-Environment Machine Teaching for Robust Reward Learning](/202607/10/2607.08647v1-multi-modal-multi-environment-machine-teaching-for-robust-reward-learning)  
+   evidence：智能体强化学习框架共同演化模型和上下文
+2. [Candidate-Constrained Retrieval-Augmented Generation for LongEval-RAG: System Design and Empirical Analysis](/202607/11/2607.04008v1-candidate-constrained-retrieval-augmented-generation-for-longeval-rag-system-design-and-empirical-analysis)  
+   标签：评分：9.0/10、query:rl
+   evidence：面向受限证据检索的检索增强生成系统
+3. [Self-Review Reinforcement Learning (SRRL) with Cross-Episode Memory and Policy Distillation](/202607/11/2607.05541v1-self-review-reinforcement-learning-srrl-with-cross-episode-memory-and-policy-distillation)  
+   标签：评分：9.0/10、query:rl
+   evidence：用于LLM推理的自我审视强化学习框架，具有跨回合记忆
+4. [UP: Unbounded Positive Asymmetric Optimization for Breaking the Exploration-Stability Dilemma](/202607/11/2607.06987v1-up-unbounded-positive-asymmetric-optimization-for-breaking-the-exploration-stability-dilemma)  
+   标签：评分：9.0/10、query:rl
+   evidence：面向LLM强化学习的无界正非对称优化
+5. [Beyond Static Evaluation: Building Simulation Environments for Scalable Agentic Reinforcement Learning](/202607/11/2607.05773v1-beyond-static-evaluation-building-simulation-environments-for-scalable-agentic-reinforcement-learning)  
    标签：评分：8.0/10、query:rl
-   evidence：跨多环境的鲁棒奖励学习
+   evidence：为可扩展的智能体LLM训练构建RL Gym环境
 
 ### 速读区论文标签
-1. [TurnOPD: Making On-Policy Distillation Turn-Aware for Efficient Long-Horizon Agent Training](/202607/10/2607.05804v1-turnopd-making-on-policy-distillation-turn-aware-for-efficient-long-horizon-agent-training)  
+1. [The Remarkable Effectiveness of Providing AI Agents with Natural Language Tools: A Replication Study Validating NLT Performance Across 14 Models](/202607/11/2607.03953v1-the-remarkable-effectiveness-of-providing-ai-agents-with-natural-language-tools-a-replication-study-validating-nlt-performance-across-14-models)  
    标签：评分：7.0/10、query:rl
-   evidence：面向长周期智能体训练的高效在策略蒸馏方法
-2. [RSF-GLLM: Bridging the Semantic Gap in Multi-Hop Knowledge Graph QA via Recurrent Soft-Flow and Decoupled LLM Generation](/202607/10/2607.06527v1-rsf-gllm-bridging-the-semantic-gap-in-multi-hop-knowledge-graph-qa-via-recurrent-soft-flow-and-decoupled-llm-generation)  
+   evidence：验证自然语言工具对智能体任务自动化的有效性
+2. [From Passive Retrieval to Active Memory Navigation: Learning to Use Memory as a Structured Action Space](/202607/11/2607.05794v1-from-passive-retrieval-to-active-memory-navigation-learning-to-use-memory-as-a-structured-action-space)  
    标签：评分：7.0/10、query:rl
-   evidence：可微分图推理与LLM生成结合的知识密集型问答
-3. [Feedback Manipulation Regularization: Enabling Offline Agent Alignment for Imitation Learning](/202607/10/2607.07859v1-feedback-manipulation-regularization-enabling-offline-agent-alignment-for-imitation-learning)  
+   evidence：将记忆作为结构化动作空间用于多轮对话的RL方法
+3. [MILES: Modular Instruction Memory with Learnable Selection for Self-Improving LLM Reasoning](/202607/11/2607.06974v1-miles-modular-instruction-memory-with-learnable-selection-for-self-improving-llm-reasoning)  
    标签：评分：7.0/10、query:rl
-   evidence：利用评估性反馈作为正则化的离线智能体对齐
-4. [Guided Action Flow: Q-Guided Inference for Flow-Matching Vision-Language-Action Policies](/202607/10/2607.02092v1-guided-action-flow-q-guided-inference-for-flow-matching-vision-language-action-policies)  
+   evidence：通过可学习选择模块实现推理自我改进
+4. [Akashic: A Low-Overhead LLM Inference Service with MemAttention](/202607/11/2607.05708v1-akashic-a-low-overhead-llm-inference-service-with-memattention)  
    标签：评分：6.0/10、query:rl
-   evidence：Q引导的流匹配视觉语言动作策略推断，实现了任务自动化中的测试时引导
-5. [Guided Action Flow: Q-Guided Inference for Flow-Matching Vision-Language-Action Policies](/202607/10/2607.02092v2-guided-action-flow-q-guided-inference-for-flow-matching-vision-language-action-policies)  
+   evidence：面向LLM智能体的低开销内存系统，支持检索增强上下文
+5. [Task Decomposition-Guided Reranking for Adaptive Agent Skill Retrieval](/202607/11/2607.06283v1-task-decomposition-guided-reranking-for-adaptive-agent-skill-retrieval)  
    标签：评分：6.0/10、query:rl
-   evidence：Q引导的流匹配视觉语言动作策略推断，实现了任务自动化中的测试时引导
+   evidence：通过任务分解重排序实现LLM智能体的自适应技能检索
+6. [When Does In-Context Search Help? A Sampling-Complexity Theory of Reflection-Driven Reasoning](/202607/11/2607.06720v1-when-does-in-context-search-help-a-sampling-complexity-theory-of-reflection-driven-reasoning)  
+   标签：评分：6.0/10、query:rl
+   evidence：反射驱动推理中上下文搜索的理论分析
 
 
 <div class="dpr-home-promo-card">

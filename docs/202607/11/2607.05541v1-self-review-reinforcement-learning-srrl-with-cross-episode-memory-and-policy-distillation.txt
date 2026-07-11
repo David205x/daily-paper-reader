@@ -1,0 +1,232 @@
+Title: Self-Review Reinforcement Learning (SRRL) with Cross-Episode Memory and Policy Distillation
+
+URL Source: https://arxiv.org/pdf/2607.05541v1
+
+Published Time: Wed, 08 Jul 2026 00:12:01 GMT
+
+Number of Pages: 9
+
+Markdown Content:
+# Self-Review Reinforcement Learning (SRRL) with Cross-Episode Memory and Policy Distillation 
+
+Muhammad Zain Amin 1 2 Kibele Sebnem Yildirim 3
+
+# Abstract 
+
+Reinforcement Learning is commonly used to train large language models using environmen-tal feedback. In applied settings, the environment usually provides sparse or delayed feedback. This makes it difficult for the model to pinpoint which actions in its reasoning led to success or failure. So, learning effectively from these signals is hard because the model must determine how each fail-ure should inform meaningful behavioral correc-tions in subsequent iterations. We introduce a training framework, Self-Review Reinforcement Learning , that embeds an explicit self-review step into each RL episode. When a first-pass response fails, the model generates a self-review to iden-tify what went wrong, which conditions an im-proved second attempt. Unlike inference-time re-flection approaches, such as Reflexion , the frame-work optimizes self-review with policy gradients and internalizes improvements into the base pol-icy via selective distillation , ensuring they persist across future episodes. A cross-episode memory 
+
+keeps successful self-reviews for reuse when en-countering similar tasks in future episodes during training. We evaluate SRRL against a standard RLVR baseline using the GRPO optimizer across two language models, Qwen 3-4B and OLMo-3-7B, on GSM8K benchmark. SRRL consistently outperforms the RLVR in final reward perfor-mance and achieves greater learning efficiency by successfully transforming feedback into be-havioral improvement. Code github repository: https://github.com/ZainAmin/COMP767-Project 
+
+> 1
+
+Department of Software Engineering and IT, ´Ecole de Technologie Sup ´erieure, Montreal, Canada 2Centre int ´egr ´ede traumatologie, H ˆopital du Sacr ´e-Cœur de Montr ´eal, Uni-versit ´e de Montr ´eal, Montreal, Canada 3Desautels Fac-ulty of Management, McGill University, Montreal, Canada. Correspondence to: Muhammad Zain Amin <muhammad-zain.amin.1@ens.etsmtl.ca >, Kibele Sebnem Yildirim <ki-bele.yildirim@mail.mcgill.ca >.
+
+Preprint. July 8, 2026. 
+
+# 1. Introduction 
+
+Figure 1. The SRRL training framework 
+
+1arXiv:2607.05541v1 [cs.LG] 6 Jul 2026 These days, large language models (LLMs) are increasingly employed as decision-making agents in situations with de-layed rewards and partial knowledge (Bai et al., 2026; Song et al., 2026; Wang et al., 2025; Zhang et al., 2025). Reinforcement Learning provides an intuitive framework for enhancing such agents. After the model agent generates a first-pass response, it typically receives environmental feedback in the form of outcome rewards. Environmental feedback is the information or signal the model receives from the world outside itself in response to its actions. But the problem is that the environment often provides no feed-back for individual steps, making the feedback rewards delayed and sparse. Therefore, the model is confused about how to choose the correct stepwise reasoning to fix its be-haviour and ends up being trained inefficiently with respect to sampling (Shi et al., 2025; Zhang et al., 2025). Especially in multistep reasoning, errors in intermediate steps can inval-idate the entire solution trajectories and credit assignments, leaving the model unable to recover. In supervised fine-tuning (SFT), the model’s base policy is trained by learning to reproduce human-provided fixed examples. During training, the model observes pairs of prompts and their desired responses, then adjusts its param-eters to minimise the difference between the generated and desired outputs. This kind of imitation learning allows the model to become highly effective at generating highly real-istic, well-structured responses it has seen before. However, this strength also creates a fundamental problem. SFT is applied to a static dataset, and the model lacks an inherent mechanism to revise its behavior. In real world use cases, SFT doesn’t have the ability to incorporate feedback and learn from its mistakes; instead it continues to rely on the training patterns it encoded earlier. Reinforcement learning with verifiable rewards (RLVR) takes the model training into interactive contexts. RLVR al-lows models to progress through a trial-and-error approach while receiving external validation feedback. In the RLVR framework, agents take an action and receive a scalar reward for success, and over time, update their policy to increase the probability of high-reward outcomes. This process takes one step beyond imitation learning and allows models to adapt and refine their performance over time with experi-ence. The key limitation is that the reward signals generally provide a numerical indication of success or failure without explaining why the action was effective or incorrect. As a result, the agents continue to make similar mistakes and adopt suboptimal strategies, without any stable corrections that persist across episodes. For this reason, the corrective structure of the good responses taken by the agent must be deduced directly from noisy, sparse, or delayed rewards. A natural progression from here is to do structure learn-ing around experience itself by transforming the feedback into intermediate reasoning representation, such as review summaries, error analysis and the strategy updates, which can help make the corrective insights straightforward. By integrating the intermediate learning representation, agents’ learning experience can reliably consolidate the improve-ments, as well as adjust their behavior more accurately without totally relying on reward-driven exploration. 
+
+# 2. Literature review 
+
+2.1. RLs and LLMs: 
+
+The concept of learning through experience has become widely central to the development of large language mod-els. While early research shows that the models refine their outputs and align their behaviour based on human-provided scores and evaluations, they have evolved into Reinforce-ment Learning from Human Feedback (RLHF) (Ouyang et al., 2022; Christiano et al., 2017; Shi et al., 2024; Shinn et al., 2023). Recent research has extended reinforcement learning be-yond the idea of preference alignment in order to enhance the mathematical and symbolic reasoning of the LLMs. In-stead of just relying on human feedback, the models receive the rewards directly from the programmatically verifiable signals. For example, a code snippet can be executed against the test cases, a mathematical answer can be checked against proven ground truth, etc. These checks actually provide the structured supervision signals that evaluate the reasoning outcomes. The key shift in these strategies is the replace-ment of subjective reward models with deterministic mecha-nism processes (Guo et al., 2025; Song et al., 2026; OpenAI, 2024). Similarly, the agent-oriented research on the LLMs presents the models as an interactive policy in order to operate in an external environment instead of just generating a single static response. In this approach, models continue to take actions, gather observations and task-dependent rewards in order to solve problems with multitask reasoning (Yao et al., 2023; Jin et al., 2025; Bai et al., 2026). Although these approaches differ, ranging from preference alignment to formal reasoning and interactive problem solv-ing, all of them share the same training paradigm, which is that the environmental feedback is reduced to a scalar reward, which is optimised through gradient policy updates. This limitation requires the model to implicitly infer how to correct its mistakes through repeated exploration rather then explicitly guided towards the structured revision of its reasoning process. As a result of this limitation, our SRRL framework departs from the reward-driven optimisa-tion towards the process where the feedback is transformed into structured analysis and behaviour revision before being internalised into the base policy. 22.2. Learning via Trails: 
+
+A large number of research studies suggest that the next scaling era for AI will be less dependent on statistical hu-man feedback and more on the interaction of agents, which streamlines the learning via trials. This way, agents can easily produce experience-rich data through continual inter-action with their environment. One of the leading studies by Silver and Sutton’s lab argues that data streams generated by agents’ interaction, combined with long-term decision making, can help the models to go beyond imitation and adopt learning via trails mechanism (Silver & Sutton, 2025). This study gives an inspiration to adopt strategies that can convert the failed trials into usable learning signals instead of just relying on the successful trials. Earlier work on simple reinforcement learning handles the challenge of sparse rewards. The issue was that the agents only received feedback after successful trials, and it was solved by introducing a mechanism that also extracts a sig-nal from failed trials. A notable contribution is the goal relabeling, as proposed in Hindsight Experience Replay (HER) (Andrychowicz et al., 2018). In the sparse-rewards setting, an agent can attempt to succeed, but if it fails, it receives no rewards, providing very little to no guidance for improvement. HER solves this issue by relabeling the goal of a failed trial as the outcome that was actually achieved. It means that even if the agent did not achieve the intended goal, the trial is still relabeled as a success for a different achieved state. So this whole process ultimately improves sample efficiency by converting failed trials into useful train-ing data. Similarly, in the LLM-agent setting environment, the author addresses the void between the reward-driven reinforcement learning and the imitation learning by allowing the agents to train from their own interaction traces, even when the rewards are sparse or not available. The agent, instead of relying on the external feedback, uses its generated future states and decisions as a form of self-supervision. Self-reflection also plays an important role as a way to observe suboptimal or failed behaviour (Zhang et al., 2025). The inference-time reflection methods demonstrate that LLMs can improve their responses by revising them be-fore consolidating and producing a final response. The authors come to the agreement that all the self-revision tech-niques which give the model the ability to think twice, help the model learn from its own mistakes and correct its be-haviour, often lead to improved performance. But these approaches require the ’think twice’ step to be executed during deployment. For this reason, the model must access memory during inference, which increases computational cost and restricts improvements in runtime framing rather than permanent changes in the policy (Zelikman et al., 2022; Madaan et al., 2023; Shinn et al., 2023). In contrast, concurrent research aims to incorporate condi-tioned feedback directly into the training process rather than relying on inference-time self-revision. Recently, H ¨ubotter et al. (2026) Song et al. (2026) used reinforcement learning with textual feedback. The feedback-conditioned teacher policy is distilled into the student policy. It doesn’t require direct feedback during deployment. Through distillation, the student learns to mimic the teacher’s feedback-informed de-cisions, thereby internalising the corrective direction within its parameters. Our proposed SRRL also aligns with this line of work. It places focus on the self-review during training. After the first-pass response fails, the model generates a structured self-review that guides a refined retry in the same episode. The proposed approach treats the self-review as a struc-tured credit assignment task. By combining self-review with cross-episode memory and policy distillation, the proposed criteria transform the experience into a lasting policy im-provement without requiring self-review at inference time. 
+
+# 3. Self-Review Reinforcement Learning 
+
+Self-Review Reinforcement Learning is a training frame-work which is designed to use the environmental feedback for structured behavioral corrections. In standard RLVR, agents usually receive a scalar reward after generating a response, and right away update their policy parameters from this signal afterwards. The main limitation of RLVR is that the reward provides no mechanism for the agent to know which intermediate reasoning steps were responsible for the failure or the success. This problem forces the model to rediscover corrective strategies through repeated explo-ration, which further causes the inefficient learning problem. SRRL addresses these problems by proposing an explicit self-review step within each training episode. This process is anchored by two supporting mechanisms, cross-episode memory and policy distillation, which ensure that the in-sights produced through self-review accumulate and persist across training. Each SRRL training episode proceeds through several stages, as shown in Figure 1. Given an input problem x, the model πθ generates the first-pass response y1. Afterwards, the environment evaluates the y1 response and returns a scalar outcome reward r1 ∈ { 0, 1} along with textual feed-back f1. If the r1 falls below a reward threshold τ (i.e., 
+
+r1 < τ ), then the model enters a self-review phase, an ex-plicit analysis of what went wrong in response y1 and what corrective strategies can be applied to correct or improve the response. Conditioned on x, y1, r1, f1, and any retrieved memory m from the cross-episode memory mechanism, the model generates a second-pass response y2. The envi-ronment evaluates y2 and returns r2, f2. If the response 
+
+y2 succeeds (i.e., r2 > τ ), the self-review is written in 3the cross-episode memory m, and the episode ends with a distillation update that trains the base policy to directly produce y2 quality responses from x alone. This eliminates the redundant exploration problem of corrective strategies for similar tasks in subsequent training episodes. The design of SRRL is beneficial as a key deployment prop-erty, as stated below: 
+
+y ∼ πθ (· | x)
+
+meaning that at inference time, the model does not require any self-review, memory retrieval, or policy distillation. All improvements accumulated during training through SRRL are encoded into the base policy weights, which effectively ensure zero latency at deployment. This factor directly addresses the limitation of inference-time self-reflection methods, such as Reflexion (Shinn et al., 2023) and Self-Refine (Madaan et al., 2023), which require reflection to be present during deployment. In SRRL, the self-review is not triggered automatically. It is activated only if the first-pass response falls below the reward threshold. This condition is very important for two reasons, first is that by applying self-review to already cor-rect response trajectories cause the reward hacking problem, which precisely means that the model can easily generate instance-specific shortcuts which can guarantee the success on current sample but will be unable to generalize. Secondly, early in training, when the first-pass solution rewards are usually low, the self-review heavy batches become domi-nated by off-policy second-pass attempt data that ultimately weakens the on-policy learning signal and destablizes opti-mization. By restricting the self-review mechanism to failed trajec-tories, we ensure that successful responses remain purely on-policy and each training batch retains a stable on-policy component. This factor directly aligns with our model-deployment property, since the model has no access to self-review during deployment; training without such con-ditioning would widen the gap between training-time and deployment-time behavior. When the condition occurs, the model generates the self-review as 
+
+∆ ∼ πθ (x, y 1, r 1, f 1, m )
+
+After self-review ∆, the model πθ attempts the second-pass solution as 
+
+y2 ∼ πθ (x, ∆) 
+
+Moreover, a single self-review only provides a learning signal within the training episode in which it is generated. Therefore, without an additional mechanism, it is impossible to retain these insights and the model has to rediscover them independently each time for structurally similar tasks in future episodes. To overcome this limitation, we incorporate a cross-episode memory step and use it as retrieval context for future training episodes. The cross-episode memory stores successful self-reviews as a plain text record. The memory item m is directly provided to the model πθ as part of the system context during the self-review ∆ step. The successful self-review ∆ is stored in m only if the second-pass attempt succeeds, as follows: 
+
+mt+1 =
+
+(
+
+mt ∪ { ∆}, if r2 > τ, mt, otherwise. This selective ∆ storing ensures that only the validated corrective strategies persist. Subsequently, the selective su-pervised policy distillation step is applied by training the base policy on the successful second-attempt response. We optimize the model to directly reproduce y2-level responses (i.e., reproduce improved behavior directly) from x with-out access to self-review ∆ context during future training episodes for structurally similar problems and at deployment as well. 
+
+Ldistill (θ) = −E(x,y 2,r 2)∼D 
+
+I{r2>τ } log πθ (y2 | x)
+
+This I function triggers the distillation update only to suc-cessful second attempts. Failed second pass solution at-tempts do not contribute to the distillation loss. 
+
+3.1. RL Objective 
+
+Both the first pass, the second pass attempts, and self-review are optimized with the RL objective. We adopt GRPO (Group Relative Policy Optimization) (Shao et al., 2024) as the underlying gradient policy optimizer. The policy loss is defined as: 
+
+Lpolicy (θ) = −E(x,y )∼D [A(x, y ) log πθ (y | x)] 
+
+Here, y represents the model output, and the conditioning context corresponds to the model inputs for each generation step. The advantage estimate A is calculated from associ-ated outcome rewards using GRPO group-relative normal-ization; for a group of G sampled responses, the advantages are normalized within the group. 
+
+Ai = ri − mean j {rj }
+
+std j {rj }
+
+4The self-review ∆ is assigned the reward ˜r = r2; that means, the self-review is rewarded by the downstream success it produces. In order to prevent the policy from drifting too far from the reference model under the combined gradient signals, we apply KL regularization with a low-variance KL loss and a fixed coefficient of β = 0 .001 .
+
+3.2. Combined Objective 
+
+The full SRRL training objective per episode combines policy gradient loss over all generated outputs with the selective distillation loss: 
+
+LSRRL = Lpolicy + Ldistill + β · LKL 
+
+The Lpolicy term covers the first-pass attempt uncondition-ally, and the self-review and the second-pass attempt are activated only when this condition is triggered (i.e., r1 < τ ). The Ldistill term is masked to zero in episodes where r2 < τ .This means that failed episodes still contribute an RL signal via Lpolicy , but do not contaminate the distillation process with unsuccessful strategies. Improvements are fully en-coded in the model weights, preserving the gains of self-review-driven training at zero additional deployment cost. 
+
+# 4. Experiments 
+
+We evaluate SRRL against a standard RLVR baseline on GSM8K agentic reasoning benchmark. 
+
+4.1. Task 
+
+Task is chosen to provide meaningful reward signal for the base model. We also ensure that the models have partial competence so that GRPO can learn from variance in re-wards. We use GSM8K, a grade-school mathematics word-problem reasoning benchmark (Cobbe et al., 2021). Each problem has a single numeric answer, and the agent receives reward at episode completion. 
+
+4.2. Metrics 
+
+4.2.1. R EWARD 
+
+For GSM8K dataset, the reward is binary and defined as: 
+
+r(y, y ∗) = I[match( y, y ∗)] 
+
+where match is exact equality for GSM8K. The self-review condition is triggered if: 
+
+max  
+
+> i
+
+rfirst attempt  
+
+> i
+
+< τ, τ = 1                      
+
+> Table 1. Training hyperparameters for experiments
+> Hyperparameter RLVR SRRL
+> Learning rate 1×10 −61×10 −6
+> KL coefficient ( β)0.001 0.001 Clipping ratio ( ϵ)0.28 0.28 Rollouts 63 per attempt Distillation coeff. ( λ)—1.0 Optimizer precision 8-bit AdamW 8-bit AdamW GPU H100 H100
+
+where the maximum is taken over all G rollouts from the first attempt. 4.2.2. L EARNING EFFICIENCY 
+
+Beyond the final evaluation reward, we also report learning efficiency as the validation reward trajectory over the train-ing steps. This shows how quickly each method reaches higher reward, which is a key advantage of SRRL. 
+
+4.3. Models and Baselines 
+
+We train two backbone models using both the RLVR and SRRL frameworks. GRPO is used as an underlying policy gradient optimizer in all cases. First, we used Qwen3-4B, a 4-billion parameter pre-trained language model from the Qwen3 family (Yang et al., 2025b). The second model used in our experimental study is OLMo-3-7B from the OLMo family (Team OLMo et al., 2024). The RLVR baseline trains the same models with standard re-ward only GRPO, and there is no self-review, cross-episode memory, or distillation step. In order to ensure that we have a fair comparison of experiments, we equalize the total training compute between the RLVR and SRRL. RLVR uses 6 rollouts per prompt, while the SRRL uses 3 rollouts per attempt across two attempts (i.e. total 6 per episode). Both methods share the same GRPO objective and differ only in the trajectory structure. We apply gradient accumulation with an effective batch size of 32, accumulating gradients across 32 episodes before each optimizer update. This im-proves gradient stability. For stable training, we employed RL techniques such as clipping, and KL regularization. We train all models using our custom SRRL training loop im-plemented in Pytorch with the Hugging Face Transformers library. Table 1 summarizes all hyperparameters. 
+
+# 5. Results and Discussion 
+
+Figure 2 shows the validation reward trajectories across the 219 training steps for models trained on GSM8K. All the curves are calculated on the fixed held-out validation set of 473 samples, and evaluated every 5 training steps using greedy decoding under the RLVR format constraints. 5Figure 2. Learning efficiency on GSM8K for Qwen3-4B (left) and OLMo-3-7B (right). SRRL achieves higher validation reward than RLVR throughout training and finishes with stronger final performance. 
+
+5.1. Qwen3-4B 
+
+Both the SRRL and the RLVR frameworks start with a shared rollout reward of approximately 0.71 at the first step. It reflects the model’s ability to produce correct answers under the sampled RLVR rollout protocol. It is lower than the 4-shot CoT benchmark, which is reported in the Qwen technical report (Yang et al., 2025a). It is consistent with the known gap between the format-constrained RLVR rollout reward and the standard greedy evaluation. Both curves remain hard to differentiate until approximately step 50. It indicates that both models share similar early gradient sig-nals and the policy has not yet diverged greatly. Afterwards, the SRRL consistently beats RLVR on the 473-sample vali-dation set. After the first 65 training steps, the curve follows a natural deceleration as the model approaches the ceiling of its math-specialized pretraining capacity. 
+
+5.2. OLMo-3-7B 
+
+The OLMo-3-7B curves show a distinct pattern consistent with a general-purpose model on a math-focused benchmark. Both curves begin at a rollout reward of approximately 0.65, which is lower than Qwen3-4B base despite OLMo-3-7B having more parameters. This likely occurs because the OLMo-3-7B pretraining corpus is less math-focused. Early on, both curves remain fused until SRRL begins to diverge. Unlike the Qwen3-4B concave trajectory, OLMo-3-7B ex-hibits a near-linear rise. This suggests that the model has greater headroom to learn and has not reached a reward ceil-ing by step 219. SRRL achieves a final validation reward of 0.75, compared with RLVR’s 0.72. This corresponds to ap-proximately 10 additional correct answers on the validation dataset. 
+
+5.3. Effects of Self-Review 
+
+The wider SRRL advantage on OLMo-3-7B compared to Qwen3-4B is not coincidental and reveals that self-review benefits models with weaker prior math knowledge. Qwen3-4B already shows strong mathematical priors from pretrain-ing, so the policy quickly learns to generate correct answers via standard reward maximisation. As a result, self-review provides incremental corrections but competes with a ca-pable base policy already. The base policy is more prone to errors in the OLMo-3-7B case. Self-review provides a systematic error-detection signal, and aligns with prior work that shows that iterative self-correction is effective when the base model operates below performance saturation. The test rewards are closer to the corresponding validation rewards for both models. It’s a very consistent train-test gap that shows the absence of validation-set overfitting. SRRL outperforms RLVR on both models, and the OLMo-3-7B achieves a larger absolute improvement than the Qwen3-4B. Notably, Qwen3-4B model achieves higher absolute test performance than OLMo-3-7B despite having fewer param-eters. This reversal is the usual parameter-scaling intuition, demonstrated by Qwen3-4B math focus pretraining, which gives it an excellent math reasoning prior. 
+
+5.4. Implications 
+
+Together, the results support multiple conclusions. First, SRRL surpasses standard RLVR on a general-purpose task and matches specialised base models, which shows promise across two architectures. Also, the magnitude of Self-Review benefit scales inversely with the base model’s prior math capability. This finding has practical importance for the model selection. SRRL should be prioritised for deploy-6Table 2. Final test rewards on the 1,319-sample GSM8K test set.       
+
+> Model RLVR SRRL
+> Qwen3-4B 0.762 0.778 OLMo-3-7B 0.714 0.742
+
+ment on general-purpose base models where the RLVR’s reward signal is less informative. Lastly, the qualitatively different learning dynamics between the two models sug-gest that the shape of reward curves carries significant in-formation on how close the model is to its domain-specific performance ceiling. In future, it may serve as a diagnostic tool for RL training budget allocation. 
+
+# 6. Conclusion 
+
+We introduced and developed a training framework, known as Self-Review Reinforcement Learning, that embeds an explicit self-review, cross-episode memory and policy distil-lation steps into the reinforcement learning loop to transform feedback into behavioral improvements. SRRL enables the model to diagnose its failed attempts, learn corrective strate-gies, and condition a refined second attempt within the same training episode. By combining self-review guidance with selective distillation, SRRL internalizes successful correc-tion strategies into the base policy weights ensuring that im-provements persist throughout future training episodes and eliminate the need for self-review at deployment. Across agentic reasoning tasks, the SRRL framework improves the learning efficiency, and produces stronger final polices as compared to standard RLVR baseline. We evaluated SRRL against RLVR on math reasoning. SRRL directly addressed the latency limitation of inference time reflection methods. Future direction suggests analysing which factor correlates the most with second attempt suc-cess the self-review more effective, for example, specificity of error diagnosis, actionability of corrective guidelines, or the current task structure. 
+
+# Acknowledgment 
+
+The authors would like to sincerely thank Professor Siva Reddy for his guidance, teaching, and providing a valuable learning experience throughout course. 
+
+# References 
+
+Andrychowicz, M., Wolski, F., Ray, A., Schneider, J., Fong, R., Welinder, P., McGrew, B., Tobin, J., Abbeel, P., and Zaremba, W. Hindsight experience replay. arXiv preprint arXiv:1707.01495 , 2018. Bai, Y. et al. Kimi k2: Open agentic intelligence. arXiv preprint arXiv:2507.20534 , 2026. Christiano, P., Leike, J., Brown, T., Martic, M., Legg, S., and Amodei, D. Deep reinforcement learning from human preferences. arXiv preprint arXiv:1706.03741 , 2017. Cobbe, K., Kosaraju, V., Bavarian, M., Chen, M., Jun, H., Kaiser, L., Tworek, J., Hilton, J., Nakano, R., Hesse, C., and Schulman, J. Training verifiers to solve math word problems. arXiv preprint arXiv:2110.14168 , 2021. URL 
+
+https://arxiv.org/abs/2110.14168 .Guo, D. et al. Deepseek-r1 incentivizes reasoning in llms through reinforcement learning. Nature , 2025. H ¨ubotter, J., L ¨ubeck, F., Behric, L., Baumann, A., Bagatella, M., Marta, D., Hakimi, I., Shenfeld, I., Kleine Buen-ing, T., Guestrin, C., and Krause, A. Reinforce-ment learning via self-distillation. arXiv preprint arXiv:2601.20802 , 2026. URL https://arxiv. org/abs/2601.20802 .Jin, B., Zeng, H., Yue, Z., et al. Search-r1: Training llms to reason and leverage search engines with reinforcement learning. OpenReview , 2025. Madaan, A., Tandon, N., Gupta, P., Hallinan, S., Gao, L., Wiegreffe, S., et al. Self-refine: Iterative refinement with self-feedback. arXiv preprint arXiv:2303.17651 , 2023. OpenAI. Openai o1 system card. arXiv preprint arXiv:2412.16720 , 2024. URL https://arxiv. org/abs/2412.16720 .Ouyang, L., Wu, J., Jiang, X., Almeida, D., Wainwright, C., Mishkin, P., et al. Training language models to fol-low instructions with human feedback. arXiv preprint arXiv:2203.02155 , 2022. Shao, Z., Wang, P., Zhu, Q., Xu, R., Song, J., Bi, X., Zhang, H., Zhang, M., Li, Y. K., Wu, Y., and Guo, D. Deepseekmath: Pushing the limits of mathemati-cal reasoning in open language models. arXiv preprint arXiv:2402.03300 , 2024. URL https://arxiv. org/abs/2402.03300 .Shi, T., Chen, K., and Zhao, J. Safer-instruct: Aligning language models with automated preference data. arXiv preprint arXiv:2311.08685 , 2024. Shi, T., Wang, Z., Yang, L., et al. Wildfeedback: Aligning llms with in-situ user interactions and feedback. arXiv preprint arXiv:2408.15549 , 2025. Shinn, N., Cassano, F., Berman, E., Gopinath, A., Narasimhan, K., and Yao, S. Reflexion: Language agents with verbal reinforcement learning. arXiv preprint arXiv:2303.11366 , 2023. 7Silver, D. and Sutton, R. S. Welcome to the era of experi-ence. Semantic Scholar preprint , 2025. Song, Y., Chen, L., Tajwar, F., et al. Expanding the capabil-ities of reinforcement learning via text feedback. arXiv preprint arXiv:2602.02482 , 2026. Team OLMo, Walsh, P., Soldaini, L., Groeneveld, D., Lo, K., Arora, S., Bhagia, A., Gu, Y., Huang, S., Jordan, M., Lambert, N., Schwenk, D., Tafjord, O., Ander-son, T., Atkinson, D., Brahman, F., Clark, C., Dasigi, P., Dziri, N., and Hajishirzi, H. 2 OLMo 2 furious. 
+
+arXiv preprint arXiv:2501.00656 , 2024. URL https: //arxiv.org/abs/2501.00656 .Wang, S., Wu, Y., and Xu, Z. Cogito, ergo ludo: An agent that learns to play by reasoning and planning. arXiv preprint arXiv:2509.25052 , 2025. Yang, A., Li, A., Yang, B., Zhang, B., Hui, B., Zheng, B., Yu, B., Gao, C., Huang, C., Lv, C., Zheng, C., Liu, D., Zhou, F., Huang, F., Hu, F., Ge, H., Wei, H., Lin, H., Tang, J., Qiu, Z., et al. Qwen3 technical report. arXiv preprint arXiv:2505.09388 , 2025a. URL https:// arxiv.org/abs/2505.09388 .Yang, A., Li, A., Yang, B., Zhang, B., Hui, B., Zheng, B., Yu, B., Gao, C., Huang, C., Lv, C., Zheng, C., Liu, D., Zhou, F., Huang, F., Hu, F., Ge, H., Wei, H., Lin, H., Tang, J., Yang, J., Tu, J., Zhang, J., Yang, J., Yang, J., Zhou, J., Zhou, J., Lin, J., Dang, K., Bao, K., Yang, K., Yu, L., Deng, L., Li, M., Xue, M., Li, M., Zhang, P., Wang, P., Zhu, Q., Men, R., Gao, R., Liu, S., Luo, S., Li, T., Tang, T., Yin, W., Ren, X., Wang, X., Zhang, X., Ren, X., Fan, Y., Su, Y., Zhang, Y., Zhang, Y., Wan, Y., Liu, Y., Wang, Z., Cui, Z., Zhang, Z., Zhou, Z., and Qiu, Z. Qwen3 technical report. arXiv preprint arXiv:2505.09388 , 2025b. URL https://arxiv.org/abs/2505.09388 .Yao, S., Zhao, J., Yu, D., Du, N., Shafran, I., Narasimhan, K., and Cao, Y. React: Synergizing reasoning and acting in language models. arXiv preprint arXiv:2210.03629 ,2023. Zelikman, E., Wu, Y., Mu, J., and Goodman, N. Star: Bootstrapping reasoning with reasoning. In Advances in Neural Information Processing Systems , 2022. Zhang, K., Chen, X., Liu, B., Xue, T., Liao, Z., Liu, Z., Wang, X., Ning, Y., Chen, Z., Fu, X., Xie, J., Sun, Y., Gou, B., Qi, Q., Meng, Z., Yang, J., Zhang, N., Li, X., Shah, A., Huynh, D., Li, H., Yang, Z., Cao, S., Jang, L., Zhou, S., Zhu, J., Sun, H., Weston, J., Su, Y., and Wu, Y. Agent learning via early experience. arXiv preprint ,2025. Preprint. 8A. Appendix 
+
+This appendix provides supplementary material for the main paper. 
+
+A1. Math Prompt 
+
+Template 
+
+Problem: {question }
+
+You are a math problem solver. Think step by step, then provide your final numeric answer inside <answer>...</answer> tags. Example: <answer>42</answer> 
+
+A2. Review Prompt 
+
+Template 
+
+You are an expert math tutor reviewing afailed solution. Analyze what went wrong and produce improved solving guidelines inside <prompt>...</prompt> tags. Problem: {question }
+
+Attempt: {attempt }
+
+Outcome: INCORRECT (reward = 0.00) [Past successful strategy: {memory }]Identify the specific error and produce improved guidelines: 
+
+A3. GSM8K Dataset Sample Problem: Beth bakes 4 batches of 2 dozen cookies in a week. If these cookies are shared equally among 16 people, how many cookies does each person consume? 
+
+Solution: Beth bakes 4 × 2 dozen cookies in total: 
+
+4 × 2 = 8 
+
+dozen cookies. Since each dozen contains 12 cookies, the total number of cookies is: 
+
+12 × 8 = 96 
+
+These 96 cookies are shared equally among 16 people: 
+
+96 16 = 6 
+
+Final Answer: <answer>6</answer> 
+
+A4. Pseudo code Algorithm 1 Self-Review Reinforcement Learning (SRRL) on GSM8K benchmark 
+
+1: Inputs: Language model πθ ; dataset of questions x; environ-ment returning feedback f and reward r; reward threshold τ ;KL coefficient β.2: Initialize: cross-episode memory m ← ∅ .3: repeat 
+
+4: Sample question x from dataset. 5: // First attempt 6: Sample first-pass response y1 ∼ πθ (· | x).7: Obtain feedback and reward (f1, r 1).8: // RL update on the first attempt 9: Update θ via Lpolicy (θ) on y1.10: // Gated self-review and second attempt 11: if r1 < τ then 
+
+12: // Self-review with cross-episode memory 13: Retrieve relevant memory m.14: Sample self-review ∆ ∼ πθ (· | x, y 1, r 1, f 1, m ).15: Sample second-pass response y2 ∼ πθ (· | x, ∆) .16: Obtain feedback and reward (f2, r 2).17: Set self-review reward ˜r ← r2.18: // Store successful self-review only 19: if r2 ≥ τ then 
+
+20: Update memory: m ← m ∪ { ∆}.21: end if 
+
+22: // RL update on self-review and second attempt 23: Update θ via Lpolicy (θ) on ∆ and y2.24: // Selective policy distillation 25: if r2 ≥ τ then 
+
+26: Update θ via Ldistill (θ) to train πθ to produce y2
+
+from x alone. 27: end if 
+
+28: end if 
+
+29: // KL regularization 30: Apply KL regularization with coefficient β.31: until converged 
+
+9
