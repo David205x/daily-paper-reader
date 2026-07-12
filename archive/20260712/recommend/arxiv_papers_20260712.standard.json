@@ -1,0 +1,327 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-12T21:01:48.750462+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 5,
+    "deep_cap": 6,
+    "deep_selected": 5,
+    "quick_candidates": 2,
+    "quick_skim_target": 11,
+    "quick_selected": 2
+  },
+  "deep_dive": [
+    {
+      "id": "2607.07976v1",
+      "source": "arxiv",
+      "title": "When Implausible Tokens Get Reinforced: Tail-Aware Credit Calibration for LLM Reinforcement Learning",
+      "abstract": "Reinforcement learning (RL) has achieved remarkable success in enhancing the reasoning capabilities of large language models (LLMs). However, widely used critic-free RL methods rely on uniform credit assignment, broadcasting the same advantage to all tokens regardless of their differences. We identify a critical failure mode of this design, which we refer to as Positive-Credit Contamination: low-probability tail tokens that are contextually erroneous receive identical positive credit to plausible ones within the same trajectory, resulting in the indiscriminate reinforcement of flawed reasoning behavior. To mitigate this issue, we propose Tail-Aware Credit calibratiOn (TACO), a method that calibrates uniform credit assignment to suppress undesirable positive updates. TACO first computes a tail-risk score that incorporates the local generation context to assess each token's risk of falling into the unreliable tail, distinguishing unexpected rarity from uncertainty-driven exploration. TACO then uses this score to tune positive credit for risky tokens without removing their gradients entirely, so that recurring useful rare patterns can accumulate reinforcement while incidental noise is progressively dampened. Experimental results across three LLMs and eight benchmarks show that TACO consistently outperforms GRPO-style baselines. Notably, TACO improves training stability, supporting sustained performance gains in long-horizon RL. The source code is available at: https://github.com/xiuyilou/TACO.",
+      "authors": [
+        "Xiuyi Lou",
+        "Zicheng Xu",
+        "Yu-Neng Chuang",
+        "Hoang Anh Duy Le",
+        "Zhaozhuo Xu",
+        "Guanchu Wang",
+        "Vladimir Braverman"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.AI",
+        "cs.LG"
+      ],
+      "published": "2026-07-08T23:00:54+00:00",
+      "link": "https://arxiv.org/pdf/2607.07976v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "credit calibration for RL in LLMs",
+      "llm_evidence_cn": "LLM强化学习中的信用校准",
+      "llm_evidence": "LLM强化学习中的信用校准",
+      "canonical_evidence": "LLM强化学习中的信用校准",
+      "llm_tldr_en": "Proposes TACO to calibrate uniform credit assignment in RL for LLMs avoiding positive contamination of tail tokens.",
+      "llm_tldr_cn": "针对LLM强化学习中均匀信用分配导致低概率错误token被错误强化的问题，提出尾部感知信用校准（TACO）方法，通过校准信用分配防止正污染，提升推理质量。",
+      "llm_tldr": "针对LLM强化学习中均匀信用分配导致低概率错误token被错误强化的问题，提出尾部感知信用校准（TACO）方法，通过校准信用分配防止正污染，提升推理质量。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "reinforcement learning for large language model",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.04364v1",
+      "source": "arxiv",
+      "title": "RL Forgets! Towards Continual Policy Optimization",
+      "abstract": "Continual post-training is becoming a central paradigm for adapting vision-language models to evolving tasks. Recent work has increasingly favored reinforcement learning over supervised fine-tuning, driven by the belief that reinforcement learning is inherently less prone to forgetting. However, the belief remains insufficiently validated, as existing evidence is largely drawn from outdated or homogeneous benchmarks. To revisit this assumption, we introduce MRCL, a Multimodal Reasoning Continual Learning benchmark built from diverse and recently released multimodal datasets. Experiments on MRCL show that reinforcement learning can still suffer from severe catastrophic forgetting during continual post-training. To address this challenge, we propose Continual Policy Optimization (CPO), a replay-free framework grounded in the prior-task behavioral KL objective. CPO uses a theoretically justified parameter-movement regularization to limit policy drift on previous tasks. Extensive experiments across multiple model scales demonstrate that CPO consistently reduces forgetting while preserving, and in some cases improving, pretrained model capabilities. On Qwen3-VL-8B, CPO reduces forgetting by 13.7\\% and improves pretrained capability by 7.0\\%. The implementation code is available at https://github.com/MaolinLuo/CPO.",
+      "authors": [
+        "Mao-Lin Luo",
+        "Zhe-Xu Wang",
+        "Zi-Hao Zhou",
+        "Bo Ye",
+        "Jian Zhao",
+        "Min-Ling Zhang",
+        "Tong Wei"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-07-05T15:46:11+00:00",
+      "link": "https://arxiv.org/pdf/2607.04364v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "RL for continual post-training of vision-language models",
+      "llm_evidence_cn": "强化学习用于视觉语言模型的持续后训练",
+      "llm_evidence": "强化学习用于视觉语言模型的持续后训练",
+      "canonical_evidence": "强化学习用于视觉语言模型的持续后训练",
+      "llm_tldr_en": "Challenges the belief that RL is inherently less prone to forgetting in continual learning; proposes Continual Policy Optimization.",
+      "llm_tldr_cn": "近期强化学习被认为比监督微调更抗遗忘，但缺乏验证。本文构建多模态推理持续学习基准，发现RL同样遭受严重灾难性遗忘。进而提出持续策略优化方法，通过正则化和经验回放缓解遗忘。实验证明该方法在多个多模态任务上有效维持先前学习能力。",
+      "llm_tldr": "近期强化学习被认为比监督微调更抗遗忘，但缺乏验证。本文构建多模态推理持续学习基准，发现RL同样遭受严重灾难性遗忘。进而提出持续策略优化方法，通过正则化和经验回放缓解遗忘。实验证明该方法在多个多模态任务上有效维持先前学习能力。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "reinforcement learning for large language model",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.05174v1",
+      "source": "arxiv",
+      "title": "AgentGym2: Benchmarking Large Language Model Agents in De-Idealized Real-World Environments",
+      "abstract": "Language agents, i.e., LLM agents, progress rapidly and are increasingly deployed in production environments. This trend underscores the urgent need for rigorous and realistic evaluations. However, most existing benchmarks evaluate agents in simplified, idealized settings. They typically rely on pre-packaged tool interfaces, overlook critical steps, and assume inputs are clean and fully specified. Consequently, they understate the difficulty of real deployments, where uncertainty and noise are ubiquitous and agents must proactively explore the environment to uncover new tools. To bridge this gap, we present AgentGym2, a new evaluation framework with task instances grounded in real-world end-to-end working demands. Beyond reasoning and planning, it measures agents' ability to execute end-to-end procedures, discover tools via exploration, compose tools for unseen tasks, and remain robust to noisy and underspecified information. Experiments on 15 proprietary and open-source models show that even SOTA systems like Gemini and GPT-5 struggle on AgentGym2, revealing a substantial gap between the capability of current agents and the demands of real-world applications.",
+      "authors": [
+        "Zhiheng Xi",
+        "Dingwen Yang",
+        "Jiaqi Liu",
+        "Jixuan Huang",
+        "Honglin Guo",
+        "Baodai Huang",
+        "Tinggang Chen",
+        "Qi Zhang",
+        "Zhonghang Lu",
+        "Chenyu Liu",
+        "Jiajun Sun",
+        "Jiazheng Zhang",
+        "Dingwei Zhu",
+        "Xin Guo",
+        "Junzhe Wang",
+        "Zhihao Zhang",
+        "Yuming Yang",
+        "Junjie Ye",
+        "Minghe Gao",
+        "Dongrui Liu",
+        "Jiaming Ji",
+        "Guohao Li",
+        "Tao Gui",
+        "Qi Zhang",
+        "Xuanjing Huang"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-07-06T14:56:51+00:00",
+      "link": "https://arxiv.org/pdf/2607.05174v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Benchmark for LLM agents in realistic real-world environments with task automation focus",
+      "llm_evidence_cn": "提出面向真实世界环境的LLM智能体基准测试，评估任务自动化能力",
+      "llm_evidence": "提出面向真实世界环境的LLM智能体基准测试，评估任务自动化能力",
+      "canonical_evidence": "提出面向真实世界环境的LLM智能体基准测试，评估任务自动化能力",
+      "llm_tldr_en": "Introduces AgentGym2, a benchmark evaluating LLM agents in de-idealized real-world environments requiring proactive exploration and tool discovery.",
+      "llm_tldr_cn": "现有LLM智能体基准测试多在简化理想环境中进行，低估了实际部署难度。本文提出AgentGym2评估框架，任务实例基于真实端到端工作需求，要求智能体主动探索环境发现工具。实验揭示现有智能体在不确定性下的性能严重下降，为提升agent鲁棒性提供了方向。",
+      "llm_tldr": "现有LLM智能体基准测试多在简化理想环境中进行，低估了实际部署难度。本文提出AgentGym2评估框架，任务实例基于真实端到端工作需求，要求智能体主动探索环境发现工具。实验揭示现有智能体在不确定性下的性能严重下降，为提升agent鲁棒性提供了方向。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.05810v1",
+      "source": "arxiv",
+      "title": "SCOPE: Leveraging Subgoal Critiques for Code Generation",
+      "abstract": "Code generation with large language models (LLMs) remains unreliable because generated programs can appear correct while still violating key semantic requirements in the natural language specification. Existing feedback-based methods improve over coder-only generation, but they often rely on unstructured critique or execution signals that do not explicitly identify what the code is semantically missing. We present SCOPE, a prover-initialized subgoal critic for code generation. SCOPE adapts a Lean-oriented prover model to produce three parseable feedback fields for downstream code generation: subgoals, gap analysis, and a robustness checklist. Our approach combines supervised fine-tuning, process-aligned reinforcement learning (RL), and feedback-guided inference, with two complementary rewards during RL: a dense reward for structured critique quality and a sparse reward based on whether the critique improves the coder's execution score.   Experiments show that SCOPE improves over the compared feedback baselines. On LiveCodeBench V6, SCOPE achieves 39.4% pass@1, compared with 36.6% for Reflexion and 20.6% for the coder-only baseline. On BigCodeBench (Hard), it reaches 42.6%, surpassing Reflexion at 36.5% and coder-only generation at 34.5%. Further analysis shows that SCOPE's gains are concentrated in tasks with concrete semantic constraints and that its code corrections are more localized than Reflexion's.",
+      "authors": [
+        "Yueke Zhang",
+        "Yifan Zhang",
+        "Zihan Fang",
+        "Kevin Leach",
+        "Wei Zhang",
+        "Yu Huang"
+      ],
+      "primary_category": "cs.SE",
+      "categories": [
+        "cs.SE"
+      ],
+      "published": "2026-07-07T04:09:41+00:00",
+      "link": "https://arxiv.org/pdf/2607.05810v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "RL with subgoal critiques for LLM code generation",
+      "llm_evidence_cn": "基于子目标批评的强化学习用于LLM代码生成",
+      "llm_evidence": "基于子目标批评的强化学习用于LLM代码生成",
+      "canonical_evidence": "基于子目标批评的强化学习用于LLM代码生成",
+      "llm_tldr_en": "Presents SCOPE, using a prover-initialized subgoal critic with process-aligned RL to improve code generation by providing structured feedback.",
+      "llm_tldr_cn": "大语言模型（LLM）生成的代码可能表面正确但违反语义规范。现有反馈方法依赖非结构化批评或执行信号，未明确识别代码缺失的语义。本文提出SCOPE，利用面向Lean定理证明器的模型生成三个可解析反馈字段：子目标、差距分析和鲁棒性检查。方法结合监督微调、过程对齐的强化学习（RL）和反馈引导推理。实验表明，SCOPE生成的代码在语义符合性上显著优于基线。该工作展示了结构化子目标批评在代码生成中的有效性。",
+      "llm_tldr": "大语言模型（LLM）生成的代码可能表面正确但违反语义规范。现有反馈方法依赖非结构化批评或执行信号，未明确识别代码缺失的语义。本文提出SCOPE，利用面向Lean定理证明器的模型生成三个可解析反馈字段：子目标、差距分析和鲁棒性检查。方法结合监督微调、过程对齐的强化学习（RL）和反馈引导推理。实验表明，SCOPE生成的代码在语义符合性上显著优于基线。该工作展示了结构化子目标批评在代码生成中的有效性。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "reinforcement learning for large language model",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.06522v1",
+      "source": "arxiv",
+      "title": "Bridging Physical Reasoning and Task Generalization via Visual Action Outcome Reasoning Alignment",
+      "abstract": "Vision-language models (VLMs) struggle to generalize in interactive physical reasoning, particularly under unseen tasks and environments. Two key failure modes are prominent: hallucinated chain-of-thought (CoT) reasoning that contradicts physical reality, and misalignment between the model's reasoning and actions. We present VAORA (Visual Action Outcome Reasoning Alignment), a novel reward design that directly addresses both issues. VAORA introduces two complementary rewards: Visual Alignment Reward, which anchors VLM reasoning to the visual context independent of the agent action itself, and Visual-Action Alignment Reward, which grounds reasoning in the visual outcome induced by the model's action. Together, these rewards suppress hallucinated CoT and reduce the gap between reasoning and behavior. To improve training stability, we further employ smooth, dense rewards by estimating success probabilities using a pre-trained in-domain expert agent. Experiments on PHYRE and Virtual Tool support our performances across novel-task and unseen-environment settings, confirming that grounded and generalizable physical intelligence can be induced through VAORA.",
+      "authors": [
+        "Han-Jun Ko",
+        "Jr-Jen Chen",
+        "Haobo Yuan",
+        "Hsin-Ying Lee",
+        "Tiancheng Shen",
+        "Ming-Hsuan Yang",
+        "Yu-Chiang Frank Wang"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI",
+        "cs.CV"
+      ],
+      "published": "2026-07-07T17:27:59+00:00",
+      "link": "https://arxiv.org/pdf/2607.06522v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Novel reward design for VLM physical reasoning alignment",
+      "llm_evidence_cn": "针对视觉语言模型物理推理对齐的新型奖励设计",
+      "llm_evidence": "针对视觉语言模型物理推理对齐的新型奖励设计",
+      "canonical_evidence": "针对视觉语言模型物理推理对齐的新型奖励设计",
+      "llm_tldr_en": "Proposes VAORA, a reward design with Visual Alignment and Visual-Action Alignment rewards to anchor VLM reasoning to visual outcomes for physical reasoning tasks.",
+      "llm_tldr_cn": "针对视觉语言模型在交互式物理推理中链式推理与物理现实不符以及推理与动作失调的问题，提出了VAORA奖励设计，包含视觉对齐奖励和视觉-动作对齐奖励，分别将推理锚定到视觉上下文和动作引起的视觉结果，从而有效提升了模型在未见任务和环境中的泛化能力，展示了精心设计的奖励函数在引导推理与动作一致方面的强大作用。",
+      "llm_tldr": "针对视觉语言模型在交互式物理推理中链式推理与物理现实不符以及推理与动作失调的问题，提出了VAORA奖励设计，包含视觉对齐奖励和视觉-动作对齐奖励，分别将推理锚定到视觉上下文和动作引起的视觉结果，从而有效提升了模型在未见任务和环境中的泛化能力，展示了精心设计的奖励函数在引导推理与动作一致方面的强大作用。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "design of reward functions in RL",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2607.08448v1",
+      "source": "arxiv",
+      "title": "Harness VLA: Steering Frozen VLAs into Reliable Manipulation Primitives via Memory-Guided Agents",
+      "abstract": "Language-conditioned manipulation requires both precise contact-rich control and robust reasoning over language, scenes, and long horizons. End-to-end Vision-Language-Action (VLA) models provide strong local visuomotor skills, but they are trained on in-distribution task trajectories and often fail under deployment perturbations such as semantic retargeting, goal re-binding, spatial-layout shifts, and unstable local contacts. LLM coding agents provide complementary semantic and compositional reasoning, but purely analytic primitives struggle with irregular grasping, constrained placement, and articulated-object interaction. We present Harness VLA, a memory-augmented agentic framework that exposes a frozen VLA as a retryable contact-rich primitive and composes it with a small fixed library of analytic primitives for grounding, staging, transport, navigation, and release. Rather than expanding the skill library, the harness learns the operating range of these fixed primitives from task-specific execution traces, global success rules, and failure models. By lifting semantic re-grounding, non-contact execution, and VLA re-staging to the planner while reserving the frozen VLA for local contact-rich phases, Harness VLA extends pretrained VLAs beyond their original trajectory distribution without finetuning. Across perturbed tabletop, household kitchen, and clean-to-randomized bimanual manipulation, Harness VLA improves over the strongest relevant baselines by 38.6 and 25.4 percentage points on LIBERO-Pro and RoboCasa365, respectively, and reaches 58.4% on RoboTwin C2R.",
+      "authors": [
+        "Yixian Zhang",
+        "Huanming Zhang",
+        "Feng Gao",
+        "Xiao Li",
+        "Zhihao Liu",
+        "Chunyang Zhu",
+        "Jiaxing Qiu",
+        "Yuchen Yan",
+        "Jiyuan Liu",
+        "Wenhao Tang",
+        "Zhengru Fang",
+        "Yi Nie",
+        "Changxu Wei",
+        "Yu Wang",
+        "Wenbo Ding",
+        "Chao Yu"
+      ],
+      "primary_category": "cs.RO",
+      "categories": [
+        "cs.RO"
+      ],
+      "published": "2026-07-09T13:08:54+00:00",
+      "link": "https://arxiv.org/pdf/2607.08448v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Memory-augmented agentic framework using frozen VLA and LLM coding agents for manipulation automation",
+      "llm_evidence_cn": "记忆增强的智能体框架，结合冻结VLA和LLM代码智能体实现操作自动化",
+      "llm_evidence": "记忆增强的智能体框架，结合冻结VLA和LLM代码智能体实现操作自动化",
+      "canonical_evidence": "记忆增强的智能体框架，结合冻结VLA和LLM代码智能体实现操作自动化",
+      "llm_tldr_en": "Proposes Harness VLA, a memory-augmented agentic framework that combines frozen Vision-Language-Action models with LLM coding agents for reliable manipulation under perturbations.",
+      "llm_tldr_cn": "端到端视觉-语言-动作（VLA）模型在分布偏移下容易失败，而LLM代码智能体缺乏精细控制能力。本文提出Harness VLA框架，通过记忆增强的智能体系统暴露冻结VLA作为可重试子程序，结合LLM语义推理，在多种扰动下实现可靠的操作原语。实验表明该方法大幅提升了机器人操作的鲁棒性和泛化性。",
+      "llm_tldr": "端到端视觉-语言-动作（VLA）模型在分布偏移下容易失败，而LLM代码智能体缺乏精细控制能力。本文提出Harness VLA框架，通过记忆增强的智能体系统暴露冻结VLA作为可重试子程序，结合LLM语义推理，在多种扰动下实现可靠的操作原语。实验表明该方法大幅提升了机器人操作的鲁棒性和泛化性。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "biorxiv-10-64898-2026-07-06-736807-v1",
+      "source": "biorxiv",
+      "title": "CellPilot: an agentic framework that pilots small language models through autonomous single-cell annotation",
+      "abstract": "Large language models can annotate cell types from marker gene lists, but they typically operate after preprocessing and clustering are complete, treating annotation as a terminal labeling step rather than controlling the analytical decisions that produce the evidence for cell identity. We present CellPilot, an agentic framework that guides a locally deployable small language model through the full single-cell analysis workflow, from raw count matrices to cluster-level annotation. CellPilot combines standard single-cell analysis tools with structured workflow control and observation-guided reasoning, allowing the model to plan analyses, execute tools, inspect intermediate results and revise decisions within a traceable session. On GTEx, structured workflow orchestration raised the same 8B model from 0.39 in a prompt-only setting to 0.89, closing most of the gap to GPT-4o (0.92) within the same framework; the framework gain was substantially larger for the smaller backbone across datasets (+0.35 versus +0.19). Across GTEx, Tabula Sapi- ens, and Mouse Cell Atlas, CellPilot achieves cluster-level annotation accuracies of 0.891, 0.750, and 0.773, outperforming representative reference-based, marker-based, and LLM-based methods. CellPilot confidence scores were associated with annotation correctness and supported post hoc filtering, while complete execution traces were retained for each analysis. These results suggest that structured workflow orchestration can be a critical determinant of performance in multi-step single-cell analysis, enabling locally deployable small language models to approach larger proprietary models while preserving transparency and practical usability.",
+      "authors": [
+        "Jiang, S.",
+        "Qi, C.",
+        "Chen, Y.",
+        "Song, X.",
+        "Wei, Z."
+      ],
+      "primary_category": "bioinformatics",
+      "categories": [
+        "bioinformatics"
+      ],
+      "published": "2026-07-10T00:00:00+00:00",
+      "link": "https://www.biorxiv.org/content/10.64898/2026.07.06.736807v1.full.pdf",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Agentic framework for autonomous single-cell annotation using small language models",
+      "llm_evidence_cn": "基于小语言模型自主单细胞注释的智能体框架",
+      "llm_evidence": "基于小语言模型自主单细胞注释的智能体框架",
+      "canonical_evidence": "基于小语言模型自主单细胞注释的智能体框架",
+      "llm_tldr_en": "Presents CellPilot, an agentic framework that guides a small language model through the full single-cell analysis workflow from raw data to annotation, combining analysis tools with structured workflow control.",
+      "llm_tldr_cn": "该论文针对单细胞注释通常作为终末步骤而无法控制分析决策的问题，提出CellPilot智能体框架，引导可本地部署的小语言模型完成从原始计数矩阵到聚类注释的全流程，结合分析工具与结构化工作流控制，实现分析规划、工具执行、中间检查与决策修订。在多种数据集上验证了其自动化分析能力。",
+      "llm_tldr": "该论文针对单细胞注释通常作为终末步骤而无法控制分析决策的问题，提出CellPilot智能体框架，引导可本地部署的小语言模型完成从原始计数矩阵到聚类注释的全流程，结合分析工具与结构化工作流控制，实现分析规划、工具执行、中间检查与决策修订。在多种数据集上验证了其自动化分析能力。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}

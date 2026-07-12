@@ -6,55 +6,41 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-07-11
-- 运行时间：2026-07-11 20:12:49 UTC
+- 最新运行日期：2026-07-12
+- 运行时间：2026-07-12 21:08:29 UTC
 - 运行状态：成功
-- 本次总论文数：11
+- 本次总论文数：7
 - 精读区：5
-- 速读区：6
+- 速读区：2
 
 ### 今日简报（AI）
-1) 今日聚焦模型自进化、检索增强生成系统设计，以及工具使用与记忆机制的实证研究。  
-2) 重点推荐“Harness-Aware Self-Evolving”协同进化框架和“Candidate-Constrained RAG”长文本检索设计。  
-3) 可关注协同进化与记忆增强方法，并参考NLT工具复现结果验证其跨模型泛化性。
-- 详情：[/202607/11/README](/202607/11/README)
+今日精读5篇速读2篇，重点关注两项高分研究：LLM强化学习的尾感知信用校准（9.0分）与持续策略优化（8.0分）。最值得关注的两个方向是：通过校准低概率token的奖励信号来提升LLM训练稳定性，以及解决强化学习中的灾难性遗忘问题。建议普通读者优先了解这两篇论文的核心方法，它们对提升模型长期学习能力有直接启示。
+- 详情：[/202607/12/README](/202607/12/README)
 
 ### 精读区论文标签
-1. [Harness-Aware Self-Evolving: Co-Evolving Model Weights, Harness, and Task Solutions](/202607/11/2607.03935v1-harness-aware-self-evolving-co-evolving-model-weights-harness-and-task-solutions)  
+1. [When Implausible Tokens Get Reinforced: Tail-Aware Credit Calibration for LLM Reinforcement Learning](/202607/12/2607.07976v1-when-implausible-tokens-get-reinforced-tail-aware-credit-calibration-for-llm-reinforcement-learning)  
    标签：评分：9.0/10、query:rl
-   evidence：智能体强化学习框架共同演化模型和上下文
-2. [Candidate-Constrained Retrieval-Augmented Generation for LongEval-RAG: System Design and Empirical Analysis](/202607/11/2607.04008v1-candidate-constrained-retrieval-augmented-generation-for-longeval-rag-system-design-and-empirical-analysis)  
-   标签：评分：9.0/10、query:rl
-   evidence：面向受限证据检索的检索增强生成系统
-3. [Self-Review Reinforcement Learning (SRRL) with Cross-Episode Memory and Policy Distillation](/202607/11/2607.05541v1-self-review-reinforcement-learning-srrl-with-cross-episode-memory-and-policy-distillation)  
-   标签：评分：9.0/10、query:rl
-   evidence：用于LLM推理的自我审视强化学习框架，具有跨回合记忆
-4. [UP: Unbounded Positive Asymmetric Optimization for Breaking the Exploration-Stability Dilemma](/202607/11/2607.06987v1-up-unbounded-positive-asymmetric-optimization-for-breaking-the-exploration-stability-dilemma)  
-   标签：评分：9.0/10、query:rl
-   evidence：面向LLM强化学习的无界正非对称优化
-5. [Beyond Static Evaluation: Building Simulation Environments for Scalable Agentic Reinforcement Learning](/202607/11/2607.05773v1-beyond-static-evaluation-building-simulation-environments-for-scalable-agentic-reinforcement-learning)  
+   evidence：LLM强化学习中的信用校准
+2. [RL Forgets! Towards Continual Policy Optimization](/202607/12/2607.04364v1-rl-forgets-towards-continual-policy-optimization)  
    标签：评分：8.0/10、query:rl
-   evidence：为可扩展的智能体LLM训练构建RL Gym环境
+   evidence：强化学习用于视觉语言模型的持续后训练
+3. [AgentGym2: Benchmarking Large Language Model Agents in De-Idealized Real-World Environments](/202607/12/2607.05174v1-agentgym2-benchmarking-large-language-model-agents-in-de-idealized-real-world-environments)  
+   标签：评分：8.0/10、query:rl
+   evidence：提出面向真实世界环境的LLM智能体基准测试，评估任务自动化能力
+4. [SCOPE: Leveraging Subgoal Critiques for Code Generation](/202607/12/2607.05810v1-scope-leveraging-subgoal-critiques-for-code-generation)  
+   标签：评分：8.0/10、query:rl
+   evidence：基于子目标批评的强化学习用于LLM代码生成
+5. [Bridging Physical Reasoning and Task Generalization via Visual Action Outcome Reasoning Alignment](/202607/12/2607.06522v1-bridging-physical-reasoning-and-task-generalization-via-visual-action-outcome-reasoning-alignment)  
+   标签：评分：8.0/10、query:rl
+   evidence：针对视觉语言模型物理推理对齐的新型奖励设计
 
 ### 速读区论文标签
-1. [The Remarkable Effectiveness of Providing AI Agents with Natural Language Tools: A Replication Study Validating NLT Performance Across 14 Models](/202607/11/2607.03953v1-the-remarkable-effectiveness-of-providing-ai-agents-with-natural-language-tools-a-replication-study-validating-nlt-performance-across-14-models)  
+1. [Harness VLA: Steering Frozen VLAs into Reliable Manipulation Primitives via Memory-Guided Agents](/202607/12/2607.08448v1-harness-vla-steering-frozen-vlas-into-reliable-manipulation-primitives-via-memory-guided-agents)  
    标签：评分：7.0/10、query:rl
-   evidence：验证自然语言工具对智能体任务自动化的有效性
-2. [From Passive Retrieval to Active Memory Navigation: Learning to Use Memory as a Structured Action Space](/202607/11/2607.05794v1-from-passive-retrieval-to-active-memory-navigation-learning-to-use-memory-as-a-structured-action-space)  
-   标签：评分：7.0/10、query:rl
-   evidence：将记忆作为结构化动作空间用于多轮对话的RL方法
-3. [MILES: Modular Instruction Memory with Learnable Selection for Self-Improving LLM Reasoning](/202607/11/2607.06974v1-miles-modular-instruction-memory-with-learnable-selection-for-self-improving-llm-reasoning)  
-   标签：评分：7.0/10、query:rl
-   evidence：通过可学习选择模块实现推理自我改进
-4. [Akashic: A Low-Overhead LLM Inference Service with MemAttention](/202607/11/2607.05708v1-akashic-a-low-overhead-llm-inference-service-with-memattention)  
+   evidence：记忆增强的智能体框架，结合冻结VLA和LLM代码智能体实现操作自动化
+2. [CellPilot: an agentic framework that pilots small language models through autonomous single-cell annotation](/202607/12/biorxiv-10-64898-2026-07-06-736807-v1-cellpilot-an-agentic-framework-that-pilots-small-language-models-through-autonomous-single-cell-annotation)  
    标签：评分：6.0/10、query:rl
-   evidence：面向LLM智能体的低开销内存系统，支持检索增强上下文
-5. [Task Decomposition-Guided Reranking for Adaptive Agent Skill Retrieval](/202607/11/2607.06283v1-task-decomposition-guided-reranking-for-adaptive-agent-skill-retrieval)  
-   标签：评分：6.0/10、query:rl
-   evidence：通过任务分解重排序实现LLM智能体的自适应技能检索
-6. [When Does In-Context Search Help? A Sampling-Complexity Theory of Reflection-Driven Reasoning](/202607/11/2607.06720v1-when-does-in-context-search-help-a-sampling-complexity-theory-of-reflection-driven-reasoning)  
-   标签：评分：6.0/10、query:rl
-   evidence：反射驱动推理中上下文搜索的理论分析
+   evidence：基于小语言模型自主单细胞注释的智能体框架
 
 
 <div class="dpr-home-promo-card">
