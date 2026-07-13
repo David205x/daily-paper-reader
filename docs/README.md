@@ -6,41 +6,34 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-07-12
-- 运行时间：2026-07-12 21:08:29 UTC
+- 最新运行日期：2026-07-13
+- 运行时间：2026-07-13 21:29:57 UTC
 - 运行状态：成功
-- 本次总论文数：7
-- 精读区：5
+- 本次总论文数：4
+- 精读区：2
 - 速读区：2
 
 ### 今日简报（AI）
-今日精读5篇速读2篇，重点关注两项高分研究：LLM强化学习的尾感知信用校准（9.0分）与持续策略优化（8.0分）。最值得关注的两个方向是：通过校准低概率token的奖励信号来提升LLM训练稳定性，以及解决强化学习中的灾难性遗忘问题。建议普通读者优先了解这两篇论文的核心方法，它们对提升模型长期学习能力有直接启示。
-- 详情：[/202607/12/README](/202607/12/README)
+今日推荐聚焦强化学习后期训练与奖励机制，精读的两篇论文均获9.0高分。  
+最值得关注的是《Bidirectional Resource Scheduling for Disaggregated and Asynchronous RL Post-Training》中的资源调度新范式，以及《Multimodal Reward Hacking in Reinforcement Learning》揭示的多模态奖励攻击风险。  
+建议优先精读这两篇高分解耦调度与安全保障论文，速读内容可作为补充对比。
+- 详情：[/202607/13/README](/202607/13/README)
 
 ### 精读区论文标签
-1. [When Implausible Tokens Get Reinforced: Tail-Aware Credit Calibration for LLM Reinforcement Learning](/202607/12/2607.07976v1-when-implausible-tokens-get-reinforced-tail-aware-credit-calibration-for-llm-reinforcement-learning)  
+1. [Bidirectional Resource Scheduling for Disaggregated and Asynchronous RL Post-Training](/202607/13/2607.09207v1-bidirectional-resource-scheduling-for-disaggregated-and-asynchronous-rl-post-training)  
    标签：评分：9.0/10、query:rl
-   evidence：LLM强化学习中的信用校准
-2. [RL Forgets! Towards Continual Policy Optimization](/202607/12/2607.04364v1-rl-forgets-towards-continual-policy-optimization)  
-   标签：评分：8.0/10、query:rl
-   evidence：强化学习用于视觉语言模型的持续后训练
-3. [AgentGym2: Benchmarking Large Language Model Agents in De-Idealized Real-World Environments](/202607/12/2607.05174v1-agentgym2-benchmarking-large-language-model-agents-in-de-idealized-real-world-environments)  
-   标签：评分：8.0/10、query:rl
-   evidence：提出面向真实世界环境的LLM智能体基准测试，评估任务自动化能力
-4. [SCOPE: Leveraging Subgoal Critiques for Code Generation](/202607/12/2607.05810v1-scope-leveraging-subgoal-critiques-for-code-generation)  
-   标签：评分：8.0/10、query:rl
-   evidence：基于子目标批评的强化学习用于LLM代码生成
-5. [Bridging Physical Reasoning and Task Generalization via Visual Action Outcome Reasoning Alignment](/202607/12/2607.06522v1-bridging-physical-reasoning-and-task-generalization-via-visual-action-outcome-reasoning-alignment)  
-   标签：评分：8.0/10、query:rl
-   evidence：针对视觉语言模型物理推理对齐的新型奖励设计
+   evidence：面向LLM解耦异步RL后训练的双向资源调度，提升推理能力
+2. [Multimodal Reward Hacking in Reinforcement Learning](/202607/13/2607.09492v1-multimodal-reward-hacking-in-reinforcement-learning)  
+   标签：评分：9.0/10、query:rl
+   evidence：研究多模态大语言模型强化学习中的奖励破解，揭示代理奖励的设计缺陷
 
 ### 速读区论文标签
-1. [Harness VLA: Steering Frozen VLAs into Reliable Manipulation Primitives via Memory-Guided Agents](/202607/12/2607.08448v1-harness-vla-steering-frozen-vlas-into-reliable-manipulation-primitives-via-memory-guided-agents)  
+1. [Learning More from Less: Reinforcement Learning from Hindsight](/202607/13/2607.09042v1-learning-more-from-less-reinforcement-learning-from-hindsight)  
    标签：评分：7.0/10、query:rl
-   evidence：记忆增强的智能体框架，结合冻结VLA和LLM代码智能体实现操作自动化
-2. [CellPilot: an agentic framework that pilots small language models through autonomous single-cell annotation](/202607/12/biorxiv-10-64898-2026-07-06-736807-v1-cellpilot-an-agentic-framework-that-pilots-small-language-models-through-autonomous-single-cell-annotation)  
+   evidence：在视觉-语言-动作模型的RL后训练中使用事后重标记
+2. [Interpreting Rewards from Inverse Reinforcement Learning](/202607/13/biorxiv-10-64898-2026-07-08-736783-v1-interpreting-rewards-from-inverse-reinforcement-learning)  
    标签：评分：6.0/10、query:rl
-   evidence：基于小语言模型自主单细胞注释的智能体框架
+   evidence：通过潜在模式分析解释逆强化学习恢复的奖励函数
 
 
 <div class="dpr-home-promo-card">

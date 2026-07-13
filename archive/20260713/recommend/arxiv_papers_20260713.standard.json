@@ -1,0 +1,181 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-13T21:27:33.494779+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 2,
+    "deep_cap": 6,
+    "deep_selected": 2,
+    "quick_candidates": 2,
+    "quick_skim_target": 11,
+    "quick_selected": 2
+  },
+  "deep_dive": [
+    {
+      "id": "2607.09207v1",
+      "source": "arxiv",
+      "title": "Bidirectional Resource Scheduling for Disaggregated and Asynchronous RL Post-Training",
+      "abstract": "It is well established that the reasoning capabilities of large language models (LLMs) can be improved by applying reinforcement learning (RL) in a post-training stage. In a standard RL iteration, the current model (the policy) generates experience through rollouts, and the resulting data is then used to update the policy during training. High-performance RL frameworks such as StreamRL and AReaL employ a disaggregated architecture and asynchronous rollouts to better exploit both rollout and training resources, thereby increasing overall system throughput.   Nonetheless, across varying RL setups (e.g., hardware configurations, model scales, staleness levels, and hyperparameters) and under changing workloads, it remains common for both rollout and training resources to experience idle periods.   In this paper, we present BiDiRL, a hybrid time-space multiplexing architecture for asynchronous, disaggregated RL designed to reduce resource idleness. First, we develop a hot-switch runtime that enables rapid switching between rollout and training resources with negligible overhead. Second, we propose a static, scheduling-aware planner based on time-performance modeling that chooses a hot-switch-friendly resource partition, so that rollout and training durations are roughly balanced at a coarse level. Third, at execution time, we introduce a bidirectional scheduler that further exploits runtime bubbles through fine-grained resource switching, allowing the bottleneck stage to temporarily borrow idle resources from the other pool. Across a wide range of workloads, datasets, and models on two 32-GPU testbeds, BiDiRL increases RL training throughput by up to 1.94x compared with RL systems including veRL, AReaL, and ROLL, without affecting convergence behavior.",
+      "authors": [
+        "Tan Zhiqiang",
+        "Wang Maoxin",
+        "Wang Sijie",
+        "Yin Yiming",
+        "Wang Qiang",
+        "Chu Xiaowen",
+        "Shi Shaohuai"
+      ],
+      "primary_category": "cs.DC",
+      "categories": [
+        "cs.DC"
+      ],
+      "published": "2026-07-10T08:51:14+00:00",
+      "link": "https://arxiv.org/pdf/2607.09207v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "bidirectional resource scheduling for disaggregated and asynchronous RL post-training of LLMs, improving reasoning capabilities",
+      "llm_evidence_cn": "面向LLM解耦异步RL后训练的双向资源调度，提升推理能力",
+      "llm_evidence": "面向LLM解耦异步RL后训练的双向资源调度，提升推理能力",
+      "canonical_evidence": "面向LLM解耦异步RL后训练的双向资源调度，提升推理能力",
+      "llm_tldr_en": "Proposes bidirectional resource scheduling for disaggregated and asynchronous RL post-training frameworks, dynamically balancing rollout and training resources to improve LLM reasoning.",
+      "llm_tldr_cn": "本文研究LLM强化学习后训练中的资源调度问题。现有解耦异步框架（如StreamRL）虽提高了吞吐量，但在不同配置和工作负载下容易出现资源利用率不均。作者提出双向资源调度方法，在rollout和训练之间动态调整资源分配，适应变化的工作负载。实验表明，该方法显著提高了系统吞吐量和模型推理能力，为大规模RL后训练的高效运行提供了关键优化。",
+      "llm_tldr": "本文研究LLM强化学习后训练中的资源调度问题。现有解耦异步框架（如StreamRL）虽提高了吞吐量，但在不同配置和工作负载下容易出现资源利用率不均。作者提出双向资源调度方法，在rollout和训练之间动态调整资源分配，适应变化的工作负载。实验表明，该方法显著提高了系统吞吐量和模型推理能力，为大规模RL后训练的高效运行提供了关键优化。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "reinforcement learning for large language model",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.09492v1",
+      "source": "arxiv",
+      "title": "Multimodal Reward Hacking in Reinforcement Learning",
+      "abstract": "Reinforcement learning (RL) is increasingly used to align multimodal large language models (MLLMs), but higher rewards do not always imply better task performance. This risk is amplified when visual evidence is evaluated by text-only or weakly grounded rewards. We study reward hacking in MLLM RL across safety VQA, chart VQA, and stress-test settings, varying reward design, data ambiguity, model scale (2B-32B), and RL algorithm (GRPO, RLOO, DAPO). We introduce Newly Rewarded Failure Rate (NRFR), which measures failures among samples whose proxy reward improves over the SFT baseline. Outcome-only rewards cause severe hacking, reaching 48.1% Reward Hacking Rate (RHR), while NRFR exceeding RHR shows that RL creates new failures rather than merely inheriting them. Scaling reduces but does not eliminate hacking: even the 32B model retains a 54.9% worse rate under outcome-only rewards, whereas answer-aware rewards improve the oracle trend at every scale. Robustness is also algorithm- and scale-dependent: GRPO is consistently most resistant, RLOO remains vulnerable, and DAPO improves substantially from 2B to 8B. Visual-evidence rewards help only with reliable verification: keyword-based checks increase hacking, while VLM-as-judge semantic verification reduces it. Overall, multimodal reward hacking is a systematic result of optimizing imperfect rewards, and robust alignment requires rewards and verifiers that remain reliable under optimization pressure.",
+      "authors": [
+        "Jiayu Yao",
+        "Yiwei Wang",
+        "Anmeng Zhang",
+        "Zhe Sun",
+        "Songsong Wang",
+        "Lingrui Mei",
+        "Yuyao Ge",
+        "Shenghua Liu"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-07-10T15:06:48+00:00",
+      "link": "https://arxiv.org/pdf/2607.09492v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Studies reward hacking in MLLM RL with varying reward designs, demonstrating failure modes of proxy rewards",
+      "llm_evidence_cn": "研究多模态大语言模型强化学习中的奖励破解，揭示代理奖励的设计缺陷",
+      "llm_evidence": "研究多模态大语言模型强化学习中的奖励破解，揭示代理奖励的设计缺陷",
+      "canonical_evidence": "研究多模态大语言模型强化学习中的奖励破解，揭示代理奖励的设计缺陷",
+      "llm_tldr_en": "Systematically studies reward hacking in multimodal LLM reinforcement learning, proposing Newly Rewarded Failure Rate metric and showing that outcome-only rewards cause severe hacking across multiple settings.",
+      "llm_tldr_cn": "针对多模态大语言模型强化学习中的奖励破解问题，该研究通过设计不同奖励类型、数据模糊度、模型规模和RL算法进行系统实验。引入新获奖失败率（NRFR）指标，发现仅使用结果奖励会导致高达48.1%的奖励破解率，且RL创造了新的失败而非仅继承已有错误。研究揭示了奖励设计缺陷在视觉问答等任务中的严重性，为奖励函数设计提供了重要警示。",
+      "llm_tldr": "针对多模态大语言模型强化学习中的奖励破解问题，该研究通过设计不同奖励类型、数据模糊度、模型规模和RL算法进行系统实验。引入新获奖失败率（NRFR）指标，发现仅使用结果奖励会导致高达48.1%的奖励破解率，且RL创造了新的失败而非仅继承已有错误。研究揭示了奖励设计缺陷在视觉问答等任务中的严重性，为奖励函数设计提供了重要警示。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "design of reward functions in RL",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2607.09042v1",
+      "source": "arxiv",
+      "title": "Learning More from Less: Reinforcement Learning from Hindsight",
+      "abstract": "Reinforcement learning (RL) is increasingly used to post-train vision-language-action (VLA) models, but every update consumes robot rollouts that are slow and costly to collect, making sample efficiency a central concern. Manipulation tasks typically provide only sparse rewards, so a weak policy fails almost every rollout early in training and has little to learn from, even when those failures execute coherent behavior. Such a failure, however, is a success at a different task. We present Learning from Hindsight (LfH), which brings hindsight relabeling to RL post-training of VLAs by scoring failed rollouts against the tasks they actually achieved. A single vision-language model relabels both the instruction and the reward, proposing a hindsight instruction for a group of failed rollouts and scoring how well each satisfies it, and the policy trains on the relabeled and original rollouts jointly. Because VLAs generalize across language, relabeling in language lets the policy learn more from the same trajectories. On out-of-distribution LIBERO-PRO tasks, where standard RL improves only slowly, LfH achieves $5\\times$ improvement in sample efficiency, and outperforms a dense progress-reward baseline. The gains hold across VLA backbones and on a physical Franka robot.",
+      "authors": [
+        "Iris Xu",
+        "Sunshine Jiang",
+        "John Marangola",
+        "Nitish Dashora",
+        "Richard Li",
+        "Thomas Liu",
+        "Zexue He",
+        "Yuheng Zhi",
+        "Alex Pentland",
+        "Pulkit Agrawal",
+        "Zhang-Wei Hong"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-07-10T02:17:41+00:00",
+      "link": "https://arxiv.org/pdf/2607.09042v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Hindsight relabeling for RL post-training of vision-language-action models",
+      "llm_evidence_cn": "在视觉-语言-动作模型的RL后训练中使用事后重标记",
+      "llm_evidence": "在视觉-语言-动作模型的RL后训练中使用事后重标记",
+      "canonical_evidence": "在视觉-语言-动作模型的RL后训练中使用事后重标记",
+      "llm_tldr_en": "Presents Learning from Hindsight (LfH) which relabels failed rollouts with achieved tasks for RL post-training of VLAs, improving sample efficiency.",
+      "llm_tldr_cn": "强化学习越来越多用于后训练视觉-语言-动作（VLA）模型，但每个更新需要大量机器人交互。本文提出从后见之明学习（LfH），将事后重标记引入VLA的RL后训练：通过单一视觉语言模型重标记失败轨迹的指令和奖励，使其成为其他任务的成功示范。该方法显著提升了样本效率。",
+      "llm_tldr": "强化学习越来越多用于后训练视觉-语言-动作（VLA）模型，但每个更新需要大量机器人交互。本文提出从后见之明学习（LfH），将事后重标记引入VLA的RL后训练：通过单一视觉语言模型重标记失败轨迹的指令和奖励，使其成为其他任务的成功示范。该方法显著提升了样本效率。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "reinforcement learning for large language model",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "biorxiv-10-64898-2026-07-08-736783-v1",
+      "source": "biorxiv",
+      "title": "Interpreting Rewards from Inverse Reinforcement Learning",
+      "abstract": "Inverse reinforcement learning can recover reward functions from observed behavior, but interpreting those rewards remains a fundamental challenge for understanding intelligent behavior and decision-making. To address this challenge, we introduce a novel framework for reward interpretation that combines reward-function analysis, latent mode assignments, and short-history behavioral analysis to infer latent motivations and behavioral dynamics. As a proof-of-concept, we instantiated the framework using switching inverse reinforcement learning on a large-scale dataset of multi-agent social interactions. Our framework interpreted the learned latent modes as \"cautious\" and \"volatile\" motivational profiles, demonstrating that recovered reward functions can reveal distinct patterns of behavioral dynamics. More broadly, these findings suggest that the proposed framework provides a promising approach for reverse-engineering and interpreting latent rewards underlying intelligent behavior and decision-making.",
+      "authors": [
+        "Chow, J.",
+        "Yang, Y.",
+        "Laschowski, B."
+      ],
+      "primary_category": "neuroscience",
+      "categories": [
+        "neuroscience"
+      ],
+      "published": "2026-07-13T00:00:00+00:00",
+      "link": "https://www.biorxiv.org/content/10.64898/2026.07.08.736783v1.full.pdf",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Framework for interpreting recovered reward functions via latent mode analysis",
+      "llm_evidence_cn": "通过潜在模式分析解释逆强化学习恢复的奖励函数",
+      "llm_evidence": "通过潜在模式分析解释逆强化学习恢复的奖励函数",
+      "canonical_evidence": "通过潜在模式分析解释逆强化学习恢复的奖励函数",
+      "llm_tldr_en": "Introduces a framework combining reward-function analysis, latent mode assignments, and short-history behavioral analysis to interpret rewards from inverse RL, demonstrated on multi-agent social interactions.",
+      "llm_tldr_cn": "逆强化学习可以恢复行为的奖励函数，但解释这些奖励仍具挑战。本文提出一种奖励解释框架，结合奖励函数分析、潜在模式分配和短历史行为分析，推断潜在动机和行为动态。在社交交互数据集上，该框架成功将潜在模式解释为“谨慎”和“波动”动机轮廓，展示了奖励函数的解释力。",
+      "llm_tldr": "逆强化学习可以恢复行为的奖励函数，但解释这些奖励仍具挑战。本文提出一种奖励解释框架，结合奖励函数分析、潜在模式分配和短历史行为分析，推断潜在动机和行为动态。在社交交互数据集上，该框架成功将潜在模式解释为“谨慎”和“波动”动机轮廓，展示了奖励函数的解释力。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "design of reward functions in RL",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}
