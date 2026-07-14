@@ -1,0 +1,259 @@
+Title: Nonparametric Bayesian Inverse Reinforcement Learning with Data-Parallel Gibbs Sampling
+
+URL Source: https://arxiv.org/pdf/2607.09886v1
+
+Published Time: Tue, 14 Jul 2026 00:08:43 GMT
+
+Number of Pages: 6
+
+Markdown Content:
+# Nonparametric Bayesian Inverse Reinforcement Learning with Data-Parallel Gibbs Sampling 
+
+Sai Anirudh Katupilla 
+
+University of Maryland, College Park 
+
+anir@umd.edu 
+
+Shreeya Dasa Lakshminath 
+
+University of Maryland, College Park 
+
+slakshm2@umd.edu 
+
+Abstract —Inverse Reinforcement Learning recovers reward functions from expert demonstrations, but standard formulations assume that all demonstrations come from a single expert. When demonstrations are pooled from multiple experts with distinct preferences, parametric methods recover an averaged reward that fits no individual expert well. We implement Nonparamet-ric Bayesian Inverse Reinforcement Learning with a Dirichlet Process prior over reward functions, allowing the number of latent reward types to be inferred jointly with the rewards themselves. Inference uses a collapsed Gibbs sampler combining a Chinese Restaurant Process update for cluster assignments with a Metropolis-Hastings update for reward weights, and soft value iteration as the inner planning routine. We evaluate on a 10 × 10 ObjectWorld grid with two and three ground-truth reward types. The serial sampler recovers K = 2 with Adjusted Rand Index of 1.000, substantially outperforming a Maximum Entropy IRL baseline (ARI=0.000). Extension to K = 3 shows that the sampler correctly identifies the number of clusters in all runs; assignment ARI of 0.48–0.58 reflects behavioral overlap between expert types that persists across grid instantiations, revealing that reliable K=3 evaluation on ObjectWorld requires controlled object placement rather than random seeding. We further parallelize the sampler across CPU cores using Ray on HPC hardware, achieving a peak speedup of 4.79 × at 8 workers, and characterize a throughput-versus-accuracy tradeoff arising from the consensus merge heuristic used during state aggregation. Code and a containerized environment are available at https://github.com/dasashreeya/np bayes irl. 
+
+Index Terms —Inverse Reinforcement Learning, Bayesian Non-parametrics, Dirichlet Process, Gibbs Sampling, Parallel MCMC, JAX, Ray 
+
+I. I NTRODUCTION 
+
+Reinforcement learning algorithms learn control policies from a reward function, but in many practical domains the reward function itself is unknown and must be inferred from observed expert behavior. Inverse Reinforcement Learning (IRL) addresses this inverse problem: given a Markov Decision Process and a set of expert trajectories, recover the reward function that best explains the observed actions. IRL has applications in robotics, autonomous driving, medical decision support, and human-AI interaction, where engineering an ex-plicit reward function is impractical but expert demonstrations are available [1]. Most IRL formulations encounter two fundamental difficul-ties. The modeling problem : real demonstration datasets rarely come from a single homogeneous expert. Fitting one reward to a mixed pool produces an average that represents nobody. Parametric Bayesian IRL [2] provides principled uncertainty over the reward but still requires the number of reward types to be fixed in advance — an assumption that is unreasonable when the goal is to discover latent structure. A Dirichlet Process prior removes this requirement, letting the number of components grow as the data demands. The computational problem : MCMC inference over reward posteriors is expensive because each sample requires evaluating trajectory likelihood via inner planning. For a nonparametric model the inference cost scales with both trajectory count and cluster count, making parallelization essential for practical use. We address both problems in a single system. Our contri-butions are:  
+
+> •
+
+A complete open-source implementation of nonpara-metric Bayesian IRL using a collapsed Gibbs sam-pler with Chinese Restaurant Process cluster updates and Metropolis-Hastings weight updates, verified against ground-truth rewards on the ObjectWorld benchmark.  
+
+> •
+
+A data-parallel extension using Ray on HPC, achieving 
+
+4.79 × peak speedup and characterizing the throughput-versus-accuracy tradeoff that emerges from the consensus merge step.  
+
+> •
+
+Empirical evaluation across two and three expert types, including an analysis of how feature discriminability in the environment bounds recovery quality independently of sampler behavior.  
+
+> •
+
+A reproducible, containerized system (Docker image and SLURM scripts) enabling direct replication on HPC in-frastructure. II. L ITERATURE SURVEY 
+
+A. Inverse Reinforcement Learning 
+
+Ng and Russell [1] formulated IRL as recovering a reward function consistent with expert optimality, but the original linear programming approach suffered from reward ambiguity. Abbeel and Ng [3] introduced apprenticeship learning via fea-ture matching. Ziebart et al. [4] proposed Maximum Entropy IRL, which selects the maximum entropy distribution over trajectories subject to feature-matching constraints, providing a principled probabilistic framing. MaxEnt IRL is the compar-ison baseline in this work. arXiv:2607.09886v1 [cs.LG] 10 Jul 2026 B. Bayesian and Nonparametric IRL 
+
+Ramachandran and Amir [2] formulated IRL as Bayesian inference over reward functions under a Boltzmann-rational expert model. We adopt their likelihood directly and extend it to a nonparametric multi-expert setting. Babes-Vroman et al. [5] proposed a parametric mixture-of-experts model with a fixed number of components. Choi and Kim [6] are the closest prior work, presenting a nonparametric Bayesian IRL framework with a collapsed Gibbs sampler; we build directly on their formulation and extend it with a parallel inference engine. Post-2012 work has explored neural reward parameterizations [16] and continuous state spaces [14], but parallelization of the Gibbs inference procedure has received limited attention. We address this gap. 
+
+C. Dirichlet Process Mixture Models 
+
+The Dirichlet Process prior was introduced by Ferguson [7]. The Chinese Restaurant Process representation [8] gives an intuitive sequential construction amenable to Gibbs sampling. Neal [9] surveyed MCMC algorithms for DP mixtures; Algo-rithm 8 of that survey is the basis for our collapsed sampler. 
+
+D. Parallel MCMC 
+
+Gibbs sampling exhibits conditional independence structure within each sweep that admits parallel computation. Lovett et al. [10] analyze parallelization of hierarchical Bayesian models, showing near-linear speedup when conditional inde-pendence is exploited. Our sampler has exactly this structure: assignments are conditionally independent across trajectories given weights, and weights are conditionally independent across clusters given assignments. We use Ray [12] for distri-bution, as its shared object store avoids repeated serialization of read-only environment tensors. 
+
+E. Choice of Method 
+
+We use the Choi and Kim framework rather than parametric mixtures or GP-IRL for three reasons. The DP prior handles cluster count uncertainty without discrete model selection, which is central to our evaluation goal. The Gibbs sampler’s per-trajectory and per-cluster updates decompose naturally for parallel execution. And the framework stays tractable on grid worlds where ground-truth rewards are known, enabling rigorous correctness validation before scaling. III. M ETHODOLOGY 
+
+A. Problem Setup 
+
+We consider a discrete Markov Decision Process M =(S, A, T, γ ). The reward function is parameterized as R(s) = 
+
+ϕ(s)⊤w, where ϕ(s) ∈ Rd is a feature vector and w ∈ Rd is a weight vector. We observe N trajectories τi = {(st, a t)}H−1
+
+> t=0
+
+generated by experts whose true weights are unknown and may differ across trajectories. 
+
+B. Generative Model 
+
+The generative model places a Dirichlet Process prior over reward weights: 
+
+G ∼ DP( α, G 0) (1) 
+
+wi ∼ G (2) 
+
+τi ∼ p(τ | wi) (3) where G0 = N (0 , I ) and α is the concentration parameter. Under the Boltzmann-rational expert model [2]: 
+
+p(τ | w) = Y
+
+> t
+
+πβw(at | st), πβw(a | s) ∝ exp( βQ w(s, a )) 
+
+(4) where Qw is computed by soft value iteration with 100 fixed Bellman backups per call. 
+
+C. Collapsed Gibbs Sampler 
+
+Inference alternates two updates per sweep. 
+
+a) Cluster assignment update: 
+
+p(zi = k | · ) ∝
+
+(
+
+n−i,k · p(τi | wk) existing kα · p(τi | wnew ) new cluster (5) where n−i,k excludes trajectory i from its own cluster count. 
+
+b) Weight update: Propose w′ 
+
+> k
+
+= wk +ϵ, ϵ ∼ N (0 , σ 2I),and accept with Metropolis-Hastings probability 
+
+min 1, p0(w′
+
+> k
+
+) Q 
+
+> i:zi=k
+
+p(τi | w′
+
+> k
+
+)
+
+p0(wk) Q 
+
+> i:zi=k
+
+p(τi | wk)
+
+!
+
+. (6) All likelihood evaluations use log-space arithmetic to prevent underflow over multi-step trajectories. 
+
+D. Hyperparameter Sensitivity 
+
+Two hyperparameters dominate sampler behavior. The DP concentration α controls the prior probability of opening new clusters; values that are too small cause collapse to K = 1 .The MH proposal scale σ controls exploration in weight space; values that are too large prevent acceptance and values that are too small slow mixing. Table I and Table II report results across a grid of values run with seed=0 and 300 sweeps. Two findings are notable. First, 
+
+σ is nearly irrelevant to ARI: results at σ ∈ { 0.01 , 0.05 , 0.1}
+
+are identical, and only σ = 0 .001 differs (worse, due to slow mixing from very small proposals). ℓ2 error increases modestly with larger σ, consistent with noisier proposals reducing weight precision without affecting cluster structure. Second, 
+
+α ≤ 5.0 all converge to the same mode (ARI=0.458, K = 3 )at 300 sweeps, suggesting the chain finds a single dominant intermediate mode regardless of concentration. α = 7.0
+
+achieves the best ARI (0.667, K = 4 ), while α = 10 .0 over-fragments slightly. Notably, the main experiments use 500 sweeps and achieve ARI=1.000 at α = 5 .0, indicating the chain requires more sweeps to escape the intermediate mode visible at 300. We use α = 5 .0 and σ = 0 .01 for all main experiments. TABLE I                                                                       
+
+> αABLATION (σ= 0 .01 FIXED , 300 SWEEPS ,SEED =0; MAIN EXPERIMENTS USE 500 SWEEPS ,SEE SECTION V)
+> αKrecovered ARI ℓ2Wall (s) 1.0 30.458 1.054 55 3.0 30.458 1.054 57 5.0 30.458 1.054 59 7.0 40.667 1.055 63 10.0 40.547 1.054 64 TABLE II
+> σABLATION (α= 5 .0FIXED , 300 SWEEPS ,SEED =0; MAIN EXPERIMENTS USE 500 SWEEPS ,SEE SECTION V)
+> σKrecovered ARI ℓ2Wall (s) 0.001 40.547 1.161 75 0.01 30.458 1.054 58 0.05 30.458 1.063 57 0.1 30.458 1.097 62
+
+E. Implementation 
+
+The system is implemented in JAX [11] across approxi-mately 2,100 lines of Python. We JIT-compile the inner Boltz-mann log-policy computation, which dominates per-sweep runtime; outer control flow remains plain Python to preserve flexibility for cluster relabeling. Correctness is verified by 13 unit tests covering likelihood evaluation, evaluation metrics, Gibbs sweep behavior including pickle-safety for Ray serial-ization, and the ObjectWorld environment. 
+
+F. Parallelization 
+
+Trajectories are partitioned across W Ray workers. Each worker runs one Gibbs sweep on its partition; results are merged after each sweep. Read-only environment tensors ϕ
+
+and T are placed in Ray’s distributed object store once at initialization. The state merge step is the principal source of approxi-mation. Workers perform independent MH updates, causing weight vectors to diverge slightly. The merge uses element-wise comparison with tolerance 10 −6 to identify correspond-ing clusters. When post-MH drift exceeds this tolerance, the same cluster across two workers is counted as two separate clusters, inflating K. We characterize this empirically in Section V. 
+
+G. Hardware and Software 
+
+Experiments were run on the University of Maryland Zaratan cluster on AMD EPYC Zen2 nodes (16 cores, 32 GB RAM, SLURM scheduling). Stack: Python 3.10, JAX 0.4.35 (CPU), Ray 2.55, NumPy 2.2, scikit-learn 1.7, Matplotlib 3.10. The full environment is packaged as a Docker image at https://hub.docker.com/r/shreeyadasa/npbayes-irl. IV. E XPERIMENTS 
+
+A. Environment 
+
+We use the ObjectWorld benchmark [13], a 10 × 10 grid with |S| = 100 states and |A| = 4 actions. The feature vector 
+
+ϕ(s) ∈ R16 is binary, encoding the color of the nearest and second-nearest object per cell (8 colors, 2 distance bands). 
+
+B. Expert Types a) Two-expert setup ( K = 2 ):  
+
+> •
+
+w1: positive weight on red-nearest, negative on blue-nearest (red-lover)  
+
+> •
+
+w2: positive weight on blue-nearest, negative on red-nearest (blue-lover) 10 trajectories per type, 20 total, length 20 steps each. 
+
+b) Three-expert setup ( K = 3 ): A third reward type, black-lover ( w3: positive weight on black-nearest, negative on green-nearest), is added. Black objects occupy 12% of states in the default grid instantiation, giving localized trajectories that are geometrically distinct from both red-lover and blue-lover. We generate 10 trajectories per type, 30 total. We note that with the default random seed and n objects =5, blue and yellow objects are entirely absent from the grid. This means w2 (blue-lover) reduces to an avoid-red signal rather than an independent seek-blue signal, a degenerate property of the environment instantiation rather than the re-ward specification. We report this explicitly as it bounds K=3 recovery quality. 
+
+C. Inference Hyperparameters              
+
+> TABLE III INFERENCE HYPERPARAMETERS (ALL MAIN EXPERIMENTS )Parameter Value
+> α(DP concentration) 5.0
+> β(Boltzmann temperature) 5.0
+> γ(discount factor) 0.95
+> σ(MH proposal scale) 0.01 Gibbs sweeps 500 Burn-in sweeps 100
+
+D. Evaluation Metrics 
+
+Adjusted Rand Index (ARI): cluster recovery against ground-truth assignments (0 = random, 1 = perfect). ℓ2 weight error: average ℓ2 distance between each ground-truth weight and its nearest recovered weight after ℓ2-normalization. Wall time: end-to-end inference runtime. 
+
+E. Baseline 
+
+MaxEnt IRL [4], implemented with feature-matching gradi-ent ascent (200 iterations, learning rate 0.01). Because MaxEnt fits a single reward, assigning all trajectories to one cluster gives ARI = 0 by construction — the expected outcome for any single-component model on heterogeneous data. 
+
+F. Parallelization Study 
+
+Wall time measured at W ∈ { 1, 2, 4, 8, 16 } on a fixed 100-sweep run. Speedup computed as T (1) /T (W ), same seed across all configurations. Fig. 1. Active cluster count K over 500 Gibbs sweeps (serial sampler, K = 2     
+
+> setup). The chain explores during burn-in (sweeps 0–100, dotted vertical line) then stabilizes at the ground-truth value K= 2 (dashed horizontal line).
+> Fig. 2. Recovered versus ground-truth cluster weight vectors across all 16 ObjectWorld features. Reward-relevant features (red and blue color indicators) are accurately recovered; the remaining 14 features receive near-zero weight.
+
+V. R ESULTS 
+
+A. Cluster and Reward Recovery ( K = 2 )
+
+The serial Gibbs sampler recovers K = 2 within approxi-mately 250 sweeps and achieves ARI = 1 .000 at the end of a 500-sweep run, with ℓ2 weight error of 1.355 and wall time of 134.3 seconds. The MaxEnt baseline attains ARI = 0 .000 by construction. Figure 1 shows the cluster count trace; Figure 2 shows recovered versus ground-truth weight vectors, confirm-ing that reward-irrelevant features receive near-zero weight. 
+
+B. Baseline Comparison 
+
+Figure 3 compares NP-Bayes against MaxEnt. NP-Bayes recovers two correct reward functions; MaxEnt recovers one averaged reward. The ℓ2 errors are similar in magnitude (1.355 vs. 1.194) but measure different things: NP-Bayes computes error per cluster against its matched ground-truth type, while MaxEnt is compared to its nearest ground-truth type from a single-component fit. 
+
+C. K = 3 Recovery and Feature Discriminability 
+
+Extending to three expert types (red-lover, blue-lover, black-lover), the sampler correctly identifies K = 3 in all runs but achieves ARI = 0 .58 on assignment recovery. Exhaustive search over α ∈ { 5.0, 8.0, 10 .0, 15 .0} does not improve this        
+
+> Fig. 3. NP-Bayes IRL (serial, 500 sweeps) versus MaxEnt IRL baseline on ARI (left) and ℓ2weight error (right). The nonparametric model achieves perfect cluster recovery ( ARI = 1 .000 ); MaxEnt fits a single reward to all trajectories, producing ARI = 0 .000 by construction. ℓ2errors are similar in magnitude but measure different things: NP-Bayes reports per-cluster error against matched ground-truth types; MaxEnt reports error from a single-component fit.
+
+ceiling, ruling out the concentration parameter as the limiting factor. Post-hoc analysis of the default grid (seed=42, nobjects = 5 )reveals that blue and yellow objects are entirely absent, reducing the blue-lover reward to a diffuse avoid-red signal that occupies 78% of states and substantially overlaps with black-lover trajectories (12% coverage). To test whether color diversity resolves this, we scanned seeds 1–20 and identi-fied seed=19 as the only seed where red, blue, and black objects all appear simultaneously (densities 17%, 54%, 17% respectively). Running the K=3 sampler on seed=19 yields 
+
+ARI = 0.48 , no improvement over seed=42. The chain transiently finds K = 3 between sweeps 150–250 but cannot sustain the partition: blue-lover (54% density) and black-lover (17%) have sufficient trajectory overlap that the sampler repeatedly merges them. These results isolate the bottleneck: color diversity in the grid is necessary but not sufficient for K=3 recovery. The binding constraint is behavioral distinguishability — whether the three reward types produce sufficiently distinct trajectory distributions — which depends on the spatial arrangement of objects, not just their presence. Only 1 of 20 random seeds produced a grid with all three required colors present, indi-cating that reliable K=3 evaluation on ObjectWorld requires either controlled object placement or a larger grid. We report this as a finding about synthetic IRL benchmark design: feature discriminability cannot be assumed from reward specification alone and must be verified against the specific environment instantiation. 
+
+D. Parallel Speedup 
+
+Table IV summarizes the scaling study. Wall time drops from 41.15 seconds at one worker to 8.58 seconds at 8 workers, a peak speedup of 4.79 ×. The super-linear result at 2 workers ( 2.76 ×) is attributable to JAX JIT compilation amortization: with one worker, compilation overhead is paid serially; with two, both workers benefit from compiled code at lower per-worker cost. Beyond 8 workers, per-worker work-Fig. 4. Parallel speedup versus worker count on Zaratan (100 sweeps). Peak of 4.79 × at 8 workers. Dashed line: ideal linear scaling. Degradation beyond 8 workers reflects per-process overhead dominating the small per-worker workload at this dataset size. 
+
+load becomes too small to amortize Ray’s actor coordination overhead and speedup degrades.                               
+
+> TABLE IV PARALLEL SPEEDUP ON ZARATAN (100 S WEEPS ,K= 2 SETUP )Workers Wall (s) Speedup ARI ℓ2
+> 141.15 1.00 ×0.800 1.182 214.91 2.76 ×0.905 1.370 49.70 4.24 ×0.457 1.152 88.58 4.79 ×0.140 1.189 16 10.28 4.00 ×0.035 1.169
+
+E. Throughput-Accuracy Tradeoff 
+
+ARI degrades sharply with worker count (0.905 at W = 2 ,0.035 at W = 16 ), while ℓ2 weight error remains approxi-mately stable across all configurations (Figure 5). This disso-ciation is diagnostic: per-worker reward inference is accurate, but cluster identity is lost during merging. The mechanism is the 10 −6-tolerance equality check in the merge step. Workers perform independent MH proposals, causing weight vectors to diverge by small amounts. Drifts beyond tolerance cause the same cluster to be registered as distinct clusters across workers, inflating K to 16–18 at 
+
+W = 16 . This is an engineering problem in the merge step, not a property of the sampler. A centralized weight update — workers perform assignment steps in parallel, one process performs weight updates and broadcasts — would eliminate drift while preserving throughput gains. 
+
+F. Discussion 
+
+The results address all three questions posed in the intro-duction. The nonparametric model correctly identifies K and achieves perfect ARI on the K = 2 benchmark while MaxEnt fails entirely. On K = 3 , the model correctly infers the cluster    
+
+> Fig. 5. ℓ2weight error versus worker count. Error remains stable across all configurations, confirming that per-worker reward inference is accurate. Cluster identity failure (rising K) drives ARI degradation, not reward quality.
+
+count but assignment accuracy is bounded by environment feature discriminability rather than sampler behavior. The par-allel system achieves 4.79 × speedup; the throughput-accuracy tradeoff is attributable to the merge step and is addressable without changes to the core inference algorithm. VI. C ONCLUSION 
+
+We presented a parallelized nonparametric Bayesian IRL system that jointly infers the number of latent expert reward types and the rewards themselves, without requiring the cluster count to be specified in advance. On the K = 2 Object-World benchmark the system achieves perfect cluster recovery (ARI = 1 .000 ) against a MaxEnt baseline that collapses to a single reward ( ARI = 0 .000 ). Extension to K = 3 reveals that recovery quality is bounded by behavioral distinguishability in the environment, not by the prior or the sampler. Data-parallel Gibbs sampling via Ray achieves 4.79 × peak speedup; the throughput-accuracy tradeoff is isolated to the consensus merge step and admits a principled fix. Ablation over α and 
+
+σ shows that α = 5 .0, σ = 0 .01 robustly recovers K = 2 and that both parameters require tuning relative to the problem scale. 
+
+a) Future Work: Priority extensions are: (i) replacing the consensus merge with a centralized weight update to recover both throughput and cluster accuracy; (ii) a hierarchical prior over α to reduce sensitivity to this parameter across problem scales; (iii) split-merge MCMC moves [15] to improve mixing in multi-modal posteriors; (iv) evaluation on procedurally gen-erated grids with guaranteed color diversity and on continuous state spaces with neural reward parameterizations [16]; and (v) application to real demonstration datasets such as driving trajectories or robotic manipulation logs. REFERENCES [1] A. Y. Ng and S. Russell, “Algorithms for inverse reinforcement learn-ing,” in International Conference on Machine Learning , 2000, pp. 663– 670. [2] D. Ramachandran and E. Amir, “Bayesian inverse reinforcement learn-ing,” in International Joint Conference on Artificial Intelligence , 2007, pp. 2586–2591. [3] P. Abbeel and A. Y. Ng, “Apprenticeship learning via inverse reinforce-ment learning,” in International Conference on Machine Learning , 2004. [4] B. D. Ziebart, A. L. Maas, J. A. Bagnell, and A. K. Dey, “Maximum en-tropy inverse reinforcement learning,” in AAAI Conference on Artificial Intelligence , 2008, pp. 1433–1438. [5] M. Babes-Vroman, V. Marivate, K. Subramanian, and M. L. Littman, “Apprenticeship learning about multiple intentions,” in International Conference on Machine Learning , 2011, pp. 897–904. [6] J. Choi and K.-E. Kim, “Nonparametric Bayesian inverse reinforcement learning for multiple reward functions,” in Advances in Neural Informa-tion Processing Systems , 2012. [7] T. S. Ferguson, “A Bayesian analysis of some nonparametric problems,” 
+
+The Annals of Statistics , vol. 1, no. 2, pp. 209–230, 1973. [8] D. J. Aldous, “Exchangeability and related topics,” in ´Ecole d’´ et´ e de probabilit´ es de Saint-Flour XIII , Springer, 1985, pp. 1–198. [9] R. M. Neal, “Markov chain sampling methods for Dirichlet process mixture models,” Journal of Computational and Graphical Statistics ,vol. 9, no. 2, pp. 249–265, 2000. [10] I. J. Lovett et al. , “Parallel Markov chain Monte Carlo for Bayesian hierarchical models,” Journal of Computational and Graphical Statistics ,vol. 31, no. 2, pp. 455–466, 2022. [11] J. Bradbury et al. , “JAX: composable transformations of Python+NumPy programs,” 2018. [Online]. Available: http://github.com/google/jax [12] P. Moritz et al. , “Ray: a distributed framework for emerging AI ap-plications,” in USENIX Symposium on Operating Systems Design and Implementation , 2018, pp. 561–577. [13] S. Levine, Z. Popovic, and V. Koltun, “Feature construction for inverse reinforcement learning,” in Advances in Neural Information Processing Systems , 2010. [14] S. Levine, Z. Popovic, and V. Koltun, “Nonlinear inverse reinforcement learning with Gaussian processes,” in Advances in Neural Information Processing Systems , 2011. [15] S. Jain and R. M. Neal, “A split-merge Markov chain Monte Carlo proce-dure for the Dirichlet process mixture model,” Journal of Computational and Graphical Statistics , vol. 13, no. 1, pp. 158–182, 2004. [16] M. Wulfmeier, P. Ondruska, and I. Posner, “Maximum entropy deep inverse reinforcement learning,” arXiv preprint arXiv:1507.04888 , 2015.

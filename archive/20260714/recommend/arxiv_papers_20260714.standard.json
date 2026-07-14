@@ -1,0 +1,567 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-14T21:33:57.740498+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 12,
+    "deep_cap": 6,
+    "deep_selected": 7,
+    "quick_candidates": 6,
+    "quick_skim_target": 11,
+    "quick_selected": 6
+  },
+  "deep_dive": [
+    {
+      "id": "2607.11506v1",
+      "source": "arxiv",
+      "title": "SCOPE-RL: Optimizing Reasoning Paths Before and After Success",
+      "abstract": "Reinforcement learning with verifiable rewards (RLVR) optimizes LLMs using sparse verifiable final-answer rewards. This sparse anchor reliably verifies whether a trajectory succeeds but provides no direct feedback on the reasoning path that produced it. Before success, prerequisite progress on hard problems receives no reward signal; after success, outcome rewards cannot distinguish well-organized correct trajectories from redundant or locally flawed ones. We introduce SCOPE-RL (Scaffolded Chain Optimization with Process Efficiency), a two-stage framework that densifies this anchor while retaining the GRPO update: Adaptive Scaffolded RL adds prefix-decomposed verifiable rewards on answer-hidden sub-question chains before success, and Quality-Aware Process RL applies correctness-gated process-shape rewards to refine correct trajectories after success. An expert-validated Step-Quality Evaluation Protocol evaluates useful-step density, error localization, and token efficiency beyond final-answer accuracy. On Qwen3-8B-Instruct trained on DAPO-Math and Big-Math, SCOPE-RL improves average accuracy by up to 11.2 pp and reduces reasoning tokens by up to 27.1% over outcome-only GRPO; the gains hold under GSPO and on Qwen3-0.6B-Instruct, indicating that reward-signal densification is complementary to policy-update-level RLVR advances. Code and data are available at https://github.com/tokencraft-lab/SCOPE-RL.",
+      "authors": [
+        "Xiaojian Liu",
+        "Han Xu",
+        "Jianqiang Xia",
+        "Zhixuan Li",
+        "Ke Xu",
+        "Yiwei Dai",
+        "Xinran Chen",
+        "Changwo Wu",
+        "Yuchen Li"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.CL"
+      ],
+      "published": "2026-07-13T12:56:28+00:00",
+      "link": "https://arxiv.org/pdf/2607.11506v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 10.0,
+      "llm_evidence_en": "reinforcement learning with verifiable rewards for LLM reasoning, optimizing reasoning paths",
+      "llm_evidence_cn": "基于可验证奖励的强化学习用于大语言模型推理，优化推理路径",
+      "llm_evidence": "基于可验证奖励的强化学习用于大语言模型推理，优化推理路径",
+      "canonical_evidence": "基于可验证奖励的强化学习用于大语言模型推理，优化推理路径",
+      "llm_tldr_en": "SCOPE-RL densifies sparse verifiable rewards to improve reasoning before success and after success, directly enhancing LLM reasoning.",
+      "llm_tldr_cn": "基于可验证奖励的强化学习虽能验证最终答案，但无法对推理过程提供直接反馈。本文提出SCOPE-RL两阶段框架：适应式脚手架RL在成功前对子问题链添加前缀分解可验证奖励，质量感知过程RL在成功后区分高质量与冗余推理路径。实验表明该方法显著提升LLM在数学推理等任务上的推理质量和效率。",
+      "llm_tldr": "基于可验证奖励的强化学习虽能验证最终答案，但无法对推理过程提供直接反馈。本文提出SCOPE-RL两阶段框架：适应式脚手架RL在成功前对子问题链添加前缀分解可验证奖励，质量感知过程RL在成功后区分高质量与冗余推理路径。实验表明该方法显著提升LLM在数学推理等任务上的推理质量和效率。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "application of reinforcement learning in large language model reasoning",
+      "matched_requirement_id": "req-7",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.09886v1",
+      "source": "arxiv",
+      "title": "Nonparametric Bayesian Inverse Reinforcement Learning with Data-Parallel Gibbs Sampling",
+      "abstract": "Inverse Reinforcement Learning recovers reward functions from expert demonstrations, but standard formulations assume that all demonstrations come from a single expert. When demonstrations are pooled from multiple experts with distinct preferences, parametric methods recover an averaged reward that fits no individual expert well. We implement Nonparametric Bayesian Inverse Reinforcement Learning with a Dirichlet Process prior over reward functions, allowing the number of latent reward types to be inferred jointly with the rewards themselves. Inference uses a collapsed Gibbs sampler combining a Chinese Restaurant Process update for cluster assignments with a Metropolis-Hastings update for reward weights, and soft value iteration as the inner planning routine. We evaluate on a 10x10 ObjectWorld grid with two and three ground-truth reward types. The serial sampler recovers K=2 with Adjusted Rand Index of 1.000, substantially outperforming a Maximum Entropy IRL baseline (ARI=0.000). Extension to K=3 shows that the sampler correctly identifies the number of clusters in all runs; assignment ARI of 0.48-0.58 reflects behavioral overlap between expert types that persists across grid instantiations, revealing that reliable K=3 evaluation on ObjectWorld requires controlled object placement rather than random seeding. We further parallelize the sampler across CPU cores using Ray on HPC hardware, achieving a peak speedup of 4.79x at 8 workers, and characterize a throughput-versus-accuracy tradeoff arising from the consensus merge heuristic used during state aggregation. Code and a containerized environment are available at https://github.com/dasashreeya/np_bayes_irl.",
+      "authors": [
+        "Sai Anirudh Katupilla",
+        "Shreeya Dasa Lakshminath"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-07-10T18:20:53+00:00",
+      "link": "https://arxiv.org/pdf/2607.09886v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Nonparametric Bayesian inverse RL to recover reward functions from multiple experts",
+      "llm_evidence_cn": "非参数贝叶斯逆强化学习从多专家演示中恢复奖励函数",
+      "llm_evidence": "非参数贝叶斯逆强化学习从多专家演示中恢复奖励函数",
+      "canonical_evidence": "非参数贝叶斯逆强化学习从多专家演示中恢复奖励函数",
+      "llm_tldr_en": "This paper presents a nonparametric Bayesian inverse reinforcement learning method using Dirichlet process priors to infer multiple reward types from pooled expert demonstrations, with efficient data-parallel Gibbs sampling.",
+      "llm_tldr_cn": "针对多专家演示混合时标准逆强化学习只能恢复单一平均奖励的问题，提出非参数贝叶斯逆强化学习方法。采用Dirichlet过程作为奖励函数的先验，通过折叠吉布斯采样同时推断潜在奖励类型的数量与参数。实验证明该方法能有效恢复多专家偏好，且无需预先指定类型数量。该工作为从异质数据中学习奖励函数提供了灵活高效的解决方案。",
+      "llm_tldr": "针对多专家演示混合时标准逆强化学习只能恢复单一平均奖励的问题，提出非参数贝叶斯逆强化学习方法。采用Dirichlet过程作为奖励函数的先验，通过折叠吉布斯采样同时推断潜在奖励类型的数量与参数。实验证明该方法能有效恢复多专家偏好，且无需预先指定类型数量。该工作为从异质数据中学习奖励函数提供了灵活高效的解决方案。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "design of reward functions in RL",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.10463v1",
+      "source": "arxiv",
+      "title": "GRASP: GRanularity-Aware Search Policy for Agentic RAG",
+      "abstract": "Agentic retrieval-augmented generation (RAG) extends static RAG by allowing language models to iteratively reason, generate search queries, retrieve evidence, and predict answers. However, it remains challenging for models to decide when to retrieve, whether to use lexical matching or semantic similarity, and how to control context granularity to prevent irrelevant tokens from interfering with agent reasoning. In this paper, we introduce GRASP, a reinforcement learning (RL) framework for training agents to adaptively coordinate complementary retrieval tools during multi-step reasoning. GRASP provides the agent with semantic search, keyword search, and paragraph-reading actions, enabling it to retrieve sentence-level evidence and expand further context only when needed. We train the policy with a reward that jointly accounts for answer accuracy, grounded reading, complementary search, and turn efficiency. Experiments on multi-hop reasoning benchmarks show that GRASP improves both retrieval recall and downstream question answering performance compared with single-step retrieval, prompting-based agentic RAG, and RL-based retrieval baselines. Qualitative and ablation analyses show that the learned policy develops interpretable skimming and scanning behavior: it uses semantic search for broad exploration, paragraph reading for local verification, and keyword search for entity-specific evidence. These results suggest that learning to coordinate retrieval signals and context granularity is critical for agent's correct reasoning.",
+      "authors": [
+        "Varun Gandhi",
+        "Jaewook Lee",
+        "Shantanu Todmal",
+        "Franck Dernoncourt",
+        "Ryan Rossi",
+        "Zichao Wang",
+        "Andrew Lan"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI",
+        "cs.IR"
+      ],
+      "published": "2026-07-11T19:58:07+00:00",
+      "link": "https://arxiv.org/pdf/2607.10463v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "RL framework for coordinating retrieval in agentic RAG",
+      "llm_evidence_cn": "用于智能体检索增强生成的强化学习框架",
+      "llm_evidence": "用于智能体检索增强生成的强化学习框架",
+      "canonical_evidence": "用于智能体检索增强生成的强化学习框架",
+      "llm_tldr_en": "GRASP uses reinforcement learning to train agents to adaptively coordinate complementary retrieval tools during multi-step reasoning, improving granularity control and reducing irrelevant context.",
+      "llm_tldr_cn": "针对智能体检索增强生成中检索时机与粒度难以控制的问题，提出GRASP强化学习框架，训练智能体在推理过程中动态协调语义搜索、关键词搜索和段落阅读等检索动作。实验表明该方法能有效提升检索质量，减少无关信息干扰。该工作为将强化学习应用于复杂检索策略优化提供了新的思路。",
+      "llm_tldr": "针对智能体检索增强生成中检索时机与粒度难以控制的问题，提出GRASP强化学习框架，训练智能体在推理过程中动态协调语义搜索、关键词搜索和段落阅读等检索动作。实验表明该方法能有效提升检索质量，减少无关信息干扰。该工作为将强化学习应用于复杂检索策略优化提供了新的思路。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "retrieval augmented generation for knowledge intensive tasks",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.10481v1",
+      "source": "arxiv",
+      "title": "ARMOR: Stabilizing On-Policy LLM RL with Off-Policy Anchor Samples",
+      "abstract": "Reinforcement learning (RL) has significantly enhanced the reasoning capabilities of large language models (LLMs), yet the training process remains notoriously fragile. In this work, we investigate a critical source of this instability: over-optimization, where models exploit training heuristics at the expense of generalizable reasoning. While reverse KL regularization is the standard defense against such degradation, our analysis reveals that it is often insufficient in this regime, as it fails to ensure comprehensive coverage of the reference distribution. To address this, we propose ARMOR (Anchor Rollout and Mixed Optimization for RL), a framework that shifts the paradigm from passive penalty to active sample stabilization. ARMOR comprises two key components: (1) Anchor Rollout, which leverages off-policy data from the reference policy to preserve established solution patterns; and (2) Mixed Optimization, which reformulates the policy objective to enable controlled exploration without relying on auxiliary losses. Extensive experiments on reasoning benchmarks validate that ARMOR effectively mitigates validation collapse, enabling sustained performance improvements over extended training horizons.",
+      "authors": [
+        "Kexin Huang",
+        "Junkang Wu",
+        "Jinda Lu",
+        "Shuo Yang",
+        "Chiyu Ma",
+        "Jiancan Wu",
+        "Xiang Wang",
+        "Xiangnan He",
+        "Guoyin Wang",
+        "Jingren Zhou"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI",
+        "cs.CL"
+      ],
+      "published": "2026-07-11T21:22:46+00:00",
+      "link": "https://arxiv.org/pdf/2607.10481v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "RL for LLM reasoning stabilization",
+      "llm_evidence_cn": "针对大语言模型推理的强化学习稳定性",
+      "llm_evidence": "针对大语言模型推理的强化学习稳定性",
+      "canonical_evidence": "针对大语言模型推理的强化学习稳定性",
+      "llm_tldr_en": "ARMOR stabilizes on-policy LLM RL with off-policy anchor samples to prevent over-optimization, improving reasoning generalization.",
+      "llm_tldr_cn": "针对大语言模型强化学习训练中的过度优化和不稳定性问题，提出ARMOR框架，通过引入离线策略锚点样本主动稳定在线策略训练。实验表明该框架有效缓解了模型对训练启发式的过度利用，提升了推理泛化能力，为LLM强化学习提供了一种稳健的训练范式。",
+      "llm_tldr": "针对大语言模型强化学习训练中的过度优化和不稳定性问题，提出ARMOR框架，通过引入离线策略锚点样本主动稳定在线策略训练。实验表明该框架有效缓解了模型对训练启发式的过度利用，提升了推理泛化能力，为LLM强化学习提供了一种稳健的训练范式。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "reinforcement learning for large language model",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.10738v1",
+      "source": "arxiv",
+      "title": "To Answer or to Abstain: Mitigating Search-Agent Hallucinations via Abstention-Aware Reinforcement Learning",
+      "abstract": "Recent advances in equipping Large Language Models (LLMs) with search tools and outcome-reward reinforcement learning (RL) have achieved new state-of-the-art results on open-domain QA tasks. However, we argue that current training paradigms harbor a critical vulnerability: they predominantly reward correct answers but fail to penalize fabricated ones when retrieval fails, thereby implicitly exacerbating hallucinations. To address this, we propose Abstention-Aware Reinforcement Learning (AWA-RL), which dynamically shapes the abstention reward utilizing the model's query-specific prior capabilities and continuous on-policy training observations. We also introduce a novel metric, RA-F1, to measure the capability-reliability trade-off. Compared to non-abstaining baselines, AWA-RL boosts absolute precision by up to 10.3% and overall RA-F1 by 2.9%, with only marginal sacrifice in raw accuracy. These results confirm that AWA-RL successfully yields highly capable and reliable search agents. The code, data, and model weights are publicly available at https://github.com/zfj1998/AWA-RL.",
+      "authors": [
+        "Fengji Zhang",
+        "Tianyu Fan",
+        "Yuxiang Zheng",
+        "Xinyao Niu",
+        "Chengen Huang",
+        "Jacky Keung",
+        "Bei Chen"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI",
+        "cs.CL"
+      ],
+      "published": "2026-07-12T12:43:12+00:00",
+      "link": "https://arxiv.org/pdf/2607.10738v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Abstention-Aware RL for LLM search agents",
+      "llm_evidence_cn": "面向大语言模型搜索智能体的放弃感知强化学习",
+      "llm_evidence": "面向大语言模型搜索智能体的放弃感知强化学习",
+      "canonical_evidence": "面向大语言模型搜索智能体的放弃感知强化学习",
+      "llm_tldr_en": "Proposes AWA-RL, a reinforcement learning approach that dynamically shapes abstention reward to mitigate hallucinations in LLM-based search agents.",
+      "llm_tldr_cn": "本文针对大语言模型（LLM）搜索智能体中的幻觉问题，指出当前训练范式只奖励正确回答而忽视检索失败时的编造。为此提出放弃感知强化学习（AWA-RL），通过利用模型查询特定先验能力和在线策略训练观测动态塑造放弃奖励。实验证明该方法有效降低了幻觉。该工作为LLM与工具结合的安全部署提供了新思路。",
+      "llm_tldr": "本文针对大语言模型（LLM）搜索智能体中的幻觉问题，指出当前训练范式只奖励正确回答而忽视检索失败时的编造。为此提出放弃感知强化学习（AWA-RL），通过利用模型查询特定先验能力和在线策略训练观测动态塑造放弃奖励。实验证明该方法有效降低了幻觉。该工作为LLM与工具结合的安全部署提供了新思路。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "reinforcement learning for large language model",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.10848v1",
+      "source": "arxiv",
+      "title": "Predictive Divergence Masks for LLM RL",
+      "abstract": "Reinforcement learning for large language models (LLMs) typically relies on trust-region masks to stabilize off-policy updates. The dominant PPO-style approach uses the sampled-token importance ratio for two criteria: a proximity criterion, which asks whether the policy has moved too far from the behavior policy, and a direction criterion, which asks whether the update pushes it farther away. Recent work DPPO improves the proximity criterion by replacing PPO's ratio-based test with a probability divergence between the behavior and training policies. However, its direction criterion is still inherited from PPO. A token can be masked only when the sampled-token importance ratio moves away from one. We observe that this ratio-based direction criterion is a single-sample proxy that can disagree in sign with the change of the divergence that defines the proximity criterion. We therefore propose the predictive divergence mask, which asks whether the next policy-gradient step will increase or decrease the same divergence used by the trust region. For the discrete softmax policies used in LLM RL, we derive this prediction in closed form. Because production rollout engines expose only a truncated (top-K) view of the vocabulary, we develop two lightweight top-$K$ estimators for this prediction. Detailed analysis shows the divergence-based direction is better aligned with the realized change of the divergence than the sampled ratio, and the resulting masks improve RL training across model scales and precision settings.",
+      "authors": [
+        "Xiangxin Zhou",
+        "Jiarui Yao",
+        "Penghui Qi",
+        "Bowen Ping",
+        "Jiaqi Tang",
+        "Haonan Wang",
+        "Tianyu Pang"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-07-12T17:20:44+00:00",
+      "link": "https://arxiv.org/pdf/2607.10848v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Improves PPO for LLM RL by using predictive divergence masks",
+      "llm_evidence_cn": "通过预测性散度掩码改进LLM的PPO强化学习",
+      "llm_evidence": "通过预测性散度掩码改进LLM的PPO强化学习",
+      "canonical_evidence": "通过预测性散度掩码改进LLM的PPO强化学习",
+      "llm_tldr_en": "Proposes predictive divergence masks to replace the sampled-token importance ratio in PPO's direction criterion, stabilizing LLM RL.",
+      "llm_tldr_cn": "针对LLM强化学习中的PPO方法，提出预测性散度掩码替换基于采样token重要性比的方向准则，提供更精确的更新方向检测，提升训练稳定性和样本效率。在多个LLM训练任务上验证了效果。",
+      "llm_tldr": "针对LLM强化学习中的PPO方法，提出预测性散度掩码替换基于采样token重要性比的方向准则，提供更精确的更新方向检测，提升训练稳定性和样本效率。在多个LLM训练任务上验证了效果。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "reinforcement learning for large language model",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.11505v1",
+      "source": "arxiv",
+      "title": "Proxy Exploration and Reusable Guidance: A Modular LLM Post-Training Paradigm via Proxy-Guided Update Signals",
+      "abstract": "Post-training is essential for refining the domain-specific capabilities of large language models (LLMs), yet existing reward optimization and distribution matching methods tightly couple policy exploration with distribution alignment. This coupling forces expensive exploration directly on the policy model and severely hinders the asynchronous generation, reuse, and cross-model transfer of optimization signals. In this paper, we propose Proxy-guided Update Signal Transfer (PUST), a novel post-training framework that fundamentally decouples update-signal exploration from distribution alignment. Instead of utilizing the primary model for costly exploration, PUST employs a lightweight proxy model as an efficient testbed to discover high-reward behaviors. We extract the relative improvement signal between the proxy's initial and optimized states, transferring this directional update to the primary model to guide its policy alignment. This decoupled pipeline, comprising proxy exploration, update-signal extraction, and signal transfer, significantly reduces computational overhead and enables optimization signals to be asynchronously generated, cached, and reused. Crucially, by transferring relative improvements rather than absolute policy distributions, PUST naturally supports weak-to-strong improvement and seamless cross-model transfer. Systematic evaluations on Qwen3-family models across math and code domains demonstrate that update signals extracted from substantially weaker proxies can robustly and adjustably enhance stronger primary models. Ultimately, PUST transforms post-training from a monolithic online optimization process into a highly modular, reusable, and cost-efficient paradigm.",
+      "authors": [
+        "Daocheng Fu",
+        "Rong Wu",
+        "Yu Yang",
+        "Xuemeng Yang",
+        "Jianbiao Mei",
+        "Licheng Wen",
+        "Pinlong Cai",
+        "Yong Liu",
+        "Botian Shi",
+        "Yu Qiao"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-07-13T12:56:21+00:00",
+      "link": "https://arxiv.org/pdf/2607.11505v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "reward optimization, decoupled exploration, proxy model for update signals",
+      "llm_evidence_cn": "奖励优化，解耦探索，代理模型生成更新信号",
+      "llm_evidence": "奖励优化，解耦探索，代理模型生成更新信号",
+      "canonical_evidence": "奖励优化，解耦探索，代理模型生成更新信号",
+      "llm_tldr_en": "PUST decouples policy exploration from distribution alignment using a proxy model, enabling reusable and transferable reward-like signals.",
+      "llm_tldr_cn": "现有LLM后训练方法将策略探索与分布对齐紧密耦合，导致探索成本高且信号难以复用。本文提出代理引导更新信号传输（PUST），用轻量代理模型进行探索并生成可重用更新信号，供主模型对齐使用。实验表明该方法在降低训练成本的同时保持了甚至提升了领域微调性能，并支持跨模型迁移。",
+      "llm_tldr": "现有LLM后训练方法将策略探索与分布对齐紧密耦合，导致探索成本高且信号难以复用。本文提出代理引导更新信号传输（PUST），用轻量代理模型进行探索并生成可重用更新信号，供主模型对齐使用。实验表明该方法在降低训练成本的同时保持了甚至提升了领域微调性能，并支持跨模型迁移。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "design of reward functions in RL",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2607.10555v1",
+      "source": "arxiv",
+      "title": "Tool-Adaptive LLM Reranker",
+      "abstract": "Generative Large Language Models (LLMs) have revolutionized information retrieval, yet their strictly parametric nature frequently leads to severe factual hallucinations when confronted with complex queries beyond their epistemic boundaries. While external tool-calling can mitigate this, indiscriminately invoking search tools for every document during reranking incurs prohibitive latency overheads, creating an intractable accuracy-efficiency dilemma. To address this challenge, we propose TALRanker, a novel framework that formalizes pointwise relevance scoring as an agentic Markov decision process. We optimize it via a two-stage training paradigm. An initial warm-up utilizes a language-preserving hybrid loss to prevent the catastrophic forgetting of native generative capacities. Subsequently, an asymmetric cost-aware reward equipped in reinforcement learning forces the policy to autonomously bypass tools for maximum efficiency when confident, while selectively retrieving external evidence to avert severe hallucination penalties when uncertain. Extensive evaluations demonstrate that TALRanker achieves state-of-the-art performance across standard and reasoning-intensive retrieval benchmarks, matching throughput with pointwise rerankers while outperforming parameter-heavy reasoning models.",
+      "authors": [
+        "Zichuan Liu",
+        "Ruijin Hua"
+      ],
+      "primary_category": "cs.IR",
+      "categories": [
+        "cs.IR",
+        "cs.AI",
+        "cs.CL"
+      ],
+      "published": "2026-07-12T04:04:59+00:00",
+      "link": "https://arxiv.org/pdf/2607.10555v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Formalizes reranking as agentic MDP optimized via RL",
+      "llm_evidence_cn": "将重排序形式化为智能体马尔可夫决策过程并通过强化学习优化",
+      "llm_evidence": "将重排序形式化为智能体马尔可夫决策过程并通过强化学习优化",
+      "canonical_evidence": "将重排序形式化为智能体马尔可夫决策过程并通过强化学习优化",
+      "llm_tldr_en": "Proposes TALRanker, which models pointwise relevance scoring as an agentic MDP and optimizes it via two-stage RL training including a hybrid loss warm-up.",
+      "llm_tldr_cn": "大语言模型在重排序任务中因参数化限制产生幻觉，而调用外部工具带来延迟。TALRanker将点式相关性评分形式化为智能体MDP，通过两阶段训练优化：先用语言保持混合损失预热，随后进行强化学习。该方法平衡了准确性与效率，在标准基准上取得最优结果。",
+      "llm_tldr": "大语言模型在重排序任务中因参数化限制产生幻觉，而调用外部工具带来延迟。TALRanker将点式相关性评分形式化为智能体MDP，通过两阶段训练优化：先用语言保持混合损失预热，随后进行强化学习。该方法平衡了准确性与效率，在标准基准上取得最优结果。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "reinforcement learning for large language model",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2607.10534v1",
+      "source": "arxiv",
+      "title": "Cross-Layer Misalignment Detection in Agent Skills: A Progressive Loading-Aware Contrastive Learning Approach",
+      "abstract": "Large language model (LLM) agents are increasingly extended through Agent Skills, reusable artifacts that package natural-language metadata, procedural instructions, and execution-time resources for runtime use. As open-source skill marketplaces expand, users and agents increasingly rely on brief metadata to select third-party skills, making it difficult to detect inconsistencies between a skill's description and its true behavior, a problem we call cross-layer misalignment. To address this issue, we propose Progressive Loading-Aware Hierarchical Contrastive Learning (PL-HCL), an LLM-based framework that detects misalignment by modeling the layered structure of Agent Skills and learning cross-layer consistency. Using a normalized corpus of over 264,000 open-source skills and a human-verified challenge set, PL-HCL improves Macro-F1 from approximately 0.45 for unadapted baselines to 0.87-0.89 across evaluated LLM backbones. This approach offers an effective screening tool for users and operators, as well as design principles for detecting inconsistencies in layered digital artifacts.",
+      "authors": [
+        "Chengjun Zhang",
+        "Yang Gao",
+        "Jianna Hur",
+        "Jingjing Zhang",
+        "Sagar Samtani"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI",
+        "cs.CR",
+        "cs.LG"
+      ],
+      "published": "2026-07-12T02:07:37+00:00",
+      "link": "https://arxiv.org/pdf/2607.10534v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "LLM agents, detection of skill misalignment",
+      "llm_evidence_cn": "大语言模型智能体技能交叉层不对齐检测",
+      "llm_evidence": "大语言模型智能体技能交叉层不对齐检测",
+      "canonical_evidence": "大语言模型智能体技能交叉层不对齐检测",
+      "llm_tldr_en": "Focuses on detecting cross-layer misalignment in LLM agent skills, relevant to agent reliability but not RL methods.",
+      "llm_tldr_cn": "针对大语言模型智能体技能中描述与行为不一致的交叉层不对齐问题，提出渐进式加载感知层次对比学习（PL-HCL）框架，通过建模技能的层次结构并学习跨层一致性来检测不对齐。实验表明该方法能有效识别不对齐技能，提升智能体的可靠性和安全性。",
+      "llm_tldr": "针对大语言模型智能体技能中描述与行为不一致的交叉层不对齐问题，提出渐进式加载感知层次对比学习（PL-HCL）框架，通过建模技能的层次结构并学习跨层一致性来检测不对齐。实验表明该方法能有效识别不对齐技能，提升智能体的可靠性和安全性。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.10559v1",
+      "source": "arxiv",
+      "title": "Large language model agents accelerate inverse design of metal-organic frameworks for gas separation",
+      "abstract": "Metal-organic frameworks (MOFs) offer a highly modular platform for adsorptive gas separation, yet their vast reticular design space makes inverse design difficult under simultaneous constraints of chemical validity, separation performance, and structural diversity. Here, we present LEMO Agent, a large-language-model agent framework for closed-loop inverse design of gas-separation MOFs in MOFid space. LEMO Agent couples language-based candidate generation with MOFid standardization, explicit validity checking, Transformer-based property prediction, structured design memory, and multi-island exploration. Through iterative generate--validate--evaluate--remember cycles, the agent uses feedback from both successful and failed candidates to guide chemically constrained search across linker, metal, and topology choices. We evaluate LEMO Agent on CH$_4$/N$_2$ and CO$_2$/N$_2$ separation tasks. Compared with representative generative, optimization, and agentic baselines, LEMO Agent enriches high-performing candidates, improves predicted separation performance, and maintains broad chemical and topological diversity. Selected candidates are further reconstructed, evaluated by GCMC simulations, and passed through an experimental down-selection workflow based on chemical feasibility and ligand purchasability, leading to initial wet-lab synthesis and SEM characterization. These results demonstrate that large language model agents can serve as interpretable and scalable design engines for accelerating MOF discovery beyond conventional fixed-library screening.",
+      "authors": [
+        "Zhaolin Hu",
+        "Hehe Fan",
+        "Wangyihan Guo",
+        "Meng Xu",
+        "Chenhao Rao",
+        "Qiwei Yang",
+        "Yi Yang"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-07-12T04:18:36+00:00",
+      "link": "https://arxiv.org/pdf/2607.10559v1",
+      "tags": [
+        "keyword:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "LLM agent for task automation in material inverse design",
+      "llm_evidence_cn": "大语言模型智能体用于材料逆设计任务自动化",
+      "llm_evidence": "大语言模型智能体用于材料逆设计任务自动化",
+      "canonical_evidence": "大语言模型智能体用于材料逆设计任务自动化",
+      "llm_tldr_en": "LEMO Agent uses LLM-based agents for closed-loop inverse design of MOFs, automating generation, validation, and exploration.",
+      "llm_tldr_cn": "金属有机框架（MOF）的逆设计面临化学有效性和性能约束的挑战。本文提出LEMO Agent，一种大语言模型智能体框架，通过语言生成候选、验证有效性、预测性能并记忆设计，实现闭环逆设计。迭代循环利用成功与失败反馈，加速气体分离MOF的发现。",
+      "llm_tldr": "金属有机框架（MOF）的逆设计面临化学有效性和性能约束的挑战。本文提出LEMO Agent，一种大语言模型智能体框架，通过语言生成候选、验证有效性、预测性能并记忆设计，实现闭环逆设计。迭代循环利用成功与失败反馈，加速气体分离MOF的发现。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2607.10601v1",
+      "source": "arxiv",
+      "title": "Agentic-DPO: From Imitation to Agentic Policy Optimization on Expert Trajectories",
+      "abstract": "Large Language Model (LLM) agents are commonly trained from expert trajectories using supervised fine-tuning (SFT), which treats multi-turn agent behavior as ordinary text imitation. This recipe is simple and low-cost, but it only learns to imitate the sequence of expert actions, rather than training the agent to choose the right action against plausible mistakes at each state. Existing methods to mitigate this problem include preference learning or reinforcement learning, but they usually need high-cost environment rollouts and reward models. We propose Agentic-DPO, a lightweight offline agent policy optimization method that turns expert trajectories into state-conditioned preference supervision. At each expert action state, Agentic-DPO samples a one-step action from the current state, treats plausible wrong actions as negatives, and contrasts them with the expert action using a DPO-style preference objective. To avoid mixing both policy and schema in preference learning, we introduce Policy-Preserving Augmentation (PPA), which renders the same latent trajectory under multiple schemas while keeping the expert policy fixed. Agentic-DPO requires no online environment rollout, reward model, or full-trajectory student exploration. We conduct experiments across StableToolBench, tau-bench retail, and Mind2Web, where Agentic-DPO consistently improves agents at different model scales beyond imitation. In particular, it raises tau-bench accuracy from 21.7% (SFT) to 41.4% for a 9B model, matching online GRPO under the same backbone with only step-level rollouts and without environment interaction during gradient steps. The results suggest that expert trajectories can support low-cost agentic policy optimization when converted from demonstrations into state-level action preferences. Code for Agentic-DPO is released at https://github.com/Schuture/Agentic-DPO.",
+      "authors": [
+        "Yixiong Chen",
+        "Alan Yuille"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-07-12T06:38:55+00:00",
+      "link": "https://arxiv.org/pdf/2607.10601v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "offline policy optimization for LLM agents from expert trajectories",
+      "llm_evidence_cn": "基于专家轨迹的大语言模型智能体离线策略优化",
+      "llm_evidence": "基于专家轨迹的大语言模型智能体离线策略优化",
+      "canonical_evidence": "基于专家轨迹的大语言模型智能体离线策略优化",
+      "llm_tldr_en": "Agentic-DPO converts expert trajectories into state-conditioned preference data for offline LLM agent policy optimization without rollouts.",
+      "llm_tldr_cn": "大语言模型智能体通常用监督微调模仿专家轨迹，但无法学习在错误动作中做选择。本文提出Agentic-DPO，一种轻量级离线策略优化方法，将专家轨迹转化为状态条件偏好数据，无需环境交互或奖励模型。通过在专家动作点的偏好学习，使智能体学会区分正确与错误动作。",
+      "llm_tldr": "大语言模型智能体通常用监督微调模仿专家轨迹，但无法学习在错误动作中做选择。本文提出Agentic-DPO，一种轻量级离线策略优化方法，将专家轨迹转化为状态条件偏好数据，无需环境交互或奖励模型。通过在专家动作点的偏好学习，使智能体学会区分正确与错误动作。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2607.10891v1",
+      "source": "arxiv",
+      "title": "SETA: Scaling Environments for Terminal Agents",
+      "abstract": "Large language models (LLMs) are rapidly shifting toward agents that solve tasks through diverse interfaces, including web and graphical user interfaces (GUIs). Among these, the terminal command line provides a text-based, general-purpose interface, covering tasks from system operations to data science and machine learning. However, scaling terminal-agent training remains challenging, as it requires diverse and coherent task instructions, executable environments, and reliable verification, while lacking naturally grounded supervision data. In this work, we propose SETA, a scalable framework for generating verifiable terminal environments for reinforcement learning (RL). The framework consists of two pipelines sharing a unified verification mechanism: SETA-Synth converts diverse sources into standardized RL environments, and SETA-Evol further expands from existing environments with adaptive control of difficulty and diversity. Together, we construct and release SETA-Env, the largest open-source verifiable terminal RL dataset to date, containing over 4,500 environments. We evaluate our dataset by training Qwen3-8B with GRPO on SETA-Env, achieving 12% pass rate on Terminal-Bench 2.0, the best reported result for an RL-trained model at the 8B scale. We further observe gains on DeepSeek-V4-Flash under the same terminal agent harness, with pass@1 on Terminal-Bench 2.0 improving from 40% to 43% and pass@5 improving from 54% to 58%. These results demonstrate that SETA- Env provides high-quality training environments for terminal agents and serves as a valuable resource for advancing research on terminal-based agent learning.",
+      "authors": [
+        "Qijia Shen",
+        "Zhiqi Huang",
+        "Vamsidhar Kamanuru",
+        "Aznaur Aliev",
+        "Jay Rainton",
+        "Ahmed Awelkair",
+        "Zhichen Zeng",
+        "Jiajun Li",
+        "Shi Dong",
+        "Yueming Yuan",
+        "Boyuan Ma",
+        "Qizheng Zhang",
+        "Jiwei Fu",
+        "Yuzhen Mao",
+        "Wendong Fan",
+        "Ping Nie",
+        "Philip Torr",
+        "Bernard Ghanem",
+        "Changran Hu",
+        "Jonathan Lingjie Li",
+        "Urmish Thakker",
+        "Guohao Li"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-07-12T19:40:27+00:00",
+      "link": "https://arxiv.org/pdf/2607.10891v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "scalable framework for generating terminal environments for RL training of LLM agents",
+      "llm_evidence_cn": "为LLM智能体生成终端环境的可扩展框架",
+      "llm_evidence": "为LLM智能体生成终端环境的可扩展框架",
+      "canonical_evidence": "为LLM智能体生成终端环境的可扩展框架",
+      "llm_tldr_en": "SETA proposes a scalable framework to generate verifiable terminal environments for RL training of LLM agents, addressing environment diversity and verification challenges.",
+      "llm_tldr_cn": "该论文提出SETA框架，用于为终端智能体生成可验证的强化学习环境。通过两个流水线（SETA-Synth和SETA-Prompt）生成多样化的任务指令、可执行环境及验证器。该框架解决了终端智能体训练中缺乏自然监督数据的问题，为RL-based终端智能体训练提供了基础设施。",
+      "llm_tldr": "该论文提出SETA框架，用于为终端智能体生成可验证的强化学习环境。通过两个流水线（SETA-Synth和SETA-Prompt）生成多样化的任务指令、可执行环境及验证器。该框架解决了终端智能体训练中缺乏自然监督数据的问题，为RL-based终端智能体训练提供了基础设施。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2607.10966v1",
+      "source": "arxiv",
+      "title": "SVR-R1: Bootstrapping Multi-modal Reasoning with Self-verification in Reinforcement Learning",
+      "abstract": "We introduce Self-Verified Reasoner (SVR-R1), a multi-turn RL framework that turns a model's own verification into a learning signal for multimodal reasoning. For each query, the model proposes an answer using the same weights, and issues a binary self-verdict (Yes/No). A 'No' triggers a second-chance rethink; a 'Yes,' or a turn cap, finalizes the output for computing the outcome-based reward. SVR-R1 is implemented with GRPO and an asynchronous multi-turn rollout framework and needs no external supervision or auxiliary critics. We evaluate SVR-R1 on vision-language reasoning benchmarks and show that it improves accuracy by a large margin over strong standard GRPO baselines. Training dynamics show decreasing reliance on verification-fewer verification turns, yet higher test accuracy-indicating that the gap between verification and generation narrows as the policy internalizes self-correction and chooses the most confident answer via our framework. SVR-R1 bridges the less explored intersection of inference-time self-refinement and RL training for VLMs, offering a simple yet effective recipe for bootstrapping multimodal reasoning. We will open-source \\textbf{SVR-R1} to facilitate future research in VLMs.",
+      "authors": [
+        "Mingyuan Wu",
+        "Jingcheng Yang",
+        "Shengyi Qian",
+        "Xudong Wang",
+        "Jize Jiang",
+        "Qifan Wang",
+        "Aashu Singh",
+        "Khoi Pham",
+        "Fei Liu",
+        "Zhaolun Su",
+        "Zhuokai Zhao",
+        "Klara Nahrstedt",
+        "Jianyu Wang",
+        "Hanchao Yu"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-07-13T00:21:30+00:00",
+      "link": "https://arxiv.org/pdf/2607.10966v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Multi-turn RL framework for multimodal reasoning with self-verification",
+      "llm_evidence_cn": "结合自验证的多轮强化学习框架用于多模态推理",
+      "llm_evidence": "结合自验证的多轮强化学习框架用于多模态推理",
+      "canonical_evidence": "结合自验证的多轮强化学习框架用于多模态推理",
+      "llm_tldr_en": "SVR-R1 introduces a multi-turn RL framework that uses self-verification to improve multimodal reasoning, achieving large accuracy gains over GRPO baselines without external supervision.",
+      "llm_tldr_cn": "针对多模态推理中缺乏有效学习信号的问题，提出SVR-R1框架，通过自验证机制将模型自身判断转化为强化学习信号。模型在每次推理中产生答案并自我判断，若判断为否则触发重新思考，并基于最终结果计算奖励。在视觉语言推理基准上，该方法大幅超越标准GRPO基线，且无需外部监督。该工作展示了自我验证在强化学习推理中的潜力。",
+      "llm_tldr": "针对多模态推理中缺乏有效学习信号的问题，提出SVR-R1框架，通过自验证机制将模型自身判断转化为强化学习信号。模型在每次推理中产生答案并自我判断，若判断为否则触发重新思考，并基于最终结果计算奖励。在视觉语言推理基准上，该方法大幅超越标准GRPO基线，且无需外部监督。该工作展示了自我验证在强化学习推理中的潜力。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "application of reinforcement learning in large language model reasoning",
+      "matched_requirement_id": "req-7",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    }
+  ]
+}
