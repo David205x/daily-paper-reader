@@ -1,0 +1,229 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-15T21:14:18.398030+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 2,
+    "deep_cap": 6,
+    "deep_selected": 2,
+    "quick_candidates": 3,
+    "quick_skim_target": 11,
+    "quick_selected": 3
+  },
+  "deep_dive": [
+    {
+      "id": "2607.12931v1",
+      "source": "arxiv",
+      "title": "ExToken: Structured Exploration for Efficient Vision-Language-Action Reinforcement Fine-tuning",
+      "abstract": "Reinforcement Learning (RL) has demonstrated significant potential for improving Vision-Language-Action (VLA) models on complex manipulation tasks. However, its practical scalability remains severely limited by the substantial cost of environmental interactions. In this work, we first investigate the exploration stagnation bottleneck in current VLA-RL frameworks and reveal that trajectory diversity is fundamentally more important to sample efficiency than the sheer quantity of collected rollouts. Motivated by these insights, we introduce RL Exploration Token (ExToken), a simple yet general framework that condition VLA policies on discrete behavioral priors derived from offline demonstrations for structured exploration. By conditioning the policy on different tokens during rollout collection, ExToken encourages the agent to explore diverse behavioral modes, substantially improving state-action coverage and exploration efficiency. To bridge exploration during training with deterministic inference at deployment, ExToken further incorporates a state-conditioned token selector that adaptively predicts effective behavioral modes for unseen scenarios. Extensive experiments across simulated and real-world robotic manipulation tasks demonstrate that ExToken consistently accelerates convergence, improves task performance, and exhibits strong robustness under highly constrained interaction budgets.",
+      "authors": [
+        "Yilun Kong",
+        "Yunpeng Qing",
+        "Guozheng Ma",
+        "Haoyu Wang",
+        "Li Shen",
+        "Zhi Hou",
+        "Dacheng Tao"
+      ],
+      "primary_category": "cs.RO",
+      "categories": [
+        "cs.RO"
+      ],
+      "published": "2026-07-14T16:04:41+00:00",
+      "link": "https://arxiv.org/pdf/2607.12931v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Reinforcement learning fine-tuning for VLA models",
+      "llm_evidence_cn": "针对视觉-语言-动作模型的强化学习微调",
+      "llm_evidence": "针对视觉-语言-动作模型的强化学习微调",
+      "canonical_evidence": "针对视觉-语言-动作模型的强化学习微调",
+      "llm_tldr_en": "Proposes ExToken, a structured exploration framework via discrete behavioral priors to improve sample efficiency in VLA reinforcement fine-tuning.",
+      "llm_tldr_cn": "针对VLA模型强化微调中探索停滞和样本效率低下问题，提出ExToken框架，通过解耦离线演示中的离散行为先验来条件化策略，实现结构化探索，在多个复杂操作任务上以更少的交互达到更高性能。",
+      "llm_tldr": "针对VLA模型强化微调中探索停滞和样本效率低下问题，提出ExToken框架，通过解耦离线演示中的离散行为先验来条件化策略，实现结构化探索，在多个复杂操作任务上以更少的交互达到更高性能。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "reinforcement learning for large language model",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.09796v1",
+      "source": "arxiv",
+      "title": "Metadata-Free Meta-Reweighted Direct Preference Optimization under Noisy Preference Labels",
+      "abstract": "Direct Preference Optimization (DPO) has become an important method for aligning large language models (LLMs) with human preferences because it removes the need for explicit reward modeling and reinforcement learning optimization. However, its performance depends heavily on the quality of preference data, and noisy preference data in real-world settings can weaken alignment performance. To address this issue, we propose a bilevel optimization framework and prove, under certain assumptions, that this framework can recover the DPO optimum under clean data. We further derive a prior form for the learnable weighting function under asymmetric label-flipping noise. Considering that high-quality metadata may be difficult to obtain, we propose a task-agnostic meta-knowledge-driven method that enables meta-learning even when metadata is completely unavailable. To reduce the high cost of higher-order gradients in LLM meta-learning, we combine central-difference approximation with LoRA fine-tuning and develop a scalable training scheme. Experiments on TL;DR summarization and Anthropic HH single-turn dialogue show that the proposed method improves training performance over multiple DPO baselines under different noise rates.",
+      "authors": [
+        "Hua Qu",
+        "Yifan Li",
+        "Xiaodong Yuan"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-07-09T09:20:25+00:00",
+      "link": "https://arxiv.org/pdf/2607.09796v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "meta-reweighted DPO for LLM alignment under noisy labels",
+      "llm_evidence_cn": "元加权DPO方法用于噪声标签下的大模型对齐",
+      "llm_evidence": "元加权DPO方法用于噪声标签下的大模型对齐",
+      "canonical_evidence": "元加权DPO方法用于噪声标签下的大模型对齐",
+      "llm_tldr_en": "Metadata-Free Meta-Reweighted DPO proposes a bilevel optimization to handle noisy preference labels for LLM alignment without requiring metadata.",
+      "llm_tldr_cn": "该论文针对偏好数据噪声导致DPO对齐性能下降的问题，提出元加权DPO框架。通过双层优化证明在假设下可恢复无噪声DPO最优解，并推导非对称翻转噪声下的可学习加权函数形式。该方法无需高质量元数据，仅依赖噪声偏好标签自身进行重加权，实验表明在多种噪声水平下显著提升对齐性能，为RLHF的替代方案提供了鲁棒改进。",
+      "llm_tldr": "该论文针对偏好数据噪声导致DPO对齐性能下降的问题，提出元加权DPO框架。通过双层优化证明在假设下可恢复无噪声DPO最优解，并推导非对称翻转噪声下的可学习加权函数形式。该方法无需高质量元数据，仅依赖噪声偏好标签自身进行重加权，实验表明在多种噪声水平下显著提升对齐性能，为RLHF的替代方案提供了鲁棒改进。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "reinforcement learning from human feedback for llm alignment",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2607.08448v2",
+      "source": "arxiv",
+      "title": "Harness VLA: Steering Frozen VLAs into Reliable Manipulation Primitives via Memory-Guided Agents",
+      "abstract": "Language-conditioned manipulation requires both precise contact-rich control and robust reasoning over language, scenes, and long horizons. End-to-end Vision-Language-Action (VLA) models provide strong local visuomotor skills, but they are trained on in-distribution task trajectories and often fail under deployment perturbations such as semantic retargeting, goal re-binding, spatial-layout shifts, and unstable local contacts. LLM coding agents provide complementary semantic and compositional reasoning, but purely analytic primitives struggle with irregular grasping, constrained placement, and articulated-object interaction. We present Harness VLA, a memory-augmented agentic framework that exposes a frozen VLA as a retryable contact-rich primitive and composes it with a small fixed library of analytic primitives for grounding, staging, transport, navigation, and release. Rather than expanding the skill library, the harness learns the operating range of these fixed primitives from task-specific execution traces, global success rules, and failure models. By lifting semantic re-grounding, non-contact execution, and VLA re-staging to the planner while reserving the frozen VLA for local contact-rich phases, Harness VLA extends pretrained VLAs beyond their original trajectory distribution without finetuning. Across perturbed tabletop, household kitchen, and clean-to-randomized bimanual manipulation, Harness VLA improves over the strongest relevant baselines by 38.6 and 25.4 percentage points on LIBERO-Pro and RoboCasa365, respectively, and reaches 58.4% on RoboTwin C2R.",
+      "authors": [
+        "Yixian Zhang",
+        "Huanming Zhang",
+        "Feng Gao",
+        "Xiao Li",
+        "Zhihao Liu",
+        "Chunyang Zhu",
+        "Jiaxing Qiu",
+        "Yuchen Yan",
+        "Jiyuan Liu",
+        "Wenhao Tang",
+        "Zhengru Fang",
+        "Yi Nie",
+        "Changxu Wei",
+        "Yu Wang",
+        "Wenbo Ding",
+        "Chao Yu"
+      ],
+      "primary_category": "cs.RO",
+      "categories": [
+        "cs.RO"
+      ],
+      "published": "2026-07-09T13:08:54+00:00",
+      "link": "https://arxiv.org/pdf/2607.08448v2",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "LLM agents for task automation in manipulation",
+      "llm_evidence_cn": "大语言模型智能体用于操作任务自动化",
+      "llm_evidence": "大语言模型智能体用于操作任务自动化",
+      "canonical_evidence": "大语言模型智能体用于操作任务自动化",
+      "llm_tldr_en": "Harness VLA uses memory-guided agents to steer frozen Vision-Language-Action models into reliable manipulation primitives, enabling robust task automation under perturbations.",
+      "llm_tldr_cn": "该论文提出Harness VLA框架，通过记忆增强的智能体引导冻结的视觉-语言-动作模型执行可靠的操作原语。针对部署中的语义重定向、空间偏移等扰动，该框架利用LLM编码智能体的组合推理能力，将VLA模型暴露为可重试的原子技能，从而提升任务自动化中的鲁棒性和泛化性。实验表明该方法在多种操作场景下显著优于基线。",
+      "llm_tldr": "该论文提出Harness VLA框架，通过记忆增强的智能体引导冻结的视觉-语言-动作模型执行可靠的操作原语。针对部署中的语义重定向、空间偏移等扰动，该框架利用LLM编码智能体的组合推理能力，将VLA模型暴露为可重试的原子技能，从而提升任务自动化中的鲁棒性和泛化性。实验表明该方法在多种操作场景下显著优于基线。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.09866v1",
+      "source": "arxiv",
+      "title": "Robo-ValueRL: Reliable Value Estimation for Offline-to-Online Reinforcement Learning",
+      "abstract": "Offline-to-online reinforcement learning is promising for generalizable robotic manipulation, yet its full-stack complexity obscures reproduction and diagnosis. Within such systems, value estimation plays a central role in prioritizing heterogeneous data for policy improvement. Despite its importance, the central question remains underexplored: how value-function reliability shapes policy optimization in offline-to-online reinforcement learning. To answer this question, we propose Robo-ValueRL, a unified framework that enables reliable value estimation and systematically traces its downstream effects on policy pretraining and online improvement. Concretely, Robo-ValueRL learns a history-conditioned value estimator and evaluates its reliability through global-progress and local-preference metrics. These resulting value estimates are propagated into quality-conditioned consistency-policy pretraining and a residual adaptation module on online rollouts, providing a unified testbed for analyzing how value reliability shapes downstream policy performance. Across 240 hours of offline demonstrations and over 3,000 online rollout trajectories, our extensive experiments show that downstream performance is strongly associated with value reliability. Reliable value functions provide better action-quality estimates, allowing value-guided offline RL to scale more effectively than quality-agnostic behavior cloning, and stabilize online improvement by prioritizing high-quality rollout data. Integrating reliable value guidance through offline pretraining with online improvement, our system achieves 86% success on millimeter-level precise chip insertion and 84% on generalizable block disassembly. We hope these findings highlight the importance of value-guided data utilization for effective policy improvement from heterogeneous robotic experience.",
+      "authors": [
+        "Wenke Xia",
+        "Pei Ren",
+        "Wenbo Yu",
+        "Yizhuo Zhang",
+        "Jifan Li",
+        "Yixue Zhang",
+        "Yinuo Zhao",
+        "Qingyang Gao",
+        "Jianlong Fu",
+        "Jian Tang",
+        "Ji-Rong Wen",
+        "Zhengping Che",
+        "Di Hu"
+      ],
+      "primary_category": "cs.RO",
+      "categories": [
+        "cs.RO",
+        "cs.AI"
+      ],
+      "published": "2026-07-10T18:01:05+00:00",
+      "link": "https://arxiv.org/pdf/2607.09866v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "value estimation for offline-to-online RL",
+      "llm_evidence_cn": "离线到在线强化学习的价值估计",
+      "llm_evidence": "离线到在线强化学习的价值估计",
+      "canonical_evidence": "离线到在线强化学习的价值估计",
+      "llm_tldr_en": "Proposes Robo-ValueRL, a framework for reliable value estimation in offline-to-online RL, enabling systematic tracking of value function reliability effects on policy optimization.",
+      "llm_tldr_cn": "该论文针对离线到在线强化学习中价值估计可靠性问题，提出了Robo-ValueRL框架。核心创新是学习历史条件价值估计器，系统追踪价值函数可靠性对策略预训练和在线改进的影响。实验表明该框架能有效提升策略优化效果，为离线到在线RL中的奖励设计提供了新思路。",
+      "llm_tldr": "该论文针对离线到在线强化学习中价值估计可靠性问题，提出了Robo-ValueRL框架。核心创新是学习历史条件价值估计器，系统追踪价值函数可靠性对策略预训练和在线改进的影响。实验表明该框架能有效提升策略优化效果，为离线到在线RL中的奖励设计提供了新思路。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "design of reward functions in RL",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.10582v1",
+      "source": "arxiv",
+      "title": "MemDecay: Region-Aware KV Cache Eviction for Efficient LLM Agent Inference",
+      "abstract": "Large language model (LLM) agents accumulate heterogeneous context, including system instructions, plans, user turns, retrieved documents, tool outputs, and intermediate reasoning, whose key-value (KV) cache can become a major memory bottleneck. Existing eviction policies generally apply the same attention- or recency-based rule to every token, ignoring semantic structure already available to the agent orchestrator.   We introduce MemDecay, a training-free, region-aware KV-cache eviction policy. MemDecay assigns tokens region-specific base priorities and decay rates, refreshes retention scores when tokens receive attention, and evicts the lowest-scoring pages under a fixed cache budget while allowing critical regions to be pinned. We also provide a procedure for calibrating decay rates from measured attention lifetimes.   We evaluate MemDecay at approximately 450 and 1,700 token contexts using Qwen2.5-1.5B and 3B. Across all settings, attention lifetimes differ by an order of magnitude across regions: system-token half-lives range from 148 to 189 decoding steps, compared with 14 to 16 for scratchpad tokens. Pinning preserves system-region facts at full-cache accuracy in every setting, while no baseline preserves more than 13 of 24. Region-aware retention remains effective as context grows, whereas recency-based retention collapses. Accumulated-attention retention performs better on unpinned content, however, and ablations identify attention-score normalization as the main limitation of the current formulation. These results establish semantic prompt structure as a robust signal for KV-cache management while clarifying how it should be combined with attention-based importance.",
+      "authors": [
+        "Venkatesha Matam",
+        "Keon Kim"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-07-12T05:35:26+00:00",
+      "link": "https://arxiv.org/pdf/2607.10582v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Region-aware KV cache eviction for efficient LLM agent inference",
+      "llm_evidence_cn": "区域感知KV缓存驱逐策略提高LLM智能体推理效率",
+      "llm_evidence": "区域感知KV缓存驱逐策略提高LLM智能体推理效率",
+      "canonical_evidence": "区域感知KV缓存驱逐策略提高LLM智能体推理效率",
+      "llm_tldr_en": "Proposes MemDecay, a training-free region-aware KV-cache eviction policy that assigns region-specific priorities and decay rates to improve LLM agent inference efficiency.",
+      "llm_tldr_cn": "针对LLM智能体推理中KV缓存占用过大的问题，提出MemDecay策略，根据语义区域分配不同基优先级和衰减率，在固定缓存预算下优先保留关键区域，实验表明该方法在保持性能的同时显著降低内存占用。",
+      "llm_tldr": "针对LLM智能体推理中KV缓存占用过大的问题，提出MemDecay策略，根据语义区域分配不同基优先级和衰减率，在固定缓存预算下优先保留关键区域，实验表明该方法在保持性能的同时显著降低内存占用。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    }
+  ]
+}
