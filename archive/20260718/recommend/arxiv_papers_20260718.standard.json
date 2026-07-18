@@ -1,0 +1,135 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-18T21:10:49.688702+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 2,
+    "deep_cap": 6,
+    "deep_selected": 2,
+    "quick_candidates": 1,
+    "quick_skim_target": 11,
+    "quick_selected": 1
+  },
+  "deep_dive": [
+    {
+      "id": "2607.11506v2",
+      "source": "arxiv",
+      "title": "SCOPE-RL: Optimizing Reasoning Paths Before and After Success",
+      "abstract": "Reinforcement learning with verifiable rewards (RLVR) optimizes LLMs using sparse verifiable final-answer rewards. This sparse anchor reliably verifies whether a trajectory succeeds but provides no direct feedback on the reasoning path that produced it. Before success, prerequisite progress on hard problems receives no reward signal; after success, outcome rewards cannot distinguish well-organized correct trajectories from redundant or locally flawed ones. We introduce SCOPE-RL (Scaffolded Chain Optimization with Process Efficiency), a two-stage framework that densifies this anchor while retaining the GRPO update: Adaptive Scaffolded RL adds prefix-decomposed verifiable rewards on answer-hidden sub-question chains before success, and Quality-Aware Process RL applies correctness-gated process-shape rewards to refine correct trajectories after success. An expert-validated Step-Quality Evaluation Protocol evaluates useful-step density, error localization, and token efficiency beyond final-answer accuracy. On Qwen3-8B-Instruct trained on DAPO-Math and Big-Math, SCOPE-RL improves average accuracy by up to 11.2 pp and reduces reasoning tokens by up to 27.1% over outcome-only GRPO; the gains hold under GSPO and on Qwen3-0.6B-Instruct, indicating that reward-signal densification is complementary to policy-update-level RLVR advances. Code and data are available at https://github.com/tokencraft-lab/SCOPE-RL.",
+      "authors": [
+        "Xiaojian Liu",
+        "Han Xu",
+        "Jianqiang Xia",
+        "Zhixuan Li",
+        "Ke Xu",
+        "Yiwei Dai",
+        "Xinran Chen",
+        "Changwo Wu",
+        "Yuchen Li"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.CL"
+      ],
+      "published": "2026-07-13T12:56:28+00:00",
+      "link": "https://arxiv.org/pdf/2607.11506v2",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "reinforcement learning for optimizing reasoning paths in LLMs",
+      "llm_evidence_cn": "强化学习优化大语言模型推理路径",
+      "llm_evidence": "强化学习优化大语言模型推理路径",
+      "canonical_evidence": "强化学习优化大语言模型推理路径",
+      "llm_tldr_en": "SCOPE-RL densifies sparse verifiable rewards by adding prefix-decomposed rewards before success and quality-aware process rewards after success for LLM reasoning.",
+      "llm_tldr_cn": "可验证奖励强化学习在LLM推理中仅提供最终答案信号，无法指导推理过程。本文提出SCOPE-RL两阶段框架：成功前通过前缀分解添加可验证子问题奖励，成功后应用质量感知过程奖励区分不同质量的正确轨迹。在数学推理任务上，该方法显著提升样本效率和最终性能，为推理过程优化提供了新方案。",
+      "llm_tldr": "可验证奖励强化学习在LLM推理中仅提供最终答案信号，无法指导推理过程。本文提出SCOPE-RL两阶段框架：成功前通过前缀分解添加可验证子问题奖励，成功后应用质量感知过程奖励区分不同质量的正确轨迹。在数学推理任务上，该方法显著提升样本效率和最终性能，为推理过程优化提供了新方案。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "application of reinforcement learning in large language model reasoning",
+      "matched_requirement_id": "req-7",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.13501v2",
+      "source": "arxiv",
+      "title": "LOTAPO: Leave-One-Turn Attribution for Self-Generated Process Rewards in Multi-Turn Search Reasoning",
+      "abstract": "Reinforcement learning for multi-turn search reasoning typically relies on terminal outcome rewards, which cannot distinguish useful, redundant, and harmful intermediate interactions. We propose LOTAPO , a self-generated process-supervision method based on backward leave-one-turn attribution. For each search turn, LOTAPO replaces the turn and its retrieval observation with a fixed [DELETE] placeholder and measures the resulting change in the current policy's mean log-likelihood of the gold answer. This Answer-Likelihood Gain estimates the turn's contribution while preserving all downstream interactions, allowing early evidence to be evaluated in the complete reasoning context. LOTAPO further applies sign-consistency gating, retaining only normalized process advantages whose directions agree with their raw attribution scores. The method requires no additional reward model, teacher, verifier, or LLM-as-a-Judge. Across seven knowledge-intensive question-answering datasets with local retrieval, LOTAPO achieves an average exact-match score of 0.326, outperforming the strongest step-reward baseline, IGPO, by 0.053. Ablations show complementary benefits from backward attribution and sign-consistency gating, demonstrating that policy-derived retrospective attribution can provide effective process supervision for multi-turn search agents.",
+      "authors": [
+        "Qiang Zhu",
+        "Jiajun Wu",
+        "Longyi Wang"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-07-15T06:55:28+00:00",
+      "link": "https://arxiv.org/pdf/2607.13501v2",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "self-generated process rewards for multi-turn search reasoning",
+      "llm_evidence_cn": "面向多轮搜索推理的自生成过程奖励",
+      "llm_evidence": "面向多轮搜索推理的自生成过程奖励",
+      "canonical_evidence": "面向多轮搜索推理的自生成过程奖励",
+      "llm_tldr_en": "LOTAPO provides self-supervised process rewards for multi-turn search reasoning via leave-one-turn attribution and answer-likelihood gain.",
+      "llm_tldr_cn": "针对多轮搜索推理中终端奖励无法区分中间交互贡献的问题，提出LOTAPO方法，通过留一出属性计算每轮替换为占位符后对答案似然的变化，作为自生成过程奖励，并采用符号一致性门控确保可靠性，有效提升多轮搜索推理性能。",
+      "llm_tldr": "针对多轮搜索推理中终端奖励无法区分中间交互贡献的问题，提出LOTAPO方法，通过留一出属性计算每轮替换为占位符后对答案似然的变化，作为自生成过程奖励，并采用符号一致性门控确保可靠性，有效提升多轮搜索推理性能。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "reinforcement learning for multi turn dialogue systems",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2607.14180v1",
+      "source": "arxiv",
+      "title": "RENEW: Towards Learning World Models and Repairing Model Exploitation from Preferences",
+      "abstract": "World models are widely used in offline reinforcement learning (RL) to improve sample efficiency and generate experience beyond a fixed dataset. However, they are vulnerable to model exploitation where data coverage is thin. Prior work addresses this either by collecting more expert demonstrations, which is often expensive, unsafe, or unavailable, or by conservative algorithms that avoid uncertain regions, which limits generalization. We propose instead to repair exploitation directly using human preferences over imagined rollouts, leveraging the strong intuitive physics that allows humans to easily spot egregious dynamics hallucinations. We formalize this as Dynamics Learning from Human Feedback (DLHF), a Bradley-Terry preference loss over trajectory log-likelihoods under a learned dynamics model. Unfortunately, naive DLHF is sample inefficient, so we introduce RENEW, which uses epistemic uncertainty to focus finetuning where the model is most exploitable. We evaluate on several Jumanji and classic control environments and find that while naive DLHF requires an outsize preference budget, RENEW makes the framework practical by improving sample efficiency, limiting catastrophic forgetting, and reducing exploitation in pretrained world models. Taken together, our results provide initial evidence that preferences can supervise world model dynamics directly, offering a new approach to addressing exploitation in offline model-based RL.",
+      "authors": [
+        "Logan Mondal Bhamidipaty",
+        "Mykel Kochenderfer",
+        "Subramanian Ramamoorthy"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-07-15T14:03:45+00:00",
+      "link": "https://arxiv.org/pdf/2607.14180v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "human preference feedback for world model repair in offline RL",
+      "llm_evidence_cn": "利用人类偏好修复离线强化学习世界模型",
+      "llm_evidence": "利用人类偏好修复离线强化学习世界模型",
+      "canonical_evidence": "利用人类偏好修复离线强化学习世界模型",
+      "llm_tldr_en": "RENEW uses human preferences over imagined rollouts to repair world model exploitation in offline RL, outperforming conservative and demonstration-based methods.",
+      "llm_tldr_cn": "该论文解决了离线强化学习中世界模型的利用问题，提出动态学习从人类反馈（DLHF）方法.DLHF不依赖昂贵的专家演示，而是通过人类对模型想象轨迹的偏好进行偏好学习，直接纠正动力学幻觉.实验证明该方法相比保守算法和演示收集方法更有效地减少了模型错误，提高了泛化性能，为人类反馈在模型学习中的应用提供了新视角.",
+      "llm_tldr": "该论文解决了离线强化学习中世界模型的利用问题，提出动态学习从人类反馈（DLHF）方法.DLHF不依赖昂贵的专家演示，而是通过人类对模型想象轨迹的偏好进行偏好学习，直接纠正动力学幻觉.实验证明该方法相比保守算法和演示收集方法更有效地减少了模型错误，提高了泛化性能，为人类反馈在模型学习中的应用提供了新视角.",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "reinforcement learning from human feedback for llm alignment",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    }
+  ]
+}

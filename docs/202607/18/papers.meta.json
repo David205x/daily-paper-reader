@@ -1,0 +1,54 @@
+{
+  "label": "2026-07-18",
+  "date": "2026-07-18",
+  "generated_at": "2026-07-18T21:13:48",
+  "count": 3,
+  "papers": [
+    {
+      "paper_id": "202607/18/2607.11506v2-scope-rl-optimizing-reasoning-paths-before-and-after-success",
+      "section": "deep",
+      "title_en": "SCOPE-RL: Optimizing Reasoning Paths Before and After Success",
+      "authors": "Xiaojian Liu, Han Xu, Jianqiang Xia, Zhixuan Li, Ke Xu, Yiwei Dai, Xinran Chen, Changwo Wu, Yuchen Li",
+      "date": "2026-07-13",
+      "pdf": "https://arxiv.org/pdf/2607.11506v2",
+      "score": "9.0",
+      "evidence": "强化学习优化大语言模型推理路径",
+      "tldr": "强化学习与可验证奖励（RLVR）使用稀疏的最终答案奖励，无法对推理过程提供反馈。为此提出SCOPE-RL两阶段框架：成功前通过前缀分解的可验证奖励稠密化信号，成功后应用正确性门控过程形状奖励优化轨迹。在Qwen3-8B上训练后，相比纯结果GRPO，准确率提升11.2个百分点，推理token减少27.1%。该框架表明奖励信号稠密化与策略更新级RLVR进展互补。",
+      "tags": "query:rl",
+      "abstract_en": "Reinforcement learning with verifiable rewards (RLVR) optimizes LLMs using sparse verifiable final-answer rewards. This sparse anchor reliably verifies whether a trajectory succeeds but provides no direct feedback on the reasoning path that produced it. Before success, prerequisite progress on hard problems receives no reward signal; after success, outcome rewards cannot distinguish well-organized correct trajectories from redundant or locally flawed ones. We introduce SCOPE-RL (Scaffolded Chain Optimization with Process Efficiency), a two-stage framework that densifies this anchor while retaining the GRPO update: Adaptive Scaffolded RL adds prefix-decomposed verifiable rewards on answer-hidden sub-question chains before success, and Quality-Aware Process RL applies correctness-gated process-shape rewards to refine correct trajectories after success. An expert-validated Step-Quality Evaluation Protocol evaluates useful-step density, error localization, and token efficiency beyond final-answer accuracy. On Qwen3-8B-Instruct trained on DAPO-Math and Big-Math, SCOPE-RL improves average accuracy by up to 11.2 pp and reduces reasoning tokens by up to 27.1% over outcome-only GRPO; the gains hold under GSPO and on Qwen3-0.6B-Instruct, indicating that reward-signal densification is complementary to policy-update-level RLVR advances. Code and data are available at https://github.com/tokencraft-lab/SCOPE-RL.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202607/18/2607.13501v2-lotapo-leave-one-turn-attribution-for-self-generated-process-rewards-in-multi-turn-search-reasoning",
+      "section": "deep",
+      "title_en": "LOTAPO: Leave-One-Turn Attribution for Self-Generated Process Rewards in Multi-Turn Search Reasoning",
+      "authors": "Qiang Zhu, Jiajun Wu, Longyi Wang",
+      "date": "2026-07-15",
+      "pdf": "https://arxiv.org/pdf/2607.13501v2",
+      "score": "8.0",
+      "evidence": "面向多轮搜索推理的自生成过程奖励",
+      "tldr": "多轮搜索推理中，强化学习常因仅依赖最终结果奖励而难以区分各轮贡献。LOTAPO提出向后逐轮归因方法，用[DELETE]占位符替换某一轮并计算其对答案似然的变化量作为贡献，同时保留下游交互。在七个知识密集型问答数据集上，LOTAPO平均精确匹配达0.326，超越最强基线IGPO 0.053，证明策略自身回溯归因可提供有效过程监督。",
+      "tags": "query:rl",
+      "abstract_en": "Reinforcement learning for multi-turn search reasoning typically relies on terminal outcome rewards, which cannot distinguish useful, redundant, and harmful intermediate interactions. We propose LOTAPO , a self-generated process-supervision method based on backward leave-one-turn attribution. For each search turn, LOTAPO replaces the turn and its retrieval observation with a fixed [DELETE] placeholder and measures the resulting change in the current policy's mean log-likelihood of the gold answer. This Answer-Likelihood Gain estimates the turn's contribution while preserving all downstream interactions, allowing early evidence to be evaluated in the complete reasoning context. LOTAPO further applies sign-consistency gating, retaining only normalized process advantages whose directions agree with their raw attribution scores. The method requires no additional reward model, teacher, verifier, or LLM-as-a-Judge. Across seven knowledge-intensive question-answering datasets with local retrieval, LOTAPO achieves an average exact-match score of 0.326, outperforming the strongest step-reward baseline, IGPO, by 0.053. Ablations show complementary benefits from backward attribution and sign-consistency gating, demonstrating that policy-derived retrospective attribution can provide effective process supervision for multi-turn search agents.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202607/18/2607.14180v1-renew-towards-learning-world-models-and-repairing-model-exploitation-from-preferences",
+      "section": "quick",
+      "title_en": "RENEW: Towards Learning World Models and Repairing Model Exploitation from Preferences",
+      "authors": "Logan Mondal Bhamidipaty, Mykel Kochenderfer, Subramanian Ramamoorthy",
+      "date": "2026-07-15",
+      "pdf": "https://arxiv.org/pdf/2607.14180v1",
+      "score": "7.0",
+      "evidence": "利用人类偏好修复离线强化学习世界模型",
+      "tldr": "离线强化学习中世界模型在数据覆盖薄区域易产生动态幻觉，即模型利用问题。本文提出RENEW，通过人类偏好直接监督模型动态，使用Bradley-Terry偏好损失（DLHF）优化轨迹对数似然，并结合认知不确定性引导微调，聚焦最易被利用区域。在Jumanji和经典控制环境中，RENEW显著提升样本效率，减少灾难性遗忘和模型利用。该工作首次证明偏好可有效监督世界模型，为离线基于模型的RL提供新思路。",
+      "tags": "query:rl",
+      "abstract_en": "World models are widely used in offline reinforcement learning (RL) to improve sample efficiency and generate experience beyond a fixed dataset. However, they are vulnerable to model exploitation where data coverage is thin. Prior work addresses this either by collecting more expert demonstrations, which is often expensive, unsafe, or unavailable, or by conservative algorithms that avoid uncertain regions, which limits generalization. We propose instead to repair exploitation directly using human preferences over imagined rollouts, leveraging the strong intuitive physics that allows humans to easily spot egregious dynamics hallucinations. We formalize this as Dynamics Learning from Human Feedback (DLHF), a Bradley-Terry preference loss over trajectory log-likelihoods under a learned dynamics model. Unfortunately, naive DLHF is sample inefficient, so we introduce RENEW, which uses epistemic uncertainty to focus finetuning where the model is most exploitable. We evaluate on several Jumanji and classic control environments and find that while naive DLHF requires an outsize preference budget, RENEW makes the framework practical by improving sample efficiency, limiting catastrophic forgetting, and reducing exploitation in pretrained world models. Taken together, our results provide initial evidence that preferences can supervise world model dynamics directly, offering a new approach to addressing exploitation in offline model-based RL.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}
