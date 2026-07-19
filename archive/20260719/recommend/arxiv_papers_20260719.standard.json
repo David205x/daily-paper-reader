@@ -1,0 +1,180 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-19T21:15:24.436363+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 2,
+    "deep_cap": 6,
+    "deep_selected": 2,
+    "quick_candidates": 2,
+    "quick_skim_target": 11,
+    "quick_selected": 2
+  },
+  "deep_dive": [
+    {
+      "id": "2607.12764v1",
+      "source": "arxiv",
+      "title": "EvoGraph-R1: Self-Evolving Multimodal Knowledge Hypergraphs for Agentic Retrieval",
+      "abstract": "Retrieval-augmented generation (RAG) has emerged as a critical paradigm for grounding Multimodal Large Language Models (MLLMs) in external knowledge. Recent GraphRAG methods introduce structured entity-relation graphs to improve retrieval and reasoning. However, they remain limited by treating knowledge graphs as static data structures built offline and queried in a single pass. This static paradigm misaligns with the interactive, iterative nature of knowledge-intensive reasoning, creating three bottlenecks: (i) text-centric fragmentation that impedes cross-modal reasoning, (ii) frozen structures unable to incorporate new evidence or correct errors, and (iii) rigid single-pass retrieval without adaptive refinement. To overcome these limitations, we introduce EvoGraph-R1, a self-evolving GraphRAG framework that reconceptualizes knowledge graphs as dynamic environments shaped through agent interactions. We formulate retrieval as a Markov Decision Process (MDP) where the agent observes the graph state and executes actions to query (GraphRetrieve), expand (WebSearch), refine (GraphEdit), or terminate (Answer) the reasoning. These actions reshape the hypergraph structure and generate feedback signals that guide subsequent evolution. Through this closed loop, the hypergraph evolves by integrating new evidence, correcting errors, and refining structure to support multi-hop reasoning. Experiments on multimodal VQA and text QA benchmarks demonstrate substantial improvements over existing RAG baselines in accuracy, coverage, and traceability, establishing self-evolving knowledge graphs as a fundamental paradigm across modalities.",
+      "authors": [
+        "Jiashi Lin",
+        "Changhong Jiang",
+        "Xiangru Lin",
+        "Ruifei Zhang",
+        "Xinyi Zhu",
+        "Jiyao Liu",
+        "Cheng Tang",
+        "Ye Du",
+        "Shujian Gao",
+        "Junzhi Ning",
+        "Lihao Liu",
+        "Ziyan Huang",
+        "Tianbin Li",
+        "Jin Ye",
+        "Junjun He"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-07-14T13:34:07+00:00",
+      "link": "https://arxiv.org/pdf/2607.12764v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "retrieval-augmented generation with self-evolving knowledge hypergraphs for knowledge-intensive tasks",
+      "llm_evidence_cn": "自演化的多模态知识超图增强检索生成，适用于知识密集型任务",
+      "llm_evidence": "自演化的多模态知识超图增强检索生成，适用于知识密集型任务",
+      "canonical_evidence": "自演化的多模态知识超图增强检索生成，适用于知识密集型任务",
+      "llm_tldr_en": "EvoGraph-R1 introduces self-evolving multimodal knowledge hypergraphs for agentic retrieval, overcoming static GraphRAG limitations by enabling iterative refinement and cross-modal reasoning.",
+      "llm_tldr_cn": "现有GraphRAG方法使用静态知识图进行单次检索，无法适应知识密集型推理的交互迭代特性。提出EvoGraph-R1框架，构建多模态知识超图并使其在推理过程中自演化：根据新证据动态更新结构，支持跨模态推理和自适应细化。实验表明在多种RAG任务上显著优于静态图方法。该工作将RAG推向更灵活的智能体检索范式。",
+      "llm_tldr": "现有GraphRAG方法使用静态知识图进行单次检索，无法适应知识密集型推理的交互迭代特性。提出EvoGraph-R1框架，构建多模态知识超图并使其在推理过程中自演化：根据新证据动态更新结构，支持跨模态推理和自适应细化。实验表明在多种RAG任务上显著优于静态图方法。该工作将RAG推向更灵活的智能体检索范式。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "retrieval augmented generation for knowledge intensive tasks",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.13389v1",
+      "source": "arxiv",
+      "title": "Where Should RL Post-Training Compute Go? Model Size, Search, Learning, and Feedback",
+      "abstract": "Reinforcement Learning (RL) post-training is increasingly used to adapt foundation models for reasoning, planning, and feedback-driven robot-learning pipelines, but constrained post-training resources are often summarized by a single total FLOP budget. We study the fixed-budget decision problem behind this practice: under the same post-training budget, should one use a larger policy, train a smaller policy longer, generate more rollout search, or spend compute on stronger reward feedback? We introduce a FLOP-accounting framework for GRPO post-training that decomposes compute into rollout/search, policy-update/learning, and reward- or feedback-model evaluation. Across LoRA-adapted Qwen2.5 policies, we find conditional allocation frontiers: the best observed allocation changes with model size, compute budget, reward system, and evaluation target. Same-FLOP model-size comparisons show that model choice and training allocation are coupled because larger policies consume more per-token compute and therefore buy fewer updates or rollouts under the same budget. Reward systems also change the accounting: rule-based rewards spend nearly all non-update compute on policy rollouts, while PRM-style feedback allocates a visible part of the budget to reward-model inference. We present RACE as a diagnostic pilot-grid protocol, not a guarantee of held-out improvement, for identifying allocation regimes before expensive validation runs; our results suggest that RL post-training papers should report total FLOPs together with how compute is divided among model size, search, learning, and feedback.",
+      "authors": [
+        "Patrick Wilhelm",
+        "Odej Kao"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.CL"
+      ],
+      "published": "2026-07-15T02:34:35+00:00",
+      "link": "https://arxiv.org/pdf/2607.13389v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "RL post-training compute allocation for LLMs",
+      "llm_evidence_cn": "RL后训练计算分配用于LLM",
+      "llm_evidence": "RL后训练计算分配用于LLM",
+      "canonical_evidence": "RL后训练计算分配用于LLM",
+      "llm_tldr_en": "Studies how to allocate fixed FLOP budgets in RL post-training among model size, search, learning, and feedback for foundation models, using GRPO framework.",
+      "llm_tldr_cn": "本文研究在强化学习后训练中，如何将固定计算预算分配给策略大小、搜索、学习和奖励反馈等环节。作者提出一个基于GRPO的FLOP核算框架，在LoRA微调的Qwen2.5模型上实验，发现不同分配方式存在条件前沿。为LLM的RL后训练资源优化提供了理论指导。",
+      "llm_tldr": "本文研究在强化学习后训练中，如何将固定计算预算分配给策略大小、搜索、学习和奖励反馈等环节。作者提出一个基于GRPO的FLOP核算框架，在LoRA微调的Qwen2.5模型上实验，发现不同分配方式存在条件前沿。为LLM的RL后训练资源优化提供了理论指导。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "reinforcement learning for large language model",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2607.11089v1",
+      "source": "arxiv",
+      "title": "OS-Pruner: Pruning Chains-of-Thought of Reasoning Models via Optimal Stopping",
+      "abstract": "Large Language Models (LLMs) have achieved remarkable success in complex reasoning tasks through Chain-of-Thought (CoT) prompting. However, these models often exhibit \"computational overthinking,\" generating redundant reasoning steps that increase latency and cost without improving accuracy. Recent studies suggest that CoT trajectories can be significantly pruned, yet existing methods often rely on forcing a static thinking budget, heuristic filtering, sub-optimal early exit via classification, or expensive re-training. In this paper, we introduce OS-Pruner, a lightweight plug-in framework that formulates chain-of-thought pruning as an optimal stopping problem. Given a reasoning prefix, OS-Pruner learns whether further reasoning is worth its token cost by optimizing an explicit utility that trades off final-answer accuracy against generated length. Our novel formulation enables the model to dynamically assess the sufficient point of termination for a reasoning chain. OS-Pruner is designed to be lightweight during both training and inference, and to provide users with fine-grained control over the reasoning-effort vs. accuracy trade-off. On diverse reasoning benchmarks and base models, OS-Pruner achieves 20-60\\% reduction in generation length with minimal accuracy sacrifice.",
+      "authors": [
+        "Mohammed Ehab",
+        "Aymane El Gadarri",
+        "Vivek F. Farias",
+        "Adam Jozefiak",
+        "Ciamac C. Moallemi"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-07-13T04:57:22+00:00",
+      "link": "https://arxiv.org/pdf/2607.11089v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "pruning chain-of-thought for reasoning models via optimal stopping",
+      "llm_evidence_cn": "通过最优停止剪枝推理模型的思维链",
+      "llm_evidence": "通过最优停止剪枝推理模型的思维链",
+      "canonical_evidence": "通过最优停止剪枝推理模型的思维链",
+      "llm_tldr_en": "Introduces OS-Pruner, a plug-in framework that formulates chain-of-thought pruning as an optimal stopping problem to reduce redundant reasoning steps in LLMs.",
+      "llm_tldr_cn": "大型语言模型在复杂推理任务中常产生冗余推理步骤，增加延迟和成本。本文提出OS-Pruner，一种轻量级插件框架，将思维链剪枝形式化为最优停止问题。通过学习在推理前缀后判断是否继续推理，OS-Pruner在保持准确性的同时显著减少推理步骤，无需重新训练，适用于多种推理模型。",
+      "llm_tldr": "大型语言模型在复杂推理任务中常产生冗余推理步骤，增加延迟和成本。本文提出OS-Pruner，一种轻量级插件框架，将思维链剪枝形式化为最优停止问题。通过学习在推理前缀后判断是否继续推理，OS-Pruner在保持准确性的同时显著减少推理步骤，无需重新训练，适用于多种推理模型。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "application of reinforcement learning in large language model reasoning",
+      "matched_requirement_id": "req-7",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.13884v1",
+      "source": "arxiv",
+      "title": "Experience Memory Graph: One-Shot Error Correction for Agents",
+      "abstract": "Large Language Model (LLM) agents have shown remarkable capabilities in autonomous decision-making by generating sequential trajectories of states, actions, and observations. However, in complex, long-horizon tasks, these agents frequently suffer from compounding errors and struggle to recover from failures. Existing self-correction mechanisms rely on prompt-based reflection, which is inherently brittle, incurs heavy time and API costs due to iterative trial-and-error loops, and produces task-specific memory that may be hard to generalize to new scenarios. To address this, we propose Experience Memory Graph (EMG), a framework that reformulates agent failure recovery as a graph matching problem. At training time, we convert both failed exploration trajectories and successful expert trajectories into directed action decision graphs. By matching these graphs, we extract common subgraphs (successful workflows) and graph edit paths that explicitly indicate how to correct failures (e.g., which actions to add, delete, or relabel under a given observation), and store them in a memory graph with intra-task nodes and cross-task edges. At test time, EMG retrieves relevant insights and guides the agent in a single, loop-free execution. Experiments on ALFWorld and ScienceWorld show that EMG consistently outperforms state-of-the-art reflection baselines in success rate and average reward, while requiring no test-time trial-and-error.",
+      "authors": [
+        "Wenjun Wang",
+        "Yuchen Fang",
+        "Fengrui Liu",
+        "Zibo Liang",
+        "Kai Zheng"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-07-15T14:33:15+00:00",
+      "link": "https://arxiv.org/pdf/2607.13884v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "error correction for LLM agents via graph matching",
+      "llm_evidence_cn": "通过图匹配为LLM智能体提供纠错",
+      "llm_evidence": "通过图匹配为LLM智能体提供纠错",
+      "canonical_evidence": "通过图匹配为LLM智能体提供纠错",
+      "llm_tldr_en": "Proposes Experience Memory Graph (EMG) for one-shot error correction in LLM agents by reformulating failure recovery as graph matching.",
+      "llm_tldr_cn": "LLM智能体在长时间任务中容易累积错误且难以恢复。现有自纠正机制依赖提示反射，效率低且泛化差。本文提出经验记忆图（EMG），将失败恢复转化为图匹配问题：将失败轨迹和成功轨迹转化为图结构，利用图匹配找到恢复路径。实验表明EMG在多个智能体任务上显著提高了成功率。",
+      "llm_tldr": "LLM智能体在长时间任务中容易累积错误且难以恢复。现有自纠正机制依赖提示反射，效率低且泛化差。本文提出经验记忆图（EMG），将失败恢复转化为图匹配问题：将失败轨迹和成功轨迹转化为图结构，利用图匹配找到恢复路径。实验表明EMG在多个智能体任务上显著提高了成功率。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}
