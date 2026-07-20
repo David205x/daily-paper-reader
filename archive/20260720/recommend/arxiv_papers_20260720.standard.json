@@ -1,0 +1,381 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-20T21:31:08.368540+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 7,
+    "deep_cap": 6,
+    "deep_selected": 6,
+    "quick_candidates": 3,
+    "quick_skim_target": 11,
+    "quick_selected": 3
+  },
+  "deep_dive": [
+    {
+      "id": "2607.15610v1",
+      "source": "arxiv",
+      "title": "Process Reward Informed Tree Rollout for Effective Multi-Turn RL",
+      "abstract": "Reinforcement learning (RL) has become a key approach for training LLM agents, yet popular methods such as GRPO/RLOO rely on multiple independently sampled complete trajectories for advantage estimation. In long-horizon agentic tasks, such a uniform rollout strategy can waste budget on uninformative dead-end attempts, while promising intermediate states do not receive sufficient exploration. The multi-turn structure of agentic trajectories, with interleaved actions and observations, naturally supports organizing a trajectory group as a tree, where each turn serves as a decision point for exploration. This perspective reframes effective exploration as the problem of deciding where to branch. We propose Process-Scorer Guided Adaptive Tree Rollout (PATR), a quality-aware rollout framework for multi-turn agent RL. PATR uses task-appropriate process feedback to score partial trajectories, selectively branches from promising states, reuses shared prefixes, and conservatively stops degenerate paths to reduce wasted sampling. The resulting rollout groups remain compatible with standard policy optimization while providing more efficient exploration under the same training budget. We evaluate PATR on FrozenLake and the challenging SWE-Bench, which is largely unexplored by prior tree-rollout agent RL methods. Experiments show that PATR improves performance by up to +5.0 points on SWE-Bench and +9.3 points on FrozenLake, highlighting process-guided tree rollouts as an effective strategy for scalable multi-turn RL.",
+      "authors": [
+        "Xintong Li",
+        "Sha Li",
+        "Yuwei Zhang",
+        "Changlong Yu",
+        "Rongmei Lin",
+        "Hongye Jin",
+        "Shuyi Guan",
+        "Xin Liu",
+        "Linwei Li",
+        "Qingyu Yin",
+        "Jingbo Shang"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.AI",
+        "cs.LG"
+      ],
+      "published": "2026-07-17T04:16:58+00:00",
+      "link": "https://arxiv.org/pdf/2607.15610v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Process reward informed tree rollout for multi-turn RL",
+      "llm_evidence_cn": "基于过程奖励的树展开用于多轮强化学习",
+      "llm_evidence": "基于过程奖励的树展开用于多轮强化学习",
+      "canonical_evidence": "基于过程奖励的树展开用于多轮强化学习",
+      "llm_tldr_en": "PATR uses a process reward model to guide adaptive tree rollout in multi-turn RL, improving exploration efficiency for LLM agents.",
+      "llm_tldr_cn": "多轮强化学习训练LLM智能体时，均匀展开策略浪费预算。本文提出过程奖励引导的自适应树展开(PATR)，利用过程奖励模型决定探索分支点，在长程智能体任务中高效利用预算，显著优于传统方法。",
+      "llm_tldr": "多轮强化学习训练LLM智能体时，均匀展开策略浪费预算。本文提出过程奖励引导的自适应树展开(PATR)，利用过程奖励模型决定探索分支点，在长程智能体任务中高效利用预算，显著优于传统方法。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "reinforcement learning for multi turn dialogue systems",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.15660v1",
+      "source": "arxiv",
+      "title": "ToolVerse: Unlocking Massive Environments and Long-Horizon Tasks for Agentic Reinforcement Learning",
+      "abstract": "While LLM agents demonstrate strong reasoning abilities in compact and well-defined scenarios, they struggle to maintain robustness and effectiveness when faced with large-scale, diverse, and dynamic real-world environments that demand seamless tool integration. To address this gap, we introduce ToolVerse, a comprehensive framework that scales up agentic RL environments and enables agents to perform complex long-horizon reasoning in Tool-Integrated Reasoning (TIR) tasks. First, ToolVerse automatically builds the massive executable agent training environments from nearly 400 real-world Model Context Protocols (MCPs) that contain about 4500 tools. Second, we propose a task design strategy based on a tool dependency graph, utilizing Dynamic Unlocking Sampling Algorithm to generate long-horizon tasks, and produce GUST (Graph Unlocking Sampling Tasks) dataset. Third, to alleviate the credit assigment problem in long-horizon agentic RL, we propose a fine-grained Turn-Aware Relative Advantage algorithm. We conduct extensive Agentic RL training using ToolVerse and evaluate our framework on serveral agentic benchmarks. Experimental results demonstrate that our framework significantly strengthens LLMs' capabilities in long-horizon tool use, achieving a marked performance boost and showcasing robust reasoning within dynamic environments.",
+      "authors": [
+        "Shuaiyu Zhou",
+        "Fengpeng Yue",
+        "Zengjie Hu",
+        "Yuanzhe Shen",
+        "Chenyang Zhang",
+        "feng hong",
+        "Cao Liu",
+        "Ke Zeng"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-07-17T06:12:04+00:00",
+      "link": "https://arxiv.org/pdf/2607.15660v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "agentic RL framework for LLM agents with tool integration",
+      "llm_evidence_cn": "面向大语言模型智能体的工具集成强化学习环境框架",
+      "llm_evidence": "面向大语言模型智能体的工具集成强化学习环境框架",
+      "canonical_evidence": "面向大语言模型智能体的工具集成强化学习环境框架",
+      "llm_tldr_en": "Introduces ToolVerse, a framework that scales up agentic RL environments by automatically building executable environments from real-world MCPs, enabling LLM agents to perform long-horizon tool-integrated reasoning tasks.",
+      "llm_tldr_cn": "针对大语言模型智能体在复杂动态环境中工具集成和长程推理能力不足的问题，本文提出ToolVerse框架。它从近400个真实世界模型上下文协议中自动构建包含约4500个工具的大规模可执行训练环境，并基于工具依赖图设计任务，使得智能体能够进行复杂的长程工具集成推理。该框架为智能体强化学习提供了大规模、多样化的训练环境。",
+      "llm_tldr": "针对大语言模型智能体在复杂动态环境中工具集成和长程推理能力不足的问题，本文提出ToolVerse框架。它从近400个真实世界模型上下文协议中自动构建包含约4500个工具的大规模可执行训练环境，并基于工具依赖图设计任务，使得智能体能够进行复杂的长程工具集成推理。该框架为智能体强化学习提供了大规模、多样化的训练环境。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.15810v1",
+      "source": "arxiv",
+      "title": "QUADS: Stabilizing NVFP4 Reinforcement Learning for MoE via QUantization-error Alignment across Dual Sides",
+      "abstract": "Rollout generation is a major bottleneck in Reinforcement Learning (RL) for Mixture-of-Experts (MoE) Large Language Models, motivating low-precision rollout acceleration such as FP8. As an emerging low-precision format, NVFP4 combines fine-grained scaling for accuracy preservation with native W4A4 FP4 GEMMs for higher throughput than FP8. However, we find that directly applying NVFP4 to MoE RL rollout is impractical. NVFP4 rollout with BF16 training collapses after roughly 150 steps, accompanied by rapidly growing rollout-trainer log-probability gaps. Through training-inference error analysis and controlled ablations, we identify activation error, rather than weight error, as the dominant source of FP4 RL instability: weights can be synchronized and aligned by a shared quantization-dequantization path, whereas activations are recomputed online and error is amplified by the coarse E2M1 grid. Therefore, to stabilize NVFP4 RL for MoE, we propose QUantization-error Alignment across Dual Sides (QUADS). On the trainer side, we introduce Asymmetric Quantization-Aware Training fake-quantizing weights while keeping activations unquantized for better alignment. On the rollout side, Residual Activation Compensation corrects high-error activation channels while preserving native W4A4 GEMMs. In our MoE RL experiments on several benchmarks, QUADS achieves BF16-level accuracy, improves average pass@1 by 21.49 points over naive NVFP4 RL, and delivers ~16% higher rollout throughput than FP8.",
+      "authors": [
+        "Zhengyang Zhuge",
+        "Hao Yu",
+        "Xin Wang",
+        "Zheng Li",
+        "Yizhong Cao",
+        "Dayiheng Liu",
+        "Jianwei Zhang"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-07-17T10:21:27+00:00",
+      "link": "https://arxiv.org/pdf/2607.15810v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "stabilizes NVFP4 low-precision reinforcement learning for MoE large language models",
+      "llm_evidence_cn": "为MoE大语言模型的低精度NVFP4强化学习训练提供稳定方法",
+      "llm_evidence": "为MoE大语言模型的低精度NVFP4强化学习训练提供稳定方法",
+      "canonical_evidence": "为MoE大语言模型的低精度NVFP4强化学习训练提供稳定方法",
+      "llm_tldr_en": "Identifies activation error as main cause of instability in NVFP4 RL rollout for MoE LLMs, and proposes QUADS to align quantization errors, enabling stable FP4 training.",
+      "llm_tldr_cn": "针对MoE大语言模型在NVFP4低精度强化学习训练中快速崩溃的问题，通过分析发现激活误差是主要不稳定性来源，提出QUADS方法从训练和推理两侧对齐量化误差，从而稳定FP4强化学习训练。实验表明QUADS使NVFP4 RL训练可持续进行，同时保持吞吐量优势，为大规模LLM的RL加速提供了实用方案。",
+      "llm_tldr": "针对MoE大语言模型在NVFP4低精度强化学习训练中快速崩溃的问题，通过分析发现激活误差是主要不稳定性来源，提出QUADS方法从训练和推理两侧对齐量化误差，从而稳定FP4强化学习训练。实验表明QUADS使NVFP4 RL训练可持续进行，同时保持吞吐量优势，为大规模LLM的RL加速提供了实用方案。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "reinforcement learning for large language model",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.16097v1",
+      "source": "arxiv",
+      "title": "Understanding Reasoning from Pretraining to Post-Training",
+      "abstract": "Reinforcement learning (RL) has become central to improving large language models (LLMs) on complex reasoning tasks, yet RL post-training is largely studied in isolation from the pretraining that precedes it. As a result, two basic questions remain open: (1) how do pretraining choices (model size, data) shape the returns to RL compute, and (2) what does RL actually do to the model? These questions are difficult to study in the standard LLM setting: pretraining corpora are vast and uncontrolled, making it hard to attribute behaviors to pretraining versus RL, and systematic compute sweeps across both stages are prohibitively expensive. To address these challenges, we use chess as a controlled testbed for studying reasoning across the full pretraining-to-post-training pipeline. We follow the standard LLM training pipeline by pretraining language models from 5M to 1B parameters on human chess games, supervised fine-tuning on synthetic reasoning traces, and running RL on chess puzzles with verifiable rewards. Using this framework, we find that the post-RL performance at given RL compute level is well-predicted from the pretraining loss, and slope of the RL reward curves improves approximately linearly with the pretraining tokens. Beyond scaling, we find that RL does not simply sharpen the SFT policy: on easy puzzles it amplifies correct moves the SFT policy already preferred, while on hard puzzles it surfaces correct moves that were nearly absent under SFT. We further test whether our findings transfer beyond chess by training a 1B language model on math-domain text, where the same predictive pattern emerges: longer-pretrained checkpoints reach higher post-RL performance and improve faster under RL. In sum, we provide a quantitative account of the pretraining-to-RL interface and a controlled testbed for studying the science of reasoning across the full pretraining-to-post-training pipeline.",
+      "authors": [
+        "Jingyan Shen",
+        "Ang Li",
+        "Salman Rahman",
+        "Yifan Sun",
+        "Micah Goldblum",
+        "Matus Telgarsky",
+        "Pavel Izmailov"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI",
+        "cs.CL"
+      ],
+      "published": "2026-07-17T16:31:58+00:00",
+      "link": "https://arxiv.org/pdf/2607.16097v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "studies how RL post-training improves LLM reasoning, using chess as a controlled testbed",
+      "llm_evidence_cn": "研究强化学习后训练如何提升大语言模型推理能力，以国际象棋为受控平台",
+      "llm_evidence": "研究强化学习后训练如何提升大语言模型推理能力，以国际象棋为受控平台",
+      "canonical_evidence": "研究强化学习后训练如何提升大语言模型推理能力，以国际象棋为受控平台",
+      "llm_tldr_en": "Uses chess to systematically investigate how pretraining choices affect RL returns and what RL does internally to improve reasoning in LLMs.",
+      "llm_tldr_cn": "针对预训练与RL后训练在推理能力提升中的交互作用缺乏研究的问题，以国际象棋为受控环境，系统探索模型规模、数据等预训练因素如何影响RL收益，并揭示RL内部机制。实验表明RL主要增强了搜索和策略泛化能力，而非记忆。该工作为理解LLM推理的预训练-后训练全流程提供了重要洞察。",
+      "llm_tldr": "针对预训练与RL后训练在推理能力提升中的交互作用缺乏研究的问题，以国际象棋为受控环境，系统探索模型规模、数据等预训练因素如何影响RL收益，并揭示RL内部机制。实验表明RL主要增强了搜索和策略泛化能力，而非记忆。该工作为理解LLM推理的预训练-后训练全流程提供了重要洞察。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "application of reinforcement learning in large language model reasoning",
+      "matched_requirement_id": "req-7",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.15374v1",
+      "source": "arxiv",
+      "title": "Reasoning-Guided Part-Level Visual Grounding via Reinforcement Learning",
+      "abstract": "Multimodal large language models (MLLMs) ground whole objects well from free-form language queries, but they struggle when the query names a part rather than the object. We trace this to a missing object-part hierarchy, since parts are localized in the same single step used for objects. We propose Object-Part Hierarchical Reflective Grounding (OP-HRG), a coarse-to-fine reasoning-guided grounding strategy that first localizes the parent object and then the part within it. A self-check then reflects on the result, with an extension to re-encode the predicted crop to inspect the region it is correcting. We introduce a part-aware GRPO framework to train our pipeline with stage-wise rewards. A 4B model trained this way outperforms 7B grounding LLMs and SAM3 across PascalPart, PartImageNet, and InstructPart, and transfers to reasoning segmentation.",
+      "authors": [
+        "Kazi Sajeed Mehrab",
+        "Hani Alomari",
+        "Najibul Haque Sarker",
+        "Chia-Wei Tang",
+        "Zaber Ibn Abdul Hakim",
+        "Anuj Karpatne",
+        "Chris Thomas"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-07-16T18:18:31+00:00",
+      "link": "https://arxiv.org/pdf/2607.15374v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "GRPO reinforcement learning for LLM visual reasoning",
+      "llm_evidence_cn": "使用GRPO强化学习进行大模型视觉推理",
+      "llm_evidence": "使用GRPO强化学习进行大模型视觉推理",
+      "canonical_evidence": "使用GRPO强化学习进行大模型视觉推理",
+      "llm_tldr_en": "OP-HRG uses hierarchical reflective grounding and part-aware GRPO reinforcement learning to improve part-level visual grounding in MLLMs, outperforming larger models.",
+      "llm_tldr_cn": "多模态大语言模型在部件级视觉定位中因缺失对象-部件层次而表现不佳。本文提出对象-部件分层反射式定位（OP-HRG），结合粗到细推理和自检机制，并引入部件感知的GRPO强化学习框架。4B模型在部件定位上超越7B模型，展示了RL在提升LLM细粒度推理能力中的有效性。",
+      "llm_tldr": "多模态大语言模型在部件级视觉定位中因缺失对象-部件层次而表现不佳。本文提出对象-部件分层反射式定位（OP-HRG），结合粗到细推理和自检机制，并引入部件感知的GRPO强化学习框架。4B模型在部件定位上超越7B模型，展示了RL在提升LLM细粒度推理能力中的有效性。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "application of reinforcement learning in large language model reasoning",
+      "matched_requirement_id": "req-7",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.15483v1",
+      "source": "arxiv",
+      "title": "Risk-Aware Preference Learning for Stochastic Outcomes",
+      "abstract": "Learning reward functions from human preferences is a widely used approach for aligning robot behavior with user expectations in human-robot interaction. Most existing approaches assume that humans evaluate uncertain outcomes using expected utility (EU), aggregating outcome utilities linearly with their probabilities. However, behavioral evidence shows that humans are systematically risk-sensitive, overweighting rare negative events and exhibiting loss aversion. We study the consequences of this mismatch in social robot navigation, where safety-critical outcomes (e.g., collisions) are rare but highly consequential. We compare EU with Cumulative Prospect Theory (CPT), a nonlinear model of human decision-making, within a Bradley-Terry preference learning framework. Our preliminary experiments show that when preferences are generated by risk-sensitive users, CPT-based learners recover reward functions with substantially lower regret compared to EU-based learners. Our results highlight the importance of modeling human risk sensitivity when learning rewards from preferences over stochastic robot outcomes.",
+      "authors": [
+        "Yi-Shiuan Tung",
+        "Yuni Wu",
+        "Wei Jiang",
+        "Alessandro Roncone",
+        "Bradley Hayes"
+      ],
+      "primary_category": "cs.RO",
+      "categories": [
+        "cs.RO"
+      ],
+      "published": "2026-07-16T21:59:38+00:00",
+      "link": "https://arxiv.org/pdf/2607.15483v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "reward function design from human preferences with risk sensitivity",
+      "llm_evidence_cn": "基于人类偏好的奖励函数设计，考虑风险敏感性",
+      "llm_evidence": "基于人类偏好的奖励函数设计，考虑风险敏感性",
+      "canonical_evidence": "基于人类偏好的奖励函数设计，考虑风险敏感性",
+      "llm_tldr_en": "This paper proposes risk-aware preference learning using Cumulative Prospect Theory to model human risk sensitivity in reward function learning from preferences, improving alignment in safety-critical robot navigation.",
+      "llm_tldr_cn": "该论文针对传统偏好学习假设人类决策符合期望效用理论导致的奖励函数偏差问题，提出结合累积前景理论的风险感知偏好学习框架。在社交机器人导航场景中，该方法能够更准确地建模人类对罕见负事件的过度加权和损失厌恶行为，从而学习到更符合人类偏好的奖励函数。实验表明该方法在安全关键任务中显著优于基于期望效用的基线方法。",
+      "llm_tldr": "该论文针对传统偏好学习假设人类决策符合期望效用理论导致的奖励函数偏差问题，提出结合累积前景理论的风险感知偏好学习框架。在社交机器人导航场景中，该方法能够更准确地建模人类对罕见负事件的过度加权和损失厌恶行为，从而学习到更符合人类偏好的奖励函数。实验表明该方法在安全关键任务中显著优于基于期望效用的基线方法。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "design of reward functions in RL",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2607.15696v1",
+      "source": "arxiv",
+      "title": "PCTD: Preference-Guided Counterfactual Task Decomposition for Agent Tool Retrieval",
+      "abstract": "Task decomposition aims to transform ambiguous instructions into executable atomic subtasks, thereby guiding high-precision tool retrieval. However, our analysis reveals that directly adopting tool retrieval metrics, i.e., Recall or NDCG, as rewards for task decomposition can easily induce reward hacking in reinforcement learning-based methods. Specifically, models tend to maximize retrieval matching through strategies such as repetitive decomposition. This spurious correlation between the shallow features of decomposition results and retrieval metric impairs generalization in Out-of-Domain (OOD) scenarios involving unseen tools. To address this issue, we propose PCTD, a Preference-guided Counterfactual Task Decomposition framework. PCTD quantifies the marginal causal gain of decomposition on retrieval ranking through a counterfactual reward, thereby cutting off spurious correlations at their source. Meanwhile, it introduces a preference reward to impose fine-grained structural supervision on logical coherence and atomicity, encouraging the model to generate high-quality decompositions. In addition, we construct MTDTool, the task decomposition benchmark specifically designed for mobile multi-turn interactions. Extensive experiments demonstrate that PCTD alleviates repetitive decomposition and surpasses SOTA methods in retrieval, decomposition quality, and OOD generalization.",
+      "authors": [
+        "Chu Zhao",
+        "Lei Tang",
+        "Minghang Li",
+        "Jianzhe Zhao",
+        "Guibing Guo",
+        "Zhengzong Chen",
+        "Yuanyuan Zhao",
+        "Fei Huang"
+      ],
+      "primary_category": "cs.IR",
+      "categories": [
+        "cs.IR"
+      ],
+      "published": "2026-07-17T07:15:41+00:00",
+      "link": "https://arxiv.org/pdf/2607.15696v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "RL-based task decomposition for agent tool retrieval with preference-guided counterfactual framework",
+      "llm_evidence_cn": "基于RL的智能体工具检索任务分解，采用偏好引导的反事实框架",
+      "llm_evidence": "基于RL的智能体工具检索任务分解，采用偏好引导的反事实框架",
+      "canonical_evidence": "基于RL的智能体工具检索任务分解，采用偏好引导的反事实框架",
+      "llm_tldr_en": "PCTD addresses reward hacking in RL-based task decomposition for agent tool retrieval by introducing preference-guided counterfactual comparisons, improving generalization to unseen tools.",
+      "llm_tldr_cn": "该论文针对强化学习任务分解中直接使用工具检索指标作为奖励易导致奖励黑客问题，提出偏好引导的反事实任务分解框架PCTD。通过构造反事实分解偏好对，避免模型利用浅层特征最大化检索匹配。实验表明PCTD在域外场景下显著提高了分解质量和工具检索准确性，有效解决了奖励黑客导致的泛化下降。",
+      "llm_tldr": "该论文针对强化学习任务分解中直接使用工具检索指标作为奖励易导致奖励黑客问题，提出偏好引导的反事实任务分解框架PCTD。通过构造反事实分解偏好对，避免模型利用浅层特征最大化检索匹配。实验表明PCTD在域外场景下显著提高了分解质量和工具检索准确性，有效解决了奖励黑客导致的泛化下降。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2607.15715v1",
+      "source": "arxiv",
+      "title": "Behavioral Controllability of Agentic Models for Information Extraction: From Fixed Workflows to Reflective Agents",
+      "abstract": "Large language model (LLM) agents are increasingly used for complex information-extraction tasks, yet it remains unclear whether agentic components such as reflection and memory lead to observable and controllable improvements over fixed LLM workflows. We study this question through conference-paper dataset extraction, where a system must identify datasets mentioned in scholarly PDFs and produce structured records. We compare a fixed workflow baseline with reflective agent variants and specify an optimized agent condition (S2) that extends the same task with richer PDF tools and dynamic tool selection. Our evaluation emphasizes process-level behavior--including tool execution, retries, reflection, memory use, runtime, and failure recovery--while treating extraction coverage and field completeness as secondary outcome measures. The paper characterizes when agentic mechanisms change system behavior, whether these changes improve task completion, and how the observed failure modes motivate an optimized agent design under the same evaluation harness.",
+      "authors": [
+        "Lujia Zhang",
+        "Xingzhou Chen",
+        "Hongwei Feng"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-07-17T07:51:09+00:00",
+      "link": "https://arxiv.org/pdf/2607.15715v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "analyzes behavioral controllability of LLM agents for information extraction",
+      "llm_evidence_cn": "分析大语言模型智能体在信息抽取任务中的行为可控性",
+      "llm_evidence": "分析大语言模型智能体在信息抽取任务中的行为可控性",
+      "canonical_evidence": "分析大语言模型智能体在信息抽取任务中的行为可控性",
+      "llm_tldr_en": "This paper studies LLM agent behavior for information extraction, comparing fixed workflows with reflective agents, and evaluates process-level controllability including tool use and memory.",
+      "llm_tldr_cn": "本文聚焦大语言模型智能体在信息抽取任务中的行为可控性问题，比较了固定工作流与具有反思和记忆机制的代理变体，通过对工具执行、重试、反思等过程级行为的评估，揭示了代理组件如何影响任务性能与可解释性，为设计可控的智能体系统提供了指导。",
+      "llm_tldr": "本文聚焦大语言模型智能体在信息抽取任务中的行为可控性问题，比较了固定工作流与具有反思和记忆机制的代理变体，通过对工具执行、重试、反思等过程级行为的评估，揭示了代理组件如何影响任务性能与可解释性，为设计可控的智能体系统提供了指导。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.13359v1",
+      "source": "arxiv",
+      "title": "Learning Latency-Aware Orchestration for Multi-Agent Systems",
+      "abstract": "Multi-agent systems (MAS) coordinate multiple LLM-powered agents through structured workflows, gaining reasoning power but incurring high inference latency from multi-step execution and repeated model invocations. Existing orchestration methods primarily optimize task performance and inference cost, leaving latency largely unaddressed. In MAS, end-to-end latency is governed by the critical execution path, so reducing total cost alone does not reliably reduce latency. Moreover, optimizing latency while preserving accuracy remains non-trivial: naive latency optimization can misassign operator-level credit and degrade task accuracy. To address this gap, we propose Latency-Aware Multi-agent System (LAMaS), a latency-aware orchestration framework for learning-based multi-agent systems. LAMaS addresses this challenge at two levels: at training time, it learns latency-aware execution graphs through constrained optimization with critical-path-aware credit assignment; at inference time, since a graph committed at training time cannot exploit runtime evidence, it complements graph construction with a lightweight controller that adaptively eliminates redundant future agent interactions as execution unfolds. Experiments on four benchmarks show that LAMaS achieves the best latency among evaluated learning-based MAS baselines, reducing end-to-end latency by over 50\\% while maintaining competitive or better accuracy. LAMaS is also modular and transfers to other MAS with minimal changes, consistently yielding latency reductions.",
+      "authors": [
+        "Xi Shi",
+        "Mengxin Zheng",
+        "Qian Lou"
+      ],
+      "primary_category": "cs.MA",
+      "categories": [
+        "cs.MA"
+      ],
+      "published": "2026-07-15T00:49:50+00:00",
+      "link": "https://arxiv.org/pdf/2607.13359v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Latency-aware orchestration for multi-agent systems with LLMs",
+      "llm_evidence_cn": "面向LLM多智能体系统的延迟感知编排",
+      "llm_evidence": "面向LLM多智能体系统的延迟感知编排",
+      "canonical_evidence": "面向LLM多智能体系统的延迟感知编排",
+      "llm_tldr_en": "LAMaS is a latency-aware orchestration framework for multi-agent systems that optimizes critical execution path latency while preserving task accuracy through a learning-based approach.",
+      "llm_tldr_cn": "多智能体系统中LLM的协调工作流虽然增强了推理能力，但引入了高延迟。现有的编排方法主要优化性能和推理成本，忽略了延迟。LAMaS通过识别关键执行路径并学习延迟感知的算子分配，在不降低任务准确度的前提下显著减少了端到端延迟。实验在多个MAS基准上验证了其有效性。该框架为实时多智能体应用的部署提供了实用方案。",
+      "llm_tldr": "多智能体系统中LLM的协调工作流虽然增强了推理能力，但引入了高延迟。现有的编排方法主要优化性能和推理成本，忽略了延迟。LAMaS通过识别关键执行路径并学习延迟感知的算子分配，在不降低任务准确度的前提下显著减少了端到端延迟。实验在多个MAS基准上验证了其有效性。该框架为实时多智能体应用的部署提供了实用方案。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}

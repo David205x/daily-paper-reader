@@ -6,32 +6,49 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-07-19
-- 运行时间：2026-07-19 21:17:46 UTC
+- 最新运行日期：2026-07-20
+- 运行时间：2026-07-20 21:36:07 UTC
 - 运行状态：成功
-- 本次总论文数：4
-- 精读区：2
-- 速读区：2
+- 本次总论文数：9
+- 精读区：6
+- 速读区：3
 
 ### 今日简报（AI）
-今日精选4篇论文，聚焦智能体检索、RL后训练计算优化、推理链剪枝与单次错误修正。最值得关注的是EvoGraph-R1自进化多模态知识超图的新范式，以及RL后训练中模型大小与搜索、学习、反馈的资源配置关系。建议优先精读这两篇，掌握智能体检索和计算策略的前沿方向。
-- 详情：[/202607/19/README](/202607/19/README)
+1) 今日9篇论文聚焦智能体强化学习与工具使用，精读6篇中2篇获得9.0高分，分别提出多轮对话奖励树展开和大规模长时任务环境ToolVerse。  
+2) 最值得关注：多智能体系统的过程奖励机制（通过树形展开提升RL效率）以及面向长视距任务的工具框架ToolVerse，两者都显著拓展了智能体的自主决策与复杂交互能力。  
+3) 建议优先阅读这两篇高分论文，并关注速读中PCTD的偏好引导任务分解方法，对设计高效智能体工具调用有直接启发。
+- 详情：[/202607/20/README](/202607/20/README)
 
 ### 精读区论文标签
-1. [EvoGraph-R1: Self-Evolving Multimodal Knowledge Hypergraphs for Agentic Retrieval](/202607/19/2607.12764v1-evograph-r1-self-evolving-multimodal-knowledge-hypergraphs-for-agentic-retrieval)  
+1. [Process Reward Informed Tree Rollout for Effective Multi-Turn RL](/202607/20/2607.15610v1-process-reward-informed-tree-rollout-for-effective-multi-turn-rl)  
+   标签：评分：9.0/10、query:rl
+   evidence：基于过程奖励的树展开用于多轮强化学习
+2. [ToolVerse: Unlocking Massive Environments and Long-Horizon Tasks for Agentic Reinforcement Learning](/202607/20/2607.15660v1-toolverse-unlocking-massive-environments-and-long-horizon-tasks-for-agentic-reinforcement-learning)  
+   标签：评分：9.0/10、query:rl
+   evidence：面向大语言模型智能体的工具集成强化学习环境框架
+3. [QUADS: Stabilizing NVFP4 Reinforcement Learning for MoE via QUantization-error Alignment across Dual Sides](/202607/20/2607.15810v1-quads-stabilizing-nvfp4-reinforcement-learning-for-moe-via-quantization-error-alignment-across-dual-sides)  
+   标签：评分：9.0/10、query:rl
+   evidence：为MoE大语言模型的低精度NVFP4强化学习训练提供稳定方法
+4. [Understanding Reasoning from Pretraining to Post-Training](/202607/20/2607.16097v1-understanding-reasoning-from-pretraining-to-post-training)  
+   标签：评分：9.0/10、query:rl
+   evidence：研究强化学习后训练如何提升大语言模型推理能力，以国际象棋为受控平台
+5. [Reasoning-Guided Part-Level Visual Grounding via Reinforcement Learning](/202607/20/2607.15374v1-reasoning-guided-part-level-visual-grounding-via-reinforcement-learning)  
    标签：评分：8.0/10、query:rl
-   evidence：自演化的多模态知识超图增强检索生成，适用于知识密集型任务
-2. [Where Should RL Post-Training Compute Go? Model Size, Search, Learning, and Feedback](/202607/19/2607.13389v1-where-should-rl-post-training-compute-go-model-size-search-learning-and-feedback)  
+   evidence：使用GRPO强化学习进行大模型视觉推理
+6. [Risk-Aware Preference Learning for Stochastic Outcomes](/202607/20/2607.15483v1-risk-aware-preference-learning-for-stochastic-outcomes)  
    标签：评分：8.0/10、query:rl
-   evidence：RL后训练计算分配用于LLM
+   evidence：基于人类偏好的奖励函数设计，考虑风险敏感性
 
 ### 速读区论文标签
-1. [OS-Pruner: Pruning Chains-of-Thought of Reasoning Models via Optimal Stopping](/202607/19/2607.11089v1-os-pruner-pruning-chains-of-thought-of-reasoning-models-via-optimal-stopping)  
+1. [PCTD: Preference-Guided Counterfactual Task Decomposition for Agent Tool Retrieval](/202607/20/2607.15696v1-pctd-preference-guided-counterfactual-task-decomposition-for-agent-tool-retrieval)  
+   标签：评分：8.0/10、query:rl
+   evidence：基于RL的智能体工具检索任务分解，采用偏好引导的反事实框架
+2. [Behavioral Controllability of Agentic Models for Information Extraction: From Fixed Workflows to Reflective Agents](/202607/20/2607.15715v1-behavioral-controllability-of-agentic-models-for-information-extraction-from-fixed-workflows-to-reflective-agents)  
    标签：评分：7.0/10、query:rl
-   evidence：通过最优停止剪枝推理模型的思维链
-2. [Experience Memory Graph: One-Shot Error Correction for Agents](/202607/19/2607.13884v1-experience-memory-graph-one-shot-error-correction-for-agents)  
+   evidence：分析大语言模型智能体在信息抽取任务中的行为可控性
+3. [Learning Latency-Aware Orchestration for Multi-Agent Systems](/202607/20/2607.13359v1-learning-latency-aware-orchestration-for-multi-agent-systems)  
    标签：评分：6.0/10、query:rl
-   evidence：通过图匹配为LLM智能体提供纠错
+   evidence：面向LLM多智能体系统的延迟感知编排
 
 
 <div class="dpr-home-promo-card">
