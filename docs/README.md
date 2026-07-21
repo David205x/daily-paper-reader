@@ -6,49 +6,71 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-07-20
-- 运行时间：2026-07-20 21:36:07 UTC
+- 最新运行日期：2026-07-21
+- 运行时间：2026-07-21 22:00:07 UTC
 - 运行状态：成功
-- 本次总论文数：9
+- 本次总论文数：17
 - 精读区：6
-- 速读区：3
+- 速读区：11
 
 ### 今日简报（AI）
-1) 今日9篇论文聚焦智能体强化学习与工具使用，精读6篇中2篇获得9.0高分，分别提出多轮对话奖励树展开和大规模长时任务环境ToolVerse。  
-2) 最值得关注：多智能体系统的过程奖励机制（通过树形展开提升RL效率）以及面向长视距任务的工具框架ToolVerse，两者都显著拓展了智能体的自主决策与复杂交互能力。  
-3) 建议优先阅读这两篇高分论文，并关注速读中PCTD的偏好引导任务分解方法，对设计高效智能体工具调用有直接启发。
-- 详情：[/202607/20/README](/202607/20/README)
+今日共处理17篇推荐，精读6篇，其中《Group Entropy-Controlled Policy Optimization》与《A Geometric Perspective on Stabilizing Value Conflict Resolution》均获9.0分，值得重点研读。方向建议关注强化学习中的熵调控策略优化与几何视角下的价值冲突解决机制。下一步可深入精读这两篇论文，并留意速读中关于LLM智能体在客服与治疗推理领域的应用探索。
+- 详情：[/202607/21/README](/202607/21/README)
 
 ### 精读区论文标签
-1. [Process Reward Informed Tree Rollout for Effective Multi-Turn RL](/202607/20/2607.15610v1-process-reward-informed-tree-rollout-for-effective-multi-turn-rl)  
+1. [Group Entropy-Controlled Policy Optimization](/202607/21/2607.16850v1-group-entropy-controlled-policy-optimization)  
    标签：评分：9.0/10、query:rl
-   evidence：基于过程奖励的树展开用于多轮强化学习
-2. [ToolVerse: Unlocking Massive Environments and Long-Horizon Tasks for Agentic Reinforcement Learning](/202607/20/2607.15660v1-toolverse-unlocking-massive-environments-and-long-horizon-tasks-for-agentic-reinforcement-learning)  
+   evidence：面向LLM强化学习的组熵控制策略优化
+2. [A Geometric Perspective on Stabilizing Value Conflict Resolution](/202607/21/2607.17946v1-a-geometric-perspective-on-stabilizing-value-conflict-resolution)  
    标签：评分：9.0/10、query:rl
-   evidence：面向大语言模型智能体的工具集成强化学习环境框架
-3. [QUADS: Stabilizing NVFP4 Reinforcement Learning for MoE via QUantization-error Alignment across Dual Sides](/202607/20/2607.15810v1-quads-stabilizing-nvfp4-reinforcement-learning-for-moe-via-quantization-error-alignment-across-dual-sides)  
+   evidence：使用思维链推理解决RLHF中的价值冲突
+3. [MADA-RL: Multi-Agent Debate-Aware Reinforcement Learning for Parameter-Efficient Reasoning in Compact Models](/202607/21/2607.18006v1-mada-rl-multi-agent-debate-aware-reinforcement-learning-for-parameter-efficient-reasoning-in-compact-models)  
    标签：评分：9.0/10、query:rl
-   evidence：为MoE大语言模型的低精度NVFP4强化学习训练提供稳定方法
-4. [Understanding Reasoning from Pretraining to Post-Training](/202607/20/2607.16097v1-understanding-reasoning-from-pretraining-to-post-training)  
-   标签：评分：9.0/10、query:rl
-   evidence：研究强化学习后训练如何提升大语言模型推理能力，以国际象棋为受控平台
-5. [Reasoning-Guided Part-Level Visual Grounding via Reinforcement Learning](/202607/20/2607.15374v1-reasoning-guided-part-level-visual-grounding-via-reinforcement-learning)  
+   evidence：通过辩论感知奖励的RL方法提升紧凑LLM推理
+4. [Environment-free Synthetic Data Generation for API-Calling Agents](/202607/21/2607.16900v1-environment-free-synthetic-data-generation-for-api-calling-agents)  
    标签：评分：8.0/10、query:rl
-   evidence：使用GRPO强化学习进行大模型视觉推理
-6. [Risk-Aware Preference Learning for Stochastic Outcomes](/202607/20/2607.15483v1-risk-aware-preference-learning-for-stochastic-outcomes)  
+   evidence：利用LLM作为世界模型生成智能体轨迹
+5. [Reward-Driven LLM Agent Workflows: Synthesizing POMDP Routing and Self-Correction for Autonomous Decision-Making](/202607/21/2607.17038v1-reward-driven-llm-agent-workflows-synthesizing-pomdp-routing-and-self-correction-for-autonomous-decision-making)  
    标签：评分：8.0/10、query:rl
-   evidence：基于人类偏好的奖励函数设计，考虑风险敏感性
+   evidence：基于奖励驱动的LLM代理工作流，结合POMDP路由与自纠正
+6. [Theoretical Foundations of $\max$@$k$ Reinforcement Learning](/202607/21/2607.17823v1-theoretical-foundations-of-maxk-reinforcement-learning)  
+   标签：评分：8.0/10、query:rl
+   evidence：面向LLM推理任务的max@k强化学习理论基础
 
 ### 速读区论文标签
-1. [PCTD: Preference-Guided Counterfactual Task Decomposition for Agent Tool Retrieval](/202607/20/2607.15696v1-pctd-preference-guided-counterfactual-task-decomposition-for-agent-tool-retrieval)  
+1. [Evidence-in-the-Loop: Trace-Driven Optimization for Customer-Service LLM Agents](/202607/21/2607.18039v1-evidence-in-the-loop-trace-driven-optimization-for-customer-service-llm-agents)  
    标签：评分：8.0/10、query:rl
-   evidence：基于RL的智能体工具检索任务分解，采用偏好引导的反事实框架
-2. [Behavioral Controllability of Agentic Models for Information Extraction: From Fixed Workflows to Reflective Agents](/202607/20/2607.15715v1-behavioral-controllability-of-agentic-models-for-information-extraction-from-fixed-workflows-to-reflective-agents)  
+   evidence：面向客服智能体的检索增强生成框架
+2. [LLM-as-a-Coach: Experiential Learning for Non-Verifiable Tasks](/202607/21/2607.18110v1-llm-as-a-coach-experiential-learning-for-non-verifiable-tasks)  
+   标签：评分：8.0/10、query:rl
+   evidence：通过教练反馈的经验学习改善非可验证任务上LLM对齐的强化学习
+3. [Medea: An AI agent for therapeutic reasoning across biological contexts](/202607/21/biorxiv-10-64898-2026-01-16-696667-v3-medea-an-ai-agent-for-therapeutic-reasoning-across-biological-contexts)  
+   标签：评分：8.0/10、query:rl
+   evidence：用于生物治疗推理的大模型自主智能体
+4. [ChatGEM: An Agentic Architecture Enabling Interactive Simulation of Genome-Scale Metabolic Models](/202607/21/biorxiv-10-64898-2026-07-20-739662-v1-chatgem-an-agentic-architecture-enabling-interactive-simulation-of-genome-scale-metabolic-models)  
+   标签：评分：8.0/10、query:rl
+   evidence：基于RAG的LLM智能体用于科研任务自动化
+5. [How to Guide LLM Generation: Dual-Surrogate Guided Search for Automated Heuristic Design](/202607/21/2607.13911v1-how-to-guide-llm-generation-dual-surrogate-guided-search-for-automated-heuristic-design)  
    标签：评分：7.0/10、query:rl
-   evidence：分析大语言模型智能体在信息抽取任务中的行为可控性
-3. [Learning Latency-Aware Orchestration for Multi-Agent Systems](/202607/20/2607.13359v1-learning-latency-aware-orchestration-for-multi-agent-systems)  
+   evidence：双代理引导搜索指导LLM生成，与策略梯度优化相关
+6. [Debiasing Text-to-Image Evaluation via Implicit Cultural Alignment Reward Modeling](/202607/21/2607.15740v1-debiasing-text-to-image-evaluation-via-implicit-cultural-alignment-reward-modeling)  
+   标签：评分：7.0/10、query:rl
+   evidence：用于文化对齐的奖励建模
+7. [Automating structural reliability analysis with a multi-agent large language model framework](/202607/21/2607.16580v1-automating-structural-reliability-analysis-with-a-multi-agent-large-language-model-framework)  
+   标签：评分：7.0/10、query:rl
+   evidence：大语言模型多智能体框架用于可靠性分析任务自动化
+8. [Why Does Feedback-Augmented Self-Distillation Fail to Improve Retrieval-Interleaved Search Agents?](/202607/21/2607.17558v1-why-does-feedback-augmented-self-distillation-fail-to-improve-retrieval-interleaved-search-agents)  
+   标签：评分：7.0/10、query:rl
+   evidence：分析基于反馈增强自蒸馏的检索交织搜索智能体训练
+9. [Enhancing Small Language Models Reasoning through Knowledge Graph Grounding](/202607/21/2607.14149v1-enhancing-small-language-models-reasoning-through-knowledge-graph-grounding)  
    标签：评分：6.0/10、query:rl
-   evidence：面向LLM多智能体系统的延迟感知编排
+   evidence：将SLM转换为利用工具调用进行知识图谱推理的智能体，与任务自动化相关
+10. [Salience Induction against Multi-Hop RAG Agents: Threat and Defense](/202607/21/2607.17535v1-salience-induction-against-multi-hop-rag-agents-threat-and-defense)  
+   标签：评分：6.0/10、query:rl
+   evidence：多跳检索增强生成智能体的安全分析
+11. [Generalize and Guide: Decomposing Rewards for Few-Shot Inverse Reinforcement Learning](/202607/21/2607.17760v1-generalize-and-guide-decomposing-rewards-for-few-shot-inverse-reinforcement-learning)  
+   标签：评分：6.0/10、query:rl
+   evidence：面向少样本逆强化学习的奖励分解方法
 
 
 <div class="dpr-home-promo-card">

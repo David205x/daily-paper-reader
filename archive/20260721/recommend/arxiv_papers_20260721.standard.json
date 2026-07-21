@@ -1,0 +1,702 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-21T21:47:15.352726+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 10,
+    "deep_cap": 6,
+    "deep_selected": 6,
+    "quick_candidates": 15,
+    "quick_skim_target": 11,
+    "quick_selected": 11
+  },
+  "deep_dive": [
+    {
+      "id": "2607.16850v1",
+      "source": "arxiv",
+      "title": "Group Entropy-Controlled Policy Optimization",
+      "abstract": "Entropy control has become an effective tool in reinforcement learning (RL) of large language models (LLMs), helping balance exploration-exploitation trade-off during alignment process. Such RL paradigm is often conducted on mixtures of heterogeneous tasks, which induce distinct entropy regimes under the same policy, making global or token-level entropy regulation insufficient to corresponding heterogeneous needs of exploration. This heterogeneity further makes GRPO-style normalized advantages induce an entropy-dependent bias, making advantage signals across prompt groups statistically non-comparable. To address this issue, we propose Group Entropy-Controlled Policy Optimization (GEPO), a lightweight extension to GRPO that uses group entropy, estimated from existing grouped samples to perform entropy-conditioned asymmetric advantage shaping. GEPO attenuates positive advantages in low-entropy groups to reduce over-exploitation, and negative advantages in high-entropy groups to preserve exploration, with adaptive thresholds derived from historical entropy statistics. Extensive experiments on two base models across thirteen benchmarks spanning mathematics, physics, science, code generation, and instruction following show that GEPO consistently outperforms GRPO and recent entropy-controlled methods, delivering balanced cross-task improvements while preserving task-specific exploration levels throughout training.",
+      "authors": [
+        "Guangran Cheng",
+        "Chengqi Lyu",
+        "Songyang Gao",
+        "Wenwei Zhang",
+        "Kai Chen"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-07-18T15:13:33+00:00",
+      "link": "https://arxiv.org/pdf/2607.16850v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "group entropy-controlled policy optimization for LLM RL",
+      "llm_evidence_cn": "面向LLM强化学习的组熵控制策略优化",
+      "llm_evidence": "面向LLM强化学习的组熵控制策略优化",
+      "canonical_evidence": "面向LLM强化学习的组熵控制策略优化",
+      "llm_tldr_en": "Group Entropy-Controlled Policy Optimization (GEPO) extends GRPO by using group entropy to address heterogeneous exploration needs across tasks in LLM alignment.",
+      "llm_tldr_cn": "在大语言模型的强化学习对齐中，异构任务导致不同熵需求，全局熵调节不足。本文提出GEPO，通过分组熵估计自适应调节各组的探索-利用平衡，并修正GRPO中熵依赖的优势偏差。实验显示GEPO在混合任务上提升对齐效果。该工作改善了LLM RL中熵控制的粒度。",
+      "llm_tldr": "在大语言模型的强化学习对齐中，异构任务导致不同熵需求，全局熵调节不足。本文提出GEPO，通过分组熵估计自适应调节各组的探索-利用平衡，并修正GRPO中熵依赖的优势偏差。实验显示GEPO在混合任务上提升对齐效果。该工作改善了LLM RL中熵控制的粒度。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "reinforcement learning for large language model",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.17946v1",
+      "source": "arxiv",
+      "title": "A Geometric Perspective on Stabilizing Value Conflict Resolution",
+      "abstract": "Large Language Models (LLMs) often struggle to navigate value conflicts when trained with the compressed scalar rewards of Reinforcement Learning from Human Feedback (RLHF). To address this challenge, we investigate how chain-of-thought (CoT) reasoning can help improve performance in this domain. Geometrically, we show that CoT correlates with further smoothing the model's loss landscape in its sharpest direction, helping resolve the optimization instability of traditional scalar rewards. We also demonstrate via relevant downstream benchmarks that value conflict-focused CoT may generalize to different kinds of moral reasoning, demonstrating that this CoT has the potential to be an effective mechanism for better moral reasoning. To capitalize on this potential, we create a new value conflict-focused CoT design that further smooths the sharpest direction of the loss landscape and increases moral reasoning performance. This finding shows that explicitly modifying and improving the design of reasoning dynamics offers a promising avenue for improving model performance on user requests with complex value conflicts, advancing pluralistic alignment in LLMs.",
+      "authors": [
+        "Saket Reddy",
+        "Andy Liu"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-07-20T13:46:47+00:00",
+      "link": "https://arxiv.org/pdf/2607.17946v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "RLHF value conflict resolution using chain-of-thought reasoning",
+      "llm_evidence_cn": "使用思维链推理解决RLHF中的价值冲突",
+      "llm_evidence": "使用思维链推理解决RLHF中的价值冲突",
+      "canonical_evidence": "使用思维链推理解决RLHF中的价值冲突",
+      "llm_tldr_en": "This paper investigates how chain-of-thought reasoning improves LLM performance in value conflict scenarios under RLHF, showing that CoT smooths the loss landscape and generalizes moral reasoning.",
+      "llm_tldr_cn": "针对RLHF中压缩标量奖励导致价值冲突难以导航的问题，本文通过几何视角分析了思维链（CoT）的作用，发现CoT能进一步平滑损失景观的最陡方向，从而缓解标量奖励的优化不稳定性。下游基准实验表明，聚焦价值冲突的CoT可泛化到多种道德推理任务。该工作为提升RLHF训练中的价值对齐提供了理论洞见和实用机制。",
+      "llm_tldr": "针对RLHF中压缩标量奖励导致价值冲突难以导航的问题，本文通过几何视角分析了思维链（CoT）的作用，发现CoT能进一步平滑损失景观的最陡方向，从而缓解标量奖励的优化不稳定性。下游基准实验表明，聚焦价值冲突的CoT可泛化到多种道德推理任务。该工作为提升RLHF训练中的价值对齐提供了理论洞见和实用机制。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "reinforcement learning from human feedback for llm alignment",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.18006v1",
+      "source": "arxiv",
+      "title": "MADA-RL: Multi-Agent Debate-Aware Reinforcement Learning for Parameter-Efficient Reasoning in Compact Models",
+      "abstract": "Large language models achieve strong reasoning performance, but often at prohibitive training cost - a challenge that is especially acute for compact models ($\\leq 4 \\, \\mathrm{B}$ parameters) trained under limited budgets. We introduce MADA-RL, a post-training framework that specializes compact models into generator and critic roles and trains them with a debate-aware learning signal, fine-tuning only a small subset of parameters via LoRA adapters. Our central contribution is a counterfactual critic advantage: a dynamic, role-conditioned baseline that redefines the critic's advantage as its reward minus the generator ensemble's per-instance accuracy. This explicitly optimizes critics to improve over generator consensus rather than to merely reproduce a correct answer, yielding more targeted credit assignment than static mean-reward normalization. At deployment, the specialized agents are composed in a lightweight multi-round protocol. Across five mathematical reasoning benchmarks, MADA-RL raises the accuracy of the DeepSeek-R1-Distill-Qwen-1.5B model from $39.9 \\, \\%$ to $41.9 \\, \\%$ ($+2.0$ points, $p < 0.001$) using $16$ times fewer trainable parameters than fully fine-tuned baselines, placing it on the accuracy-trainable-parameter Pareto front. It approaches, but does not surpass, the strongest baselines (DeepScaleR, STILL-3), which are trained on substantially larger datasets; we analyse this gap and the associated inference-time cost directly. A controlled study isolates the source of MADA-RL's gains: the counterfactual advantage produces the highest critic improvement rate of any model evaluated, indicating that trained critics learn to correct generator errors rather than to imitate them.",
+      "authors": [
+        "Martino M. L. Pulici",
+        "Cuong Xuan Chu",
+        "Evgeny Kharlamov",
+        "Zifeng Ding",
+        "Volker Tresp",
+        "Yunpu Ma"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI",
+        "cs.CL",
+        "cs.MA"
+      ],
+      "published": "2026-07-20T14:38:00+00:00",
+      "link": "https://arxiv.org/pdf/2607.18006v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "RL for reasoning in compact LLMs with debate-aware reward",
+      "llm_evidence_cn": "通过辩论感知奖励的RL方法提升紧凑LLM推理",
+      "llm_evidence": "通过辩论感知奖励的RL方法提升紧凑LLM推理",
+      "canonical_evidence": "通过辩论感知奖励的RL方法提升紧凑LLM推理",
+      "llm_tldr_en": "Proposes MADA-RL, a post-training framework using multi-agent debate-aware RL with counterfactual critic advantage to improve reasoning in compact LLMs via LoRA fine-tuning.",
+      "llm_tldr_cn": "针对紧凑型大语言模型训练成本高的问题，本文提出MADA-RL框架，利用多智能体辩论感知强化学习，通过反事实评论者优势奖励和LoRA微调，参数高效地提升推理性能。实验表明该方法在有限预算下显著增强模型推理能力。",
+      "llm_tldr": "针对紧凑型大语言模型训练成本高的问题，本文提出MADA-RL框架，利用多智能体辩论感知强化学习，通过反事实评论者优势奖励和LoRA微调，参数高效地提升推理性能。实验表明该方法在有限预算下显著增强模型推理能力。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "application of reinforcement learning in large language model reasoning",
+      "matched_requirement_id": "req-7",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.16900v1",
+      "source": "arxiv",
+      "title": "Environment-free Synthetic Data Generation for API-Calling Agents",
+      "abstract": "Training API-calling large language model (LLM) agents demands massive amounts of high-quality trajectories. However, collecting such data at scale typically requires fully implemented environments with executable APIs and realistic, pre-populated backend databases, creating a major bottleneck for scalability. To overcome this, we propose an environment-free synthetic data generation approach that leverages LLMs as on-the-fly digital world models. Given only API specifications, our method generates trajectories mimicking interactions between an agent and a stateful environment. Specifically, an LLM first generates diverse tasks solvable with the provided APIs. A teacher agent then iteratively solves each task while an LLM simulator generates coherent synthetic API responses conditioned on the task context and simulation history. Finally, an LLM judge filters the trajectories to ensure the quality of the resulting dataset. We evaluate our approach on the challenging AppWorld and OfficeBench benchmarks, which include both information-retrieval and state-changing tasks. Fine-tuning models on our synthetic data yields significant performance gains, demonstrating that effective supervision for API-calling agents can be generated without any executable environment. Our results establish LLM-based API simulation as a practical, scalable solution for training agents across diverse API ecosystems.",
+      "authors": [
+        "Seanie Lee",
+        "Sanjoy Chowdhury",
+        "Chao Jiang",
+        "Cheng-Yu Hsieh",
+        "Ting-Yao Hu",
+        "Alexander T Toshev",
+        "Oncel Tuzel",
+        "Raviteja Vemulapalli"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-07-18T17:36:44+00:00",
+      "link": "https://arxiv.org/pdf/2607.16900v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "synthetic trajectory generation for LLM agents using LLM as world model",
+      "llm_evidence_cn": "利用LLM作为世界模型生成智能体轨迹",
+      "llm_evidence": "利用LLM作为世界模型生成智能体轨迹",
+      "canonical_evidence": "利用LLM作为世界模型生成智能体轨迹",
+      "llm_tldr_en": "This paper proposes an environment-free method to generate synthetic trajectories for training API-calling LLM agents, using LLMs as on-the-fly world models to simulate stateful interactions.",
+      "llm_tldr_cn": "训练API调用智能体需要大量高质量轨迹，通常依赖预建执行环境。本文提出无环境合成数据生成方法，仅需API规范，利用LLM作为动态世界模型，首先生成多样任务，再由教师智能体逐步解决，同时LLM模拟器生成一致的状态更新。该方法大幅降低了数据生成的门槛，可扩展至任意API集合。",
+      "llm_tldr": "训练API调用智能体需要大量高质量轨迹，通常依赖预建执行环境。本文提出无环境合成数据生成方法，仅需API规范，利用LLM作为动态世界模型，首先生成多样任务，再由教师智能体逐步解决，同时LLM模拟器生成一致的状态更新。该方法大幅降低了数据生成的门槛，可扩展至任意API集合。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.17038v1",
+      "source": "arxiv",
+      "title": "Reward-Driven LLM Agent Workflows: Synthesizing POMDP Routing and Self-Correction for Autonomous Decision-Making",
+      "abstract": "This paper addresses key technical challenges in current large language model (LLM) agent applications, including long-horizon planning, sparse reward attribution, and dynamic environmental interaction, by designing and optimizing an intelligent agent workflow. The proposed architecture is based on the synthesis of core AI paradigms: Visual, Language, Generative, Graph, Multimodal, Reinforcement, and Agent Intelligence. Unlike conventional baseline models that rely on static prompting and lack robust perception-action loops, our approach introduces a Partially Observable Markov Decision Process (POMDP) routing mechanism. This mechanism is augmented with an internal, self-correcting reward model that evaluates decision trajectories before execution. By integrating multimodal inputs and advanced reinforcement learning principles (such as proximal policy optimization and value function approximation), the agent maintains long-term structural memory and dynamically adapts its reasoning pathways to mitigate error accumulation. Empirical experiments on the ALFWorld embodied simulation environment and the WebShop online navigation benchmark demonstrate a 24.5% absolute improvement in task success rate and trajectory efficiency over mainstream baselines like the standard ReAct framework. Comprehensive ablation studies confirm the significant contribution of the reward-driven critique module in suppressing hallucination rates. This research bridges theoretical foundations of reinforcement learning and graph-based memory with autonomous agent workflows. Ultimately, the resulting architecture offers a practical, scalable reference framework for developing artificial intelligence technologies in complex, multi-step autonomous systems. Code is available at https://github.com/01Amez/RLAW_Implementation.",
+      "authors": [
+        "Amez Amanj Ali",
+        "Kuo-Kun Tseng"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-07-19T02:51:41+00:00",
+      "link": "https://arxiv.org/pdf/2607.17038v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "reward-driven LLM agent workflows with POMDP routing and self-correction",
+      "llm_evidence_cn": "基于奖励驱动的LLM代理工作流，结合POMDP路由与自纠正",
+      "llm_evidence": "基于奖励驱动的LLM代理工作流，结合POMDP路由与自纠正",
+      "canonical_evidence": "基于奖励驱动的LLM代理工作流，结合POMDP路由与自纠正",
+      "llm_tldr_en": "A POMDP-routing mechanism with internal self-correcting reward model enables long-horizon planning and sparse reward attribution in LLM agents.",
+      "llm_tldr_cn": "LLM代理面临长程规划与稀疏奖励归因挑战。本文提出基于POMDP路由和内部自纠正奖励模型的智能体工作流，将部分可观测马尔可夫决策过程与自我评估结合。实验证明该方法在自主决策任务上优于静态提示基线。该工作为构建健壮的LLM代理提供了综合框架。",
+      "llm_tldr": "LLM代理面临长程规划与稀疏奖励归因挑战。本文提出基于POMDP路由和内部自纠正奖励模型的智能体工作流，将部分可观测马尔可夫决策过程与自我评估结合。实验证明该方法在自主决策任务上优于静态提示基线。该工作为构建健壮的LLM代理提供了综合框架。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.17823v1",
+      "source": "arxiv",
+      "title": "Theoretical Foundations of $\\max$@$k$ Reinforcement Learning",
+      "abstract": "Reinforcement Learning is a cornerstone technique for modern large reasoning models. Usually, for difficult tasks such as code generation and theorem proving, the agent is evaluated by generating $K$ responses rather than sampling a single response, and performance is then measured using a retry-aware metric such as $\\max$@$k$. Despite their practical importance, the theoretical foundations of learning under such criteria remain limited. In this work, we provide a theoretical study of the $\\max$@$k$ learning problem in finite-horizon reinforcement learning. We show that optimizing the $\\max$@$k$ objectives is fundamentally different from standard expected-return maximization. In particular, we prove that Markovian policies are in general insufficient, identify a compact state augmentation that restores optimality, and explicitly characterize the performance gap that can arise between history-dependent and non-history-dependent policies. Moreover, we show that learning $\\max$@$k$-optimal policies is statistically harder than standard reinforcement learning and provide an efficient algorithm that achieves the optimal sample complexity rate.",
+      "authors": [
+        "Riccardo Poiani",
+        "Martino Bernasconi",
+        "Andrea Celli"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-07-20T11:11:55+00:00",
+      "link": "https://arxiv.org/pdf/2607.17823v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Theoretical study of max@k RL for LLM reasoning tasks",
+      "llm_evidence_cn": "面向LLM推理任务的max@k强化学习理论基础",
+      "llm_evidence": "面向LLM推理任务的max@k强化学习理论基础",
+      "canonical_evidence": "面向LLM推理任务的max@k强化学习理论基础",
+      "llm_tldr_en": "Provides theoretical foundations for max@k reinforcement learning, proving Markovian policies insufficient and identifying optimal policy class, relevant to LLM reasoning evaluation.",
+      "llm_tldr_cn": "针对大语言模型推理任务中常用的max@k评估准则，本文首次从理论上研究max@k强化学习，证明马尔可夫策略不足，识别最优策略类，为训练更好的推理模型提供理论基础。",
+      "llm_tldr": "针对大语言模型推理任务中常用的max@k评估准则，本文首次从理论上研究max@k强化学习，证明马尔可夫策略不足，识别最优策略类，为训练更好的推理模型提供理论基础。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "application of reinforcement learning in large language model reasoning",
+      "matched_requirement_id": "req-7",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2607.18039v1",
+      "source": "arxiv",
+      "title": "Evidence-in-the-Loop: Trace-Driven Optimization for Customer-Service LLM Agents",
+      "abstract": "Production customer-service bots must improve answer quality across iterative releases, yet large language models must not bypass evidence boundaries, policy rules, or human-handoff safeguards. We present an \\textbf{Evidence-Grounded Customer-Service Agent Workflow} deployed in a real-world customer-service setting. BM25 recall, issue-title-vector recall, issue-description-vector recall, weighted RRF fusion, and cross-encoder reranking construct grounded FAQ evidence for controlled LLM decisions. Policy-guided orchestration then combines this RAG evidence with scenario-specific rule evidence, conversation memory, and clarification state inside a fixed LangGraph DAG~\\cite{langgraph2024}. The paper contributes three reusable deployment patterns: \\textbf{hybrid RAG evidence construction}, where multi-channel retrieval and reranking produce auditable FAQ candidates; \\textbf{evidence-grounded issue/action decision}, where an Evidence-Grounded Decision Module selects an issue/action from typed FAQ evidence and scenario-specific rule evidence; and \\textbf{trace-driven RAG and reranker improvement}, where traces diagnose whether failures come from recall, ranking, final candidate selection, clarification, rule-derived evidence, or action policy, and where reranker fine-tuning is evaluated not only for in-domain gain but also for forgetting risk.",
+      "authors": [
+        "Chunming Wu",
+        "Dafei Qiu",
+        "Congde Yuan",
+        "Charles Quan",
+        "Jun Wu",
+        "Suipeng Li",
+        "Mo Wu",
+        "Gavin Xie",
+        "Hope Chen",
+        "Max Yao"
+      ],
+      "primary_category": "cs.IR",
+      "categories": [
+        "cs.IR"
+      ],
+      "published": "2026-07-20T15:07:58+00:00",
+      "link": "https://arxiv.org/pdf/2607.18039v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "RAG framework for customer-service agents",
+      "llm_evidence_cn": "面向客服智能体的检索增强生成框架",
+      "llm_evidence": "面向客服智能体的检索增强生成框架",
+      "canonical_evidence": "面向客服智能体的检索增强生成框架",
+      "llm_tldr_en": "Presents an evidence-grounded customer-service agent workflow using RAG with BM25, vector recall, fusion, and cross-encoder reranking, deployed in real-world setting.",
+      "llm_tldr_cn": "针对客服机器人回答质量提升需求，提出证据驱动的工作流，结合BM25召回、向量召回、加权融合与交叉编码器重排序构建FAQ证据，搭配策略引导编排，在真实客服场景部署，贡献三种可复用模式。",
+      "llm_tldr": "针对客服机器人回答质量提升需求，提出证据驱动的工作流，结合BM25召回、向量召回、加权融合与交叉编码器重排序构建FAQ证据，搭配策略引导编排，在真实客服场景部署，贡献三种可复用模式。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "retrieval augmented generation for knowledge intensive tasks",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2607.13911v1",
+      "source": "arxiv",
+      "title": "How to Guide LLM Generation: Dual-Surrogate Guided Search for Automated Heuristic Design",
+      "abstract": "Large language models (LLMs) have made automated heuristic design (AHD) increasingly practical by generating executable heuristic code from task descriptions and evaluator feedback. Yet under a limited query and evaluation budget, search efficiency depends critically on a pre-generation decision. Before each LLM query and black-box evaluation, the system must choose which archived heuristics to reuse as parents and which generation operator should transform them. Existing methods typically choose such actions with predefined rules, leaving the expected outcome of each concrete operator-parent action only indirectly modeled. Therefore, we propose \\emph{\\fullmethod{}} (\\method{}), a surrogate-guided action-selection module for operator-parent selection in LLM-based AHD. \\method{} guides the LLM code-generation process by scoring pre-generation actions with two complementary surrogates. Specifically, a transition surrogate is proposed to predict the latent distribution of the child representation induced by an operator-parent action, while an instance-conditioned utility surrogate is proposed to estimate the expected performance of sampled child latents. Moreover, we propose an uncertainty-aware acquisition rule that combines predicted utility, utility uncertainty, and transition uncertainty to select the next LLM generation action. Across a diverse heuristic-design suite, \\method{} is competitive with strong LLM-AHD baselines, and ablation and action-selection analyses suggest that its behavior goes beyond simple archive ranking or fixed operator preferences.",
+      "authors": [
+        "Yuhan Wang",
+        "Chaoda Peng",
+        "Xingyu Wu",
+        "Sheng-Hao Wu",
+        "Zhi-Hui Zhan"
+      ],
+      "primary_category": "cs.NE",
+      "categories": [
+        "cs.NE"
+      ],
+      "published": "2026-07-15T14:52:46+00:00",
+      "link": "https://arxiv.org/pdf/2607.13911v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Dual-surrogate guided search for LLM generation, related to policy gradient optimization",
+      "llm_evidence_cn": "双代理引导搜索指导LLM生成，与策略梯度优化相关",
+      "llm_evidence": "双代理引导搜索指导LLM生成，与策略梯度优化相关",
+      "canonical_evidence": "双代理引导搜索指导LLM生成，与策略梯度优化相关",
+      "llm_tldr_en": "Proposes a surrogate-guided action-selection module for automated heuristic design with LLMs, framing pre-generation decisions as a reinforcement learning-like optimization.",
+      "llm_tldr_cn": "针对LLM自动化启发式设计中的生成前决策问题，该论文提出双代理引导搜索方法。该方法通过替代模型预测每个算子-父代动作的期望结果，从而优化选择策略，类似于策略梯度中的价值函数。实验表明在有限的查询预算下，该方法显著提升了搜索效率。该工作为LLM生成中的决策优化提供了新视角。",
+      "llm_tldr": "针对LLM自动化启发式设计中的生成前决策问题，该论文提出双代理引导搜索方法。该方法通过替代模型预测每个算子-父代动作的期望结果，从而优化选择策略，类似于策略梯度中的价值函数。实验表明在有限的查询预算下，该方法显著提升了搜索效率。该工作为LLM生成中的决策优化提供了新视角。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "policy gradient methods for language generation",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.14149v1",
+      "source": "arxiv",
+      "title": "Enhancing Small Language Models Reasoning through Knowledge Graph Grounding",
+      "abstract": "Although large language models (LLMs) have set benchmarks for zero-shot reasoning, their deployment remains cost-prohibitive and environmentally taxing. Small Language Models (SLMs) offer a sustainable alternative, but prone to errors, on tasks requiring complex, multi-hop logical grounding. We investigate a neuro-symbolic agentic framework to enhance the reasoning capabilities of SLMs, specifically Gemma 3 (1B, 4B) and Llama 3.2 (3B), using the CLUTRR kinship benchmark. Our approach transforms the SLM into a minimalist agent utilizing two specialized tool calls: extract_facts for symbolic triplet extraction and get_hint for expert reasoning via a Relational Graph Convolutional Network (RGCN). We evaluate these models across two configurations, both in an Oracle scenario with ground-truth triplets and a Realistic scenario relying on self-extracted knowledge. Our results reveal that while RGCN-derived hints provide a 1.5 - 2x performance gain over story-only baselines, the system is constrained by the extraction bottleneck and sequential deductive fragility, where early extraction errors compound over multi-hop chains. Furthermore, we identify a \"distraction effect\" in specific architectures where noisy, self-generated facts degrade performance despite the presence of expert hints. This work characterizes the challenges of symbolic grounding in low-resource agentic systems and provides a roadmap for iterative verification in neuro-symbolic agentic pipelines.",
+      "authors": [
+        "Dimitrios Kelesis",
+        "Konstantinos Bougiatiotis",
+        "Georgios Paliouras"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI",
+        "cs.LG"
+      ],
+      "published": "2026-07-14T13:07:46+00:00",
+      "link": "https://arxiv.org/pdf/2607.14149v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Transforms SLM into an agent using tool calls for knowledge graph reasoning, related to task automation",
+      "llm_evidence_cn": "将SLM转换为利用工具调用进行知识图谱推理的智能体，与任务自动化相关",
+      "llm_evidence": "将SLM转换为利用工具调用进行知识图谱推理的智能体，与任务自动化相关",
+      "canonical_evidence": "将SLM转换为利用工具调用进行知识图谱推理的智能体，与任务自动化相关",
+      "llm_tldr_en": "Proposes a neuro-symbolic agentic framework that uses tool calls (extract_facts and get_hint) to enhance small language model reasoning on the CLUTRR task.",
+      "llm_tldr_cn": "该论文提出一种神经符号智能体框架，将小语言模型（SLM）转化为利用两个专门工具（extract_facts提取知识三元组，get_hint通过RGCN获取专家推理提示）的智能体，以增强其在CLUTRR关系推理上的表现。实验表明该框架显著提升了SLM的多跳逻辑推理能力，同时保持了较低的计算成本。该方法展示了将SLM改造为任务驱动智能体的潜力。",
+      "llm_tldr": "该论文提出一种神经符号智能体框架，将小语言模型（SLM）转化为利用两个专门工具（extract_facts提取知识三元组，get_hint通过RGCN获取专家推理提示）的智能体，以增强其在CLUTRR关系推理上的表现。实验表明该框架显著提升了SLM的多跳逻辑推理能力，同时保持了较低的计算成本。该方法展示了将SLM改造为任务驱动智能体的潜力。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.18110v1",
+      "source": "arxiv",
+      "title": "LLM-as-a-Coach: Experiential Learning for Non-Verifiable Tasks",
+      "abstract": "Reinforcement learning (RL) on open-ended tasks compresses an LLM's rubric-based evaluation into a scalar reward, discarding rich textual feedback and conflating responses with distinct quality profiles. We propose Experiential Learning (EL), which repurposes the feedback model from an LLM-as-a-Judge into an LLM-as-a-Coach. The coach distills its assessment of each on-policy response into transferable experiential knowledge, which conditions a teacher model and is internalized by the policy through on-policy context distillation. Compared with scalar rewards, this higher-bandwidth feedback channel provides dense supervision and preserves fine-grained preferences among high-quality responses. Across two policy families, with feedback from the policy itself or a proprietary model, EL consistently outperforms rubric-based RL on held-out and unseen open-ended tasks. Notably, EL generalizes better beyond the training distribution, and mitigates reward hacking. These findings establish experiential knowledge as a richer and more generalizable learning signal for post-training on non-verifiable tasks.",
+      "authors": [
+        "Tianzhu Ye",
+        "Li Dong",
+        "Guanheng Chen",
+        "He Zhu",
+        "Xun Wu",
+        "Shaohan Huang",
+        "Furu Wei"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.CL"
+      ],
+      "published": "2026-07-20T16:08:49+00:00",
+      "link": "https://arxiv.org/pdf/2607.18110v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Experiential learning with coach feedback improves RL for LLM alignment on non-verifiable tasks",
+      "llm_evidence_cn": "通过教练反馈的经验学习改善非可验证任务上LLM对齐的强化学习",
+      "llm_evidence": "通过教练反馈的经验学习改善非可验证任务上LLM对齐的强化学习",
+      "canonical_evidence": "通过教练反馈的经验学习改善非可验证任务上LLM对齐的强化学习",
+      "llm_tldr_en": "Proposes Experiential Learning (EL) that uses LLM-as-a-Coach to provide dense textual feedback instead of scalar rewards, improving RL performance on open-ended tasks for LLM alignment.",
+      "llm_tldr_cn": "针对强化学习在开放任务中将rubric评价压缩为标量奖励丢失反馈信息的问题，本文提出经验学习（EL），将评审模型转化为教练，提供密集文本反馈，通过在线上下文蒸馏内化知识，在非可验证任务上显著优于标准RL方法。",
+      "llm_tldr": "针对强化学习在开放任务中将rubric评价压缩为标量奖励丢失反馈信息的问题，本文提出经验学习（EL），将评审模型转化为教练，提供密集文本反馈，通过在线上下文蒸馏内化知识，在非可验证任务上显著优于标准RL方法。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "reinforcement learning from human feedback for llm alignment",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2607.15740v1",
+      "source": "arxiv",
+      "title": "Debiasing Text-to-Image Evaluation via Implicit Cultural Alignment Reward Modeling",
+      "abstract": "As Text-to-Image (T2I) systems rapidly advance, evaluating the cultural authenticity of synthesized content has become increasingly important for fair and trustworthy generative AI. Existing T2I evaluation metrics and multimodal judges often rely on visual-semantic representations that underrepresent implicit cultural norms, leading to biased preference judgments and the omission of fine-grained cultural cues. In addition, visual question answering (VQA)-based evaluators typically depend on autoregressive text generation, which limits their scalability for real-time reward modeling. To address these limitations, we introduce an Implicit Cultural Alignment Reward Model built upon a lightweight 4.2-billion-parameter Multimodal Large Language Model (MLLM). Our framework integrates an Implicit Cultural Probe with a Skip-connection Cross-Attention (SkipCA) mechanism, enabling late-stage semantic features to directly attend to early-stage visual representations and better preserve culturally salient details. Evaluations on 3,323 challenging and carefully curated image pairs from the CulturalFrames benchmark show that our approach achieves 80.54% pairwise accuracy, with Pearson and Kendall correlation coefficients of 0.546 and 0.377, respectively, outperforming representative vision-language metrics and MLLM-based evaluators. Moreover, by bypassing autoregressive text generation, our model processes each evaluation in 0.21 seconds under our local inference setup, achieving a $10\\times$ speedup over standard VQA-based evaluators. These results suggest that the proposed reward model can provide an efficient and culturally aware scalar signal for preference optimization pipelines such as Reinforcement Learning from Human Feedback and Direct Preference Optimization.",
+      "authors": [
+        "Bo-An Chang",
+        "Yu-Chih Chen"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI",
+        "cs.LG",
+        "cs.MM"
+      ],
+      "published": "2026-07-17T08:23:03+00:00",
+      "link": "https://arxiv.org/pdf/2607.15740v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "reward modeling for cultural alignment in T2I evaluation",
+      "llm_evidence_cn": "用于文化对齐的奖励建模",
+      "llm_evidence": "用于文化对齐的奖励建模",
+      "canonical_evidence": "用于文化对齐的奖励建模",
+      "llm_tldr_en": "This paper introduces an Implicit Cultural Alignment Reward Model built on a lightweight MLLM to debias T2I evaluation, addressing cultural underrepresentation and scalability issues.",
+      "llm_tldr_cn": "现有文本到图像评估指标忽略隐式文化规范，导致偏好判断偏差。本文提出隐式文化对齐奖励模型，基于轻量级多模态大语言模型（4.2B参数），无需自回归生成即可实时评估文化真实性。该方法在去偏方面优于现有VQA-based评估器，且可扩展性强。该工作为公平可靠的生成式AI评估提供了新范式。",
+      "llm_tldr": "现有文本到图像评估指标忽略隐式文化规范，导致偏好判断偏差。本文提出隐式文化对齐奖励模型，基于轻量级多模态大语言模型（4.2B参数），无需自回归生成即可实时评估文化真实性。该方法在去偏方面优于现有VQA-based评估器，且可扩展性强。该工作为公平可靠的生成式AI评估提供了新范式。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "design of reward functions in RL",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.17535v1",
+      "source": "arxiv",
+      "title": "Salience Induction against Multi-Hop RAG Agents: Threat and Defense",
+      "abstract": "Agentic retrieval-augmented generation (RAG) systems increasingly retrieve external evidence and orchestrate tools for knowledge-intensive applications. In Multi-Hop question answering, agents chain facts across documents. Existing defenses focus on content poisoning, which injects false facts, and prompt injection, which embeds directives. We identify a third attack surface: the salience channel, through which fact position, emphasis, framing, and semantic proximity can redirect reasoning even when all retrieved claims are true and no instructions are present. We formalize Salience Induction as truth-preserving edits that redirect Multi-Hop attribute binding while leaving the retrieval trace semantically intact. We define six Salience-Editing operator classes and build an iterative proposer-verifier pipeline under factual and stealth constraints. We also introduce SalientWiki-MH, a decoy-annotated Multi-Hop benchmark. Evaluations across five frontier model families (GPT, Claude, Gemini, DeepSeek, and Qwen) and three agent architectures (ReAct, Reflexion, and tool-calling) show broad generalization. Under a 30% edit budget, Salience Induction achieves an 83.3% attack success rate; the strongest evaluated baseline defense leaves 75.7% post-defense ASR. Untargeted rewriting further reduces attacks only by degrading neutral task success. Our lightweight input-side defense, Salience Normalization, reduces attack success to 15.3% under standard attacks and 23.6% under an adaptive attack. These results show that truthfulness and instruction filtering alone are insufficient: robust agentic RAG also requires defenses against salience-relevance decoupling.",
+      "authors": [
+        "Xingfu Zhou",
+        "Pengfei Wang",
+        "Yuan Zhou",
+        "Wei Xie",
+        "Xu Zhou"
+      ],
+      "primary_category": "cs.CR",
+      "categories": [
+        "cs.CR",
+        "cs.CL"
+      ],
+      "published": "2026-07-20T04:27:50+00:00",
+      "link": "https://arxiv.org/pdf/2607.17535v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "security analysis for multi-hop RAG agents",
+      "llm_evidence_cn": "多跳检索增强生成智能体的安全分析",
+      "llm_evidence": "多跳检索增强生成智能体的安全分析",
+      "canonical_evidence": "多跳检索增强生成智能体的安全分析",
+      "llm_tldr_en": "Identifies salience induction as a new attack surface for multi-hop RAG agents, formalizing truth-preserving edits that redirect reasoning via position and emphasis.",
+      "llm_tldr_cn": "现有防御聚焦内容投毒与提示注入，忽视了基于显著性（位置、强调、语义接近）的攻击。形式化显著性诱导为保持真相的编辑操作，可重定向多跳属性绑定而不改变检索语义。定义六种显著性编辑算子，为RAG系统安全提供新视角。",
+      "llm_tldr": "现有防御聚焦内容投毒与提示注入，忽视了基于显著性（位置、强调、语义接近）的攻击。形式化显著性诱导为保持真相的编辑操作，可重定向多跳属性绑定而不改变检索语义。定义六种显著性编辑算子，为RAG系统安全提供新视角。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "retrieval augmented generation for knowledge intensive tasks",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "biorxiv-10-64898-2026-01-16-696667-v3",
+      "source": "biorxiv",
+      "title": "Medea: An AI agent for therapeutic reasoning across biological contexts",
+      "abstract": "Therapeutic hypotheses can transfer across diseases but their relevance depends on biological context. The same target, perturbation, or treatment can produce different effects across cell types, disease states, genetic backgrounds, and patients. Therapeutic reasoning therefore requires methods that preserve context, test when evidence supports transfer, and identify where context-specific effects limit it. Although AI agents can perform therapeutic analyses, existing systems often fail to preserve biological context over long workflows, verify intermediate computational steps, or reconcile conflicting evidence across datasets and literature. Here, we present Medea, an AI agent for therapeutic reasoning across biological contexts. Medea executes multi-step analyses using biological tools, machine learning models, and literature retrieval while enforcing verification during planning, execution, and evidence synthesis. We evaluate Medea across 5,673 open-ended analyses in three domains: cell type specific therapeutic target nomination in five diseases and 29 cell types, synthetic lethality prediction in 7 cancer cell lines, and immunotherapy response prediction from multimodal patient profiles. Using a previously unpublished epistatic miniarray profiling screen performed under two DNA-damaging treatments, we evaluate Medea on predicting synthetic lethality among 238,046 gene-gene pairs in yeast. Medea predicts these experimentally measured synthetic lethal interactions, indicating that its performance reflects biological relevance rather than information leakage from benchmark datasets. Across these evaluations, Medea improves performance over large language models, reasoning models, biomedical agents, and specialized machine learning models while maintaining low failure rates and calibrated abstention. These results show that verifiable AI agents can perform therapeutic analyses across biological contexts.",
+      "authors": [
+        "Sui, P.",
+        "Li, M.",
+        "Munson, B. P.",
+        "Gao, S.",
+        "Shen, W.",
+        "Giunchiglia, V.",
+        "Shen, A.",
+        "Huang, Y.",
+        "Kong, Z.",
+        "Licon, K.",
+        "Ideker, T.",
+        "Zitnik, M."
+      ],
+      "primary_category": "bioinformatics",
+      "categories": [
+        "bioinformatics"
+      ],
+      "published": "2026-07-17T00:00:00+00:00",
+      "link": "https://www.biorxiv.org/content/10.64898/2026.01.16.696667v3.full.pdf",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "LLM agent for automated therapeutic reasoning in biology",
+      "llm_evidence_cn": "用于生物治疗推理的大模型自主智能体",
+      "llm_evidence": "用于生物治疗推理的大模型自主智能体",
+      "canonical_evidence": "用于生物治疗推理的大模型自主智能体",
+      "llm_tldr_en": "Medea is an AI agent that performs therapeutic reasoning across biological contexts, using LLMs to preserve context, verify steps, and reconcile evidence, automating complex analytical workflows.",
+      "llm_tldr_cn": "针对生物治疗推理中上下文丢失和证据冲突问题，提出Medea智能体，利用大语言模型在多步工作流中保持上下文、验证中间步骤并调和矛盾证据，实现跨疾病治疗假设的自动化分析与评估，展示了LLM在科学发现任务自动化中的潜力。",
+      "llm_tldr": "针对生物治疗推理中上下文丢失和证据冲突问题，提出Medea智能体，利用大语言模型在多步工作流中保持上下文、验证中间步骤并调和矛盾证据，实现跨疾病治疗假设的自动化分析与评估，展示了LLM在科学发现任务自动化中的潜力。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2607.16580v1",
+      "source": "arxiv",
+      "title": "Automating structural reliability analysis with a multi-agent large language model framework",
+      "abstract": "Structural reliability analysis supports the design and safety assessment of buildings and civil infrastructure but requires specialized expertise throughout the workflow. This study presents a multi-agent large language model framework that automates component-level reliability analysis from a natural-language problem statement to interpreted estimates of the reliability index and failure probability. Specialized agents handle problem formulation, method planning, code generation, execution, and result interpretation, with human confirmation at key decision points. The Method Planner is fine-tuned using QLoRA for a priori reliability-method category selection. Analysis results are not generated directly by an LLM; instead, validated deterministic solvers compute the reliability estimates, improving reproducibility and reducing hallucination risk. The framework uses open-weight models and supports local execution without closed APIs. Results show that it lowers the expertise barrier to structural reliability assessment while preserving computational trustworthiness.",
+      "authors": [
+        "Jaehwan Jeon",
+        "Chang Hee Lee",
+        "Taeyong Kim"
+      ],
+      "primary_category": "stat.AP",
+      "categories": [
+        "stat.AP",
+        "cs.CE",
+        "cs.SE"
+      ],
+      "published": "2026-07-18T01:45:27+00:00",
+      "link": "https://arxiv.org/pdf/2607.16580v1",
+      "tags": [
+        "keyword:rl"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "LLM multi-agent framework for task automation in reliability analysis",
+      "llm_evidence_cn": "大语言模型多智能体框架用于可靠性分析任务自动化",
+      "llm_evidence": "大语言模型多智能体框架用于可靠性分析任务自动化",
+      "canonical_evidence": "大语言模型多智能体框架用于可靠性分析任务自动化",
+      "llm_tldr_en": "Presents a multi-agent LLM framework that automates structural reliability analysis from natural-language problem to reliability index estimate, with fine-tuned method planner.",
+      "llm_tldr_cn": "传统结构可靠性分析依赖专家经验。提出多智能体LLM框架，由专门智能体处理问题公式化、方法规划、代码生成、执行与结果解释。方法规划器通过QLoRA微调选择可靠性方法。在组件级分析中自动生成可靠指标与失效概率估算。",
+      "llm_tldr": "传统结构可靠性分析依赖专家经验。提出多智能体LLM框架，由专门智能体处理问题公式化、方法规划、代码生成、执行与结果解释。方法规划器通过QLoRA微调选择可靠性方法。在组件级分析中自动生成可靠指标与失效概率估算。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.17760v1",
+      "source": "arxiv",
+      "title": "Generalize and Guide: Decomposing Rewards for Few-Shot Inverse Reinforcement Learning",
+      "abstract": "Inverse reinforcement learning (IRL) provides a powerful framework for learning from demonstrations. However, real-world tasks often exhibit substantial natural variations (e.g., picking up mugs with varying shapes), making it impractical to collect demonstrations that fully specify a new task under every possible scenario. In practice, while demonstrations for the target task are limited, it is often easier to obtain datasets of heterogeneous but related behaviors. This motivates the problem of few-shot IRL with multi-task demonstrations (FM-IRL), where an agent must learn a new task with substantial variations from only a limited number of target-task demonstrations, together with sufficient demonstrations of related tasks and online agent experience. To do so, we must both recover the expert distribution of the new task and provide guidance when the agent deviates from it. We introduce Multitask discriminator Proximity-Guided IRL (MPG), which learns two complementary reward components: (1) a generalizable discriminator that transfers shared structure across related tasks to identify expert behavior in a new task, and (2) a proximity function that measures how far a state deviates from expert behavior and provides corrective guidance during exploration. We demonstrate the effectiveness of our method on multiple challenging navigation and manipulation tasks under significant variations (e.g., object configurations, table layouts, and initial robot poses), achieving an average success rate of 81.2%, outperforming the strongest per-task baseline by an average of 24.7 percentage points.",
+      "authors": [
+        "Ziyi Liu",
+        "Grace Zhang"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI",
+        "cs.RO"
+      ],
+      "published": "2026-07-20T09:51:02+00:00",
+      "link": "https://arxiv.org/pdf/2607.17760v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "reward decomposition for few-shot inverse reinforcement learning",
+      "llm_evidence_cn": "面向少样本逆强化学习的奖励分解方法",
+      "llm_evidence": "面向少样本逆强化学习的奖励分解方法",
+      "canonical_evidence": "面向少样本逆强化学习的奖励分解方法",
+      "llm_tldr_en": "Decomposing rewards enables few-shot IRL with multi-task demonstrations, allowing generalization to tasks with substantial variations.",
+      "llm_tldr_cn": "现实任务中的演示往往覆盖不全，难以学习新变体。本文提出少样本逆强化学习框架，通过多任务演示和奖励分解，从少量目标演示中泛化。方法利用异构相关任务数据辅助学习，并在在线交互中适应。该工作为奖励函数设计提供了高效少样本学习途径。",
+      "llm_tldr": "现实任务中的演示往往覆盖不全，难以学习新变体。本文提出少样本逆强化学习框架，通过多任务演示和奖励分解，从少量目标演示中泛化。方法利用异构相关任务数据辅助学习，并在在线交互中适应。该工作为奖励函数设计提供了高效少样本学习途径。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "design of reward functions in RL",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "biorxiv-10-64898-2026-07-20-739662-v1",
+      "source": "biorxiv",
+      "title": "ChatGEM: An Agentic Architecture Enabling Interactive Simulation of Genome-Scale Metabolic Models",
+      "abstract": "Genome-scale metabolic models (GEMs) are powerful tools for predicting cellular phenotypes and guiding microbial strain engineering, yet broad adoption remains challenging due to the computational expertise required. To overcome that, we present ChatGEM, an agentic platform that enables interactive GEM simulation through natural language. Built on the multi-agent ADEPT framework, ChatGEM integrates COBRApy within a retrieval-augmented generation (RAG) architecture that coordinates code generation and execution through specialized agents. Benchmarking across three tasks of increasing complexity showed that RAG-enabled code generation improved the mean overall performance score from 2.63 to 4.20 while reducing the execution time significantly starting from routine to complex tasks. Application of ChatGEM using an enzyme-constrained GEM (ecGEM) for four engineered Pseudomonas putida KT2440 strains identified the constitutive strain as the optimal chassis for succinate overproduction using a succinate leakage index - a prediction observed experimentally. Therefore, ChatGEM democratizes metabolic modeling by enabling researchers without computational expertise to perform sophisticated GEM-based analyses through natural language, and, hence, accelerating scientific discovery.",
+      "authors": [
+        "Chowdhury, N.",
+        "George, A.",
+        "Purohit, S.",
+        "Contolesi, A.",
+        "Bredeweg, E. L.",
+        "Czajka, J.",
+        "Stratton, K. G.",
+        "Gao, Y.",
+        "Stephenson, M.",
+        "Elmore, J. R.",
+        "Scott, A.",
+        "Leach, D. T.",
+        "Jerger, A.",
+        "Lemmon, T.",
+        "Piehowski, P.",
+        "Tate, K.",
+        "Fulcher, J. M.",
+        "Beliaev, A.",
+        "Burnum-Johnson, K.",
+        "Rigor, P.",
+        "Bardhan, J."
+      ],
+      "primary_category": "systems biology",
+      "categories": [
+        "systems biology"
+      ],
+      "published": "2026-07-21T00:00:00+00:00",
+      "link": "https://www.biorxiv.org/content/10.64898/2026.07.20.739662v1.full.pdf",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "LLM agent with RAG for scientific task automation",
+      "llm_evidence_cn": "基于RAG的LLM智能体用于科研任务自动化",
+      "llm_evidence": "基于RAG的LLM智能体用于科研任务自动化",
+      "canonical_evidence": "基于RAG的LLM智能体用于科研任务自动化",
+      "llm_tldr_en": "ChatGEM is an agentic platform that integrates COBRApy with a RAG architecture to enable interactive simulation of genome-scale metabolic models via natural language, improving performance from 2.63 to 4.20.",
+      "llm_tldr_cn": "面对代谢模型模拟需要专业知识的问题，本文提出ChatGEM智能体平台，基于多智能体ADEPT框架，通过检索增强生成（RAG）架构协调代码生成与执行，实现自然语言交互式模型模拟。在三个复杂度递增的任务上，RAG使代码生成的平均综合得分从2.63提升至4.20，并减少执行时间。该工作展示了LLM智能体在科学计算自动化中的潜力。",
+      "llm_tldr": "面对代谢模型模拟需要专业知识的问题，本文提出ChatGEM智能体平台，基于多智能体ADEPT框架，通过检索增强生成（RAG）架构协调代码生成与执行，实现自然语言交互式模型模拟。在三个复杂度递增的任务上，RAG使代码生成的平均综合得分从2.63提升至4.20，并减少执行时间。该工作展示了LLM智能体在科学计算自动化中的潜力。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2607.17558v1",
+      "source": "arxiv",
+      "title": "Why Does Feedback-Augmented Self-Distillation Fail to Improve Retrieval-Interleaved Search Agents?",
+      "abstract": "On-policy self-distillation (OPSD) offers a promising approach for training large language models without relying on a separate teacher model. However, its effectiveness on complex agentic tasks remains largely unexplored. In this work, we instantiate Feedback-Augmented Self-Distillation (FA-SD), a self-distillation algorithm for agentic search that leverages successful demonstrations as privileged information. We identify that models can rely on recurring reasoning-and-search output templates, producing trajectories that appear diverse but are largely agnostic to the input question, making the KL-based self-distillation signal uninformative. We term this phenomenon decoding collapse, a failure mode that can be missed by existing evaluation metrics. To understand its underlying cause, we show that although the self-teacher achieves stronger performance, learning remains inherently unstable due to inconsistent supervision signals. We further decompose this inconsistency into model inconsistency and prompt inconsistency, and show that the latter can significantly degrade the quality of the supervision signal, limiting the effectiveness of self-teacher learning. To mitigate this inconsistency, we introduce an exponential moving average (EMA) teacher to stabilize the self-teacher and provide more consistent supervision signals. Although the EMA teacher requires a warm-up phase during which performance may temporarily regress, it ultimately improves model performance by providing more stable supervision.",
+      "authors": [
+        "Fan Yang",
+        "Rui Meng",
+        "Yuxin Wen"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-07-20T05:07:22+00:00",
+      "link": "https://arxiv.org/pdf/2607.17558v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Analyzes training of LLM agents for search using feedback-augmented self-distillation",
+      "llm_evidence_cn": "分析基于反馈增强自蒸馏的检索交织搜索智能体训练",
+      "llm_evidence": "分析基于反馈增强自蒸馏的检索交织搜索智能体训练",
+      "canonical_evidence": "分析基于反馈增强自蒸馏的检索交织搜索智能体训练",
+      "llm_tldr_en": "This paper investigates why feedback-augmented self-distillation fails to improve retrieval-interleaved search agents, identifying decoding collapse as a key failure mode.",
+      "llm_tldr_cn": "针对检索交织搜索智能体训练中自蒸馏效果不佳的问题，提出反馈增强自蒸馏（FA-SD）算法，并揭示解码崩溃是主要失败原因——模型依赖与输入无关的推理-搜索模板，使KL散度信号无效。该发现为智能体训练方法设计提供了重要警示。",
+      "llm_tldr": "针对检索交织搜索智能体训练中自蒸馏效果不佳的问题，提出反馈增强自蒸馏（FA-SD）算法，并揭示解码崩溃是主要失败原因——模型依赖与输入无关的推理-搜索模板，使KL散度信号无效。该发现为智能体训练方法设计提供了重要警示。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    }
+  ]
+}
