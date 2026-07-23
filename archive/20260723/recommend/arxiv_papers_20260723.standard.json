@@ -1,0 +1,412 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-23T21:30:10.690962+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 7,
+    "deep_cap": 6,
+    "deep_selected": 6,
+    "quick_candidates": 4,
+    "quick_skim_target": 11,
+    "quick_selected": 4
+  },
+  "deep_dive": [
+    {
+      "id": "2607.13315v2",
+      "source": "arxiv",
+      "title": "Meta-Learning Preferences for Multilingual LLM Alignment",
+      "abstract": "Unequal availability of human preference data across languages poses a significant challenge for aligning large language models in multilingual settings. To address the lack of sufficient data in low-resource language alignment, we propose a meta-learning framework for Reinforcement Learning from Human Feedback and Direct Preference Optimization. By leveraging preference data from other languages, our framework learns a transferable initialization that enables effective adaptation to a target language with minimal data. We provide theoretical guarantees for both the meta-reward modeling and meta-policy optimization settings, and empirically demonstrate the effectiveness of our approach on multilingual benchmarks. In an extremely low-resource setting with only 100 target-language preference samples, our approach achieves up to $28\\%$ win-rate improvements over baseline methods, and consistently outperforms baselines across multiple target languages and model scales. Our approaches retain these advantages across different combinations of meta-training languages and varying linguistic distances from the target languages.",
+      "authors": [
+        "Jiaying Lin",
+        "Seongho Son",
+        "Nam Phuong Tran",
+        "Long Tran-thanh",
+        "Ilija Bogunovic",
+        "Debmalya Mandal"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-07-14T22:38:39+00:00",
+      "link": "https://arxiv.org/pdf/2607.13315v2",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "meta-learning for RLHF in multilingual LLM alignment",
+      "llm_evidence_cn": "多语言LLM对齐中基于元学习的RLHF",
+      "llm_evidence": "多语言LLM对齐中基于元学习的RLHF",
+      "canonical_evidence": "多语言LLM对齐中基于元学习的RLHF",
+      "llm_tldr_en": "Proposes meta-learning framework for RLHF and DPO that transfers preference knowledge across languages, achieving effective alignment with minimal target-language data.",
+      "llm_tldr_cn": "多语言大模型对齐面临人类偏好数据分布不均的挑战，低资源语言数据稀缺。本文提出基于元学习的RLHF/DPO框架，通过利用多种语言的偏好数据学习可迁移初始化，仅需少量目标语言数据即可快速适应。理论证明了元奖励建模和元策略优化的收敛性，实验在极低资源（100条）下仍能有效对齐，显著提升了多语言对齐的可行性。",
+      "llm_tldr": "多语言大模型对齐面临人类偏好数据分布不均的挑战，低资源语言数据稀缺。本文提出基于元学习的RLHF/DPO框架，通过利用多种语言的偏好数据学习可迁移初始化，仅需少量目标语言数据即可快速适应。理论证明了元奖励建模和元策略优化的收敛性，实验在极低资源（100条）下仍能有效对齐，显著提升了多语言对齐的可行性。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "reinforcement learning from human feedback for llm alignment",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.19199v1",
+      "source": "arxiv",
+      "title": "Conservative Query and Adaptive Regularization for Offline RL Under Uncertainty Estimation",
+      "abstract": "Offline reinforcement learning (RL) aims to learn an effective policy from a static dataset, but its performance is fundamentally limited by dataset coverage. Action preference queries leverage expert feedback without additional environment interaction, enabling policy improvement during offline training. However, existing methods still face two key challenges: selecting informative preference queries and effectively exploiting the collected feedback. Current approaches typically rely only on the distance between policy actions and dataset actions for query selection, while enforcing fixed constraints that keep the policy close to queried preferences. Such strategies often lead to unstable policy updates and integrate poorly with value regularization. To address these limitations, we propose Conservative Query and Adaptive Regularization under Uncertainty Estimation, a lightweight framework that jointly improves preference querying and preference exploitation. Specifically, we employ a Morse network to estimate the uncertainty of policy actions with respect to the offline dataset. Based on this uncertainty, we introduce a conservative query strategy that selectively queries actions near the dataset to preserve Bellman-update stability, together with an uncertainty-aware adaptive regularization scheme that dynamically adjusts data-level constraints during policy optimization. We integrate our framework with CQL and evaluate it extensively on the D4RL benchmark. Experimental results demonstrate superior or competitive performance across a wide range of tasks.",
+      "authors": [
+        "Li-Rong Zhou",
+        "Qin-Wen Luo",
+        "Sheng-Jun Huang"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-07-21T15:34:06+00:00",
+      "link": "https://arxiv.org/pdf/2607.19199v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "offline RL with preference queries and adaptive regularization",
+      "llm_evidence_cn": "离线强化学习中的偏好查询与自适应正则化",
+      "llm_evidence": "离线强化学习中的偏好查询与自适应正则化",
+      "canonical_evidence": "离线强化学习中的偏好查询与自适应正则化",
+      "llm_tldr_en": "Proposes conservative query selection and adaptive regularization for offline RL with action preference queries, improving policy stability and performance.",
+      "llm_tldr_cn": "离线强化学习受限于数据集覆盖，偏好查询可缓解此问题但现有方法存在查询选择低效和正则化固定等缺陷。本文提出保守查询策略和自适应正则化方法，通过不确定性估计选择信息量高的查询，并动态调整约束强度，显著提升了策略更新稳定性和最终性能。",
+      "llm_tldr": "离线强化学习受限于数据集覆盖，偏好查询可缓解此问题但现有方法存在查询选择低效和正则化固定等缺陷。本文提出保守查询策略和自适应正则化方法，通过不确定性估计选择信息量高的查询，并动态调整约束强度，显著提升了策略更新稳定性和最终性能。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "design of reward functions in RL",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.19824v1",
+      "source": "arxiv",
+      "title": "Rewarding Better Thinking for LLM Preference Alignment",
+      "abstract": "LLM preference alignment aims to optimize models toward human preferences across diverse user instructions. Reinforcement learning has become a major post-training approach for this goal, but existing proxy rewards are often outcome-level, mainly evaluating the final response while providing limited guidance for the reasoning trajectory. This can make credit assignment coarse when multiple responses receive similar final scores, leaving trajectory-level preferences under-specified. To address this limitation, we propose Thinking Checklist Reward (TCR), a process-oriented reward for RL-based preference alignment. TCR converts preference pairs into sample-specific thinking checklists and uses them to evaluate whether the generated reasoning trace addresses the preference-implied considerations. To reduce overlap with outcome-level supervision, TCR further introduces an exponential moving average (EMA) residual formulation to isolate a complementary thinking surplus beyond what is predictable from the outcome reward. Experiments on five models from three model families show that TCR consistently improves alignment performance across diverse benchmarks, with ablations further validating the importance of EMA-based residual formulation and sample-specific checklist supervision.",
+      "authors": [
+        "Xubo Liu",
+        "Wenya Guo",
+        "Ruxue Yan",
+        "Xinying Qian",
+        "Ying Zhang"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI",
+        "cs.CL"
+      ],
+      "published": "2026-07-22T06:57:55+00:00",
+      "link": "https://arxiv.org/pdf/2607.19824v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "proposes Thinking Checklist Reward, a process-oriented reward for RL-based LLM preference alignment",
+      "llm_evidence_cn": "提出思维检查清单奖励TCR，一种用于基于强化学习的大模型偏好对齐的过程导向奖励",
+      "llm_evidence": "提出思维检查清单奖励TCR，一种用于基于强化学习的大模型偏好对齐的过程导向奖励",
+      "canonical_evidence": "提出思维检查清单奖励TCR，一种用于基于强化学习的大模型偏好对齐的过程导向奖励",
+      "llm_tldr_en": "Introduces Thinking Checklist Reward (TCR), a process-oriented reward for RL-based LLM alignment that evaluates reasoning traces via sample-specific checklists, improving credit assignment.",
+      "llm_tldr_cn": "现有LLM偏好对齐中的奖励多为结果级，对推理过程指导不足。提出思维检查清单奖励TCR，将偏好对转化为样本特定检查清单，评估生成推理过程是否满足偏好，实现过程级奖励。在多个基准上TCR优于结果级奖励，有效改善推理轨道质量。",
+      "llm_tldr": "现有LLM偏好对齐中的奖励多为结果级，对推理过程指导不足。提出思维检查清单奖励TCR，将偏好对转化为样本特定检查清单，评估生成推理过程是否满足偏好，实现过程级奖励。在多个基准上TCR优于结果级奖励，有效改善推理轨道质量。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "design of reward functions in RL",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.20083v1",
+      "source": "arxiv",
+      "title": "Co-Evolving LLM Evaluators and Policies via DynamicRubric",
+      "abstract": "Post-training with evaluator feedback on policy-induced samples serves as a major mechanism for improving large language models. As policies improve, these sampled responses become close in quality. These close candidates create a bottleneck for policy optimization: collapsed relative evaluator score gaps yield weak or misleading policy supervision. We theoretically characterize why these gaps matter through a probability allocation view, showing that the directional gain of shifting probability mass from one response to another is exactly the evaluator score gap between them. This identifies relative score gaps as the policy optimization signals that guide updates. Motivated by this view, we propose DynamicRubric, a response-set-conditioned evaluator--policy co-evolution framework that generates weighted binary rubric items for each candidate set and aggregates the resulting judgments into response-level scores. In our experiments with 8B backbones, DynamicRubric improves evaluator performance and provides stronger policy supervision than baselines using a 70B reward model or a 235B static rubric generator. DynamicRubric-optimized policies also show gains on verifiable reasoning and coding tasks. A DynamicRubric-optimized model is fully deployed in WeChat Search's AI answering scenario, where it serves all online traffic across tens of millions of requests per day and improves key online metrics. These results suggest a principle for evaluator-guided post-training: evaluators should evolve with the policies they supervise.",
+      "authors": [
+        "Beining Wang",
+        "Weihang Su",
+        "Hongtao Tian",
+        "Hao Kong",
+        "Tao Yang",
+        "Ting Yao",
+        "Qingyi Pan",
+        "Yueyue Wu",
+        "Qingyao Ai",
+        "Min Zhang",
+        "Yiqun Liu"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-07-22T12:35:40+00:00",
+      "link": "https://arxiv.org/pdf/2607.20083v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "evaluator score gaps as policy optimization signals",
+      "llm_evidence_cn": "评估器分数差距作为策略优化信号",
+      "llm_evidence": "评估器分数差距作为策略优化信号",
+      "canonical_evidence": "评估器分数差距作为策略优化信号",
+      "llm_tldr_en": "Theoretically identifies evaluator score gaps as policy optimization signals and proposes DynamicRubric for co-evolving evaluators and policies.",
+      "llm_tldr_cn": "后训练中，随着策略改进，采样响应质量趋同，评估器分数差距变小，导致策略监督信号薄弱。本文通过概率分配视角理论证明了分数差距直接对应策略更新的方向性增益。基于此提出DynamicRubric，使评估器和策略共同进化，自适应调整评估标准以维持有效梯度。实验表明该方法能持续提供强监督信号，提升对齐效果。",
+      "llm_tldr": "后训练中，随着策略改进，采样响应质量趋同，评估器分数差距变小，导致策略监督信号薄弱。本文通过概率分配视角理论证明了分数差距直接对应策略更新的方向性增益。基于此提出DynamicRubric，使评估器和策略共同进化，自适应调整评估标准以维持有效梯度。实验表明该方法能持续提供强监督信号，提升对齐效果。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "design of reward functions in RL",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.14494v1",
+      "source": "arxiv",
+      "title": "SAGA: Schema-Aware Grounding for Agentic Text-to-SPARQL Generation",
+      "abstract": "Complex knowledge base question answering (KBQA) is commonly approached through either information retrieval over a question-specific subgraph or semantic parsing into an executable logical form. We study the latter paradigm. Recent large language model agents make semantic parsing interactive: they alternate between reasoning, querying the knowledge base, and extending a partial SPARQL query. This interleaving reduces reliance on one-shot generation, but makes the quality of \\emph{KB grounding} depend on what the interaction tools expose. Existing agents retrieve or prune candidate properties mainly through lexical relevance and instance-level observations, without systematically conditioning on entity types, property domains and ranges, or the expected answer type. We call this failure mode \\emph{type-blind grounding}. It enlarges the grounding search space and often produces plausible-looking but semantically incompatible triple patterns that execute to empty results. We propose SAGA (\\underline{S}chema-\\underline{A}ware \\underline{G}rounding for \\underline{A}gentic Text-to-SPARQL Generation), a training-free framework that turns property exploration into a schema-constrained grounding operation. SAGA maintains a persistent bidirectional type state, filters known-incompatible property candidates at construction time, presents the remaining graph patterns in a compact schema-annotated format, and handles missing schema information permissively through empirical and trace-local evidence. Across nine benchmark settings over Wikidata and Freebase, SAGA achieves the highest F1 on all nine settings and the highest exact-match accuracy on eight, while reducing empty-result queries across all reported Wikidata settings.",
+      "authors": [
+        "Yiming Zhang",
+        "Koji Tsuda"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI",
+        "cs.IR",
+        "cs.LG"
+      ],
+      "published": "2026-07-16T02:17:21+00:00",
+      "link": "https://arxiv.org/pdf/2607.14494v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "agentic text-to-SPARQL generation for KBQA using LLM agents",
+      "llm_evidence_cn": "使用大语言模型智能体进行知识库问答的文本到SPARQL生成",
+      "llm_evidence": "使用大语言模型智能体进行知识库问答的文本到SPARQL生成",
+      "canonical_evidence": "使用大语言模型智能体进行知识库问答的文本到SPARQL生成",
+      "llm_tldr_en": "SAGA introduces schema-aware grounding for interactive LLM agents generating SPARQL queries, improving KBQA accuracy.",
+      "llm_tldr_cn": "大语言模型智能体在交互式语义解析中常因知识库接地不足而性能受限。本文提出SAGA框架，通过系统性考虑实体类型、属性域和范围等信息，实现模式感知接地，提升了智能体在文本到SPARQL生成任务中的准确性和鲁棒性。",
+      "llm_tldr": "大语言模型智能体在交互式语义解析中常因知识库接地不足而性能受限。本文提出SAGA框架，通过系统性考虑实体类型、属性域和范围等信息，实现模式感知接地，提升了智能体在文本到SPARQL生成任务中的准确性和鲁棒性。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.16716v1",
+      "source": "arxiv",
+      "title": "RECON: Benchmarking Agent Memory for Compositional Reasoning over Long Contexts",
+      "abstract": "Large language models and LLM-based agents are widely used as personal chat assistants, enterprise copilots, and autonomous workflow agents. In all these applications, memory (the ability to retain, access, and reason over information accumulated over long contexts and multiple interactions) plays a crucial role in determining the reliability of any agent. We introduce RECON (Reasoning over Extended Contexts with Obfuscated Narratives), a benchmark for evaluating compositional reasoning over long contexts. RECON spans 24 case files across three domains (criminal, medical, and financial), each ranging from 50k to 100k tokens, and tests agents on six memory intensive tasks: reconstructing multi-hop evidence chains, propagating cascading invalidations, resolving source conflicts, counterfactual reasoning, satisfying temporal constraints, and temporal fact retrieval. Recent memory benchmarks evaluate whether agents can retrieve scattered facts or detect if a fact has changed whereas RECON evaluates what happens after the change, whether agents can trace which downstream conclusions are affected, which survive through independent support, and how alternative timelines would have unfolded. Our evaluation reveals substantial limitations across current architectures: even the strongest non-Oracle system reaches only 22.4% Accuracy, with retrieval and reasoning each surfacing as challenges.",
+      "authors": [
+        "Mihir Shriniwas Arya"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-07-18T09:11:22+00:00",
+      "link": "https://arxiv.org/pdf/2607.16716v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "LLM agent memory benchmark for task automation",
+      "llm_evidence_cn": "面向任务自动化的大语言模型智能体记忆基准",
+      "llm_evidence": "面向任务自动化的大语言模型智能体记忆基准",
+      "canonical_evidence": "面向任务自动化的大语言模型智能体记忆基准",
+      "llm_tldr_en": "RECON benchmarks compositional reasoning over long contexts for LLM agents, evaluating memory-intensive tasks like multi-hop evidence chains.",
+      "llm_tldr_cn": "大语言模型智能体在长上下文和多次交互中的记忆能力至关重要。本文提出RECON基准，涵盖三个领域24个案卷，测试智能体在六种记忆密集型任务上的表现，包括多跳证据链重建和级联失效传播。该工作为提升智能体在任务自动化中的可靠性提供了标准化评估工具。",
+      "llm_tldr": "大语言模型智能体在长上下文和多次交互中的记忆能力至关重要。本文提出RECON基准，涵盖三个领域24个案卷，测试智能体在六种记忆密集型任务上的表现，包括多跳证据链重建和级联失效传播。该工作为提升智能体在任务自动化中的可靠性提供了标准化评估工具。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2607.18955v2",
+      "source": "arxiv",
+      "title": "H$^2$SD: Hybrid Hindsight Self-Distillation",
+      "abstract": "Reinforcement learning with verifiable rewards (RLVR) provides reliable outcome supervision for language model reasoning, but a scalar trajectory reward offers limited token-level guidance. Existing self-distillation methods add a privileged teacher but typically assign it a fixed role: direct distribution matching may destabilize successful behavior, while magnitude-only modulation offers little corrective guidance after failure. We observe that successful and failed trajectories require different forms of hindsight supervision. A successful response already contains a valid student-generated reasoning path and can therefore serve as privileged context rather than being replaced by an external rationale. A failed response, however, requires corrective reference information. We introduce Hybrid Hindsight Self-Distillation ($\\mathrm{H}^{2}\\mathrm{SD}$), which jointly adapts teacher context and update strategy to trajectory correctness. For successful trajectories, we construct the teacher context from the verified response and a rephrasing instruction, and use the teacher only to re-evaluate the original response tokens. This emphasizes essential deductions over redundant content and refines magnitude-based credit assignment without changing the reward direction. For failed trajectories, a verifier-confirmed reference hint provides corrective guidance through reverse-KL distillation. Controlled ablations show that the gains depend on outcome-conditioned routing and the rephrasing instruction. Experiments on challenging reasoning benchmarks show that H$^2$SD achieves the strongest overall performance among representative RLVR and self-distillation baselines, with stable optimization and a favorable accuracy-efficiency trade-off.",
+      "authors": [
+        "Qiye Cai",
+        "Yichuan Ma",
+        "Linyang Li",
+        "Peiji Li",
+        "Yongkang Chen",
+        "Qipeng Guo",
+        "Yicheng Zou",
+        "Xiaocheng Feng",
+        "Bing Qin"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.CL"
+      ],
+      "published": "2026-07-21T10:47:27+00:00",
+      "link": "https://arxiv.org/pdf/2607.18955v2",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Proposes hybrid hindsight self-distillation for RLVR to improve token-level reward guidance",
+      "llm_evidence_cn": "提出混合事后自我蒸馏方法，改进可验证奖励强化学习中的词元级奖励指导",
+      "llm_evidence": "提出混合事后自我蒸馏方法，改进可验证奖励强化学习中的词元级奖励指导",
+      "canonical_evidence": "提出混合事后自我蒸馏方法，改进可验证奖励强化学习中的词元级奖励指导",
+      "llm_tldr_en": "H2SD introduces a hybrid hindsight self-distillation method that treats successful and failed RLVR trajectories differently, improving token-level guidance and reasoning performance.",
+      "llm_tldr_cn": "可验证奖励强化学习(RLVR)为语言模型推理提供可靠的输出监督，但稀疏的轨迹奖励缺乏词元级指导。现有自我蒸馏方法对成功和失败轨迹采用固定角色，效果有限。本文提出混合事后自我蒸馏(H2SD)，对成功轨迹保留学生自身路径作为上下文，对失败轨迹提供纠正参考。在数学推理任务上，H2SD显著提升了RLVR微调的效果，同时保持训练稳定性。",
+      "llm_tldr": "可验证奖励强化学习(RLVR)为语言模型推理提供可靠的输出监督，但稀疏的轨迹奖励缺乏词元级指导。现有自我蒸馏方法对成功和失败轨迹采用固定角色，效果有限。本文提出混合事后自我蒸馏(H2SD)，对成功轨迹保留学生自身路径作为上下文，对失败轨迹提供纠正参考。在数学推理任务上，H2SD显著提升了RLVR微调的效果，同时保持训练稳定性。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "design of reward functions in RL",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2607.19670v1",
+      "source": "arxiv",
+      "title": "Same Game, Different Story: A Minimal Conservative Strategic Robustness Benchmark for Large Language Model Agents",
+      "abstract": "Large language model (LLM) agents increasingly operate in strategic settings where outcomes depend on the actions of other agents. This raises a reliability question: will a model choose consistently when the same incentives are presented through different narratives? We introduce Same Game, Different Story, a benchmark that defines strategic robustness as invariance of model-induced action distributions under payoff-preserving changes in framing. We illustrate the framework through a secondary analysis of published aggregate cooperation rates for GPT-3.5, GPT-4, and LLaMa-2 across four social-dilemma games. The retained comparison covers business and friend-sharing framings, representing 24 model-game-context cells and 7,200 decisions in the source study. Because trial-level data were unavailable, approximate counts were reconstructed from published figures; the resulting estimates are therefore illustrative rather than an exact replication. Under the paper's conservative transformation, pooled strategic robustness is 0.783, and friend-sharing framing increases cooperation by 0.307 relative to business framing. The results indicate that social-relational framing can substantially alter LLM behavior even when the underlying action sets and payoffs remain fixed. Strategic robustness should therefore be evaluated separately from strategic competence, using families of payoff-equivalent prompts rather than a single presentation of a game.",
+      "authors": [
+        "Seyed Pouyan Mousavi Davoudi",
+        "Alireza Amiri-Margavi",
+        "Amin Gholami Davodi",
+        "Hamidreza Hasani Balyani",
+        "Arshia Gharagozlou"
+      ],
+      "primary_category": "cs.MA",
+      "categories": [
+        "cs.MA"
+      ],
+      "published": "2026-07-22T02:18:49+00:00",
+      "link": "https://arxiv.org/pdf/2607.19670v1",
+      "tags": [
+        "keyword:rl"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "strategic robustness benchmark for LLM agents",
+      "llm_evidence_cn": "大语言模型智能体的策略鲁棒性基准",
+      "llm_evidence": "大语言模型智能体的策略鲁棒性基准",
+      "canonical_evidence": "大语言模型智能体的策略鲁棒性基准",
+      "llm_tldr_en": "Introduces a benchmark measuring strategic robustness of LLM agents under payoff-preserving framing changes in social dilemmas.",
+      "llm_tldr_cn": "大语言模型智能体在战略场景中可能因表述不同而改变行为。本文提出Same Game, Different Story基准，通过改变社会困境游戏的框架但不改变收益结构，评估智能体的策略鲁棒性。对多个模型的测试揭示了显著的不一致性。",
+      "llm_tldr": "大语言模型智能体在战略场景中可能因表述不同而改变行为。本文提出Same Game, Different Story基准，通过改变社会困境游戏的框架但不改变收益结构，评估智能体的策略鲁棒性。对多个模型的测试揭示了显著的不一致性。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.16900v2",
+      "source": "arxiv",
+      "title": "Environment-free Synthetic Data Generation for API-Calling Agents",
+      "abstract": "Training API-calling large language model (LLM) agents demands massive amounts of high-quality trajectories. However, collecting such data at scale typically requires fully implemented environments with executable APIs and realistic, pre-populated backend databases, creating a major bottleneck for scalability. To overcome this, we propose an environment-free synthetic data generation approach that leverages LLMs as on-the-fly digital world models. Given only API specifications, our method generates trajectories mimicking interactions between an agent and a stateful environment. Specifically, an LLM first generates diverse tasks solvable with the provided APIs. A teacher agent then iteratively solves each task while an LLM simulator generates coherent synthetic API responses conditioned on the task context and simulation history. Finally, an LLM judge filters the trajectories to ensure the quality of the resulting dataset. We evaluate our approach on the challenging AppWorld and OfficeBench benchmarks, which include both information-retrieval and state-changing tasks. Fine-tuning models on our synthetic data yields significant performance gains, demonstrating that effective supervision for API-calling agents can be generated without any executable environment. Our results establish LLM-based API simulation as a practical, scalable solution for training agents across diverse API ecosystems.",
+      "authors": [
+        "Seanie Lee",
+        "Sanjoy Chowdhury",
+        "Chao Jiang",
+        "Cheng-Yu Hsieh",
+        "Ting-Yao Hu",
+        "Alexander T Toshev",
+        "Oncel Tuzel",
+        "Raviteja Vemulapalli"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-07-18T17:36:44+00:00",
+      "link": "https://arxiv.org/pdf/2607.16900v2",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Synthetic data generation for training API-calling LLM agents",
+      "llm_evidence_cn": "用于训练API调用LLM智能体的合成数据生成",
+      "llm_evidence": "用于训练API调用LLM智能体的合成数据生成",
+      "canonical_evidence": "用于训练API调用LLM智能体的合成数据生成",
+      "llm_tldr_en": "Proposes environment-free synthetic data generation for API-calling LLM agents by using LLMs as digital world models to generate trajectories.",
+      "llm_tldr_cn": "本文针对API调用LLM智能体训练数据获取困难的问题，提出无环境合成数据生成方法，利用LLM本身作为数字世界模型模拟环境状态。仅需API规范，即可生成多样的任务和代理轨迹，避免了搭建完整执行环境的高成本。该方法可大规模生成高质量轨迹，直接支持智能体的强化学习训练，降低数据收集瓶颈。",
+      "llm_tldr": "本文针对API调用LLM智能体训练数据获取困难的问题，提出无环境合成数据生成方法，利用LLM本身作为数字世界模型模拟环境状态。仅需API规范，即可生成多样的任务和代理轨迹，避免了搭建完整执行环境的高成本。该方法可大规模生成高质量轨迹，直接支持智能体的强化学习训练，降低数据收集瓶颈。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.18580v1",
+      "source": "arxiv",
+      "title": "STeP: Signal Temporal Logic for Precise Specifications for Action Generation with Vision Language Models",
+      "abstract": "Vision-language-action (VLA) models have shown impressive generalization, but often lack interpretability and can struggle to follow precise natural language instructions that encode spatial, temporal, and logical requirements. We propose a hierarchical framework that uses Signal Temporal Logic (STL) as a shared representation connecting high-level language understanding with low-level robot execution. A high-level policy leverages a VLM to decompose language instructions into high-level subtasks, generate STL specifications for each subtask, and choose a low-level policy for executing each subtask. The STL specifications translate language-derived intent into precise constraints, and the low-level policy selection determines whether those constraints are enforced directly through STL-guided model-predictive control or monitored during execution of a learned policy for perceptually complex, or contact-rich behaviors. By integrating STL into plan validation, low-level policy, subtask monitoring, and replanning, our framework enables language-derived plans to be checked, optimized, and revised at runtime using a common formal structure. We evaluate the approach on a real-world tabletop domain, demonstrating how formal specifications can improve the precision, reliability, and interpretability of language-conditioned robot planning.",
+      "authors": [
+        "Kasra Torshizi",
+        "Anukriti Singh",
+        "Sidharth Mathur",
+        "Khuzema Habib",
+        "Leo Du",
+        "Pratap Tokekar"
+      ],
+      "primary_category": "cs.RO",
+      "categories": [
+        "cs.RO"
+      ],
+      "published": "2026-07-20T23:26:32+00:00",
+      "link": "https://arxiv.org/pdf/2607.18580v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "VLM hierarchical policy for robot action generation",
+      "llm_evidence_cn": "视觉语言模型分层策略生成机器人动作",
+      "llm_evidence": "视觉语言模型分层策略生成机器人动作",
+      "canonical_evidence": "视觉语言模型分层策略生成机器人动作",
+      "llm_tldr_en": "Proposes a hierarchical framework using Signal Temporal Logic (STL) as a shared representation between language understanding and robot execution, decomposing instructions into subtasks and generating precise constraints.",
+      "llm_tldr_cn": "本文针对视觉-语言-动作模型在遵循精确时空逻辑指令方面的不足，提出一种分层框架，利用信号时序逻辑（STL）作为高层语言理解与低层机器人执行之间的共享表示。高层策略借助视觉语言模型将指令分解为子任务并生成STL规范，再选择低层策略执行。该方法提升了动作生成的精确性和可解释性，为LLM智能体在自动化任务中的应用提供了新思路。",
+      "llm_tldr": "本文针对视觉-语言-动作模型在遵循精确时空逻辑指令方面的不足，提出一种分层框架，利用信号时序逻辑（STL）作为高层语言理解与低层机器人执行之间的共享表示。高层策略借助视觉语言模型将指令分解为子任务并生成STL规范，再选择低层策略执行。该方法提升了动作生成的精确性和可解释性，为LLM智能体在自动化任务中的应用提供了新思路。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}
