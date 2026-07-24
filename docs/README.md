@@ -6,50 +6,47 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-07-23
-- 运行时间：2026-07-23 21:38:29 UTC
+- 最新运行日期：2026-07-24
+- 运行时间：2026-07-24 21:29:32 UTC
 - 运行状态：成功
-- 本次总论文数：10
-- 精读区：6
-- 速读区：4
+- 本次总论文数：9
+- 精读区：4
+- 速读区：5
 
 ### 今日简报（AI）
-今日推荐10篇论文，精读两篇9分大作聚焦多语言LLM对齐与离线强化学习保守正则化。重点关注Meta-Learning实现多语言偏好对齐，以及不确定性估计下的离线RL保守查询与自适应正则化。建议优先精读这两篇，快速浏览其余四篇以拓宽视野。
-- 详情：[/202607/23/README](/202607/23/README)
+今日精读9篇论文，聚焦大模型评估器与智能体长期决策治理。最值得关注：动态评分卡使评估器与策略协同进化（9.0/10），以及从记忆到技能的长期智能体治理框架（8.0/10）。建议优先阅读这两篇精读论文，理解如何通过动态反馈和证据驱动提升LLM可靠性。
+- 详情：[/202607/24/README](/202607/24/README)
 
 ### 精读区论文标签
-1. [Meta-Learning Preferences for Multilingual LLM Alignment](/202607/23/2607.13315v2-meta-learning-preferences-for-multilingual-llm-alignment)  
+1. [Co-Evolving LLM Evaluators and Policies via DynamicRubric](/202607/24/2607.20083v2-co-evolving-llm-evaluators-and-policies-via-dynamicrubric)  
    标签：评分：9.0/10、query:rl
-   evidence：多语言LLM对齐中基于元学习的RLHF
-2. [Conservative Query and Adaptive Regularization for Offline RL Under Uncertainty Estimation](/202607/23/2607.19199v1-conservative-query-and-adaptive-regularization-for-offline-rl-under-uncertainty-estimation)  
-   标签：评分：9.0/10、query:rl
-   evidence：离线强化学习中的偏好查询与自适应正则化
-3. [Rewarding Better Thinking for LLM Preference Alignment](/202607/23/2607.19824v1-rewarding-better-thinking-for-llm-preference-alignment)  
-   标签：评分：9.0/10、query:rl
-   evidence：提出思维检查清单奖励TCR，一种用于基于强化学习的大模型偏好对齐的过程导向奖励
-4. [Co-Evolving LLM Evaluators and Policies via DynamicRubric](/202607/23/2607.20083v1-co-evolving-llm-evaluators-and-policies-via-dynamicrubric)  
-   标签：评分：9.0/10、query:rl
-   evidence：评估器分数差距作为策略优化信号
-5. [SAGA: Schema-Aware Grounding for Agentic Text-to-SPARQL Generation](/202607/23/2607.14494v1-saga-schema-aware-grounding-for-agentic-text-to-sparql-generation)  
+   evidence：共同进化评估器和策略以维持评分差距用于LLM对齐
+2. [From Memory to Skills: Evidence-Grounded Co-Evolution Governance for Long-Horizon LLM Agents](/202607/24/2607.16621v1-from-memory-to-skills-evidence-grounded-co-evolution-governance-for-long-horizon-llm-agents)  
    标签：评分：8.0/10、query:rl
-   evidence：使用大语言模型智能体进行知识库问答的文本到SPARQL生成
-6. [RECON: Benchmarking Agent Memory for Compositional Reasoning over Long Contexts](/202607/23/2607.16716v1-recon-benchmarking-agent-memory-for-compositional-reasoning-over-long-contexts)  
+   evidence：面向长周期任务自动化的LLM智能体框架，实现记忆与技能协同演化
+3. [Neuro-Symbolic Meta-Policies for Temporal Knowledge-Graph Memory under Partial Observability](/202607/24/2607.18368v1-neuro-symbolic-meta-policies-for-temporal-knowledge-graph-memory-under-partial-observability)  
    标签：评分：8.0/10、query:rl
-   evidence：面向任务自动化的大语言模型智能体记忆基准
+   evidence：面向部分可观察强化学习的神经符号元策略，使用知识图谱记忆
+4. [PrefReward: Learning User Preference Matrix for Personalized Text Generation](/202607/24/2607.21067v1-prefreward-learning-user-preference-matrix-for-personalized-text-generation)  
+   标签：评分：8.0/10、query:rl
+   evidence：学习用户偏好矩阵作为文本生成的奖励信号
 
 ### 速读区论文标签
-1. [H$^2$SD: Hybrid Hindsight Self-Distillation](/202607/23/2607.18955v2-h2sd-hybrid-hindsight-self-distillation)  
-   标签：评分：8.0/10、query:rl
-   evidence：提出混合事后自我蒸馏方法，改进可验证奖励强化学习中的词元级奖励指导
-2. [Same Game, Different Story: A Minimal Conservative Strategic Robustness Benchmark for Large Language Model Agents](/202607/23/2607.19670v1-same-game-different-story-a-minimal-conservative-strategic-robustness-benchmark-for-large-language-model-agents)  
+1. [Lomekwi: Resource-Bounded Tool Discovery in LLM Agents](/202607/24/2607.16961v1-lomekwi-resource-bounded-tool-discovery-in-llm-agents)  
    标签：评分：7.0/10、query:rl
-   evidence：大语言模型智能体的策略鲁棒性基准
-3. [Environment-free Synthetic Data Generation for API-Calling Agents](/202607/23/2607.16900v2-environment-free-synthetic-data-generation-for-api-calling-agents)  
+   evidence：LLM智能体工具发现框架，包含好奇心、识别和效率三个维度
+2. [EdgeCoInfer: Hierarchical Collaborative Inference for On-Device Multimodal Large Models](/202607/24/2607.17143v1-edgecoinfer-hierarchical-collaborative-inference-for-on-device-multimodal-large-models)  
+   标签：评分：7.0/10、query:rl
+   evidence：采用分层强化学习实现多模态大模型的协同推理
+3. [AttriMem: Attribution-Guided Process Feedback for Agent Memory Learning](/202607/24/2607.21106v1-attrimem-attribution-guided-process-feedback-for-agent-memory-learning)  
+   标签：评分：7.0/10、query:rl
+   evidence：利用归因引导的过程反馈进行代理记忆学习的RL方法
+4. [EmoAgent-R1: Towards Multimodal Emotion Understanding with Reinforcement Learning-based Dynamic Agent Specialization](/202607/24/2607.21013v1-emoagent-r1-towards-multimodal-emotion-understanding-with-reinforcement-learning-based-dynamic-agent-specialization)  
    标签：评分：6.0/10、query:rl
-   evidence：用于训练API调用LLM智能体的合成数据生成
-4. [STeP: Signal Temporal Logic for Precise Specifications for Action Generation with Vision Language Models](/202607/23/2607.18580v1-step-signal-temporal-logic-for-precise-specifications-for-action-generation-with-vision-language-models)  
+   evidence：基于强化学习的动态智能体特化用于多模态情感理解
+5. [Sample-Efficient Learning from Agent Experience](/202607/24/2607.21051v1-sample-efficient-learning-from-agent-experience)  
    标签：评分：6.0/10、query:rl
-   evidence：视觉语言模型分层策略生成机器人动作
+   evidence：从智能体经验中进行样本高效学习，用于任务自动化
 
 
 <div class="dpr-home-promo-card">

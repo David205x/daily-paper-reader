@@ -1,0 +1,374 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-24T21:22:34.865150+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 4,
+    "deep_cap": 6,
+    "deep_selected": 4,
+    "quick_candidates": 5,
+    "quick_skim_target": 11,
+    "quick_selected": 5
+  },
+  "deep_dive": [
+    {
+      "id": "2607.20083v2",
+      "source": "arxiv",
+      "title": "Co-Evolving LLM Evaluators and Policies via DynamicRubric",
+      "abstract": "Post-training with evaluator feedback on policy-induced samples serves as a major mechanism for improving large language models. As policies improve, these sampled responses become close in quality. These close candidates create a bottleneck for policy optimization: collapsed relative evaluator score gaps yield weak or misleading policy supervision. We theoretically characterize why these gaps matter through a probability allocation view, showing that the directional gain of shifting probability mass from one response to another is exactly the evaluator score gap between them. This identifies relative score gaps as the policy optimization signals that guide updates. Motivated by this view, we propose DynamicRubric, a response-set-conditioned evaluator--policy co-evolution framework that generates weighted binary rubric items for each candidate set and aggregates the resulting judgments into response-level scores. In our experiments with 8B backbones, DynamicRubric improves evaluator performance and provides stronger policy supervision than baselines using a 70B reward model or a 235B static rubric generator. DynamicRubric-optimized policies also show gains on verifiable reasoning and coding tasks. A DynamicRubric-optimized model is fully deployed in WeChat Search's AI answering scenario, where it serves all online traffic across tens of millions of requests per day and improves key online metrics. These results suggest a principle for evaluator-guided post-training: evaluators should evolve with the policies they supervise.",
+      "authors": [
+        "Beining Wang",
+        "Weihang Su",
+        "Hongtao Tian",
+        "Hao Kong",
+        "Tao Yang",
+        "Ting Yao",
+        "Qingyi Pan",
+        "Yueyue Wu",
+        "Qingyao Ai",
+        "Min Zhang",
+        "Yiqun Liu"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-07-22T12:35:40+00:00",
+      "link": "https://arxiv.org/pdf/2607.20083v2",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Co-evolving evaluators and policies to maintain score gaps for LLM alignment",
+      "llm_evidence_cn": "共同进化评估器和策略以维持评分差距用于LLM对齐",
+      "llm_evidence": "共同进化评估器和策略以维持评分差距用于LLM对齐",
+      "canonical_evidence": "共同进化评估器和策略以维持评分差距用于LLM对齐",
+      "llm_tldr_en": "DynamicRubric co-evolves LLM evaluators and policies to prevent collapsed score gaps, which are identified as the optimization signals for policy updates, improving RLHF alignment.",
+      "llm_tldr_cn": "DynamicRubric针对RLHF中评估器评分差距随策略提升而坍塌的问题，提出评估器-政策共同进化机制。首先从概率分配视角理论推导了相对评分差距作为政策优化信号的重要性，然后设计响应集条件化的评估器动态调整评分标准。实验证明该方法有效保持有意义的评分差距，为LLM后训练提供更准确的监督信号，显著提升对齐效果。",
+      "llm_tldr": "DynamicRubric针对RLHF中评估器评分差距随策略提升而坍塌的问题，提出评估器-政策共同进化机制。首先从概率分配视角理论推导了相对评分差距作为政策优化信号的重要性，然后设计响应集条件化的评估器动态调整评分标准。实验证明该方法有效保持有意义的评分差距，为LLM后训练提供更准确的监督信号，显著提升对齐效果。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "reinforcement learning from human feedback for llm alignment",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.16621v1",
+      "source": "arxiv",
+      "title": "From Memory to Skills: Evidence-Grounded Co-Evolution Governance for Long-Horizon LLM Agents",
+      "abstract": "Existing memory systems for long-horizon LLM agents often retrieve prior traces as passive context rather than converting them into executable capabilities. In this paper, we propose MSCE, a training-free Memory--Skill Co-Evolution framework that organizes agent experience into grounded step traces, reusable procedural policies, and declarative environmental cognition. MSCE crystallizes evidence-backed L2 policies with positive estimated gain into callable skills that retain evidence links, applicability boundaries, decision guidance, verification rules, and reliability estimates. It further introduces reflection-weighted value backfilling, which propagates sparse terminal feedback through dense local self-reflections to produce evidence-calibrated trace values for governing memory and skill evolution. Experiments on EvoAgentBench and LoCoMo demonstrate that MSCE significantly outperforms state-of-the-art skill-augmented and memory-driven agent baselines, exhibiting strong cross-domain transferability and lifelong-evolution capabilities.",
+      "authors": [
+        "Bo Tang",
+        "Yang Zhang",
+        "Guomian Zhuang",
+        "Wenqiang Wei",
+        "Gaoyang Zheng",
+        "Lindong Xie",
+        "Yanchao Tan",
+        "Feiyu Xiong",
+        "Qingyu Yang",
+        "Edward Chung",
+        "Zhiyu li"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-07-18T03:46:22+00:00",
+      "link": "https://arxiv.org/pdf/2607.16621v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "LLM agent framework for long-horizon task automation with memory-skill co-evolution",
+      "llm_evidence_cn": "面向长周期任务自动化的LLM智能体框架，实现记忆与技能协同演化",
+      "llm_evidence": "面向长周期任务自动化的LLM智能体框架，实现记忆与技能协同演化",
+      "canonical_evidence": "面向长周期任务自动化的LLM智能体框架，实现记忆与技能协同演化",
+      "llm_tldr_en": "MSCE organizes LLM agent experience into reusable skills from memory traces, enabling training-free long-horizon task automation with reflection-weighted value backfilling.",
+      "llm_tldr_cn": "现有LLM智能体记忆系统仅将历史记录作为被动上下文，无法转化为可执行能力。为此提出MSCE框架，无需额外训练，通过将经验组织为带有证据链的可调用技能，引入反思加权值回传机制传播稀疏反馈。实验表明，MSCE显著提升了智能体在长期任务中的表现和技能复用效率。该工作为构建自主任务自动化智能体提供了新范式。",
+      "llm_tldr": "现有LLM智能体记忆系统仅将历史记录作为被动上下文，无法转化为可执行能力。为此提出MSCE框架，无需额外训练，通过将经验组织为带有证据链的可调用技能，引入反思加权值回传机制传播稀疏反馈。实验表明，MSCE显著提升了智能体在长期任务中的表现和技能复用效率。该工作为构建自主任务自动化智能体提供了新范式。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.18368v1",
+      "source": "arxiv",
+      "title": "Neuro-Symbolic Meta-Policies for Temporal Knowledge-Graph Memory under Partial Observability",
+      "abstract": "Partially observable reinforcement learning requires deciding what to retain, retrieve, and forget over time. We introduce a neuro-symbolic meta-policy that learns which symbolic memory heuristic to apply at each decision point while keeping execution symbolic. Our setting uses temporal knowledge-graph memory in RoomKG, where hidden state and observations are represented as Resource Description Framework (RDF) graphs and memory is augmented with temporal RDF triple annotations. The model combines knowledge-graph encoding of memory contents with value heads for question answering, exploration, and forgetting, yielding a controller that is both adaptive and inspectable. This gives the work a direct Semantic Web grounding through RDF-based representation, annotation-compatible graph semantics, and graph-based symbolic operations over explicit memory state. On train/test room splits at long-term memory capacity of 512, the qualifier-aware StarE-GNN configuration achieves the best held-out performance among the compared symbolic, neural, and neuro-symbolic systems while preserving step-level traceability of memory-management decisions.",
+      "authors": [
+        "Taewoon Kim",
+        "Vincent François-Lavet",
+        "Michael Cochez"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-07-20T17:55:00+00:00",
+      "link": "https://arxiv.org/pdf/2607.18368v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "neuro-symbolic meta-policy for partially observable RL with knowledge-graph memory",
+      "llm_evidence_cn": "面向部分可观察强化学习的神经符号元策略，使用知识图谱记忆",
+      "llm_evidence": "面向部分可观察强化学习的神经符号元策略，使用知识图谱记忆",
+      "canonical_evidence": "面向部分可观察强化学习的神经符号元策略，使用知识图谱记忆",
+      "llm_tldr_en": "Introduces a neuro-symbolic meta-policy for RL with temporal knowledge-graph memory, adapting memory heuristics at each decision.",
+      "llm_tldr_cn": "该论文针对部分可观察强化学习中记忆管理问题，提出了神经符号元策略，学习在每个决策点应用哪种符号记忆启发式。使用时态知识图谱记忆，状态和观测表示为RDF图，记忆带有时间三元组注释。模型结合知识图谱编码和价值头用于问答、探索和遗忘，实现了自适应且可检查的控制器。这项工作将强化学习与语义网技术结合，为RL中的记忆和推理提供了新方法。",
+      "llm_tldr": "该论文针对部分可观察强化学习中记忆管理问题，提出了神经符号元策略，学习在每个决策点应用哪种符号记忆启发式。使用时态知识图谱记忆，状态和观测表示为RDF图，记忆带有时间三元组注释。模型结合知识图谱编码和价值头用于问答、探索和遗忘，实现了自适应且可检查的控制器。这项工作将强化学习与语义网技术结合，为RL中的记忆和推理提供了新方法。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "reinforcement learning for large language model",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.21067v1",
+      "source": "arxiv",
+      "title": "PrefReward: Learning User Preference Matrix for Personalized Text Generation",
+      "abstract": "Large Language Models (LLMs) have demonstrated remarkable ability in generating personalized content by leveraging user histories and contextual cues. However, most existing personalization approaches rely on implicit representations within model parameters, making it difficult to interpret user-specific preferences or effectively handle long-context dependencies. To address these challenges, we propose PrefReward, a novel preference-aware generative framework that explicitly models user styles through a structured preference matrix and integrates it into the decoding process as a reward signal. PrefReward consists of two stages: (1) extracting a user-specific preference matrix that summarizes individual stylistic tendencies, and (2) using the matrix to guide generation via a KL-divergence-based reward function. Experiments on the LongLaMP dataset show that PrefReward outperforms non-personalized and retrieval-based baselines in both generation quality and personalization interpretability.",
+      "authors": [
+        "Yue Wu",
+        "Chengbing Wang",
+        "Yimeng Bai",
+        "Xiaoyan Zhao",
+        "Yang Zhang",
+        "Fuli Feng"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-07-23T09:00:20+00:00",
+      "link": "https://arxiv.org/pdf/2607.21067v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "learns a user preference matrix as reward signal for text generation",
+      "llm_evidence_cn": "学习用户偏好矩阵作为文本生成的奖励信号",
+      "llm_evidence": "学习用户偏好矩阵作为文本生成的奖励信号",
+      "canonical_evidence": "学习用户偏好矩阵作为文本生成的奖励信号",
+      "llm_tldr_en": "Proposes PrefReward, which learns a structured user preference matrix and integrates it as a reward signal during decoding for personalized text generation.",
+      "llm_tldr_cn": "大模型个性化生成中用户偏好难以显式建模。本文提出PrefReward框架，通过提取用户偏好矩阵并在解码过程中作为奖励信号，实现可解释的风格控制。该方法包括偏好矩阵提取和基于奖励的生成两个阶段，提高了个性化文本的忠实度和可控性。",
+      "llm_tldr": "大模型个性化生成中用户偏好难以显式建模。本文提出PrefReward框架，通过提取用户偏好矩阵并在解码过程中作为奖励信号，实现可解释的风格控制。该方法包括偏好矩阵提取和基于奖励的生成两个阶段，提高了个性化文本的忠实度和可控性。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "design of reward functions in RL",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2607.16961v1",
+      "source": "arxiv",
+      "title": "Lomekwi: Resource-Bounded Tool Discovery in LLM Agents",
+      "abstract": "Existing tool-use benchmarks report a single success rate for complex, multistep tasks. Inspired by ideas from cognitive science, we distinguish tool use from tool discovery and decompose the latter into curiosity (the model's ability to discover the parts needed to build the tool), recognition (the model's ability to discover the process of creating the tool), and efficiency (the model's use of the tool after creation). We show that this framework can be applied to existing discovery tasks, such as Voyager. In addition, we provide evidence that recognition inversely scales with model size, and we introduce and analyze a class of combinatorial games that demonstrates this. We further observe inverse scaling in a separate environment designed to emulate real-world tasks.",
+      "authors": [
+        "Roshan Klein-Seetharaman",
+        "Daniel Wang",
+        "Andrew Xu"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-07-18T20:40:13+00:00",
+      "link": "https://arxiv.org/pdf/2607.16961v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Tool discovery framework for LLM agents with curiosity, recognition, and efficiency components",
+      "llm_evidence_cn": "LLM智能体工具发现框架，包含好奇心、识别和效率三个维度",
+      "llm_evidence": "LLM智能体工具发现框架，包含好奇心、识别和效率三个维度",
+      "canonical_evidence": "LLM智能体工具发现框架，包含好奇心、识别和效率三个维度",
+      "llm_tldr_en": "Lomekwi decomposes tool discovery in LLM agents into curiosity, recognition, and efficiency, revealing inverse scaling in recognition and analyzing combinatorial games.",
+      "llm_tldr_cn": "现有工具使用基准仅报告单次成功率，忽略了工具发现过程。受认知科学启发，本文提出Lomekwi框架，将工具发现分解为好奇心、识别和效率三个维度，并应用于Voyager等任务。实验发现识别能力随模型规模增大反而下降（逆缩放），并通过组合游戏和仿真环境进行了验证。该框架为理解和提升LLM智能体的工具发现能力提供了新思路。",
+      "llm_tldr": "现有工具使用基准仅报告单次成功率，忽略了工具发现过程。受认知科学启发，本文提出Lomekwi框架，将工具发现分解为好奇心、识别和效率三个维度，并应用于Voyager等任务。实验发现识别能力随模型规模增大反而下降（逆缩放），并通过组合游戏和仿真环境进行了验证。该框架为理解和提升LLM智能体的工具发现能力提供了新思路。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.21013v1",
+      "source": "arxiv",
+      "title": "EmoAgent-R1: Towards Multimodal Emotion Understanding with Reinforcement Learning-based Dynamic Agent Specialization",
+      "abstract": "Multimodal large language models (MLLMs) have achieved impressive performance in multimodal emotion recognition (MER) tasks and lifted MER to a new level that is complex emotion understanding with advanced video understanding abilities and natural language description. However, existing MLLM-based methods often use a fixed prompt to perceive the emotions, ignoring the dynamicity and complexity of the emotion source in the multimodal inputs. To address these issues, we propose a novel Reinforcement Learning-based Dynamic Agent Specialization framework (\\textbf{EmoAgent-R1}) to optimize the emotion recognition, reasoning, and generalization abilities of an MLLM with dynamic agent specialization based on reinforcement learning. Specifically, we first adopt a cold start strategy to endow an MLLM with preliminary emotion recognition, reasoning, and agent routing ability by training with synthetic answer-conditioned chain-of-thought data and agent routing data. Then, we further train the MLLM with reinforcement learning to perceive emotions in a two-step agentic workflow with agent selection and agent specialization. To effectively train EmoAgent-R1, we propose a novel Progressive Group-Relative Policy Optimization (P-GRPO) to combine group-based relative advantages with a PMI-inspired progressive token-level modulation to transform sparse rewards into fine-grained learning signals, mitigating the coarse-grained uniform credit assignment issue in GRPO. Extensive experiments on MER benchmarks demonstrate the superiority of our EmoAgent-R1 in stronger emotion reasoning performance and improved optimization stability.",
+      "authors": [
+        "Lihuang Fang",
+        "Yuchen Zou",
+        "kebin Jin",
+        "Jinghui Qin"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI",
+        "cs.CV"
+      ],
+      "published": "2026-07-23T07:52:40+00:00",
+      "link": "https://arxiv.org/pdf/2607.21013v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Reinforcement learning-based dynamic agent specialization for multimodal emotion understanding",
+      "llm_evidence_cn": "基于强化学习的动态智能体特化用于多模态情感理解",
+      "llm_evidence": "基于强化学习的动态智能体特化用于多模态情感理解",
+      "canonical_evidence": "基于强化学习的动态智能体特化用于多模态情感理解",
+      "llm_tldr_en": "EmoAgent-R1 uses reinforcement learning to dynamically specialize multimodal LLM agents for emotion recognition, improving reasoning and generalization.",
+      "llm_tldr_cn": "针对多模态大语言模型在情感理解任务中固定提示难以动态适应情感源的问题，本文提出EmoAgent-R1框架，利用强化学习实现动态智能体专业化，优化情感识别、推理和泛化能力。实验表明该方法在复杂情感理解任务上优于固定提示基线，为多模态情感交互提供了新思路。",
+      "llm_tldr": "针对多模态大语言模型在情感理解任务中固定提示难以动态适应情感源的问题，本文提出EmoAgent-R1框架，利用强化学习实现动态智能体专业化，优化情感识别、推理和泛化能力。实验表明该方法在复杂情感理解任务上优于固定提示基线，为多模态情感交互提供了新思路。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.17143v1",
+      "source": "arxiv",
+      "title": "EdgeCoInfer: Hierarchical Collaborative Inference for On-Device Multimodal Large Models",
+      "abstract": "Modern mobile applications predominantly execute concurrent Multimodal Large Language Models (MLLMs) to provide ubiquitous intelligence. However, satisfying this demand within edge environments faces significant challenges due to multi-task concurrency and strictly coupled hard constraints. To address these issues, we propose EdgeCoInfer, a framework enabling granularity-adaptive deployment by co-optimizing inter-model functional module sharing and \\textbf{intra-model fine-grained partitioning}. We solve the underlying Mixed-Integer Non-Linear Programming (MINLP) problem via a Hybrid Evolutionary Hierarchical Reinforcement Learning (HE-HRL) paradigm, which synchronizes a Genetic Algorithm (GA) for discrete model placement with a Soft Actor-Critic (SAC) agent for continuous resource allocation. To navigate the sparse feasible region, we introduce a feasibility-guided constructive execution mechanism, integrating a constructive cut-step decoder with pre-act pruning and a two-phase curriculum strategy for stable adaptation. Experimental results demonstrate that EdgeCoInfer ensures a 100\\% task completion rate in high-concurrency scenarios, achieving a 76\\% reduction in system cost and 71.88\\% memory savings compared to state-of-the-art baselines.",
+      "authors": [
+        "Lin Tan",
+        "David K. Y. Yau",
+        "Songtao Guo"
+      ],
+      "primary_category": "cs.DC",
+      "categories": [
+        "cs.DC"
+      ],
+      "published": "2026-07-19T08:57:47+00:00",
+      "link": "https://arxiv.org/pdf/2607.17143v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "employs hierarchical reinforcement learning for collaborative inference of multimodal LLMs",
+      "llm_evidence_cn": "采用分层强化学习实现多模态大模型的协同推理",
+      "llm_evidence": "采用分层强化学习实现多模态大模型的协同推理",
+      "canonical_evidence": "采用分层强化学习实现多模态大模型的协同推理",
+      "llm_tldr_en": "Uses hybrid evolutionary hierarchical RL to optimize placement and partitioning of multimodal LLMs on edge devices.",
+      "llm_tldr_cn": "该论文针对边缘环境中多任务并发部署多模态大语言模型（MLLM）的挑战，提出了EdgeCoInfer框架。通过混合进化分层强化学习（HE-HRL）同时优化模型间模块共享和模型内细粒度划分，解决混合整数非线性规划问题。在边缘设备上实现了粒度自适应部署，有效平衡了多任务并发与硬件约束，展示了强化学习在LLM系统优化中的应用。",
+      "llm_tldr": "该论文针对边缘环境中多任务并发部署多模态大语言模型（MLLM）的挑战，提出了EdgeCoInfer框架。通过混合进化分层强化学习（HE-HRL）同时优化模型间模块共享和模型内细粒度划分，解决混合整数非线性规划问题。在边缘设备上实现了粒度自适应部署，有效平衡了多任务并发与硬件约束，展示了强化学习在LLM系统优化中的应用。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "reinforcement learning for large language model",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.21051v1",
+      "source": "arxiv",
+      "title": "Sample-Efficient Learning from Agent Experience",
+      "abstract": "Real-world agent learning is often constrained by costly environment interactions, such as running time-consuming experiments or obtaining human feedback. In-context learning offers a highly sample-efficient way for agents to learn from their own interaction histories, but its gains disappear once that experience is removed from the context. Separately, context distillation provides a mechanism for internalizing contextual information into model weights. However, applying it to agents' interaction histories without sacrificing environment sample efficiency remains underexplored. We term this problem Experience Distillation and develop an implementation that requires no further environment interaction beyond the collected experience. Experiments on 749 curated software-engineering tasks and six text-adventure games show that it retains at least 64.8\\% of the gains from in-context learning across both domains, whereas direct supervised fine-tuning on the collected experience recovers only 3.8\\%. Compared with classical reinforcement-learning baselines, in-context learning from trial-and-error experience followed by Experience Distillation matches their performance with at least \\(9.6\\times\\) fewer environment samples.",
+      "authors": [
+        "Chenhui Gou",
+        "Haoqin Tu",
+        "Yunhao Fang",
+        "Jianfei Cai",
+        "Hamid Rezatofighi"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-07-23T08:34:31+00:00",
+      "link": "https://arxiv.org/pdf/2607.21051v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "sample-efficient learning from agent experience for task automation",
+      "llm_evidence_cn": "从智能体经验中进行样本高效学习，用于任务自动化",
+      "llm_evidence": "从智能体经验中进行样本高效学习，用于任务自动化",
+      "canonical_evidence": "从智能体经验中进行样本高效学习，用于任务自动化",
+      "llm_tldr_en": "Experience Distillation internalizes agent interaction history into model weights using context distillation, enabling sample-efficient learning without further environment interaction, validated on 749 software engineering tasks.",
+      "llm_tldr_cn": "现实世界中智能体学习常受限于昂贵环境交互，而上下文学习虽然样本高效但经验无法持久。该论文提出经验蒸馏问题，并通过上下文蒸馏技术将智能体交互历史内化到模型权重中，无需额外环境交互。在749个软件工程任务上的实验表明，该方法使得模型能够持久利用自身经验进行学习，提升了任务自动化中的样本效率。",
+      "llm_tldr": "现实世界中智能体学习常受限于昂贵环境交互，而上下文学习虽然样本高效但经验无法持久。该论文提出经验蒸馏问题，并通过上下文蒸馏技术将智能体交互历史内化到模型权重中，无需额外环境交互。在749个软件工程任务上的实验表明，该方法使得模型能够持久利用自身经验进行学习，提升了任务自动化中的样本效率。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.21106v1",
+      "source": "arxiv",
+      "title": "AttriMem: Attribution-Guided Process Feedback for Agent Memory Learning",
+      "abstract": "Effective memory is crucial for LLM agents, yet constructing it effectively remains challenging. A memory-construction policy decides what information to extract, store, update, compress, or discard as interactions accumulate. Heuristic memory methods rely on subjective, task-specific rules, which can misalign with downstream objectives and limit cross-task adaptability. RL-based methods, by contrast, learn from task feedback but mainly use outcome- or module-level rewards. These coarse signals indicate task success but cannot identify which intermediate memory contents support the final answer, creating a fine-grained credit-assignment bottleneck. However, constructing such process feedback is prohibitively difficult because intermediate memory decisions lack unique ground-truth targets, while the appropriate credit varies with the agent's uncertain reasoning trajectory and therefore cannot be specified in advance. We propose AttriMem, an attribution-guided process-feedback framework for learning memory-construction policies with RL. AttriMem augments the global outcome reward with local rewards derived from token-level contributions to the final answer. Experiments on long-horizon dialogue question answering show that AttriMem outperforms retrieval-based, heuristic, and RL-based baselines, generalizes across benchmarks and answer models, stabilizes RL optimization.",
+      "authors": [
+        "Qinfeng Li",
+        "Yuntai Bao",
+        "Xinyan Yu",
+        "Hongze Chen",
+        "Wenqi Zhang",
+        "Xuhong Zhang"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-07-23T09:35:34+00:00",
+      "link": "https://arxiv.org/pdf/2607.21106v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Attribution-guided process feedback for agent memory learning using RL",
+      "llm_evidence_cn": "利用归因引导的过程反馈进行代理记忆学习的RL方法",
+      "llm_evidence": "利用归因引导的过程反馈进行代理记忆学习的RL方法",
+      "canonical_evidence": "利用归因引导的过程反馈进行代理记忆学习的RL方法",
+      "llm_tldr_en": "AttriMem uses attribution-guided process feedback to credit intermediate memory decisions in RL-based agent memory construction, overcoming coarse outcome rewards.",
+      "llm_tldr_cn": "AttriMem针对LLM代理记忆构建中RL方法仅使用粗粒度结果奖励、无法识别中间记忆内容贡献的问题，提出归因引导的过程反馈机制。该机制通过归因分析定位哪些记忆操作关键影响最终答案，为记忆策略提供细粒度监督。在多种代理任务上，该方法相比启发式规则和结果奖励RL显著提升跨任务适应性和下游性能。",
+      "llm_tldr": "AttriMem针对LLM代理记忆构建中RL方法仅使用粗粒度结果奖励、无法识别中间记忆内容贡献的问题，提出归因引导的过程反馈机制。该机制通过归因分析定位哪些记忆操作关键影响最终答案，为记忆策略提供细粒度监督。在多种代理任务上，该方法相比启发式规则和结果奖励RL显著提升跨任务适应性和下游性能。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    }
+  ]
+}
