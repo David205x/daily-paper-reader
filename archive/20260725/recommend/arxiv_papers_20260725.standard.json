@@ -1,0 +1,280 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-25T21:20:16.693446+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 4,
+    "deep_cap": 6,
+    "deep_selected": 4,
+    "quick_candidates": 3,
+    "quick_skim_target": 11,
+    "quick_selected": 3
+  },
+  "deep_dive": [
+    {
+      "id": "2607.20908v1",
+      "source": "arxiv",
+      "title": "Multi-turn RL with Structural and Performance Aware Rewards for CUDA Kernel Generation",
+      "abstract": "Reinforcement Learning with Verifiable Rewards (RLVR) has emerged as a powerful technique to enhance the reasoning capacity of LLMs for optimized code generation. However, existing RLVR approaches primarily rely on outcome-based signals such as correctness and speedup, overlooking performance-critical structural properties of programs that are essential for generating optimized code. In this work, we propose CudaPerf, a reflective RL framework that incorporates both verifiable execution rewards and structural code-aware rewards derived from parallelization features (e.g., memory coalescing, occupancy, Arithmatic Intensity, and synchronization patterns). CudaPerf operates in two stages: (1) an offline pairwise ranking module that learns to distinguish strong and weak program candidates via contrastive comparisons, and (2) an online RL training phase that jointly optimizes for correctness, performance, and structural efficiency through a unified reward signal. To further enhance learning, CudaPerf utilizes iterative refinement using execution feedback enabling progressive improvement of generated candidates. We also introduce a dataset comprising 2.9k C to CUDA and 1k PyTorch to CUDA programs, each paired with diverse input configurations and multiple CUDA implementations encompassing diverse optimization strategies. CudaPerf is evaluated across multiple benchmarks comprising both C to CUDA and PyTorch to CUDA transformations. Empirical findings suggest that CudaPerf significantly outperforms strong baselines, including Qwen-3-32B (for C to CUDA) and CUDA Agent (for PyTorch to CUDA) by achieving up to 5X & 3.32X improvements in speedup, and 17% & 7% improvements in correctness, respectively.",
+      "authors": [
+        "Quazi Ishtiaque Mahmud",
+        "Nesreen K. Ahmed",
+        "Ali Jannesari"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-07-23T04:06:41+00:00",
+      "link": "https://arxiv.org/pdf/2607.20908v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "design of structural and performance aware rewards in multi-turn RL for code generation",
+      "llm_evidence_cn": "设计结构感知和性能感知奖励用于多轮强化学习代码生成",
+      "llm_evidence": "设计结构感知和性能感知奖励用于多轮强化学习代码生成",
+      "canonical_evidence": "设计结构感知和性能感知奖励用于多轮强化学习代码生成",
+      "llm_tldr_en": "Introduces CudaPerf, a reflective RL framework with structural code-aware rewards alongside verifiable rewards for CUDA kernel generation.",
+      "llm_tldr_cn": "现有基于可验证奖励的强化学习方法忽略了代码的结构性能属性。本文提出CudaPerf框架，结合可验证执行奖励和代码结构感知奖励（如访存合并、占用率等），通过两阶段学习生成优化CUDA内核。实验证明该方法在代码质量和性能上均优于基线，为RL奖励函数设计提供新思路。",
+      "llm_tldr": "现有基于可验证奖励的强化学习方法忽略了代码的结构性能属性。本文提出CudaPerf框架，结合可验证执行奖励和代码结构感知奖励（如访存合并、占用率等），通过两阶段学习生成优化CUDA内核。实验证明该方法在代码质量和性能上均优于基线，为RL奖励函数设计提供新思路。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "design of reward functions in RL",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.21324v1",
+      "source": "arxiv",
+      "title": "GRADRAG: Cross-Component Prompt Adaptation for Coordinated Multi-Agent RAG",
+      "abstract": "Retrieval-Augmented Generation (RAG) systems increasingly employ multiple LLM agents. Yet, most prior work optimizes components in isolation rather than coordinating improvements across the pipeline. We introduce GRADRAG, a framework for cross-component prompt adaptation that models the RAG pipeline as a computational graph and propagates structured evaluation feedback to update upstream agents. An Evaluator critiques downstream answers and supporting evidence, producing actionable feedback that a Prompt Optimizer uses to iteratively update adaptive agents, such as retrievers, graph constructors, and answerers. The Evaluator also triggers early stopping when the output is deemed satisfactory. We evaluate GRADRAG on the SQUALITY and QMSUM benchmarks under two retrieval paradigms: flat chunk-based retrieval using IRCoT-style query refinement (Trivedi et al., 2023), and graph-based retrieval that constructs and iteratively enriches an entity-relation graph from the document. Across both settings, GRADRAG consistently outperforms one-step refinement baselines that update only the final generator, achieving a 12-15 percentage point net preference margin in LLM-judged pairwise comparisons, with most gains realized within two refinement iterations.",
+      "authors": [
+        "Paolo Pedinotti",
+        "Enrico Santus"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.AI"
+      ],
+      "published": "2026-07-23T13:54:38+00:00",
+      "link": "https://arxiv.org/pdf/2607.21324v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Cross-component prompt adaptation for coordinated multi-agent RAG",
+      "llm_evidence_cn": "面向协调多智能体检索增强生成的跨组件提示自适应",
+      "llm_evidence": "面向协调多智能体检索增强生成的跨组件提示自适应",
+      "canonical_evidence": "面向协调多智能体检索增强生成的跨组件提示自适应",
+      "llm_tldr_en": "Introduces GRADRAG, a framework that propagates evaluation feedback to update prompts across RAG pipeline agents.",
+      "llm_tldr_cn": "现有RAG系统往往孤立优化各组件，缺乏全局协调。本文提出GRADRAG框架，将RAG流水线建模为计算图，通过评估器对下游回答和证据进行结构化反馈，由Prompt优化器迭代更新检索器、图构建器和回答器等多智能体提示。在SQUALITY和QMSUM基准上，GRADRAG显著优于独立优化方法，并支持早期停止。",
+      "llm_tldr": "现有RAG系统往往孤立优化各组件，缺乏全局协调。本文提出GRADRAG框架，将RAG流水线建模为计算图，通过评估器对下游回答和证据进行结构化反馈，由Prompt优化器迭代更新检索器、图构建器和回答器等多智能体提示。在SQUALITY和QMSUM基准上，GRADRAG显著优于独立优化方法，并支持早期停止。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "retrieval augmented generation for knowledge intensive tasks",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.19301v1",
+      "source": "arxiv",
+      "title": "PAGE-RAG: Evidence-Grounded Adaptive Graph Retrieval for Long-Document Question Answering",
+      "abstract": "GraphRAG improves long-document question answering by introducing structured representations beyond conventional retrieval. However, automatically constructed graphs are inherently incomplete projections of source documents, and treating them as independent knowledge sources may lead to unreliable retrieval and generation. We propose PAGE-RAG, a projection-aware adaptive graph retrieval framework for reliable long-document question answering. PAGE-RAG views graph structures as semantic skeletons that organize and navigate document knowledge, rather than replacing the original knowledge source. Based on this perspective, PAGE-RAG introduces a task-adaptive retrieval routing strategy that dynamically selects appropriate retrieval behaviors according to query requirements. Furthermore, PAGE-RAG incorporates strict knowledge boundary control, ensuring that generated responses remain grounded within available evidence and abstaining from unsupported information beyond the accessible knowledge scope. Experiments demonstrate that PAGE-RAG achieves competitive answer quality while improving retrieval efficiency and knowledge reliability, highlighting the importance of projection-aware graph modeling, adaptive retrieval, and explicit knowledge boundary control for trustworthy GraphRAG systems. The source code is publicly available at https://github.com/CXY0112/PAGE-RAG.",
+      "authors": [
+        "Xingyu Chen",
+        "Junxiu An",
+        "Jun Guo",
+        "Li Wang"
+      ],
+      "primary_category": "cs.IR",
+      "categories": [
+        "cs.IR"
+      ],
+      "published": "2026-07-21T17:13:22+00:00",
+      "link": "https://arxiv.org/pdf/2607.19301v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "retrieval augmented generation for long-document QA",
+      "llm_evidence_cn": "检索增强生成用于长文档问答",
+      "llm_evidence": "检索增强生成用于长文档问答",
+      "canonical_evidence": "检索增强生成用于长文档问答",
+      "llm_tldr_en": "Proposes PAGE-RAG, an adaptive graph retrieval framework for reliable long-document QA using projection-aware retrieval.",
+      "llm_tldr_cn": "现有GraphRAG方法因自动构建图不完整导致检索不可靠。本文提出PAGE-RAG，将图结构视为语义骨架，并引入任务自适应检索路由策略。实验表明PAGE-RAG在长文档问答中显著提升检索可靠性和生成质量，为知识密集型任务提供新范式。",
+      "llm_tldr": "现有GraphRAG方法因自动构建图不完整导致检索不可靠。本文提出PAGE-RAG，将图结构视为语义骨架，并引入任务自适应检索路由策略。实验表明PAGE-RAG在长文档问答中显著提升检索可靠性和生成质量，为知识密集型任务提供新范式。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "retrieval augmented generation for knowledge intensive tasks",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.21419v1",
+      "source": "arxiv",
+      "title": "PATS: Policy-Aware Training Scaffolding for Agentic Reinforcement Learning",
+      "abstract": "In long-horizon LLM agent reinforcement learning, weak policies often repeat similar failures, producing uninformative rollout trajectories and limiting effective policy optimization. Existing skill-centric methods improve exploration by optimizing, filtering, or internalizing reusable skills. However, they remain centered on the skills themselves rather than being designed as adaptive training-time support for the evolving policy. To address this, we propose a policy-centric training paradigm that reframes skills as a dynamic training scaffold. Our framework, Pats, converts rollout groups from the latest policy into evidence cards and uses task-specific evaluation to adjust the context used in subsequent rollouts. Concrete guidance helps weak policies to complete challenging tasks. As policy improves, redundant context is revised or removed to reduce reliance on explicit guidance while preserving useful rollout variation. The policy is optimized with environmental rewards using standard RLVR, and the training scaffold is discarded at deployment. On ALFWorld and WebShop, Pats improves over strong baselines by up to 18.6%. Across seven search-augmented QA benchmarks, it remains competitive while using 32.1% fewer prompt tokens than the baseline.",
+      "authors": [
+        "Yipeng Shi",
+        "Zhipeng Ma",
+        "Yue Wang",
+        "Qitai Tan",
+        "Yang Li",
+        "Peng Chen",
+        "Zhengzhou Zhu"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-07-23T15:24:35+00:00",
+      "link": "https://arxiv.org/pdf/2607.21419v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Policy-aware training scaffolding for LLM agent reinforcement learning",
+      "llm_evidence_cn": "LLM智能体强化学习的策略感知训练支架",
+      "llm_evidence": "LLM智能体强化学习的策略感知训练支架",
+      "canonical_evidence": "LLM智能体强化学习的策略感知训练支架",
+      "llm_tldr_en": "Proposes Pats, a policy-centric training paradigm for long-horizon LLM agent RL that converts rollout groups into evidence cards to dynamically adjust context, improving weak policies.",
+      "llm_tldr_cn": "当前长程LLM智能体强化学习中弱策略常重复失败，产出无效轨迹。为此提出Pats框架，以策略为中心将技能重塑为动态训练支架：将最新策略的rollout组转为证据卡片，通过任务特定评估调整后续rollout上下文，提供具体引导帮助弱策略探索。实验表明该方法能有效提升策略优化效率。",
+      "llm_tldr": "当前长程LLM智能体强化学习中弱策略常重复失败，产出无效轨迹。为此提出Pats框架，以策略为中心将技能重塑为动态训练支架：将最新策略的rollout组转为证据卡片，通过任务特定评估调整后续rollout上下文，提供具体引导帮助弱策略探索。实验表明该方法能有效提升策略优化效率。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2607.20668v1",
+      "source": "arxiv",
+      "title": "From Agent Failures to Text Policies: What Works and What Breaks",
+      "abstract": "TextGrad improves language-model systems by revising text from feedback. Its core thesis is that natural-language feedback can act as a gradient for optimizing text components without changing model weights. Applying it to agents is harder because feedback arrives only after a sequence of actions, making it difficult to identify which decision caused failure. We study this problem by separating the ability to follow a useful policy from the ability to learn that policy from experience. Our main finding is a clear gap between these two abilities. Human-written policies improve two frozen 7B agents on TextWorldExpress by 5.0 success points, showing that useful policy text exists. However, policies generated from agent trajectories do not reliably outperform fixed prompting, even with richer traces, counterfactual evidence, or iterative GEPA search. The main challenge for agent-level TextGrad is therefore not executing textual policy updates, but reliably generating and selecting them from experience.",
+      "authors": [
+        "Jaideep Ray",
+        "Ankit Goyal"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.AI"
+      ],
+      "published": "2026-07-22T19:08:19+00:00",
+      "link": "https://arxiv.org/pdf/2607.20668v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "LLM agents learn from failure using text feedback for policy improvement",
+      "llm_evidence_cn": "LLM智能体通过文本反馈从失败中学习策略改进",
+      "llm_evidence": "LLM智能体通过文本反馈从失败中学习策略改进",
+      "canonical_evidence": "LLM智能体通过文本反馈从失败中学习策略改进",
+      "llm_tldr_en": "Studies the gap between following a useful policy and learning it from experience; human-written policies improve agents but automatically generated policies fail, proposing a foundation for text-based policy learning in LLM agents.",
+      "llm_tldr_cn": "本文研究LLM智能体从经验中学习策略的挑战。将策略遵循与策略学习分离，发现人类编写的策略能显著提升智能体性能（+5.0成功点），而自动生成的策略不可靠。揭示策略学习的关键瓶颈，为基于文本反馈的智能体策略优化奠定基础。",
+      "llm_tldr": "本文研究LLM智能体从经验中学习策略的挑战。将策略遵循与策略学习分离，发现人类编写的策略能显著提升智能体性能（+5.0成功点），而自动生成的策略不可靠。揭示策略学习的关键瓶颈，为基于文本反馈的智能体策略优化奠定基础。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.21302v1",
+      "source": "arxiv",
+      "title": "Expert Behavior Prior Reinforcement Learning",
+      "abstract": "Behavior prior reinforcement learning (BPRL) has emerged as a promising paradigm to improve sample efficiency in online reinforcement learning (RL) by leveraging policy priors derived from offline demonstrations. However, most existing BPRL methods rely on static offline datasets, which often suffer from low data diversity and suboptimal trajectory quality. This reliance restricts the effectiveness of policy priors, hindering both policy exploitation and stability during online training. Consequently, agents are prone to inefficient exploration and unstable learning dynamics. To address these limitations, we deviate from existing offline pre-training methods and propose an Expert Behavior Prior (EBP) algorithm. Specifically, we introduce a Q-guided conditional variational autoencoder (Q-CVAE) that learns to generate expert policy priors directly from the online replay buffer. This enables the generation of high-value actions for guiding policy updates without relying on pre-collected expert trajectories. To further enhance policy exploitation, we propose an expert policy guidance (EPG) mechanism that selects expert actions from a generative support set, and we integrate a policy gradient correction (PGC) module to harmonize Q-guidance with expert supervision, promoting stable and consistent policy improvement. Extensive experiments conducted on robotic control (Gym, PyBullet) and industrial control (DMControl) benchmarks demonstrate that EBP significantly outperforms state-of-the-art online RL algorithms, achieving higher sample efficiency and more stable convergence.",
+      "authors": [
+        "Gong Gao",
+        "Weidong Zhao",
+        "Xianhui Liu",
+        "Ning Jia"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-07-23T13:26:57+00:00",
+      "link": "https://arxiv.org/pdf/2607.21302v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "General RL method for generating expert behavior priors applicable to LLM training",
+      "llm_evidence_cn": "通用强化学习方法，可应用于大语言模型训练中的先验生成",
+      "llm_evidence": "通用强化学习方法，可应用于大语言模型训练中的先验生成",
+      "canonical_evidence": "通用强化学习方法，可应用于大语言模型训练中的先验生成",
+      "llm_tldr_en": "Expert Behavior Prior (EBP) algorithm uses Q-guided conditional VAE to generate diverse high-quality policy priors, outperforming static offline datasets in online RL sample efficiency and stability.",
+      "llm_tldr_cn": "现有行为先验强化学习（BPRL）依赖静态离线数据集，存在数据多样性低与轨迹质量次优问题。本文提出专家行为先验（EBP）算法，通过Q引导的条件变分自编码器在线生成多样化高质量策略先验，提升探索效率和训练稳定性。在多个连续控制任务上优于现有方法，为强化学习中的先验利用提供新思路。",
+      "llm_tldr": "现有行为先验强化学习（BPRL）依赖静态离线数据集，存在数据多样性低与轨迹质量次优问题。本文提出专家行为先验（EBP）算法，通过Q引导的条件变分自编码器在线生成多样化高质量策略先验，提升探索效率和训练稳定性。在多个连续控制任务上优于现有方法，为强化学习中的先验利用提供新思路。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "reinforcement learning for large language model",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.21361v1",
+      "source": "arxiv",
+      "title": "FedAgentKE: Federated Semantic Knowledge Evolution for Heterogeneous Agents",
+      "abstract": "Large language model (LLM)-based agents increasingly rely on reasoning, tool use, and iterative execution, yet existing agent frameworks still operate largely in isolation. While recent memory-based agent systems improve individual agents through local retrieval and workflow reuse, local experiences remain fragmented across isolated agent frameworks, limiting cross-framework knowledge transfer and collaborative reasoning evolution. We propose FedAgentKE, a lightweight framework for Federated Semantic Knowledge Evolution across heterogeneous agents. FedAgentKE enables distributed agent frameworks to collaboratively evolve transferable reasoning abstractions through iterative semantic knowledge distillation, aggregation, and adaptation without sharing raw reasoning trajectories. Experiments demonstrate consistent improvements under both cross-framework and cross-task settings, highlighting the potential of federated semantic knowledge evolution for future collaborative agent ecosystems.",
+      "authors": [
+        "Weihao Li",
+        "Jun Bai",
+        "Ziyang Song"
+      ],
+      "primary_category": "cs.MA",
+      "categories": [
+        "cs.MA"
+      ],
+      "published": "2026-07-23T14:24:02+00:00",
+      "link": "https://arxiv.org/pdf/2607.21361v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Federated knowledge evolution for LLM agents",
+      "llm_evidence_cn": "面向大模型智能体的联邦知识演化",
+      "llm_evidence": "面向大模型智能体的联邦知识演化",
+      "canonical_evidence": "面向大模型智能体的联邦知识演化",
+      "llm_tldr_en": "FedAgentKE enables heterogeneous LLM agents to collaboratively evolve reasoning knowledge via federated semantic distillation without sharing raw data.",
+      "llm_tldr_cn": "现有大模型智能体框架各自独立运行，经验碎片化限制了跨框架知识迁移。本文提出FedAgentKE，通过迭代语义知识蒸馏、聚合与适配，使异构智能体能够在保护隐私的前提下协同演化可迁移的推理知识。实验表明该方法显著提升了多个智能体框架在复杂任务上的泛化性能，为分布式智能体协作提供了轻量化联邦学习方案。",
+      "llm_tldr": "现有大模型智能体框架各自独立运行，经验碎片化限制了跨框架知识迁移。本文提出FedAgentKE，通过迭代语义知识蒸馏、聚合与适配，使异构智能体能够在保护隐私的前提下协同演化可迁移的推理知识。实验表明该方法显著提升了多个智能体框架在复杂任务上的泛化性能，为分布式智能体协作提供了轻量化联邦学习方案。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    }
+  ]
+}

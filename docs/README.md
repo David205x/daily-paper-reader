@@ -6,47 +6,43 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-07-24
-- 运行时间：2026-07-24 21:29:32 UTC
+- 最新运行日期：2026-07-25
+- 运行时间：2026-07-25 21:24:28 UTC
 - 运行状态：成功
-- 本次总论文数：9
+- 本次总论文数：7
 - 精读区：4
-- 速读区：5
+- 速读区：3
 
 ### 今日简报（AI）
-今日精读9篇论文，聚焦大模型评估器与智能体长期决策治理。最值得关注：动态评分卡使评估器与策略协同进化（9.0/10），以及从记忆到技能的长期智能体治理框架（8.0/10）。建议优先阅读这两篇精读论文，理解如何通过动态反馈和证据驱动提升LLM可靠性。
-- 详情：[/202607/24/README](/202607/24/README)
+今日精选7篇论文，精读2篇高分研究聚焦CUDA内核生成多轮强化学习与多智能体RAG协调优化。  
+最值得关注两个方向：利用结构及性能感知奖励优化CUDA内核生成，以及跨组件提示自适应实现多智能体RAG协同。  
+建议优先阅读精读论文，并关注智能体失败策略与专家先验强化学习等速读研究中的实用经验。
+- 详情：[/202607/25/README](/202607/25/README)
 
 ### 精读区论文标签
-1. [Co-Evolving LLM Evaluators and Policies via DynamicRubric](/202607/24/2607.20083v2-co-evolving-llm-evaluators-and-policies-via-dynamicrubric)  
+1. [Multi-turn RL with Structural and Performance Aware Rewards for CUDA Kernel Generation](/202607/25/2607.20908v1-multi-turn-rl-with-structural-and-performance-aware-rewards-for-cuda-kernel-generation)  
    标签：评分：9.0/10、query:rl
-   evidence：共同进化评估器和策略以维持评分差距用于LLM对齐
-2. [From Memory to Skills: Evidence-Grounded Co-Evolution Governance for Long-Horizon LLM Agents](/202607/24/2607.16621v1-from-memory-to-skills-evidence-grounded-co-evolution-governance-for-long-horizon-llm-agents)  
+   evidence：设计结构感知和性能感知奖励用于多轮强化学习代码生成
+2. [GRADRAG: Cross-Component Prompt Adaptation for Coordinated Multi-Agent RAG](/202607/25/2607.21324v1-gradrag-cross-component-prompt-adaptation-for-coordinated-multi-agent-rag)  
+   标签：评分：9.0/10、query:rl
+   evidence：面向协调多智能体检索增强生成的跨组件提示自适应
+3. [PAGE-RAG: Evidence-Grounded Adaptive Graph Retrieval for Long-Document Question Answering](/202607/25/2607.19301v1-page-rag-evidence-grounded-adaptive-graph-retrieval-for-long-document-question-answering)  
    标签：评分：8.0/10、query:rl
-   evidence：面向长周期任务自动化的LLM智能体框架，实现记忆与技能协同演化
-3. [Neuro-Symbolic Meta-Policies for Temporal Knowledge-Graph Memory under Partial Observability](/202607/24/2607.18368v1-neuro-symbolic-meta-policies-for-temporal-knowledge-graph-memory-under-partial-observability)  
+   evidence：检索增强生成用于长文档问答
+4. [PATS: Policy-Aware Training Scaffolding for Agentic Reinforcement Learning](/202607/25/2607.21419v1-pats-policy-aware-training-scaffolding-for-agentic-reinforcement-learning)  
    标签：评分：8.0/10、query:rl
-   evidence：面向部分可观察强化学习的神经符号元策略，使用知识图谱记忆
-4. [PrefReward: Learning User Preference Matrix for Personalized Text Generation](/202607/24/2607.21067v1-prefreward-learning-user-preference-matrix-for-personalized-text-generation)  
-   标签：评分：8.0/10、query:rl
-   evidence：学习用户偏好矩阵作为文本生成的奖励信号
+   evidence：LLM智能体强化学习的策略感知训练支架
 
 ### 速读区论文标签
-1. [Lomekwi: Resource-Bounded Tool Discovery in LLM Agents](/202607/24/2607.16961v1-lomekwi-resource-bounded-tool-discovery-in-llm-agents)  
+1. [From Agent Failures to Text Policies: What Works and What Breaks](/202607/25/2607.20668v1-from-agent-failures-to-text-policies-what-works-and-what-breaks)  
    标签：评分：7.0/10、query:rl
-   evidence：LLM智能体工具发现框架，包含好奇心、识别和效率三个维度
-2. [EdgeCoInfer: Hierarchical Collaborative Inference for On-Device Multimodal Large Models](/202607/24/2607.17143v1-edgecoinfer-hierarchical-collaborative-inference-for-on-device-multimodal-large-models)  
+   evidence：LLM智能体通过文本反馈从失败中学习策略改进
+2. [Expert Behavior Prior Reinforcement Learning](/202607/25/2607.21302v1-expert-behavior-prior-reinforcement-learning)  
    标签：评分：7.0/10、query:rl
-   evidence：采用分层强化学习实现多模态大模型的协同推理
-3. [AttriMem: Attribution-Guided Process Feedback for Agent Memory Learning](/202607/24/2607.21106v1-attrimem-attribution-guided-process-feedback-for-agent-memory-learning)  
+   evidence：通用强化学习方法，可应用于大语言模型训练中的先验生成
+3. [FedAgentKE: Federated Semantic Knowledge Evolution for Heterogeneous Agents](/202607/25/2607.21361v1-fedagentke-federated-semantic-knowledge-evolution-for-heterogeneous-agents)  
    标签：评分：7.0/10、query:rl
-   evidence：利用归因引导的过程反馈进行代理记忆学习的RL方法
-4. [EmoAgent-R1: Towards Multimodal Emotion Understanding with Reinforcement Learning-based Dynamic Agent Specialization](/202607/24/2607.21013v1-emoagent-r1-towards-multimodal-emotion-understanding-with-reinforcement-learning-based-dynamic-agent-specialization)  
-   标签：评分：6.0/10、query:rl
-   evidence：基于强化学习的动态智能体特化用于多模态情感理解
-5. [Sample-Efficient Learning from Agent Experience](/202607/24/2607.21051v1-sample-efficient-learning-from-agent-experience)  
-   标签：评分：6.0/10、query:rl
-   evidence：从智能体经验中进行样本高效学习，用于任务自动化
+   evidence：面向大模型智能体的联邦知识演化
 
 
 <div class="dpr-home-promo-card">
