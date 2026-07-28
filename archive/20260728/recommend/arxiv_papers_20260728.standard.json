@@ -1,0 +1,728 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-28T21:34:57.389091+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 14,
+    "deep_cap": 6,
+    "deep_selected": 6,
+    "quick_candidates": 13,
+    "quick_skim_target": 11,
+    "quick_selected": 11
+  },
+  "deep_dive": [
+    {
+      "id": "2607.22996v1",
+      "source": "arxiv",
+      "title": "Beyond Direct Answering: Aligning Educational LLMs as Socratic Guides via Heuristic Reinforcement Learning",
+      "abstract": "Large language models (LLMs) deployed in educational settings often behave as direct answerers: they disclose target concepts in the opening turn instead of guiding students through progressive inquiry, as Socratic pedagogy prescribes. We present HeuristicEdu, a two-phase pipeline that aligns Qwen2.5-7B toward Socratic tutoring via supervised warm-up and Group Relative Policy Optimization (GRPO). Training uses SocraticEdu, 797 multi-turn Chinese children's science dialogues reconstructed from a live platform, with a heuristic reward over cognitive depth (R_cog), curiosity engagement (R_eng), and directness (R_dir), together with a K_query correction for student-introduced terms. We introduce Scaffolding Effectiveness (SE) and Conversation Depth (CD) to evaluate outcomes beyond surface fluency. On 30 held-out questions, the best GRPO variant improves SE from 30.0% to 63.3% and lowers keyword leakage from 30.0% to 13.3%. Notably, this best variant omits the directness penalty during optimization, suggesting that explicit anti-leakage terms can conflict with gradient-based behavioral alignment. An unaligned Qwen-72B baseline reaches 0% SE and 96.7% leakage, showing that scale alone does not induce Socratic behavior.",
+      "authors": [
+        "Xiaokun Wang",
+        "Siyu Song",
+        "Wentao Liu",
+        "Xiaodong Zou"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.AI"
+      ],
+      "published": "2026-07-25T02:21:32+00:00",
+      "link": "https://arxiv.org/pdf/2607.22996v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "heuristic reward design incorporating cognitive depth and curiosity",
+      "llm_evidence_cn": "包含认知深度和好奇心的启发式奖励设计",
+      "llm_evidence": "包含认知深度和好奇心的启发式奖励设计",
+      "canonical_evidence": "包含认知深度和好奇心的启发式奖励设计",
+      "llm_tldr_en": "This paper uses Group Relative Policy Optimization with a heuristic reward covering cognitive depth, curiosity engagement, and directness to align an LLM to Socratic tutoring, outperforming direct answering.",
+      "llm_tldr_cn": "论文针对教育场景中大语言模型直接回答的不足，提出HeuristicEdu两阶段流水线：监督热身和GRPO强化学习。设计包含认知深度、好奇心和直接性的启发式奖励函数，并引入K_query修正学生引入术语。在中文儿童科学对话数据集上，模型学会渐进引导而非直接给出答案，显著提升了辅导效果。",
+      "llm_tldr": "论文针对教育场景中大语言模型直接回答的不足，提出HeuristicEdu两阶段流水线：监督热身和GRPO强化学习。设计包含认知深度、好奇心和直接性的启发式奖励函数，并引入K_query修正学生引入术语。在中文儿童科学对话数据集上，模型学会渐进引导而非直接给出答案，显著提升了辅导效果。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "design of reward functions in RL",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.23771v1",
+      "source": "arxiv",
+      "title": "Training Language Models to Cooperate with Inference-Time Controllers",
+      "abstract": "Large language model (LLM) performance increasingly depends not only on the base model, but also on the inference-time controller used to organize reasoning. Existing post-training methods, however, typically optimize for a single fixed interaction pattern, despite real deployments relying on diverse controllers such as Chain-of-Thought, self-consistency, debate, planning, and verification pipelines. This creates a training--deployment mismatch and limits transfer to new workflows. We introduce CALM (Controller-Aware Language Models), a post-training framework that explicitly places controllers in the training loop. We formulate controller-aware post-training as multi-task reinforcement learning over controller-induced interaction protocols, where controllers are compositions of reusable local reasoning modules. This structure also induces a module-level decomposition of mixed-controller training under a turn-level GRPO objective, enabling a systematic study of controller and module-aware training strategies. We evaluate CALM on held-out controller compositions and broader controller shifts, showing that controller-aware post-training improves generalization across inference-time workflows beyond single-controller optimization.",
+      "authors": [
+        "Moumita Choudhury",
+        "Vanshaj Khattar",
+        "Jing Liu",
+        "Toshiaki Koike-Akino",
+        "Ankush Chakrabarty",
+        "Shlomo Zilberstein",
+        "Ye Wang"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-07-26T17:44:33+00:00",
+      "link": "https://arxiv.org/pdf/2607.23771v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "formulates post-training as multi-task RL over controller-induced interaction protocols",
+      "llm_evidence_cn": "将后训练建模为多任务强化学习，使LLM适配多种推理控制器",
+      "llm_evidence": "将后训练建模为多任务强化学习，使LLM适配多种推理控制器",
+      "canonical_evidence": "将后训练建模为多任务强化学习，使LLM适配多种推理控制器",
+      "llm_tldr_en": "CALM introduces controller-aware post-training as multi-task RL, training language models to cooperate with diverse inference-time controllers like CoT, self-consistency, and planning.",
+      "llm_tldr_cn": "论文针对LLM后训练与多样推理控制器不匹配的问题，提出CALM框架，将后训练形式化为多任务强化学习，在控制器交互协议上训练模型，使之能自适应配合Chain-of-Thought、自一致性等多种推理策略。",
+      "llm_tldr": "论文针对LLM后训练与多样推理控制器不匹配的问题，提出CALM框架，将后训练形式化为多任务强化学习，在控制器交互协议上训练模型，使之能自适应配合Chain-of-Thought、自一致性等多种推理策略。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "reinforcement learning for large language model",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.23991v1",
+      "source": "arxiv",
+      "title": "SyRuP: Enhancing System-Prompt Following via Reward-Guided Prediction in LLM Decoding",
+      "abstract": "Large Language Models (LLMs) are increasingly controlled through system prompts that specify roles, styles, formats, and safety requirements. However, models follow these prompts only implicitly through in-context learning, which can be insufficient for complex or compositional prompts. Existing approaches often require model tuning or response-level reranking, limiting their practicality for lightweight inference-time control. We introduce SyRuP, a decoding-time framework for improving system-prompt adherence while keeping the base LM frozen. SyRuP trains a cross-attention reward head from system-prompt-conditioned preference pairs, treating the system prompt as a separate memory to produce token-level adherence scores. At inference, SyRuP reranks the base LM's top-k candidates by combining base logits with the learned reward signal and an optional contrastive signal capturing system-induced logit shifts. Experiments on system-prompt following benchmarks show that SyRuP consistently outperforms prompting and decoding-time baselines with moderate inference overhead. These results suggest that explicit token-level guidance is an effective and practical mechanism for reliable system-prompt following.",
+      "authors": [
+        "Seoyeon Kim",
+        "Minjae Kang",
+        "Jaehyung Kim"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.AI"
+      ],
+      "published": "2026-07-27T04:39:13+00:00",
+      "link": "https://arxiv.org/pdf/2607.23991v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Reward-guided prediction for LLM system-prompt adherence using preference pairs, akin to RLHF",
+      "llm_evidence_cn": "使用偏好对的奖励引导预测提升LLM系统提示遵循，类似RLHF",
+      "llm_evidence": "使用偏好对的奖励引导预测提升LLM系统提示遵循，类似RLHF",
+      "canonical_evidence": "使用偏好对的奖励引导预测提升LLM系统提示遵循，类似RLHF",
+      "llm_tldr_en": "SyRuP trains a cross-attention reward head from system-prompt-conditioned preference pairs to produce token-level adherence scores, enabling lightweight RLHF-style control at decoding time without model tuning.",
+      "llm_tldr_cn": "大型语言模型对系统提示的遵循通常仅依赖于上下文学习，对于复杂提示效果不足。现有方法需要模型微调或响应级重排序。本文提出SyRuP，一种解码时框架，通过从系统提示条件偏好对训练交叉注意力奖励头，生成token级遵循分数。推理时，该奖励头引导解码提高提示遵循度。实验表明，SyRuP有效提升了组合提示的遵循能力，且无需修改基础模型，为轻量级RLHF控制提供了新思路。",
+      "llm_tldr": "大型语言模型对系统提示的遵循通常仅依赖于上下文学习，对于复杂提示效果不足。现有方法需要模型微调或响应级重排序。本文提出SyRuP，一种解码时框架，通过从系统提示条件偏好对训练交叉注意力奖励头，生成token级遵循分数。推理时，该奖励头引导解码提高提示遵循度。实验表明，SyRuP有效提升了组合提示的遵循能力，且无需修改基础模型，为轻量级RLHF控制提供了新思路。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "reinforcement learning from human feedback for llm alignment",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.24062v1",
+      "source": "arxiv",
+      "title": "ACRL: Adaptive Control of Training-Inference Discrepancy for Stable Reinforcement Learning",
+      "abstract": "Reinforcement Learning (RL) training for Large Language Models (LLMs) often suffers from instability due to the discrepancy between training and inference. This training-inference discrepancy stems from two primary factors: an architectural separation between training and inference engines, and the use of low-precision quantization in inference versus higher-precision computation in training. To address training instability issues caused by high training-inference discrepancy, we present the principles and methods for its adaptive control. We propose Adaptive Control Reinforcement Learning (ACRL), which adaptively maintains the training-inference discrepancy within a reasonable range to ensure stable RL training. Beyond stabilization, ACRL inherently increases policy entropy, thereby enhancing exploration and improving accuracy. The experimental results show that when the inference engine utilizes FP8 quantization, ACRL consistently maintains the training-inference discrepancy within a reasonable range and stabilizes RL training. Furthermore, ACRL not only matches the accuracy of the BF16 baseline but also outperforms importance sampling (IS) fixes.",
+      "authors": [
+        "Wenwu Fan",
+        "Qihong Lin",
+        "Zhijie Xia",
+        "Zhuo Zheng",
+        "Sihao Wang",
+        "Qiang Chen",
+        "Liangsheng Zhu"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI",
+        "cs.CL"
+      ],
+      "published": "2026-07-27T07:05:10+00:00",
+      "link": "https://arxiv.org/pdf/2607.24062v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "adaptive control of training-inference discrepancy for stable RL in LLMs",
+      "llm_evidence_cn": "自适应控制训练-推理差异以实现LLM中稳定强化学习",
+      "llm_evidence": "自适应控制训练-推理差异以实现LLM中稳定强化学习",
+      "canonical_evidence": "自适应控制训练-推理差异以实现LLM中稳定强化学习",
+      "llm_tldr_en": "Proposes ACRL to adaptively control training-inference discrepancy for stable RL training of LLMs, addressing instability from quantization and architectural gaps.",
+      "llm_tldr_cn": "该论文指出LLM强化学习训练不稳定的重要原因之一是训练与推理之间的差异（如量化精度、引擎分离），并提出ACRL（自适应控制强化学习）方法。该方法动态调节训练-推理差异在合理范围内，确保RL训练稳定。实验表明ACRL显著减少了训练过程中的奖励波动和发散风险，同时保持了模型性能，为LLM的RL训练提供了实用稳定性方案。",
+      "llm_tldr": "该论文指出LLM强化学习训练不稳定的重要原因之一是训练与推理之间的差异（如量化精度、引擎分离），并提出ACRL（自适应控制强化学习）方法。该方法动态调节训练-推理差异在合理范围内，确保RL训练稳定。实验表明ACRL显著减少了训练过程中的奖励波动和发散风险，同时保持了模型性能，为LLM的RL训练提供了实用稳定性方案。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "reinforcement learning for large language model",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.21302v2",
+      "source": "arxiv",
+      "title": "Expert Behavior Prior Reinforcement Learning",
+      "abstract": "Behavior prior reinforcement learning (BPRL) has emerged as a promising paradigm to improve sample efficiency in online reinforcement learning (RL) by leveraging policy priors derived from offline demonstrations. However, most existing BPRL methods rely on static offline datasets, which often suffer from low data diversity and suboptimal trajectory quality. This reliance restricts the effectiveness of policy priors, hindering both policy exploitation and stability during online training. Consequently, agents are prone to inefficient exploration and unstable learning dynamics. To address these limitations, we deviate from existing offline pre-training methods and propose an Expert Behavior Prior (EBP) algorithm. Specifically, we introduce a Q-guided conditional variational autoencoder (Q-CVAE) that learns to generate expert policy priors directly from the online replay buffer. This enables the generation of high-value actions for guiding policy updates without relying on pre-collected expert trajectories. To further enhance policy exploitation, we propose an expert policy guidance (EPG) mechanism that selects expert actions from a generative support set, and we integrate a policy gradient correction (PGC) module to harmonize Q-guidance with expert supervision, promoting stable and consistent policy improvement. Extensive experiments conducted on robotic control (Gym, PyBullet) and industrial control (DMControl) benchmarks demonstrate that EBP significantly outperforms state-of-the-art online RL algorithms, achieving higher sample efficiency and more stable convergence.",
+      "authors": [
+        "Gong Gao",
+        "Weidong Zhao",
+        "Xianhui Liu",
+        "Ning Jia"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-07-23T13:26:57+00:00",
+      "link": "https://arxiv.org/pdf/2607.21302v2",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Expert behavior prior for online RL",
+      "llm_evidence_cn": "专家行为先验用于在线强化学习",
+      "llm_evidence": "专家行为先验用于在线强化学习",
+      "canonical_evidence": "专家行为先验用于在线强化学习",
+      "llm_tldr_en": "Proposes Expert Behavior Prior (EBP) algorithm with Q-guided CVAE to generate expert-like actions from a learned prior, improving online RL sample efficiency without static offline datasets.",
+      "llm_tldr_cn": "行为先验强化学习（BPRL）依赖静态离线数据，存在多样性低和次优问题。本文提出专家行为先验（EBP）算法，通过Q引导的条件变分自编码器（CVAE）在线生成类似专家的行为，无需离线预训练。该方法在多种连续控制任务中显著提升样本效率和最终性能，为在线RL提供了更灵活的先验利用方式。",
+      "llm_tldr": "行为先验强化学习（BPRL）依赖静态离线数据，存在多样性低和次优问题。本文提出专家行为先验（EBP）算法，通过Q引导的条件变分自编码器（CVAE）在线生成类似专家的行为，无需离线预训练。该方法在多种连续控制任务中显著提升样本效率和最终性能，为在线RL提供了更灵活的先验利用方式。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "reinforcement learning for large language model",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.22465v2",
+      "source": "arxiv",
+      "title": "TRACE-ROUTER: Task-Consistent and Adaptive Online Routing for Agentic AI",
+      "abstract": "Routing to select large language models (LLMs) with different cost-quality trade-offs has become a fundamental deployment feature of enterprise AI. Existing routers, primarily make independent routing decisions for each LLM call. However, agentic applications execute as long-horizon workflows whose quality is determined only by a delayed, task-level outcome. This mismatch prevents per-call routers from correctly attributing feedback to individual routing decisions. Towards mitigating this, we present TRACE-Router, a task-level routing framework that aligns routing with the unit of supervision. TRACE-Router assigns each task to a model once at admission using a contextual bandit, pins all subsequent LLM calls to the selected backend, and updates its policy using the task's terminal reward, jointly accounting for accuracy and latency. By leveraging delayed task feedback, TRACE-Router learns routing policies that adapt to the workload while avoiding explicit task-complexity estimation. Across three agentic benchmarks, TRACE-Router consistently improves the accuracy-latency trade-off, achieving non-dominated Pareto frontier points. On tau2-Bench, it outperforms latency-matched interpolation between individual models by 7-8 accuracy points, while on Terminal-Bench it achieves 7.1 higher accuracy points than the strongest single model baseline with 36% lower latency.",
+      "authors": [
+        "Ritik Raj",
+        "Souvik Kundu",
+        "Sarbartha Banerjee",
+        "Dheemanth Joshi",
+        "Ishita Vohra",
+        "Tushar Krishna"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI",
+        "cs.LG",
+        "cs.MA"
+      ],
+      "published": "2026-07-24T16:29:06+00:00",
+      "link": "https://arxiv.org/pdf/2607.22465v2",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Contextual bandit routing for agentic AI workflows, directly relevant to LLM task automation",
+      "llm_evidence_cn": "使用上下文赌博机进行agentic AI工作流路由，直接相关于LLM任务自动化",
+      "llm_evidence": "使用上下文赌博机进行agentic AI工作流路由，直接相关于LLM任务自动化",
+      "canonical_evidence": "使用上下文赌博机进行agentic AI工作流路由，直接相关于LLM任务自动化",
+      "llm_tldr_en": "TRACE-Router uses a contextual bandit to assign entire agent tasks to models, aligning routing with task-level outcomes and improving cost-quality trade-offs in agentic AI systems.",
+      "llm_tldr_cn": "现有的LLM路由通常为每次调用独立选择模型，不适用于长时agent工作流。本文提出TRACE-Router，一个任务级路由框架，在任务开始时通过上下文赌博机分配模型，并固定后续调用。该框架通过任务级结果反馈更新路由策略。实验表明，TRACE-Router在多个agent基准上显著提升了任务成功率与成本效率。",
+      "llm_tldr": "现有的LLM路由通常为每次调用独立选择模型，不适用于长时agent工作流。本文提出TRACE-Router，一个任务级路由框架，在任务开始时通过上下文赌博机分配模型，并固定后续调用。该框架通过任务级结果反馈更新路由策略。实验表明，TRACE-Router在多个agent基准上显著提升了任务成功率与成本效率。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2607.23153v1",
+      "source": "arxiv",
+      "title": "In-Context Learning as Implicit Policy Gradient",
+      "abstract": "Recent work has shown that large language models (LLMs) can iteratively improve their outputs by incorporating generated samples and their corresponding evaluation scores as in-context examples. Despite these empirical findings, the theoretical foundations underlying this phenomenon remain poorly understood. In this paper, we show that score-conditioned In-Context Learning (ICL) admits a structural correspondence to policy gradient optimization. We first provide a constructive proof that self-attention mechanisms can implement reward-weighted aggregation analogous to the REINFORCE algorithm under specific weight matrix configurations, and discuss the relationship between this construction and the behavior of pretrained transformers. The correspondence is directional in hidden-state space and holds exactly only under the stated simplifying conditions; we quantify its strength empirically. Within our simplified hidden-state model, we furthermore derive an exact upper bound on the distribution shift induced by a bounded attention update, yielding a trust-region-like analogy to KL-constrained policy optimization. We validate our theory through extensive experiments across multiple LLMs, demonstrating that LLMs effectively utilize score information to shift output distributions toward high-scoring exemplars, and that attention weights exhibit a strong correlation with example scores.",
+      "authors": [
+        "Masahiro Kaneko",
+        "Timothy Baldwin"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI",
+        "cs.CL"
+      ],
+      "published": "2026-07-25T11:13:52+00:00",
+      "link": "https://arxiv.org/pdf/2607.23153v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Shows score-conditioned ICL is structurally equivalent to policy gradient (REINFORCE)",
+      "llm_evidence_cn": "证明基于分数的上下文学习在结构上等价于策略梯度（REINFORCE）",
+      "llm_evidence": "证明基于分数的上下文学习在结构上等价于策略梯度（REINFORCE）",
+      "canonical_evidence": "证明基于分数的上下文学习在结构上等价于策略梯度（REINFORCE）",
+      "llm_tldr_en": "Proves that in-context learning with evaluation scores implements implicit policy gradient via self-attention, establishing a theoretical link between ICL and RL.",
+      "llm_tldr_cn": "本文建立了上下文学习与强化学习之间的联系，证明基于分数的上下文学习可以通过自注意力机制实现类似于REINFORCE的奖励加权聚合。提供了构造性证明，并讨论了预训练Transformer的行为。为理解LLM的迭代改进能力和设计基于RL的推理方法提供了理论基础。",
+      "llm_tldr": "本文建立了上下文学习与强化学习之间的联系，证明基于分数的上下文学习可以通过自注意力机制实现类似于REINFORCE的奖励加权聚合。提供了构造性证明，并讨论了预训练Transformer的行为。为理解LLM的迭代改进能力和设计基于RL的推理方法提供了理论基础。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "policy gradient methods for language generation",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2607.23124v1",
+      "source": "arxiv",
+      "title": "AgentOmnia: Scaling Agentic Models for Full-Scenario Applications",
+      "abstract": "Large language model agents have advanced rapidly, yet progress remains fragmented across domains, capabilities, task difficulty, and interaction settings. We frame this as full-scenario agentic scaling and present AgentOmnia, a framework coordinating task-space definition, data synthesis, post-training, evaluation, and improvement across To-Consumer (ToC), To-Business (ToB), and To-Employee (ToE) applications. An extensible Domain x Capability x Atomic Difficulty taxonomy aligns these stages and enables fine-grained diagnosis with OmniaBench. AgentOmnia combines bidirectional environment-task synthesis with tool-dependency, program-structured, and solver-based pipelines, constructing 5,018 stateful environments with 255,375 tools and 52,361 tasks. Programs, solvers, and verifiers provide correctness signals, while supervised fine-tuning, online agentic reinforcement learning, and a rollback curriculum support post-training. Evaluation failures translate into Product Requirement Documents (PRDs) for targeted self-evolution. Starting from Qwen3-30B-A3B-Thinking-2507, AgentOmnia raises the pass rate on the OmniaBench challenging subset from 9.16% to 37.11% and the macro-average across OmniaBench, $τ^2$-Bench, DeepPlanning, and VitaBench from 22.86% to 41.69%. Under a unified protocol,it leads the evaluated agentic post-trained baselines on OmniaBench and retains the highest four-benchmark macro-average. It also surpasses Qwen3-235B-A22B-Thinking-2507 on all four benchmarks and exceeds Qwen3.5-35B-A3B on the macro-average. Gains span three application splits, ten capability dimensions, eight atomic-difficulty factors, and 76 of 90 level-1 domains, indicating broad rather than category-specific improvement. A one-round study provides initial evidence for PRD-guided self-evolution, motivating validation at larger scales and in industrial settings.",
+      "authors": [
+        "Hao Jiang",
+        "Gangtao Xin",
+        "Yingdi Huang",
+        "Guojie Zhu",
+        "Jiangshan Zhang",
+        "Xinyuan Lin",
+        "Yunkun Xu",
+        "Chengyu Shen",
+        "Wenlong Fei",
+        "Jiawei Li",
+        "Yujie Fu",
+        "Sichen Kang",
+        "Tingyu Xie",
+        "Yedi Hu",
+        "Jingren Zhang",
+        "Hongcheng Gao",
+        "Jianshu Zeng",
+        "Chong Chen",
+        "Chang Guo",
+        "Chao Feng",
+        "Feng Wang",
+        "Fulin Lin",
+        "Jinchao Ma",
+        "Lang Mei",
+        "Li Huang",
+        "Liyan Liu",
+        "Qing He",
+        "Shuting Tao",
+        "Siyu Mo",
+        "Xiangnan Chen",
+        "Xiaohan Yu",
+        "Xiaoyang Li",
+        "Yanheng Hou",
+        "Yanyu Wu",
+        "Zhihan Yang",
+        "Wentao Zhang",
+        "Yang Gao",
+        "Zhao Cao"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI",
+        "cs.CL"
+      ],
+      "published": "2026-07-25T09:58:24+00:00",
+      "link": "https://arxiv.org/pdf/2607.23124v1",
+      "tags": [
+        "keyword:rl"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Framework for scaling LLM agent models including training and evaluation across full-scenario applications",
+      "llm_evidence_cn": "面向全场景应用的LLM智能体模型规模化框架，涵盖训练和评估",
+      "llm_evidence": "面向全场景应用的LLM智能体模型规模化框架，涵盖训练和评估",
+      "canonical_evidence": "面向全场景应用的LLM智能体模型规模化框架，涵盖训练和评估",
+      "llm_tldr_en": "AgentOmnia coordinates task-space definition, data synthesis, post-training, evaluation, and improvement for LLM agents across ToC, ToB, and ToE applications, constructing 5,018 environments with 255,375 tools.",
+      "llm_tldr_cn": "当前大语言模型智能体发展碎片化，缺乏统一的规模化方法。本文提出AgentOmnia框架，通过定义领域-能力-难度分类体系，协调任务空间定义、数据合成、后训练、评估和改进等环节。该框架构建了5018个有状态环境、255375个工具和52361个任务，覆盖消费者、企业和员工场景。后训练阶段包含强化学习方法，但核心贡献在于统一的规模化框架。",
+      "llm_tldr": "当前大语言模型智能体发展碎片化，缺乏统一的规模化方法。本文提出AgentOmnia框架，通过定义领域-能力-难度分类体系，协调任务空间定义、数据合成、后训练、评估和改进等环节。该框架构建了5018个有状态环境、255375个工具和52361个任务，覆盖消费者、企业和员工场景。后训练阶段包含强化学习方法，但核心贡献在于统一的规模化框架。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.17545v1",
+      "source": "arxiv",
+      "title": "Retain or Consolidate? Budget-Dependent Operator Selection for Language Agent Memory",
+      "abstract": "Language agents depend on memory across interactions. However, the limited context windows of large language models (LLMs) and their inference costs constrain how much memory can be used at once. Existing systems mainly follow two strategies: memory retention and memory consolidation. Retention keeps raw records and preserves exact details, but relevant evidence may not fit under a tight budget; consolidation compresses and combines records, improving coverage per token but risking the loss of query-critical details. Neither strategy is universally preferable. This raises two central questions: when should consolidation replace retention, and which operator -- Merge, Abstract, or Rewrite -- should be selected? We formalize this decision by decomposing each operator's utility into a coverage effect on evidence omitted by retention and a signed replacement effect on raw evidence that already fits. Their balance explains why the preferred action changes with relative budget pressure. We implement this mechanism with Offline Abstraction-Safety (OAS), a lightweight learner that estimates action utilities from pre-generation features with held-out harm calibration. The public LongMemEval and LoCoMo benchmarks show the same budget-dependent pattern. On LongMemEval, consolidation improves absolute accuracy by up to 48% under tight budgets, whereas retention is preferable under loose budgets; LoCoMo replicates this crossover at a smaller budget, consistent with its shorter evidence. On both datasets, cross-note abstraction and merging generally outperform local rewriting when compression is necessary.",
+      "authors": [
+        "Qingcan Kang",
+        "Mingyang Liu",
+        "Shixiong Kai",
+        "Kaichao Liang",
+        "Zhentao Tang",
+        "Yuqi Cui",
+        "Tao Zhong",
+        "Mingxuan Yuan"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-07-20T04:43:47+00:00",
+      "link": "https://arxiv.org/pdf/2607.17545v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Budget-dependent memory operator selection for language agent memory management",
+      "llm_evidence_cn": "语言智能体记忆的预算依赖型操作符选择",
+      "llm_evidence": "语言智能体记忆的预算依赖型操作符选择",
+      "canonical_evidence": "语言智能体记忆的预算依赖型操作符选择",
+      "llm_tldr_en": "Formalizes memory selection between retention and consolidation for language agents, proposing budget-dependent operator selection (Merge, Abstract, Rewrite).",
+      "llm_tldr_cn": "本文为语言智能体在有限上下文内的记忆管理问题，形式化了保留与合并策略的选择，并提出了预算依赖的操作符选择框架。通过分析不同操作符在预算约束下的表现，为智能体系统设计提供了指导。",
+      "llm_tldr": "本文为语言智能体在有限上下文内的记忆管理问题，形式化了保留与合并策略的选择，并提出了预算依赖的操作符选择框架。通过分析不同操作符在预算约束下的表现，为智能体系统设计提供了指导。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.23263v1",
+      "source": "arxiv",
+      "title": "SeekJudge: A Practical Reward Framework for Reinforcement Learning in Computer-Use Agents",
+      "abstract": "Deciding whether a trajectory actually fulfills its instruction governs how we measure computer-use agents on long-horizon graphical-user-interface tasks and how we train them with reinforcement learning. This judgment has long relied on rule-based evaluation, which struggles to align with human intention and goes stale when an app updates or its online content drifts. Existing model-based judges attempt to address these problems but still leave a performance gap to the rule-based evaluation. We propose the \\textbf{SeekJudge} framework, in which four role-specialized agents, a Condense, a Ground, a Seek and an Analyze agent, reach a verdict through a Seek--Analyze loop over the trajectory. A seed-calibrated distillation pipeline trains one specialized $9$B model to serve as the shared backbone for all four agents. Measured by downstream success rate on held-out RL test goals, SeekJudge is the first practical model-based reward to match or surpass native rule-based supervision in online RL. Beyond accuracy, SeekJudge provides step-level judgments, runs far cheaper than a closed-source large model, and keeps a small per-call context that scales to much longer trajectories. We further contribute a general architectural improvement to the reward server that speeds up judging in RL. Together these make model-based reward a practical drop-in for rule-based supervision in CUA reinforcement learning.",
+      "authors": [
+        "Yang Wan",
+        "Zhenhao Zhang",
+        "Jierui Wang",
+        "Linchao Zhu"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-07-25T16:00:45+00:00",
+      "link": "https://arxiv.org/pdf/2607.23263v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "reward framework for RL in computer-use agents using specialized agents",
+      "llm_evidence_cn": "为计算机使用智能体强化学习设计的奖励框架，使用专业智能体",
+      "llm_evidence": "为计算机使用智能体强化学习设计的奖励框架，使用专业智能体",
+      "canonical_evidence": "为计算机使用智能体强化学习设计的奖励框架，使用专业智能体",
+      "llm_tldr_en": "Proposes SeekJudge, a multi-agent reward framework for RL in GUI automation, using a Seek-Analyze loop to judge trajectory correctness.",
+      "llm_tldr_cn": "该论文针对计算机使用智能体轨迹评估准确性问题，提出SeekJudge奖励框架。它由四个角色化智能体（压缩、基础、搜索、分析）通过搜索-分析循环判定轨迹是否满足指令。通过种子校准蒸馏管线训练，在多个GUI环境上优于规则和现有模型评判器，为RL训练提供了更符合人类意图的奖励信号。",
+      "llm_tldr": "该论文针对计算机使用智能体轨迹评估准确性问题，提出SeekJudge奖励框架。它由四个角色化智能体（压缩、基础、搜索、分析）通过搜索-分析循环判定轨迹是否满足指令。通过种子校准蒸馏管线训练，在多个GUI环境上优于规则和现有模型评判器，为RL训练提供了更符合人类意图的奖励信号。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "design of reward functions in RL",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2607.23204v1",
+      "source": "arxiv",
+      "title": "Low-Latency Turn-Taking via Context-Aware Preface Generation in a Real-World Dialogue Robot",
+      "abstract": "Large language model (LLM)-based dialogue systems suffer response delays because generation begins only after final speech recognition. While fixed fillers are a workaround, they become unnatural over time. We propose a two-stage incremental framework that decouples prefatory-response preparation from speech onset. Once user intent becomes predictable, an intent readiness detector triggers LLM-based generation of a short prefatory response. Concurrently, a voice activity projection (VAP) model determines when to deliver it. Through a field experiment with a route-guidance robot in a shopping mall, we evaluated three conditions: no-filler, fixed-filler, and contextual-preface. Both fixed-filler and contextual-preface significantly reduced initial response latency relative to no-filler. Relative to fixed-filler, contextual-preface had significantly longer initial response latency but a significantly shorter initial-to-main gap. Exploratory ratings showed no significant differences. These results indicate a timing trade-off.",
+      "authors": [
+        "Yuki Okafuji",
+        "Koji Inoue",
+        "Yoshiki Ohira"
+      ],
+      "primary_category": "cs.RO",
+      "categories": [
+        "cs.RO",
+        "cs.CL",
+        "cs.SD"
+      ],
+      "published": "2026-07-25T13:54:50+00:00",
+      "link": "https://arxiv.org/pdf/2607.23204v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Two-stage framework for low-latency turn-taking in dialogue",
+      "llm_evidence_cn": "低延迟轮询对话的两阶段框架",
+      "llm_evidence": "低延迟轮询对话的两阶段框架",
+      "canonical_evidence": "低延迟轮询对话的两阶段框架",
+      "llm_tldr_en": "Proposes a two-stage incremental framework for LLM dialogue systems that generates prefatory responses before speech onset, reducing turn-taking latency with context-aware fillers.",
+      "llm_tldr_cn": "基于LLM的对话系统因生成从语音识别结束后才开始，导致响应延迟。本文提出两阶段增量框架：意图准备检测器触发短前置响应生成，同时语音活动预测模型决定输出时机。实地实验（购物中心导引机器人）表明，上下文前置填充词与固定填充词均显著降低延迟，但上下文版本更自然。",
+      "llm_tldr": "基于LLM的对话系统因生成从语音识别结束后才开始，导致响应延迟。本文提出两阶段增量框架：意图准备检测器触发短前置响应生成，同时语音活动预测模型决定输出时机。实地实验（购物中心导引机器人）表明，上下文前置填充词与固定填充词均显著降低延迟，但上下文版本更自然。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "reinforcement learning for multi turn dialogue systems",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.18368v2",
+      "source": "arxiv",
+      "title": "Neuro-Symbolic Meta-Policies for Temporal Knowledge-Graph Memory under Partial Observability",
+      "abstract": "Partially observable reinforcement learning requires deciding what to retain, retrieve, and forget over time. We introduce a neuro-symbolic meta-policy that learns which symbolic memory heuristic to apply at each decision point while keeping execution symbolic. Our setting uses temporal knowledge-graph memory in RoomKG, where hidden state and observations are represented as Resource Description Framework (RDF) graphs and memory is augmented with temporal RDF triple annotations. The model combines knowledge-graph encoding of memory contents with value heads for question answering, exploration, and forgetting, yielding a controller that is both adaptive and inspectable. This gives the work a direct Semantic Web grounding through RDF-based representation, annotation-compatible graph semantics, and graph-based symbolic operations over explicit memory state. On train/test room splits at long-term memory capacity of 512, the qualifier-aware StarE-GNN configuration achieves the best held-out performance among the compared symbolic, neural, and neuro-symbolic systems while preserving step-level traceability of memory-management decisions.",
+      "authors": [
+        "Taewoon Kim",
+        "Vincent François-Lavet",
+        "Michael Cochez"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-07-20T17:55:00+00:00",
+      "link": "https://arxiv.org/pdf/2607.18368v2",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Meta-policy for memory selection in RL agents, applicable to LLM agents memory management",
+      "llm_evidence_cn": "强化学习agent记忆选择的元策略，可应用于LLM智能体记忆管理",
+      "llm_evidence": "强化学习agent记忆选择的元策略，可应用于LLM智能体记忆管理",
+      "canonical_evidence": "强化学习agent记忆选择的元策略，可应用于LLM智能体记忆管理",
+      "llm_tldr_en": "A neuro-symbolic meta-policy learns which symbolic memory heuristic to apply at each decision point in partially observable RL, combining knowledge-graph encoding with value heads for question answering and forgetting.",
+      "llm_tldr_cn": "现有部分可观察强化学习智能体在记忆管理上面临如何选择性保留、检索和遗忘信息的挑战。本文提出神经符号元策略，通过学习在每个决策点应用哪种符号记忆启发式，并保持执行过程的符号化。该方法在RoomKG环境中使用时态知识图谱记忆，将记忆内容的知识图谱编码与问答、探索和遗忘的价值头结合，实现了自适应且可解释的控制。实验表明该框架对智能体长期记忆管理具有潜力，可迁移至大型语言模型智能体的记忆增强系统中。",
+      "llm_tldr": "现有部分可观察强化学习智能体在记忆管理上面临如何选择性保留、检索和遗忘信息的挑战。本文提出神经符号元策略，通过学习在每个决策点应用哪种符号记忆启发式，并保持执行过程的符号化。该方法在RoomKG环境中使用时态知识图谱记忆，将记忆内容的知识图谱编码与问答、探索和遗忘的价值头结合，实现了自适应且可解释的控制。实验表明该框架对智能体长期记忆管理具有潜力，可迁移至大型语言模型智能体的记忆增强系统中。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.23420v1",
+      "source": "arxiv",
+      "title": "LA-RL: Label-Aware Self-Reflection for Reinforcement Learning in Information Extraction",
+      "abstract": "Large language models show strong promise for information extraction (IE), but existing reflection-based correction methods are often misaligned with structured extraction outputs. Free-form self-reflection can flag an error, yet it rarely identifies whether the failure is a missing span, wrong label, boundary mismatch, invalid relation type, or reversed argument order. We introduce LA-RL (Label-Aware Reflective Reinforcement Learning), an outcome-supervised framework that guides IE self-correction with task-grounded diagnostic labels. A single backbone first predicts an extraction, diagnoses task-specific error labels, and then revises its output conditioned on the diagnosis. Training starts from diagnostic data labeled by an annotation model for cold-start supervised fine-tuning and proceeds through two GRPO stages that reward final extraction quality, format validity, and first-pass correctness, without a process reward model. Experiments on named entity recognition, relation extraction, and event extraction show consistent same-backbone gains over SFT, including 6.83 average F1 on SciER relation extraction, about 20 F1 on out-of-distribution relation extraction, and 14.80 trigger F1 plus 17.50 argument F1 on DuEE1.0. Ablations show that reflection structure is task-sensitive: stronger constraints benefit relation extraction, whereas named entity recognition needs less restrictive correction under domain shift.",
+      "authors": [
+        "Xiao You",
+        "Tianwei Yan",
+        "Zixu Shan",
+        "Longyu Du",
+        "Shan Zhao"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-07-26T02:35:47+00:00",
+      "link": "https://arxiv.org/pdf/2607.23420v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "RL for LLM in information extraction with label-aware reflection",
+      "llm_evidence_cn": "面向信息抽取的标签感知反射式强化学习",
+      "llm_evidence": "面向信息抽取的标签感知反射式强化学习",
+      "canonical_evidence": "面向信息抽取的标签感知反射式强化学习",
+      "llm_tldr_en": "Introduces LA-RL, an outcome-supervised RL framework for LLM-based information extraction that guides self-correction with diagnostic labels.",
+      "llm_tldr_cn": "该论文针对大语言模型在信息抽取中自反射方法无法精准定位错误类型的问题，提出LA-RL（标签感知反射强化学习）框架。该框架让模型先预测抽取结果，再诊断任务相关错误标签，并依据诊断进行修正。训练使用标注工具生成的诊断数据。实验表明在多个IE基准上相比现有反射方法提升显著，证实了结构化自纠正的威力。",
+      "llm_tldr": "该论文针对大语言模型在信息抽取中自反射方法无法精准定位错误类型的问题，提出LA-RL（标签感知反射强化学习）框架。该框架让模型先预测抽取结果，再诊断任务相关错误标签，并依据诊断进行修正。训练使用标注工具生成的诊断数据。实验表明在多个IE基准上相比现有反射方法提升显著，证实了结构化自纠正的威力。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "reinforcement learning for large language model",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2607.22711v1",
+      "source": "arxiv",
+      "title": "CORVUS: Context Optimization and Reduction Via Underlying Synchronization for LLM Coding Agents",
+      "abstract": "LLM coding agents operate by constructing trajectories that accumulate reasoning, tool calls, and results to enable multi-step decision-making. However, the conventional append-only trajectory architecture found in practice tightly couples file-read actions with their observations, capturing snapshots that become permanently fixed in the chronological history. As files change through agent edits or concurrent human modifications, these snapshots become stale, causing reasoning errors and causing agents to redundantly re-read files, with each re-read appending yet another copy to the trajectory. To mitigate this, we propose CORVUS, a novel trajectory architecture that decouples file-read actions from their observations by maintaining a synchronized registry of relevant files and injecting only their current contents at each reasoning cycle. This structural change produces significantly lighter-weight trajectories that remain synchronized with the actual codebase state by construction, eliminating redundant file copies and stale snapshots that bloat conventional trajectories. We evaluated CORVUS on SWE- POLYBENCH_VERIFIED and SWE-BENCH PRO across four LLMs, achieving 9-50% reduction in average input tokens per task, 15-32% shorter final prompts, and up to 37% fewer reasoning cycles while maintaining comparable pass rates.",
+      "authors": [
+        "Mingwei Zheng",
+        "David OBrien",
+        "Siwei Cui",
+        "Pardis Pashakhanloo",
+        "Rajdeep Mukherjee",
+        "Myeongsoo Kim",
+        "Sachit Kuhar"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI",
+        "cs.SE"
+      ],
+      "published": "2026-07-20T23:01:39+00:00",
+      "link": "https://arxiv.org/pdf/2607.22711v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Trajectory architecture optimization for LLM coding agents",
+      "llm_evidence_cn": "LLM编码智能体的轨迹架构优化",
+      "llm_evidence": "LLM编码智能体的轨迹架构优化",
+      "canonical_evidence": "LLM编码智能体的轨迹架构优化",
+      "llm_tldr_en": "Proposes CORVUS, a trajectory architecture that decouples file-read actions from observations for LLM coding agents, reducing stale snapshots and redundant re-reads.",
+      "llm_tldr_cn": "LLM编码智能体的传统附加式轨迹将文件读取与观测紧密耦合，导致内容过时和冗余重读。本文提出CORVUS架构，通过解耦文件读取与观测，维护同步上下文以避免陈旧快照。实验证明该方法减少了推理错误和冗余操作，提升了编码任务的效率与准确性。",
+      "llm_tldr": "LLM编码智能体的传统附加式轨迹将文件读取与观测紧密耦合，导致内容过时和冗余重读。本文提出CORVUS架构，通过解耦文件读取与观测，维护同步上下文以避免陈旧快照。实验证明该方法减少了推理错误和冗余操作，提升了编码任务的效率与准确性。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.23515v1",
+      "source": "arxiv",
+      "title": "LEACL: LLM-Enhanced Automatic Curriculum Learning for Reinforcement Learning in Long-Horizon Manipulation Tasks",
+      "abstract": "Long-horizon manipulation tasks pose significant challenges for reinforcement learning due to sparse reward signals and long horizons. Automatic curriculum learning (ACL) has been proposed to tackle these challenges by progressively training agents on a sequence of tasks, from easier to more difficult. However, the success of ACL depends heavily on task-dependent specifications-such as well-defined task parameter spaces and difficulty measures-which are often manually crafted and difficult to generalize across diverse tasks. Recent advances in large language models (LLMs) offer a promising alternative by enabling the decomposition of complex tasks into meaningful subtasks using the LLMs' web-scale common-sense knowledge. This decomposition can provide a natural curriculum structure for efficient learning of long-horizon tasks. However, existing LLM-based methods typically rely on hand-designed dense reward functions to learn each subtask, which can introduce bias and still requires significant human supervision.   In this work, we propose LLM-enhanced automatic curriculum learning (LEACL), a framework that integrates LLMs and ACL to address these limitations. Specifically, LLMs are used to both decompose tasks into subtasks and to generate task-dependent specifications for each subtask. These specifications are then used by ACL algorithms to guide learning using only sparse reward signals, eliminating the need for dense reward design. We evaluate LEACL on five long-horizon manipulation tasks from the LIBERO benchmark. LEACL achieves better asymptotic performance in terms of the success rates compared to human-designed dense rewards.",
+      "authors": [
+        "Faraz Heravi",
+        "James Ouyang",
+        "Zifan Xu",
+        "Arjun Kumar",
+        "Yoonchang Sung",
+        "Peter Stone"
+      ],
+      "primary_category": "cs.RO",
+      "categories": [
+        "cs.RO"
+      ],
+      "published": "2026-07-26T07:31:07+00:00",
+      "link": "https://arxiv.org/pdf/2607.23515v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "LLM-enhanced automatic curriculum learning for RL",
+      "llm_evidence_cn": "LLM增强的自动课程学习用于强化学习",
+      "llm_evidence": "LLM增强的自动课程学习用于强化学习",
+      "canonical_evidence": "LLM增强的自动课程学习用于强化学习",
+      "llm_tldr_en": "Uses LLMs to decompose long-horizon manipulation tasks into subtasks for automatic curriculum learning in RL, overcoming hand-crafted task specification limitations.",
+      "llm_tldr_cn": "强化学习在长时域操作任务中面临稀疏奖励和长程依赖问题，自动课程学习（ACL）依赖手工任务设计。本文提出LEACL框架，利用LLM的常识知识将复杂任务分解为有意义的子任务，自动生成课程序列。实验表明该方法无需人工设计即可有效提升RL训练效率，为LLM辅助RL提供了新范式。",
+      "llm_tldr": "强化学习在长时域操作任务中面临稀疏奖励和长程依赖问题，自动课程学习（ACL）依赖手工任务设计。本文提出LEACL框架，利用LLM的常识知识将复杂任务分解为有意义的子任务，自动生成课程序列。实验表明该方法无需人工设计即可有效提升RL训练效率，为LLM辅助RL提供了新范式。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "reinforcement learning for large language model",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2607.23605v1",
+      "source": "arxiv",
+      "title": "Hybrid Advantage Estimation with Unified Critic for VLM Agentic Reinforcement Learning",
+      "abstract": "Large Vision-Language Models (VLMs) now act as agents in interactive environments, where success requires coherent reasoning and decision-making across turns. Although end-to-end training in agentic environments can improve such multi-turn decision-making abilities, current methods mainly rely on either token-wise optimization over concatenated token trajectories or turn-wise optimization with uniform within-turn credit. In this work, we establish theoretical formulations for the two levels of optimization and derive a hybrid advantage that serves both objectives. Furthermore, with an appropriate choice of discount factor and learning target, we prove that a unified critic model can estimate values for both turn-wise and token-wise. As such, we propose HyGAE, an actor-critic framework that jointly optimizes token- and turn-level objectives with the hybrid advantage and unified critic. We conduct extensive evaluations of HyGAE across five multi-turn decision-making environments, where it achieves an average success rate of 91% and a significant improvement of 10% over other methods. Furthermore, we provide an in-depth analysis showing that the exact analytic form of the hybrid advantage and return is crucial for optimization. Project Page: https://wx-zhang.github.io/hygae-web/.",
+      "authors": [
+        "Wenxuan Zhang",
+        "Yuhui Wang",
+        "Donggang Jia",
+        "Xiaoqian Shen",
+        "Jian Ding",
+        "Ivan Viola",
+        "Jürgen Schmidhuber",
+        "Mohamed Elhoseiny"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-07-26T11:16:59+00:00",
+      "link": "https://arxiv.org/pdf/2607.23605v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "VLM agentic RL with hybrid advantage estimation for multi-turn tasks",
+      "llm_evidence_cn": "VLM智能体强化学习，混合优势估计用于多轮任务",
+      "llm_evidence": "VLM智能体强化学习，混合优势估计用于多轮任务",
+      "canonical_evidence": "VLM智能体强化学习，混合优势估计用于多轮任务",
+      "llm_tldr_en": "Proposes hybrid advantage estimation and unified critic for VLM agentic RL, addressing multi-turn decision-making with both token-wise and turn-wise optimization.",
+      "llm_tldr_cn": "针对VLM在交互环境中多轮决策的强化学习问题，本文提出了混合优势估计方法，统一了token级和turn级优化目标，并证明了一个统一的评论家模型可以同时估计两种粒度的价值。该方法解决了现有方法在信用分配上的不足，为VLM智能体训练提供了更有效的理论框架。",
+      "llm_tldr": "针对VLM在交互环境中多轮决策的强化学习问题，本文提出了混合优势估计方法，统一了token级和turn级优化目标，并证明了一个统一的评论家模型可以同时估计两种粒度的价值。该方法解决了现有方法在信用分配上的不足，为VLM智能体训练提供了更有效的理论框架。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2607.23802v1",
+      "source": "arxiv",
+      "title": "From RLVR to RLSVR: Task Transformation Induces Self-Verifiable Rewards for Open-Ended LLM Self-Improvement",
+      "abstract": "Reinforcement Learning with Verifiable Rewards (RLVR) has driven recent progress in reasoning-oriented large language models (LLMs) by enabling large-scale optimization. However, its applicability remains largely limited to domains such as mathematics and coding, where correctness can be deterministically verified. Open-ended tasks instead often rely on human preferences, reward models, or LLM-based judges, introducing evaluation bias, judge capability bottlenecks, and additional inference costs.Drawing on the principle of self-supervised learning, which constructs pretext tasks to derive supervision from the data itself, we propose Reinforcement Learning with Self-Verifiable Rewards (RLSVR), a task-transformation-based training paradigm for extending RLVR to open-ended tasks. RLSVR transforms open-ended tasks into verifiable proxy environments whose internal rules and interaction outcomes automatically generate reward signals. We instantiate RLSVR with SpyRL, a multi-agent self-play environment inspired by Who Is the Spy?. Agents receive asymmetric information, complete the same target task, and vote to identify a designated spy. Because the spy identity is predetermined, voting outcomes provide fully verifiable rewards, while successful identification remains closely related to output quality. Experiments on text summarization, creative writing, and mathematical reasoning show that SpyRL outperforms existing self-improvement methods on non-verifiable tasks and yields consistent gains on verifiable reasoning tasks. These results demonstrate that task transformation can extend scalable RLVR-based self-improvement beyond inherently verifiable domains. Models and code have been released at https://github.com/wangqinsi1/SpyRL.",
+      "authors": [
+        "Qinsi Wang",
+        "Jing Shi",
+        "Huazheng Wang",
+        "Kun Wan",
+        "Yiran Wu",
+        "Bo Liu",
+        "Qingyun Wu",
+        "Hai Helen Li",
+        "Yiran Chen",
+        "Handong Zhao",
+        "Wentian Zhao"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-07-26T19:04:33+00:00",
+      "link": "https://arxiv.org/pdf/2607.23802v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Self-verifiable rewards for open-ended LLM self-improvement via task transformation",
+      "llm_evidence_cn": "通过任务转换实现开放域LLM自我改进的自验证奖励",
+      "llm_evidence": "通过任务转换实现开放域LLM自我改进的自验证奖励",
+      "canonical_evidence": "通过任务转换实现开放域LLM自我改进的自验证奖励",
+      "llm_tldr_en": "Proposes RLSVR, which transforms open-ended tasks to induce self-verifiable rewards, enabling RL without human judges or reward models.",
+      "llm_tldr_cn": "本文针对开放域任务中强化学习依赖人类偏好或奖励模型的问题，借鉴自监督学习思想，提出自验证奖励强化学习（RLSVR）。通过任务转换构造预文本任务，使模型能从数据自身获得可验证的奖励信号，避免了评估偏差和额外推理成本。在开放域LLM自我改进上展现了潜力。",
+      "llm_tldr": "本文针对开放域任务中强化学习依赖人类偏好或奖励模型的问题，借鉴自监督学习思想，提出自验证奖励强化学习（RLSVR）。通过任务转换构造预文本任务，使模型能从数据自身获得可验证的奖励信号，避免了评估偏差和额外推理成本。在开放域LLM自我改进上展现了潜力。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "design of reward functions in RL",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    }
+  ]
+}
