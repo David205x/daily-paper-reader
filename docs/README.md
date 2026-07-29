@@ -6,73 +6,71 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-07-28
-- 运行时间：2026-07-28 21:44:34 UTC
+- 最新运行日期：2026-07-29
+- 运行时间：2026-07-29 21:29:03 UTC
 - 运行状态：成功
 - 本次总论文数：17
 - 精读区：6
 - 速读区：11
 
 ### 今日简报（AI）
-1) 今日论文聚焦强化学习在教育对齐与推理控制方向，精读两篇高分工作。  
-2) 最值得看的是《Beyond Direct Answering》用启发式强化学习让模型做苏格拉底式引导，以及《Training Language Models to Cooperate》训练模型与推理时控制器协作，均获9.0分。  
-3) 建议关注强化学习在复杂交互任务中的落地潜力，尤其是教育场景与动态推理控制。
-- 详情：[/202607/28/README](/202607/28/README)
+今日精读6篇速读11篇，重点攻坚搜索智能体强化学习与小型语言模型鲁棒性方向。最值得关注《EviBack》提出的证据约束教师回退机制（9.0/10）和《Towards Robust RL》对小型语言模型智能体的鲁棒性改进（9.0/10）。下一步可优先精读这两篇论文，并尝试将EviBack的框架迁移至多模态或开源模型场景。
+- 详情：[/202607/29/README](/202607/29/README)
 
 ### 精读区论文标签
-1. [Beyond Direct Answering: Aligning Educational LLMs as Socratic Guides via Heuristic Reinforcement Learning](/202607/28/2607.22996v1-beyond-direct-answering-aligning-educational-llms-as-socratic-guides-via-heuristic-reinforcement-learning)  
+1. [EviBack: Search-Agent Reinforcement Learning via Evidence-Constrained Teacher Backoff](/202607/29/2607.23955v1-eviback-search-agent-reinforcement-learning-via-evidence-constrained-teacher-backoff)  
    标签：评分：9.0/10、query:rl
-   evidence：包含认知深度和好奇心的启发式奖励设计
-2. [Training Language Models to Cooperate with Inference-Time Controllers](/202607/28/2607.23771v1-training-language-models-to-cooperate-with-inference-time-controllers)  
+   evidence：基于证据约束教师退出的搜索代理强化学习，用于检索增强生成
+2. [Towards Robust Reinforcement Learning for Small-Scale Language Model Agents](/202607/29/2607.25091v1-towards-robust-reinforcement-learning-for-small-scale-language-model-agents)  
    标签：评分：9.0/10、query:rl
-   evidence：将后训练建模为多任务强化学习，使LLM适配多种推理控制器
-3. [SyRuP: Enhancing System-Prompt Following via Reward-Guided Prediction in LLM Decoding](/202607/28/2607.23991v1-syrup-enhancing-system-prompt-following-via-reward-guided-prediction-in-llm-decoding)  
+   evidence：使用PPO的鲁棒强化学习用于小规模语言模型代理
+3. [ODYSSE: Episode-wise Policy Optimization for Personalized Agentic Reasoning](/202607/29/2607.25369v1-odysse-episode-wise-policy-optimization-for-personalized-agentic-reasoning)  
    标签：评分：9.0/10、query:rl
-   evidence：使用偏好对的奖励引导预测提升LLM系统提示遵循，类似RLHF
-4. [ACRL: Adaptive Control of Training-Inference Discrepancy for Stable Reinforcement Learning](/202607/28/2607.24062v1-acrl-adaptive-control-of-training-inference-discrepancy-for-stable-reinforcement-learning)  
+   evidence：基于逐回合策略优化的强化学习用于个性化代理推理
+4. [A Control System, a Dataset, and a Recipe for Making Frozen LLM Agents Learn a Domain](/202607/29/2607.25415v1-a-control-system-a-dataset-and-a-recipe-for-making-frozen-llm-agents-learn-a-domain)  
    标签：评分：9.0/10、query:rl
-   evidence：自适应控制训练-推理差异以实现LLM中稳定强化学习
-5. [Expert Behavior Prior Reinforcement Learning](/202607/28/2607.21302v2-expert-behavior-prior-reinforcement-learning)  
+   evidence：经典强化学习策略学习冻结LLM智能体控制套件
+5. [HiSkill: Empowering LLM Agents with Hierarchical Skill Graphs](/202607/29/2607.25853v1-hiskill-empowering-llm-agents-with-hierarchical-skill-graphs)  
+   标签：评分：9.0/10、query:rl
+   evidence：层次化技能图增强LLM智能体，支持任务分解和复用
+6. [Traceable LLM Reasoning for Fake-Order Fraud Detection](/202607/29/2607.23075v1-traceable-llm-reasoning-for-fake-order-fraud-detection)  
    标签：评分：8.0/10、query:rl
-   evidence：专家行为先验用于在线强化学习
-6. [TRACE-ROUTER: Task-Consistent and Adaptive Online Routing for Agentic AI](/202607/28/2607.22465v2-trace-router-task-consistent-and-adaptive-online-routing-for-agentic-ai)  
-   标签：评分：8.0/10、query:rl
-   evidence：使用上下文赌博机进行agentic AI工作流路由，直接相关于LLM任务自动化
+   evidence：用于欺诈检测的LLM推理的RL框架
 
 ### 速读区论文标签
-1. [In-Context Learning as Implicit Policy Gradient](/202607/28/2607.23153v1-in-context-learning-as-implicit-policy-gradient)  
+1. [Offline-Online Curriculum RL for Multimodal Reasoning](/202607/29/2607.23700v1-offline-online-curriculum-rl-for-multimodal-reasoning)  
    标签：评分：8.0/10、query:rl
-   evidence：证明基于分数的上下文学习在结构上等价于策略梯度（REINFORCE）
-2. [SeekJudge: A Practical Reward Framework for Reinforcement Learning in Computer-Use Agents](/202607/28/2607.23263v1-seekjudge-a-practical-reward-framework-for-reinforcement-learning-in-computer-use-agents)  
+   evidence：课程强化学习提升多模态大模型推理
+2. [EviBack: Search-Agent Reinforcement Learning via Evidence-Constrained Teacher Backoff](/202607/29/2607.23955v2-eviback-search-agent-reinforcement-learning-via-evidence-constrained-teacher-backoff)  
    标签：评分：8.0/10、query:rl
-   evidence：为计算机使用智能体强化学习设计的奖励框架，使用专业智能体
-3. [LA-RL: Label-Aware Self-Reflection for Reinforcement Learning in Information Extraction](/202607/28/2607.23420v1-la-rl-label-aware-self-reflection-for-reinforcement-learning-in-information-extraction)  
+   evidence：使用证据约束教师回退的强化学习用于Agentic RAG多轮搜索
+3. [From Proprietary to Open-Source: Bridging the Distribution Gap via Multi-Agent Protocol Distillation in Agentic Search](/202607/29/2607.24280v1-from-proprietary-to-open-source-bridging-the-distribution-gap-via-multi-agent-protocol-distillation-in-agentic-search)  
    标签：评分：8.0/10、query:rl
-   evidence：面向信息抽取的标签感知反射式强化学习
-4. [LEACL: LLM-Enhanced Automatic Curriculum Learning for Reinforcement Learning in Long-Horizon Manipulation Tasks](/202607/28/2607.23515v1-leacl-llm-enhanced-automatic-curriculum-learning-for-reinforcement-learning-in-long-horizon-manipulation-tasks)  
+   evidence：多智能体协议蒸馏结合强化学习监督的智能搜索
+4. [SearchArt: Training Long-Horizon Search Agent with Scalable Synthetic and Verified Task](/202607/29/2607.24850v1-searchart-training-long-horizon-search-agent-with-scalable-synthetic-and-verified-task)  
    标签：评分：8.0/10、query:rl
-   evidence：LLM增强的自动课程学习用于强化学习
-5. [Hybrid Advantage Estimation with Unified Critic for VLM Agentic Reinforcement Learning](/202607/28/2607.23605v1-hybrid-advantage-estimation-with-unified-critic-for-vlm-agentic-reinforcement-learning)  
+   evidence：SearchArt训练长程搜索智能体实现任务自动化，使用合成数据
+5. [Inverse RL Helps Align AI by Imitating Humans](/202607/29/2607.24900v1-inverse-rl-helps-align-ai-by-imitating-humans)  
    标签：评分：8.0/10、query:rl
-   evidence：VLM智能体强化学习，混合优势估计用于多轮任务
-6. [From RLVR to RLSVR: Task Transformation Induces Self-Verifiable Rewards for Open-Ended LLM Self-Improvement](/202607/28/2607.23802v1-from-rlvr-to-rlsvr-task-transformation-induces-self-verifiable-rewards-for-open-ended-llm-self-improvement)  
+   evidence：从演示中逆向强化学习奖励，用于AI对齐
+6. [Tools Are Not Islands: Set-Level Tool Retrieval for LLM Agents via Query-Conditioned Hyperedge Prediction](/202607/29/2607.25718v1-tools-are-not-islands-set-level-tool-retrieval-for-llm-agents-via-query-conditioned-hyperedge-prediction)  
    标签：评分：8.0/10、query:rl
-   evidence：通过任务转换实现开放域LLM自我改进的自验证奖励
-7. [AgentOmnia: Scaling Agentic Models for Full-Scenario Applications](/202607/28/2607.23124v1-agentomnia-scaling-agentic-models-for-full-scenario-applications)  
+   evidence：面向LLM智能体集合级工具检索
+7. [LAMAR: An Open Language-Aware Multilingual Alignment Reranker](/202607/29/2607.22042v2-lamar-an-open-language-aware-multilingual-alignment-reranker)  
    标签：评分：7.0/10、query:rl
-   evidence：面向全场景应用的LLM智能体模型规模化框架，涵盖训练和评估
-8. [Low-Latency Turn-Taking via Context-Aware Preface Generation in a Real-World Dialogue Robot](/202607/28/2607.23204v1-low-latency-turn-taking-via-context-aware-preface-generation-in-a-real-world-dialogue-robot)  
+   evidence：多语言RAG流水线中的重排序器
+8. [Co-Evolving Graph and Text Memory for Training-Free Multi-Hop Question Answering](/202607/29/2607.23278v1-co-evolving-graph-and-text-memory-for-training-free-multi-hop-question-answering)  
    标签：评分：7.0/10、query:rl
-   evidence：低延迟轮询对话的两阶段框架
-9. [Retain or Consolidate? Budget-Dependent Operator Selection for Language Agent Memory](/202607/28/2607.17545v1-retain-or-consolidate-budget-dependent-operator-selection-for-language-agent-memory)  
+   evidence：提出Co-E无训练多跳问答系统，利用图-文本同步记忆，与检索增强生成相关
+9. [MemChain: Learning Interpretable Memory Traces for Memory-Augmented LLM Agents](/202607/29/2607.24097v1-memchain-learning-interpretable-memory-traces-for-memory-augmented-llm-agents)  
+   标签：评分：7.0/10、query:rl
+   evidence：可训练的后检索记忆策略，用于检索增强生成
+10. [Structure-aware Relative Policy Optimization for Ranking](/202607/29/2607.25268v1-structure-aware-relative-policy-optimization-for-ranking)  
+   标签：评分：7.0/10、query:rl
+   evidence：使用强化学习的排序策略优化
+11. [The Case Against Generation for Retrieval: Discriminative Language Models as Effective Retrievers](/202607/29/2607.25346v1-the-case-against-generation-for-retrieval-discriminative-language-models-as-effective-retrievers)  
    标签：评分：6.0/10、query:rl
-   evidence：语言智能体记忆的预算依赖型操作符选择
-10. [Neuro-Symbolic Meta-Policies for Temporal Knowledge-Graph Memory under Partial Observability](/202607/28/2607.18368v2-neuro-symbolic-meta-policies-for-temporal-knowledge-graph-memory-under-partial-observability)  
-   标签：评分：6.0/10、query:rl
-   evidence：强化学习agent记忆选择的元策略，可应用于LLM智能体记忆管理
-11. [CORVUS: Context Optimization and Reduction Via Underlying Synchronization for LLM Coding Agents](/202607/28/2607.22711v1-corvus-context-optimization-and-reduction-via-underlying-synchronization-for-llm-coding-agents)  
-   标签：评分：6.0/10、query:rl
-   evidence：LLM编码智能体的轨迹架构优化
+   evidence：提出基于LLM的判别式检索器，高效检索，可直接用于检索增强生成
 
 
 <div class="dpr-home-promo-card">

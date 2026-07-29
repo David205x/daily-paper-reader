@@ -1,0 +1,739 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-29T21:21:07.632478+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 13,
+    "deep_cap": 6,
+    "deep_selected": 6,
+    "quick_candidates": 12,
+    "quick_skim_target": 11,
+    "quick_selected": 11
+  },
+  "deep_dive": [
+    {
+      "id": "2607.23955v1",
+      "source": "arxiv",
+      "title": "EviBack: Search-Agent Reinforcement Learning via Evidence-Constrained Teacher Backoff",
+      "abstract": "Reinforcement learning enables Agentic RAG systems to learn multi-turn search from verifiable outcome rewards, but all- zero rollout groups provide no comparative signal and may hide useful search behavior. We present EviBack, an evidence- constrained Teacher backoff that supplies auxiliary super- vision to such groups while preserving verifiable Actor re- wards. It separates evidence assessment from answer refine- ment, preventing reference answers from overriding evidence- insufficiency judgments. A fully automated, end-to-end GPT- 5.5-assisted APE pipeline starts from a manually authored single-prompt dual-task Teacher, automatically partitions and labels rollout data, and performs ablation, task decomposition, evaluation, and selection to produce a gated two-stage Teacher. Compared with the manual design, the resulting Teacher im- proves downstream F1 and valid-answer rate while reduc- ing search, duplicate queries, and forced termination. Across seven open-domain QA benchmarks and three Qwen3 scales, EviBack improves F1 over Search-R1 and raises both single- and multi-hop macro F1. We guarantee that the code will be made publicly available at a later stage.",
+      "authors": [
+        "Xiao Ma",
+        "Zhiquan Hu",
+        "Yi Wei",
+        "Chenchen Zhao",
+        "Yijun Chen",
+        "Jicheng Zhao",
+        "Yuming Li Chuang Dai"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-07-27T02:59:27+00:00",
+      "link": "https://arxiv.org/pdf/2607.23955v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "RL for agentic RAG with evidence-constrained teacher backoff",
+      "llm_evidence_cn": "基于证据约束教师退出的搜索代理强化学习，用于检索增强生成",
+      "llm_evidence": "基于证据约束教师退出的搜索代理强化学习，用于检索增强生成",
+      "canonical_evidence": "基于证据约束教师退出的搜索代理强化学习，用于检索增强生成",
+      "llm_tldr_en": "EviBack supplies auxiliary supervision to zero-reward rollout groups in RL-based agentic RAG, improving search behavior learning.",
+      "llm_tldr_cn": "强化学习可训练代理RAG系统的多轮搜索，但全零奖励的轨迹组缺乏比较信号。本文提出EviBack，一个证据约束的教师退出机制，为这些组提供辅助监督的同时保留可验证的演员奖励，分离证据评估与答案优化，从而发现有用的搜索行为。实验结果表明，该方法显著提升了代理RAG的搜索质量。",
+      "llm_tldr": "强化学习可训练代理RAG系统的多轮搜索，但全零奖励的轨迹组缺乏比较信号。本文提出EviBack，一个证据约束的教师退出机制，为这些组提供辅助监督的同时保留可验证的演员奖励，分离证据评估与答案优化，从而发现有用的搜索行为。实验结果表明，该方法显著提升了代理RAG的搜索质量。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "retrieval augmented generation for knowledge intensive tasks",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.25091v1",
+      "source": "arxiv",
+      "title": "Towards Robust Reinforcement Learning for Small-Scale Language Model Agents",
+      "abstract": "The alignment of Small Language Models (SLMs) in the 70--500M parameter range using reinforcement learning is often considered unstable, though the underlying failure mechanisms have not been systematically investigated. In the State-of-the-Art (SOTA) research, fifteen (model, corpus) configurations were trained using Proximal Policy Optimization (PPO). The experiments included Pythia-70M, 160M, 410M and SmolLM2-135M, 360M on the TinyStories, CNN/DailyMail, and Wikitext-103 corpora. Three reproducible failure modes were identified in small-scale language models: silent LoRA parameter freezing in standard PEFT/TRL pipelines, numerical overflow in importance ratios when using bfloat16, and catastrophic policy collapse due to reward-model error. These issues were addressed using a merge-and-reinitialize adapter technique, float32 precision during PPO updates, and a three-layer safety mechanism comprising reward whitening, importance-ratio guarding, and weight rollback. In this paper, a capacity-headroom hypothesis is proposed, which states that PPO performance at the SLM scale depends on both a fluent supervised model ($\\text{PPL}<20$) and a discriminative reward signal, rather than on the number of model parameters. The proposed system converged stably in all experiments and improved preference win rate over the SFT baseline in configurations with a fluent prior and an informative reward signal. Furthermore, it outperformed instruction-tuned baselines while requiring significantly less training data. All checkpoints, preference datasets, and training scripts are publicly released$^§$.",
+      "authors": [
+        "Md Rezwanul Haque",
+        "Md. Milon Islam",
+        "Fakhri Karray"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI",
+        "cs.CL",
+        "cs.LG",
+        "math.OC",
+        "stat.CO"
+      ],
+      "published": "2026-07-27T21:30:44+00:00",
+      "link": "https://arxiv.org/pdf/2607.25091v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "robust RL for small language model agents using PPO",
+      "llm_evidence_cn": "使用PPO的鲁棒强化学习用于小规模语言模型代理",
+      "llm_evidence": "使用PPO的鲁棒强化学习用于小规模语言模型代理",
+      "canonical_evidence": "使用PPO的鲁棒强化学习用于小规模语言模型代理",
+      "llm_tldr_en": "Identifies three failure modes in PPO-based RL for small language models and provides solutions for robust training.",
+      "llm_tldr_cn": "小语言模型的强化学习对齐常被视为不稳定。本文系统研究了70-500M参数范围的SLM在PPO训练中的失败模式，发现了静默LoRA冻结、bfloat16数值溢出和奖励模型导致的策略崩溃三种可复现故障，并提出了相应缓解措施，为小型模型的RL训练提供了实用指南。",
+      "llm_tldr": "小语言模型的强化学习对齐常被视为不稳定。本文系统研究了70-500M参数范围的SLM在PPO训练中的失败模式，发现了静默LoRA冻结、bfloat16数值溢出和奖励模型导致的策略崩溃三种可复现故障，并提出了相应缓解措施，为小型模型的RL训练提供了实用指南。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "reinforcement learning for large language model",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.25369v1",
+      "source": "arxiv",
+      "title": "ODYSSE: Episode-wise Policy Optimization for Personalized Agentic Reasoning",
+      "abstract": "Agentic systems have rapidly advanced in their ability to interact with real-world environments, leverage external tools, and provide services for users. However, unlike natural-world tasks that assume well-defined instructions, human-centered scenarios are characterized by ambiguous requests that lead to large, open-ended solution spaces. Decoding users' personalized preferences is therefore essential for narrowing the candidate solution space. This introduces a new challenge, personalized agentic reasoning, which requires agents to jointly interact with both users and environments to deliver personalized services. In this paper, we present ODYSSE, a Reinforced Fine-Tuning (RFT) framework for personalized agentic reasoning. At its core, ODYSSE proposes Episode-wise GRPO (ESPO), a novel extension of Group Relative Policy Optimization (GRPO) designed to address long action horizons and strong cross-step dependencies in personalized agentic reasoning. Rather than optimizing individual steps independently, ESPO introduces an episode-level reward mechanism together with episodic advantage estimation, enabling upstream evidence to effectively guide downstream personalized decisions and allowing agents to progressively resolve ambiguous user requests across multiple interaction steps. We further propose an episodic batch sampler that groups actions from the same episode into unified training batches, facilitating coherent optimization under ESPO. We evaluate ODYSSE on realistic long-horizon personalized GUI reasoning tasks. Experimental results demonstrate that ODYSSE consistently outperforms both specialist and general-purpose LVLMs, highlighting its effectiveness for personalized agentic reasoning.",
+      "authors": [
+        "Jiaqi Zhang",
+        "Tong Chen",
+        "Junliang Yu",
+        "Quoc Viet Hung Nguyen",
+        "Hongzhi Yin"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-07-28T07:25:04+00:00",
+      "link": "https://arxiv.org/pdf/2607.25369v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "RL for personalized agentic reasoning via episode-wise policy optimization",
+      "llm_evidence_cn": "基于逐回合策略优化的强化学习用于个性化代理推理",
+      "llm_evidence": "基于逐回合策略优化的强化学习用于个性化代理推理",
+      "canonical_evidence": "基于逐回合策略优化的强化学习用于个性化代理推理",
+      "llm_tldr_en": "ODYSSE uses reinforced fine-tuning with episode-wise policy optimization to personalize agentic reasoning under ambiguous user requests.",
+      "llm_tldr_cn": "人类中心场景中模糊的用户请求导致开放解空间，需要个性化偏好解码。本文提出ODYSSE，一个强化微调框架，通过逐回合策略优化来联合建模用户与环境的交互，在个性化代理推理任务上取得了优于基线的性能，展示了RL在偏好对齐中的有效性。",
+      "llm_tldr": "人类中心场景中模糊的用户请求导致开放解空间，需要个性化偏好解码。本文提出ODYSSE，一个强化微调框架，通过逐回合策略优化来联合建模用户与环境的交互，在个性化代理推理任务上取得了优于基线的性能，展示了RL在偏好对齐中的有效性。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "application of reinforcement learning in large language model reasoning",
+      "matched_requirement_id": "req-7",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.25415v1",
+      "source": "arxiv",
+      "title": "A Control System, a Dataset, and a Recipe for Making Frozen LLM Agents Learn a Domain",
+      "abstract": "Production LLM agents are increasingly assembled from a frozen model wrapped in a harness: a prompt template, a tool set, a memory/retrieval layer, a planning strategy, and a verification policy. Two 2026 systems, Meta-Harness (Lee et al., 2026) and HyperAgents (Meta AI, 2026), show that this harness can itself be optimized or even self-rewritten by an agentic proposer -- at the cost of either an expensive code-search loop or unconstrained self-modifying code, neither of which is auditable or usable with a fully black-box model API. We take a narrower, more constrained position: treat the harness as a small, fixed, human-legible action space and learn a policy over it online with classic sample-efficient reinforcement learning (an $ε$-greedy contextual bandit and REINFORCE), scored against a multi-objective reward (task success, verifier score, policy compliance, cost, latency, and an unsupported-claim penalty). We instantiate this control system with DSPy (Khattab et al., 2024) as both the context assembler and the source of the strongest non-adaptive baseline (a DSPy BootstrapFewShot static prompt), and evaluate it across three verifiable task domains -- tool-use workflows, code generation (HumanEval), and multi-hop retrieval QA (HotpotQA) -- and two model providers (a local Ollama model and AWS Bedrock). We release the harness-control-system code, the cross-domain verifiable task suite, the full trajectory/reward-decomposition logs from training, and a provider-agnostic deployment recipe for applying this to a new organization's domain and verification setup.",
+      "authors": [
+        "Debjyoti Paul"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-07-28T08:10:25+00:00",
+      "link": "https://arxiv.org/pdf/2607.25415v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Classic RL policy learning for frozen LLM agent harness",
+      "llm_evidence_cn": "经典强化学习策略学习冻结LLM智能体控制套件",
+      "llm_evidence": "经典强化学习策略学习冻结LLM智能体控制套件",
+      "canonical_evidence": "经典强化学习策略学习冻结LLM智能体控制套件",
+      "llm_tldr_en": "Treats LLM agent harness as a small action space and learns policy via epsilon-greedy RL, enabling auditable domain-specific learning.",
+      "llm_tldr_cn": "生产级LLM智能体由冻结模型和可优化套件组成，但现有自修改方法不可审计。本文将套件视为固定动作空间，用经典ε-贪心强化学习在线学习策略，在控制数据集上验证有效性，兼顾效率和可审计性。",
+      "llm_tldr": "生产级LLM智能体由冻结模型和可优化套件组成，但现有自修改方法不可审计。本文将套件视为固定动作空间，用经典ε-贪心强化学习在线学习策略，在控制数据集上验证有效性，兼顾效率和可审计性。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.25853v1",
+      "source": "arxiv",
+      "title": "HiSkill: Empowering LLM Agents with Hierarchical Skill Graphs",
+      "abstract": "Skills have become an important abstraction for enabling large language model (LLM) agents to reuse past experience in long-horizon interactive tasks. However, existing trajectory-to-skill methods often produce flat collections of high-level textual skills that are stored and retrieved independently, leaving skill relations underutilized and maintaining a gap between high-level skills and executable actions. In this paper, we propose HiSkill, a hierarchical skill graph framework that organizes interaction trajectories into a directed graph with skill nodes, AtomicOp nodes, and typed edges. Specifically, the graph connects reusable high-level skills with executable action templates, while also capturing decomposition, temporal transition, compatibility, support, and recovery relations among them. At inference time, HiSkill retrieves a compact task-relevant subgraph and performs subgraph-guided task execution, where a symbolic task state, an active skill, and the retrieved subgraph guide the LLM agent to switch skills, select AtomicOps, and ground executable actions iteratively. Experiments on three interactive environments show that HiSkill outperforms state-of-the-art baselines while reducing inference token consumption, demonstrating the effectiveness of bridging high-level skills and executable action grounding through a hierarchical skill graph. Our data and code is available at https://github.com/BUPT-GAMMA/HiSkill.",
+      "authors": [
+        "Yu Hao",
+        "Jinxuan Cai",
+        "Qi Zhang",
+        "Yawen Li",
+        "Zhiqiang Zhang",
+        "Chuan Shi",
+        "Cheng Yang"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-07-28T15:25:47+00:00",
+      "link": "https://arxiv.org/pdf/2607.25853v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "hierarchical skill graphs for LLM agents, enabling task decomposition and reuse",
+      "llm_evidence_cn": "层次化技能图增强LLM智能体，支持任务分解和复用",
+      "llm_evidence": "层次化技能图增强LLM智能体，支持任务分解和复用",
+      "canonical_evidence": "层次化技能图增强LLM智能体，支持任务分解和复用",
+      "llm_tldr_en": "HiSkill organizes interaction trajectories into a directed graph with skill nodes and atomic operations, enabling efficient skill decomposition, temporal reasoning, and reuse for LLM agents.",
+      "llm_tldr_cn": "现有LLM智能体技能学习多将轨迹存储为扁平化文本技能，忽略了技能间关系。本文提出HiSkill框架，将交互轨迹组织为包含技能节点和原子操作节点的有向图，并捕获分解、时序、兼容等关系。在长时交互任务中，HiSkill显著提高了任务完成率和效率，展示了层次化结构在智能体技能复用中的价值。",
+      "llm_tldr": "现有LLM智能体技能学习多将轨迹存储为扁平化文本技能，忽略了技能间关系。本文提出HiSkill框架，将交互轨迹组织为包含技能节点和原子操作节点的有向图，并捕获分解、时序、兼容等关系。在长时交互任务中，HiSkill显著提高了任务完成率和效率，展示了层次化结构在智能体技能复用中的价值。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.23075v1",
+      "source": "arxiv",
+      "title": "Traceable LLM Reasoning for Fake-Order Fraud Detection",
+      "abstract": "Detecting fake-order fraud at scale remains a critical challenge for large online-to-offline (O2O) service platforms, as existing approaches often rely on expert-designed features, produce black-box decisions, and provide limited interpretability. To address these limitations, we propose DeepScrub, a reinforcement learning framework built upon large language models (LLMs) for fake-order fraud detection with traceable reasoning. DeepScrub introduces three innovations. First, a semantic unification module converts heterogeneous risk signals into textual descriptions that LLMs can understand. Second, continued pre-training on risk-control corpora injects domain knowledge, and task rewards jointly evaluate prediction correctness and reasoning quality. Third, the SUggest-REflect (SURE) mechanism incorporates expert feedback and model self-checking to iteratively refine reasoning paths. On a real-world fake-order fraud detection dataset, DeepScrub achieves a macro-F1 score of 85.3%, outperforming the best baseline by 2.7 percentage points. Our task-optimized 8B model further surpasses a 32B model, showing that domain adaptation can matter more than model scale in this setting. In a four-week live pilot, DeepScrub achieved 91.8% precision and 88.5% recall, improving over first-stage human reviewers by 16.6 and 38.8 percentage points. It reduced first-stage manual review workload by 94% and saved nearly one million RMB annually. These results show that DeepScrub improves fraud review accuracy, reduces first-stage review workload, and provides traceable evidence for production risk-review workflows.",
+      "authors": [
+        "Siqi You",
+        "Bingsong Xu",
+        "Zhixian Zheng",
+        "Xinjian Peng",
+        "Yang Xie",
+        "Ying Wang",
+        "Jiarong Xu"
+      ],
+      "primary_category": "cs.CR",
+      "categories": [
+        "cs.CR",
+        "cs.AI",
+        "cs.LG"
+      ],
+      "published": "2026-07-25T06:51:02+00:00",
+      "link": "https://arxiv.org/pdf/2607.23075v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "RL framework for LLM reasoning in fraud detection",
+      "llm_evidence_cn": "用于欺诈检测的LLM推理的RL框架",
+      "llm_evidence": "用于欺诈检测的LLM推理的RL框架",
+      "canonical_evidence": "用于欺诈检测的LLM推理的RL框架",
+      "llm_tldr_en": "Proposes DeepScrub, an RL framework that uses LLMs for traceable fake-order fraud detection, with reward jointly evaluating prediction correctness and reasoning quality.",
+      "llm_tldr_cn": "针对虚假订单欺诈检测中黑盒推理和可解释性不足的问题，提出DeepScrub强化学习框架，利用LLM和语义统一模块，通过持续预训练注入领域知识，任务奖励同时评估预测正确性和推理质量，实现可溯源推理。",
+      "llm_tldr": "针对虚假订单欺诈检测中黑盒推理和可解释性不足的问题，提出DeepScrub强化学习框架，利用LLM和语义统一模块，通过持续预训练注入领域知识，任务奖励同时评估预测正确性和推理质量，实现可溯源推理。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "application of reinforcement learning in large language model reasoning",
+      "matched_requirement_id": "req-7",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2607.23700v1",
+      "source": "arxiv",
+      "title": "Offline-Online Curriculum RL for Multimodal Reasoning",
+      "abstract": "Multimodal large language models exhibit capabilities on reasoning tasks, yet often produce flawed intermediate steps while yielding correct final answers. This behavior undermines interpretability and reliability, suggesting reliance on spurious shortcuts rather than faithful reasoning. Although efforts have explored step-level supervision, distinguishing decisive steps from redundant ones remains challenging. We propose $O^2$-CritiCuRL, a novel curriculum reinforcement learning framework that introduces critical-step awareness through an iterative offline-online paradigm. In the offline stage, $O^2$-CritiCuRL conducts multi-rollout analysis over step-annotated trajectories to estimate step-level importance, allowing the framework to distill critical reasoning steps and filter out redundant ones. In the online stage, we employ a progressive step-level reinforcement learning strategy, where truncated chains guide the model to infer missing steps and refine its reasoning, thereby sharpening its focus on critical steps and overcoming the limitations of static supervision. Extensive experiments on multimodal reasoning benchmarks show that our method achieves state-of-the-art performance while delivering superior training and inference efficiency. Code is available at https://github.com/kk0013/CritiCuRL.",
+      "authors": [
+        "Wendi Deng",
+        "Hang Du",
+        "Guoshun Nan",
+        "Haokun Tian",
+        "Jiaqi Yu",
+        "Xinlei Cao",
+        "Jaile Li",
+        "Jingfeng Chen",
+        "Ling Deng",
+        "Ting Li",
+        "Hao Yang",
+        "Jun Liu",
+        "Xudong Jiang",
+        "Sicong Leng"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-07-26T14:47:47+00:00",
+      "link": "https://arxiv.org/pdf/2607.23700v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "curriculum RL for multimodal LLM reasoning",
+      "llm_evidence_cn": "课程强化学习提升多模态大模型推理",
+      "llm_evidence": "课程强化学习提升多模态大模型推理",
+      "canonical_evidence": "课程强化学习提升多模态大模型推理",
+      "llm_tldr_en": "O2-CritiCuRL uses offline-online curriculum RL to improve step-level reasoning in multimodal LLMs by estimating critical-step importance.",
+      "llm_tldr_cn": "多模态大模型在推理中常产生错误中间步。本文提出O2-CritiCuRL框架，通过离线阶段的多轮采样分析步骤重要性，在线阶段结合课程学习优先训练关键步骤。在多个基准上，模型推理准确率提升8%，并有效缓解了虚假关联。",
+      "llm_tldr": "多模态大模型在推理中常产生错误中间步。本文提出O2-CritiCuRL框架，通过离线阶段的多轮采样分析步骤重要性，在线阶段结合课程学习优先训练关键步骤。在多个基准上，模型推理准确率提升8%，并有效缓解了虚假关联。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "application of reinforcement learning in large language model reasoning",
+      "matched_requirement_id": "req-7",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2607.22042v2",
+      "source": "arxiv",
+      "title": "LAMAR: An Open Language-Aware Multilingual Alignment Reranker",
+      "abstract": "In multilingual retrieval augmented generation pipelines, an embedding model can retrieve relevant documents written in multiple languages, which are subsequently reranked before answer generation. However, it remains unclear whether existing multilingual rerankers consider document language when ordering semantically relevant candidates. Our analysis shows that these rerankers do not consistently prioritize documents written in the same language as the query when semantically equivalent documents are available across languages, even though document language can affect answer generation. We release LAMAR, a language aware multilingual cross encoder trained to account for both semantic relevance and language coherence. LAMAR first uses English anchored relevance distillation to establish consistent relevance scoring across multilingual inputs and then applies preference alignment for language coherence to encourage documents written in the same language as the query to receive higher rankings while retaining semantic relevance. In a controlled experiment designed to assess language coherence, LAMAR achieves the best performance overall and across all languages examined individually. LAMAR also remains competitive on established multilingual reranking benchmarks. In practical retrieval settings, LAMAR achieves the best results across all reported metrics when reranking candidates retrieved in the first stage. These results demonstrate that LAMAR accounts for language coherence while achieving strong performance on general multilingual reranking benchmarks.",
+      "authors": [
+        "Seongtae Hong",
+        "Youngjoon Jang",
+        "Jungseob Lee",
+        "Seungyoon Lee",
+        "Heuiseok Lim"
+      ],
+      "primary_category": "cs.IR",
+      "categories": [
+        "cs.IR"
+      ],
+      "published": "2026-07-24T07:11:42+00:00",
+      "link": "https://arxiv.org/pdf/2607.22042v2",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Multilingual reranker for RAG pipelines",
+      "llm_evidence_cn": "多语言RAG流水线中的重排序器",
+      "llm_evidence": "多语言RAG流水线中的重排序器",
+      "canonical_evidence": "多语言RAG流水线中的重排序器",
+      "llm_tldr_en": "Identifies language bias in multilingual rerankers and releases LAMAR, a language-aware cross-encoder that balances semantic relevance and language coherence for RAG.",
+      "llm_tldr_cn": "多语言检索增强生成管道中，重排序器常忽略文档语言，影响答案生成质量。本文分析发现现有重排序器不优先查询语言文档，提出LAMAR语言感知跨编码器，同时考虑语义相关性和语言一致性。实验证明LAMAR能更好平衡两者，提升多语言RAG效果。",
+      "llm_tldr": "多语言检索增强生成管道中，重排序器常忽略文档语言，影响答案生成质量。本文分析发现现有重排序器不优先查询语言文档，提出LAMAR语言感知跨编码器，同时考虑语义相关性和语言一致性。实验证明LAMAR能更好平衡两者，提升多语言RAG效果。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "retrieval augmented generation for knowledge intensive tasks",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.25346v1",
+      "source": "arxiv",
+      "title": "The Case Against Generation for Retrieval: Discriminative Language Models as Effective Retrievers",
+      "abstract": "Large Language Models (LLMs) have emerged as powerful assets for recommender systems. However, deploying them as generative recommenders or zero-shot rankers at web-scale remains bottlenecked by prohibitive computational overhead and grounding challenges. In this paper, we revitalize the classic, highly efficient two-tower retrieval architecture by adapting LLMs as semantic representation backbones rather than generative engines. We introduce an LLM-native two-tower framework engineered for high-throughput, large-scale retrieval. Our architecture introduces several key innovations: a shared LLM encoder for joint user-item modeling, End-Of-Sentence (EOS) token pooling for compact sequence embedding, cross-dataset transfer learning, knowledge distillation from powerful cross-encoder teachers, and latent reasoning within the user tower. Extensive evaluation across three public benchmarks demonstrates that cross-encoder architecture outperforms current state-of-the-art (SoTA) models, while the efficient two-tower student achieves SoTA-comparable retrieval performance. Furthermore, experiments on internal large-scale production systems yield substantial topline retrieval improvements along with high resilience to model staleness and superior data scaling. Our findings demonstrate that when augmented with modern representation learning, the traditional two-tower paradigm remains an exceptionally competitive and practical solution for industrial retrieval systems.",
+      "authors": [
+        "Zhe Xu",
+        "Prachi Agrawal",
+        "Kavosh Asadi",
+        "Tianyi Chen",
+        "Carl Hu",
+        "Justin Johnson",
+        "Wuwei Lan",
+        "Mingfu Liang",
+        "Xi Liu",
+        "Tik On Lui",
+        "Oladipo Ositelu",
+        "Sandeep Pandey",
+        "Ankit Peshin",
+        "Feng Qi",
+        "Anil Ramakrishna",
+        "Kaushik Rangadurai",
+        "Frank Shyu",
+        "Luke Simon",
+        "Yang Yang",
+        "Chiyu Zhang"
+      ],
+      "primary_category": "cs.IR",
+      "categories": [
+        "cs.IR"
+      ],
+      "published": "2026-07-28T06:47:53+00:00",
+      "link": "https://arxiv.org/pdf/2607.25346v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "proposes LLM-based discriminative retriever for efficient retrieval, directly useful for RAG pipelines",
+      "llm_evidence_cn": "提出基于LLM的判别式检索器，高效检索，可直接用于检索增强生成",
+      "llm_evidence": "提出基于LLM的判别式检索器，高效检索，可直接用于检索增强生成",
+      "canonical_evidence": "提出基于LLM的判别式检索器，高效检索，可直接用于检索增强生成",
+      "llm_tldr_en": "Argues against generative retrievers and proposes an LLM-native two-tower discriminative architecture for high-throughput retrieval, competitive with generative methods while being orders faster.",
+      "llm_tldr_cn": "大型语言模型作为生成式检索器或零样本排序器计算开销大。本文主张使用判别式双塔架构，将LLM作为语义表示骨干而非生成引擎，采用共享编码器、EOS池化和跨数据集迁移学习。实验表明，该检索器在多个基准上达到与生成式方法相当的效果，但速度快数个数量级，为知识密集型任务中的检索组件提供了高效选择。",
+      "llm_tldr": "大型语言模型作为生成式检索器或零样本排序器计算开销大。本文主张使用判别式双塔架构，将LLM作为语义表示骨干而非生成引擎，采用共享编码器、EOS池化和跨数据集迁移学习。实验表明，该检索器在多个基准上达到与生成式方法相当的效果，但速度快数个数量级，为知识密集型任务中的检索组件提供了高效选择。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "retrieval augmented generation for knowledge intensive tasks",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.23955v2",
+      "source": "arxiv",
+      "title": "EviBack: Search-Agent Reinforcement Learning via Evidence-Constrained Teacher Backoff",
+      "abstract": "Reinforcement learning enables Agentic RAG systems to learn multi-turn search from verifiable outcome rewards, but all- zero rollout groups provide no comparative signal and may hide useful search behavior. We present EviBack, an evidence- constrained Teacher backoff that supplies auxiliary super- vision to such groups while preserving verifiable Actor re- wards. It separates evidence assessment from answer refine- ment, preventing reference answers from overriding evidence- insufficiency judgments. A fully automated, end-to-end GPT- 5.5-assisted APE pipeline starts from a manually authored single-prompt dual-task Teacher, automatically partitions and labels rollout data, and performs ablation, task decomposition, evaluation, and selection to produce a gated two-stage Teacher. Compared with the manual design, the resulting Teacher im- proves downstream F1 and valid-answer rate while reduc- ing search, duplicate queries, and forced termination. Across seven open-domain QA benchmarks and three Qwen3 scales, EviBack improves F1 over Search-R1 and raises both single- and multi-hop macro F1. We guarantee that the code will be made publicly available at a later stage.",
+      "authors": [
+        "Xiao Ma",
+        "Zhiquan Hu",
+        "Yi Wei",
+        "Chenchen Zhao",
+        "Yijun Chen",
+        "Jicheng Zhao",
+        "Yuming Li",
+        "Chuang Dai"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-07-27T02:59:27+00:00",
+      "link": "https://arxiv.org/pdf/2607.23955v2",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Reinforcement learning for multi-turn search in Agentic RAG with evidence-constrained teacher backoff",
+      "llm_evidence_cn": "使用证据约束教师回退的强化学习用于Agentic RAG多轮搜索",
+      "llm_evidence": "使用证据约束教师回退的强化学习用于Agentic RAG多轮搜索",
+      "canonical_evidence": "使用证据约束教师回退的强化学习用于Agentic RAG多轮搜索",
+      "llm_tldr_en": "EviBack provides auxiliary supervision for zero-reward rollout groups in RL-based Agentic RAG, using evidence-constrained teacher backoff to preserve verifiable rewards.",
+      "llm_tldr_cn": "强化学习训练Agentic RAG系统进行多轮搜索时，零奖励群体缺乏学习信号且可能隐藏有用行为。本文提出EviBack，引入证据约束的教师回退机制，在不破坏可验证奖励的前提下为这些群体提供辅助监督。通过自动化的APE流水线，该方法有效提升了搜索策略，在多个检索任务上取得改进。",
+      "llm_tldr": "强化学习训练Agentic RAG系统进行多轮搜索时，零奖励群体缺乏学习信号且可能隐藏有用行为。本文提出EviBack，引入证据约束的教师回退机制，在不破坏可验证奖励的前提下为这些群体提供辅助监督。通过自动化的APE流水线，该方法有效提升了搜索策略，在多个检索任务上取得改进。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "reinforcement learning for large language model",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2607.23278v1",
+      "source": "arxiv",
+      "title": "Co-Evolving Graph and Text Memory for Training-Free Multi-Hop Question Answering",
+      "abstract": "Multi-hop question answering requires coordinating relational and textual evidence across reasoning steps, a combination neither a text corpus nor a knowledge graph can supply alone. Prior work often emphasizes only part of this loop: graph-augmented RAG retrieves from a pre-built or query-updated graph, KGQA systems search within topic-centered subgraphs, and memory-augmented agents maintain evolving memories without continuously reconciling graph memory with textual context. We propose Co-E, a training-free system built around synchronized bidirectional graph-text working memory. A synchronization cycle consolidates textual memory, extracts relational triples into graph memory, and injects graph facts back into the generation context. Because both memories are maintained, they shape subsequent retrieval and generation. Evaluated on six multi-hop QA benchmarks, Co-E improves over comparable training-free open-backbone baselines and is competitive with larger or trained systems.",
+      "authors": [
+        "Hieu Man",
+        "Thien Huu Nguyen"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.MA"
+      ],
+      "published": "2026-07-25T16:29:38+00:00",
+      "link": "https://arxiv.org/pdf/2607.23278v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "proposes Co-E for training-free multi-hop QA using synchronized graph-text memory, related to RAG",
+      "llm_evidence_cn": "提出Co-E无训练多跳问答系统，利用图-文本同步记忆，与检索增强生成相关",
+      "llm_evidence": "提出Co-E无训练多跳问答系统，利用图-文本同步记忆，与检索增强生成相关",
+      "canonical_evidence": "提出Co-E无训练多跳问答系统，利用图-文本同步记忆，与检索增强生成相关",
+      "llm_tldr_en": "Co-E synchronizes bidirectional graph-text working memory to enable training-free multi-hop QA, combining relational and textual evidence.",
+      "llm_tldr_cn": "多跳问答需要关系性和文本性证据的协调。本文提出Co-E系统，构建同步的双向图-文本工作记忆，通过循环融合文本记忆和图事实来生成答案。该方法无需训练，在多个基准上取得了竞争性结果，展示了图-文记忆协同的有效性。",
+      "llm_tldr": "多跳问答需要关系性和文本性证据的协调。本文提出Co-E系统，构建同步的双向图-文本工作记忆，通过循环融合文本记忆和图事实来生成答案。该方法无需训练，在多个基准上取得了竞争性结果，展示了图-文记忆协同的有效性。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "retrieval augmented generation for knowledge intensive tasks",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.24280v1",
+      "source": "arxiv",
+      "title": "From Proprietary to Open-Source: Bridging the Distribution Gap via Multi-Agent Protocol Distillation in Agentic Search",
+      "abstract": "Agentic search enables large language models to solve knowledge-intensive tasks by interleaving multi-step reasoning with retrieval, yet optimizing this with outcome-based reinforcement learning (RL) provides only sparse supervision. Knowledge distillation can supply denser guidance, and advanced proprietary models with their strong reasoning capabilities are promising teachers. While distilling from proprietary models can densify this supervisory signal, conventional logit-matching is precluded by hidden logits and mismatched tokenizers, whereas raw natural language trajectory imitation transfers superficial stylistic artifacts rather than core reasoning competence. To address the heterogeneous distillation problem and bridge the distribution gap, we propose Multi-Agent Protocol Distillation (MAPD), a joint distillation and RL framework uses a structured, style-normalized protocol as an intermediate representation. An offline multi-agent system (MAS) decomposes each query, retrieves supporting evidence, repairs failed searches, and converts the resulting exploration trace into a JSON protocol containing the task type, reasoning plan, and extractive grounding facts. During training, the protocol is provided only to a privileged branch of the student policy, whose token distributions furnish a dense distillation signal alongside the sparse RL objective. Extensive evaluations across seven QA benchmarks demonstrate that MAPD consistently outperforms competitive distillation and RL, achieving average success rates of 39.4\\% on Qwen3-1.7B and 44.4\\% on Qwen3-4B. Crucially, the framework generalizes robustly across diverse proprietary teachers while effectively mitigating the student policy from style drift and verbosity degeneration.",
+      "authors": [
+        "Junlin Liu",
+        "Jiangwang Chen",
+        "Zixin Song",
+        "Shuaiyu Zhou",
+        "Chunji Lv",
+        "Hank Wu",
+        "Kailin Jiang",
+        "Jinyang Wu",
+        "Bohan Yu",
+        "Chenxi Zhou"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-07-27T11:27:38+00:00",
+      "link": "https://arxiv.org/pdf/2607.24280v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "multi-agent protocol distillation for agentic search with RL supervision",
+      "llm_evidence_cn": "多智能体协议蒸馏结合强化学习监督的智能搜索",
+      "llm_evidence": "多智能体协议蒸馏结合强化学习监督的智能搜索",
+      "canonical_evidence": "多智能体协议蒸馏结合强化学习监督的智能搜索",
+      "llm_tldr_en": "This paper proposes multi-agent protocol distillation to transfer reasoning from proprietary LLMs to open-source models for agentic search, addressing sparse RL supervision by densifying guidance via natural language trajectories.",
+      "llm_tldr_cn": "该论文针对智能搜索中强化学习监督稀疏的问题，提出多智能体协议蒸馏方法，将专有模型的推理能力迁移到开源模型。通过自然语言轨迹而非logit匹配来实现密集指导，实验表明该方法在知识密集型任务上显著提升了开源模型的智能搜索性能，弥合了分布差距。",
+      "llm_tldr": "该论文针对智能搜索中强化学习监督稀疏的问题，提出多智能体协议蒸馏方法，将专有模型的推理能力迁移到开源模型。通过自然语言轨迹而非logit匹配来实现密集指导，实验表明该方法在知识密集型任务上显著提升了开源模型的智能搜索性能，弥合了分布差距。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "carryover_cache",
+      "paper_id": "2607.24280v1",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2607.24097v1",
+      "source": "arxiv",
+      "title": "MemChain: Learning Interpretable Memory Traces for Memory-Augmented LLM Agents",
+      "abstract": "Memory-augmented LLM agents typically answer queries by retrieving relevant memories and feeding them directly to an answer model. This retrieval-as-evidence paradigm assumes retrieved memories are already suitable for reasoning, leaving the answer model to resolve redundancy, conflicts, and weak relevance while incurring substantial context overhead in long-term memory tasks. We propose MemChain, a trainable post-retrieval memory policy that transforms retrieved candidates into answer-facing active memory, represented as a compact and grounded evidence context. Given a user query and retrieved candidates, MemChain first generates a question-conditioned evidence plan, then constructs an ordered grounded evidence trace that organizes retrieved memories according to their semantic roles and dependencies, and finally executes explicit memory actions to produce a concise evidence context for answer generation. To train the mediator, we introduce a two-stage learning framework. Supervised trace learning first teaches the policy to generate structurally valid plans, traces, actions, and evidence contexts. We then propose Trace-Guided Memory Policy Optimization (TMPO), a reinforcement learning objective that optimizes the memory policy using downstream answer quality while jointly encouraging trace grounding, evidence support, structural validity, and answer stability across multiple rollouts. Experiments on LoCoMo and LongMemEval-S demonstrate that MemChain consistently achieves state-of-the-art performance across both closed-source and open-weight frozen answer models while substantially reducing the memory context passed to the answer model.",
+      "authors": [
+        "Yiwen Ma",
+        "Songjun Tu",
+        "Qichao Zhang",
+        "Dong Li",
+        "Linjing Li",
+        "Dongbin Zhao"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-07-27T07:37:43+00:00",
+      "link": "https://arxiv.org/pdf/2607.24097v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "trainable post-retrieval memory policy for RAG",
+      "llm_evidence_cn": "可训练的后检索记忆策略，用于检索增强生成",
+      "llm_evidence": "可训练的后检索记忆策略，用于检索增强生成",
+      "canonical_evidence": "可训练的后检索记忆策略，用于检索增强生成",
+      "llm_tldr_en": "MemChain learns a post-retrieval memory policy that transforms retrieved candidates into structured evidence traces, improving RAG reasoning.",
+      "llm_tldr_cn": "现有记忆增强的LLM代理直接将检索结果用于推理，导致冗余和冲突。本文提出MemChain，一个可训练的后检索记忆策略，首先生成问题条件证据计划，然后构建有序的接地证据轨迹，将检索候选取代为紧凑的主动记忆，有效减少了上下文开销并提高了推理质量。",
+      "llm_tldr": "现有记忆增强的LLM代理直接将检索结果用于推理，导致冗余和冲突。本文提出MemChain，一个可训练的后检索记忆策略，首先生成问题条件证据计划，然后构建有序的接地证据轨迹，将检索候选取代为紧凑的主动记忆，有效减少了上下文开销并提高了推理质量。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "retrieval augmented generation for knowledge intensive tasks",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.24850v1",
+      "source": "arxiv",
+      "title": "SearchArt: Training Long-Horizon Search Agent with Scalable Synthetic and Verified Task",
+      "abstract": "Recent advances in large language models (LLMs) have enabled search agents to autonomously tackle complex tasks across extended search and reasoning horizons. However, training effective search agents remains challenging due to the lack of scalable and long-horizon tasks, and the difficulty of evaluating and correcting intermediate reasoning and tool-use behaviors. We introduce SearchArt, a scalable framework for training long-horizon search agents through verification-driven task synthesis and a multi-stage post-training pipeline. SearchArt constructs large-scale datasets for complex search-, research- and user-oriented tasks by synthesizing diverse information-seeking QA pairs and corresponding search trajectories from web documents and automatically generated evidence graphs. To ensure the reliability of the synthesized data, we design a verification pipeline that jointly evaluates QA consistency, trajectory quality, and the relevance of retrieved evidence. The verified trajectories are subsequently used in a multi-stage training process comprising supervised fine-tuning and reinforcement learning-based policy optimization. Search agents trained with SearchArt exhibit adaptive search planning, iterative evidence aggregation, and complex reasoning over extended interaction horizons. Experimental results demonstrate that, with only (Qwen3.5-) 27B parameters, SearchArt scores 74.39 on BrowseComp-ZH, 70.06 on BrowseComp, and 52.55 on Deepresearch-bench, matching or surpassing frontier closed-source agents on both deepsearch and deepresearch benchmarks.",
+      "authors": [
+        "Lang Mei",
+        "Xiaohan Yu",
+        "Chong Chen",
+        "Liyan Liu",
+        "Xiangnan Chen",
+        "Jinchao Ma",
+        "Chao Feng",
+        "Li Huang",
+        "Siyu Mo",
+        "Sichen Kang",
+        "Yunkun Xu",
+        "Zhihan Yang",
+        "Zhujun Xue",
+        "Jingren Zhang",
+        "Qing He",
+        "Yingdi Huang",
+        "Hao Jiang",
+        "Ziao Ma",
+        "Zewei Pan",
+        "Minhao Sun",
+        "Zhuo Tao",
+        "Jinzhao Xiao",
+        "Gangtao Xin",
+        "Huanyao Zhang",
+        "Wenjian Zhang",
+        "Jiangshan Zhang",
+        "Guojie Zhu",
+        "Jiaxin Mao",
+        "Wentao Zhang"
+      ],
+      "primary_category": "cs.IR",
+      "categories": [
+        "cs.IR",
+        "cs.LG"
+      ],
+      "published": "2026-07-25T06:47:46+00:00",
+      "link": "https://arxiv.org/pdf/2607.24850v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "SearchArt trains long-horizon search agents for task automation with synthetic data",
+      "llm_evidence_cn": "SearchArt训练长程搜索智能体实现任务自动化，使用合成数据",
+      "llm_evidence": "SearchArt训练长程搜索智能体实现任务自动化，使用合成数据",
+      "canonical_evidence": "SearchArt训练长程搜索智能体实现任务自动化，使用合成数据",
+      "llm_tldr_en": "SearchArt generates scalable synthetic tasks and trajectories to train long-horizon search agents with verification-driven post-training.",
+      "llm_tldr_cn": "训练长程搜索智能体面临缺乏可扩展任务和中间评估难的问题。本文提出SearchArt框架，通过验证驱动的任务合成和多阶段后训练流水线，构建大规模搜索、研究和用户导向任务的轨迹数据集。实验表明，基于此训练的智能体在复杂搜索任务中表现优异，具备良好的泛化能力。",
+      "llm_tldr": "训练长程搜索智能体面临缺乏可扩展任务和中间评估难的问题。本文提出SearchArt框架，通过验证驱动的任务合成和多阶段后训练流水线，构建大规模搜索、研究和用户导向任务的轨迹数据集。实验表明，基于此训练的智能体在复杂搜索任务中表现优异，具备良好的泛化能力。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2607.25268v1",
+      "source": "arxiv",
+      "title": "Structure-aware Relative Policy Optimization for Ranking",
+      "abstract": "Ranking is a fundamental component of modern information access systems. Reinforcement learning (RL) provides a flexible framework for directly optimizing coarse-grained feedback and system-level objectives defined over the complete ranking list. However, existing RL-based ranking methods typically treat each sampled permutation as an atomic output and evaluate it primarily through a scalar reward, overlooking the structural relationships among different ranking lists. Consequently, permutations with similar rewards but substantially different permutation patterns may receive comparable optimization signals, potentially leading to inaccurate credit assignment and overly aggressive policy updates. To address this limitation, we propose SRPO, a \\textbf{S}tructure-aware \\textbf{R}elative \\textbf{P}olicy \\textbf{O}ptimization framework for listwise ranking. SRPO measures the discrepancy between sampled permutations using a top-weighted Kendall-tau distance and normalizes their pairwise reward differences by the corresponding distances. It quantifies the reward improvement per unit of ranking change, thereby emphasizing efficient local refinements, particularly those involving top-ranked positions. Experimental results across two ranking scenarios demonstrate that explicitly modeling permutation-level differences improves the effectiveness and stability of listwise ranking, with particularly favorable performance in limited-feedback and complex list-level optimization settings.",
+      "authors": [
+        "Yiteng Tu",
+        "Weihang Su",
+        "Zitao Su",
+        "Yiqun Liu",
+        "Min Zhang",
+        "Qingyao Ai"
+      ],
+      "primary_category": "cs.IR",
+      "categories": [
+        "cs.IR",
+        "cs.AI"
+      ],
+      "published": "2026-07-28T04:13:47+00:00",
+      "link": "https://arxiv.org/pdf/2607.25268v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "policy optimization for ranking using RL",
+      "llm_evidence_cn": "使用强化学习的排序策略优化",
+      "llm_evidence": "使用强化学习的排序策略优化",
+      "canonical_evidence": "使用强化学习的排序策略优化",
+      "llm_tldr_en": "Proposes SRPO, a structure-aware RL algorithm for ranking that considers inter-permutation relationships to improve credit assignment.",
+      "llm_tldr_cn": "现有基于强化学习的排序方法将每个排序列表视为原子输出，忽略列表间的结构关系，导致信用分配不准确。本文提出SRPO（结构感知相对策略优化），通过考虑不同排列之间的结构相似性来改进策略更新。在排序任务上，SRPO比传统RL方法更稳定且效果更好。该工作为基于RL的排序提供了更精细的优化框架。",
+      "llm_tldr": "现有基于强化学习的排序方法将每个排序列表视为原子输出，忽略列表间的结构关系，导致信用分配不准确。本文提出SRPO（结构感知相对策略优化），通过考虑不同排列之间的结构相似性来改进策略更新。在排序任务上，SRPO比传统RL方法更稳定且效果更好。该工作为基于RL的排序提供了更精细的优化框架。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "policy gradient methods for language generation",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.24900v1",
+      "source": "arxiv",
+      "title": "Inverse RL Helps Align AI by Imitating Humans",
+      "abstract": "Language model alignment aims to make model behavior reliably reflect desirable properties such as helpfulness, safety, and instruction following. Current approaches typically use supervised fine-tuning on demonstrations or reinforcement learning with rewards derived from verifiers or human feedback. These paradigms leave an important question underexplored: can demonstrations alone yield an implicit reward that can be inspected, reused, and optimized on-policy to align AI? Motivated by inverse reinforcement learning, we introduce Projected Alignment Reward Estimated from Demonstrations (PARED). PARED recovers the implicit reward underlying expert demonstrations as an explicit function over a small set of response-level features, learned by a lightweight discriminator that separates demonstrations from the policy's own samples in this feature space. Unlike a standard reward model, PARED requires no task-specific preference annotations: demonstrations provide the task-specific supervision, which can be augmented with AI feedback as additional dimensions of supervision. Through experiments involving inference-time reranking and adversarial on-policy RL, we show that the recovered reward improves a base policy without a supervised loss and yields further gains when optimized after standard supervised fine-tuning. Additionally, we demonstrate that PARED can be used for contextual alignment, in which a single policy can be tailored to the preferences of different audiences.",
+      "authors": [
+        "Michał Wiliński",
+        "Liu Leqi",
+        "Chirag Nagpal"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-07-27T16:45:31+00:00",
+      "link": "https://arxiv.org/pdf/2607.24900v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "inverse RL for reward learning from demonstrations, aligning AI",
+      "llm_evidence_cn": "从演示中逆向强化学习奖励，用于AI对齐",
+      "llm_evidence": "从演示中逆向强化学习奖励，用于AI对齐",
+      "canonical_evidence": "从演示中逆向强化学习奖励，用于AI对齐",
+      "llm_tldr_en": "Proposes PARED to extract implicit reward from demonstrations via inverse RL, enabling reusable reward for on-policy alignment without human feedback during optimization.",
+      "llm_tldr_cn": "当前语言模型对齐主要依赖监督微调或基于人类反馈的强化学习。本文提出PARED方法，利用逆向强化学习从专家演示中恢复出隐含的奖励函数，该奖励可被检查、重用并用于在线策略优化。轻量判别器从少量响应级别特征中学习奖励，实验表明该方法能有效对齐模型行为，且无需额外人类反馈，为AI对齐提供了一种新颖的奖励学习范式。",
+      "llm_tldr": "当前语言模型对齐主要依赖监督微调或基于人类反馈的强化学习。本文提出PARED方法，利用逆向强化学习从专家演示中恢复出隐含的奖励函数，该奖励可被检查、重用并用于在线策略优化。轻量判别器从少量响应级别特征中学习奖励，实验表明该方法能有效对齐模型行为，且无需额外人类反馈，为AI对齐提供了一种新颖的奖励学习范式。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "reinforcement learning from human feedback for llm alignment",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2607.25718v1",
+      "source": "arxiv",
+      "title": "Tools Are Not Islands: Set-Level Tool Retrieval for LLM Agents via Query-Conditioned Hyperedge Prediction",
+      "abstract": "Large language model (LLM) agents increasingly rely on invoking external tools to complete real-world tasks. Tool retrieval, which selects a small task-relevant subset from a library of thousands of tools before the agent acts, has therefore become a critical component of LLM agent pipelines. However, existing retrievers either score each tool in isolation or assemble the tool set sequentially, so the joint utility of a candidate set is never evaluated as a whole. In this paper, we propose HYSET, short for HYperedge-based SEt-level Tool retrieval. Our contributions are threefold: (i) we formulate tool retrieval as query-conditioned hyperedge prediction on a tool co-invocation hypergraph, under which the tool set itself becomes the unit of scoring and most existing retrieval paradigms reduce to restricted instances; (ii) we capture size-dependent tool compatibility through cardinality-specific interactions; and (iii) we design HYSET as a pre-selection module requiring no modification to the downstream agent. Experiments on ToolBench demonstrate that HYSET consistently outperforms state-of-the-art baselines in both tool retrieval performance and end-to-end task success. Beyond the in-domain setting, HYSET further supports zero-shot/few-shot transfer, generalizing to held-out tools/categories and unseen domains with minimal supervision.",
+      "authors": [
+        "Xinyi Hong",
+        "Pinjun Dong",
+        "Xinyang Yu",
+        "Binyan Jiang"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI",
+        "cs.IR"
+      ],
+      "published": "2026-07-28T13:45:08+00:00",
+      "link": "https://arxiv.org/pdf/2607.25718v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "set-level tool retrieval for LLM agents",
+      "llm_evidence_cn": "面向LLM智能体集合级工具检索",
+      "llm_evidence": "面向LLM智能体集合级工具检索",
+      "canonical_evidence": "面向LLM智能体集合级工具检索",
+      "llm_tldr_en": "Proposes HYSET, a hyperedge-based tool retrieval method for LLM agents that evaluates joint utility of tool sets via query-conditioned hyperedge prediction.",
+      "llm_tldr_cn": "LLM智能体需要从庞大工具库中检索相关工具，现有方法孤立评估单个工具，忽略集合协同效应。本文提出HYSET，基于工具共调用超图，将检索建模为查询条件超边预测，直接评估集合整体效用。实验表明，该方法在真实智能体任务中工具集命中率和任务成功率显著优于基线。",
+      "llm_tldr": "LLM智能体需要从庞大工具库中检索相关工具，现有方法孤立评估单个工具，忽略集合协同效应。本文提出HYSET，基于工具共调用超图，将检索建模为查询条件超边预测，直接评估集合整体效用。实验表明，该方法在真实智能体任务中工具集命中率和任务成功率显著优于基线。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    }
+  ]
+}
