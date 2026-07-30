@@ -1,0 +1,673 @@
+Title: CoRT: Counterfactual Replay for Token-Level Rubric-Guided Policy Optimization
+
+URL Source: https://arxiv.org/pdf/2607.25659v1
+
+Published Time: Wed, 29 Jul 2026 00:56:14 GMT
+
+Number of Pages: 12
+
+Markdown Content:
+# CoRT: Counterfactual Replay for Token-Level Rubric-Guided Policy Optimization 
+
+# Bo-Wen Zhang 1,2,3 ∗† , Junwei He 3∗, Wen Wang 4, Song-Lin Lv 1,2 , Wentao Ma 3, Rongyi Lin 3‡,Shuhan Zhong 3, Lan-Zhe Guo 1,2§ 
+
+> 1
+
+State Key Laboratory of Novel Software Technology, Nanjing University 
+
+> 2
+
+School of Intelligence Science and Technology, Nanjing University 
+
+> 3
+
+ByteDance 4University of Chinese Academy of Sciences zbw@smail.nju.edu.cn, hejunwei@bytedance.com, guolz@nju.edu.cn 
+
+Abstract 
+
+Rubric-based reinforcement learning enriches language model training by evaluating model outputs against explicit criteria. Yet in GRPO-style pipelines, these structured judgments are reduced to a scalar response-level reward and converted into a response-level advantage, which is broadcast uniformly to all generated tokens. This leaves no explicit mechanism for allocating credit within a response, even when different cri-teria are grounded in different spans, formatting decisions, or semantic choices. We propose CoRT, a token-level credit weighting method for rubric-conditioned GRPO. Instead of training an auxiliary token scoring model, CoRT uses coun-terfactual replay to rescore the same sampled response un-der the original rubric-conditioned prompt and a matched criteria-free prompt. The resulting tokenwise log-likelihood contrasts serve as a proxy for dependence on the rubric context. CoRT maps these contrasts to bounded, response-normalized weights and uses them to redistribute the signed GRPO advantage across tokens, without introducing an aux-iliary scorer or changing the response-level reward. Experi-ments across instruction-tuned models and reward granular-ities show that CoRT improves over matched response-level GRPO in the vast majority of comparisons, with an average gain of 4.4 percentage points. The method remains competi-tive with learned token-level credit baselines while avoiding a separate relevance-learning stage. These results suggest that policy-internal counterfactual likelihood contrasts provide an effective training signal for within-response credit allocation while retaining the simplicity and stability of GRPO. 
+
+# Introduction 
+
+Reinforcement learning (RL) has become a central compo-nent of large language model post-training, enabling models to optimize behaviors that are difficult to capture with su-pervised fine-tuning alone (Ouyang et al. 2022; Jaech et al. 2024; Guo et al. 2025). This is especially important for open-domain instruction following, where user requests often com-bine semantic goals with diverse surface and behavioral con-straints, and many tasks do not have a single verifiable an-swer. In many recent RL pipelines, a verifier or reward model 
+
+> ∗
+
+Co-first authors. 
+
+> †
+
+Work done during internship at ByteDance. 
+
+> ‡
+
+Project lead. 
+
+> §
+
+Corresponding author. 
+
+assigns a scalar score to each sampled response, and pol-icy optimization methods such as GRPO (Shao et al. 2024) update the model using response-level advantages. This for-mulation is simple and scalable, but it treats a generated response as a single unit of credit assignment, even when different tokens may contribute to different requirements. Rubric-based RL provides a more structured source of su-pervision for these settings. Rather than judging a response only by an overall score, a rubric decomposes response be-havior into explicit criteria, such as correctness, formatting, or safety (Gunjal et al. 2025; Li et al. 2026). However, in GRPO-style training, these structured judgments are aggre-gated into a single advantage before optimization and applied uniformly to all generated tokens. The supervision is struc-tured at the criterion level, while the policy update remains uniform at the token level, leaving potential attribution in-formation encoded in the rubric underused. A natural way to address this mismatch is to move from response-level reward assignment to token-level credit assignment. In principle, token-level signals can differentiate tokens critical to fulfill-ing rubric criteria from incidental filler tokens within the final response. One route is to learn an auxiliary token-level rele-vance or scoring model, but this introduces a separate training stage and an additional component that must be integrated into the RL pipeline. This raises a simpler question: Can token-level credit be derived directly from policy-internal signals, without training a separate relevance estimator? 
+
+Fixed-response replay exposes such a signal. If the same sampled response is rescored after removing the rubric crite-ria, tokens whose likelihood depends on these criteria tend to change more than generic content tokens. Figure 1 illustrates this effect on a real example. Because the response tokens are held fixed, the contrast isolates how the policy’s likelihood for the observed trajectory changes under the criteria-free prompt. The highlighted tokens are not labeled by an exter-nal annotator; they are exposed by the policy’s own response to this local counterfactual prompt change. Motivated by this observation, we propose CoRT (Co unterfactual Replay for Token-level credit weighting), a token-level credit weighting method for rubric-conditioned GRPO. Here, counterfactual replay denotes a fixed-response intervention inspired by replay and counterfactual data aug-mentation in RL (Andrychowicz et al. 2017; Pitis, Creager, and Garg 2020): sampled tokens are held fixed and rescored arXiv:2607.25659v1 [cs.AI] 28 Jul 2026 −25 −15 −5 0
+
+Token log probability 
+
+balanced 
+
+diet 
+
+athletes 
+
+health 
+
+"
+
+three 
+
+*
+
+P.S. 
+
+final phrase 
+
+## Same response tokens 
+
+0 10 20 
+
+Drop Δt
+
+## ℓ + 
+
+> t
+
+## − ℓ −
+
+> t
+
+orange + hatching = rubric cue 
+
+with criteria criteria-free replay Figure 1: Real replay example. The same response is rescored with criteria and under a criteria-free replay. Generic con-tent tokens show little log-probability change, while rubric-controlled tokens (orange) drop more after criteria removal. after removing rubric criteria, yielding policy-internal like-lihood contrasts rather than relabeled trajectories or new data. CoRT converts this contrast into bounded, response-normalized credit weights. These weights redistribute the original response-level GRPO advantage across tokens, so that rubric-dependent tokens receive more of the signed update signal without changing its direction. Unlike meth-ods that train a token-level relevance model, CoRT requires no separate relevance-learning stage and does not change the response-level reward. By modifying only the within-response credit allocation while preserving response-level supervision, CoRT improves training effectiveness while pre-serving the simplicity of the GRPO. 
+
+# Related Work 
+
+Instruction following and rubric feedback. Instruction following has been widely studied as a central goal of lan-guage model post training, with prior work improving model alignment through curated instruction data, instruction syn-thesis, and preference optimization (Zhou et al. 2023a; Xu et al. 2024; Lou et al. 2024; Rafailov et al. 2023). Recent benchmarks increasingly emphasize explicit constraints and fine-grained instruction diversity (Zhou et al. 2023b; Pyatkin et al. 2026; Gu et al. 2024), as well as multidimensional cri-teria and judge-based assessment (Ye et al. 2025; He et al. 2025). This evaluation paradigm has further motivated rubric and verifier based training methods, which extend RLHF be-yond generic preference labels by providing more structured and inspectable supervision (Peng et al. 2025; Sun et al. 2024; He et al. 2024; Zhang et al. 2025). However, in many RL formulations, such structured feedback is ultimately re-duced to a response level scalar reward or advantage. As a result, the criterion level information provided by rubrics or verifiers is not directly used to determine which parts of a response contribute to satisfying or violating specific require-ments. Motivated by this gap, our work studies how criterion level rubric feedback can be used for within response credit assignment, allowing structured supervision to affect token level policy updates rather than only response level scoring. 
+
+Policy optimization for language models. PPO is built around a clipped policy-gradient surrogate and remains widely used for language-model alignment (Schulman et al. 2017; Ouyang et al. 2022). GRPO removes the value model by normalizing rewards within a response group, and has become a common basis for scalable RL training of LLMs (Shao et al. 2024; Guo et al. 2025). Recent vari-ants such as DAPO and GSPO refine large scale RL training through choices in normalization, clipping, and sampling (Yu et al. 2026; Zheng et al. 2025), while other work studies group normalization, multi reward settings, and credit assignment for reasoning (Parthasarathi et al. 2025; Liu et al. 2026). These GRPO-style methods primarily refine how response-level feedback is normalized, sampled, and optimized, but they do not specify how rubric criteria should be attributed to tokens within a response. CoRT instead operates at the credit allocation stage, redistributing the resulting group-relative advantage across tokens while leaving the reward interface and group-relative normalization unchanged. 
+
+Fine grained credit assignment. Fine-grained supervi-sion aims to alleviate the sparsity of outcome-only rewards by assigning training signals to smaller units of behav-ior. Process reward methods score intermediate reasoning steps (Lightman et al. 2024; Wang et al. 2024), while agentic RL studies sparse long-horizon credit assignment through implicit step rewards, hindsight credit assignment, and hi-erarchical advantage estimation (Liu et al. 2025; Tan et al. 2026; Peng et al. 2026). In instruction following, Rubrics-to-Tokens (RTT) learns a Token-Level Relevance Discrimi-nator to convert response-level rubric outcomes into token-level rewards (Xu et al. 2026). As the closest prior work, RTT targets the same uniform-credit problem in rubric-based RL, but training its discriminator requires a nontrivial data-generation pipeline for token-level relevance supervision. CoRT keeps the goal of fine-grained credit assignment, but replaces discriminator relevance with a policy-internal like-lihood contrast. This connects CoRT to context intervention and attribution methods that test whether outputs depend on specific parts of the input context (Cohen-Wang et al. 2024; Sarti et al. 2024; Shilpika et al. 2026), as well as broader counterfactual views of intervention (Pearl 2009; Wachter, Mittelstadt, and Russell 2017). Rather than using such con-trasts only to explain completed generations, CoRT uses them to redistribute the GRPO advantage during policy training. 
+
+# Rubric Signals in Group-Relative RL 
+
+Let x be an instruction and c a set of rubric criteria. We denote the full rubric prompt by x+ = ( x, c ) and the criteria-free prompt by x− = x. For each prompt group, the old policy samples G responses yi ∼ πθold (· | x+). A rubric verifier assigns each response a scalar outcome reward ri, and GRPO Counterfactual Replay   
+
+> Mention reinforcement learning
+> Explain group -relative advantage
+> Keep the response under 80 words
+> Response -Level RL
+> Correctness
+> Helpfulness
+> Readability
+> Rubrics
+
+… Same for each token                               
+
+> Scalar Reward Rule Verifier
+> Rewards
+> broadcast
+> LLM Judge
+> Full Prompt
+> Explain GRPO to a beginner.
+> Criteria -Free Prompt
+> Contrast -to -Weight Mapping Criteria -Free Replay
+> Normal Rollout
+> ℓ⁺ₜ = log π( yₜ | x⁺, y<ₜ)
+> ℓ⁻ₜ = log π( yₜ | x⁻, y<ₜ)
+> Same Generated Response
+> CoRT Advantage !𝑨 𝒊
+> GRPO Advantage Ai
+> CoRT Weight 𝝎 𝒊
+> Token Credit Example
+> Explain GRPO to a beginner.
+> 1. Mention reinforcement learning
+> Rubric Criteria
+> 2. Explain group -relative advantage
+> 3. Keep the response under 80 words
+> CoRT Weight
+> y1y2y3y4yn
+> …
+> y1y2y3y4yn
+> …
+
+Figure 2: Overview of CoRT. Response level rubric rewards are first converted into a scalar GRPO advantage, which is normally broadcast uniformly to all generated tokens. CoRT replays the same response under a criteria-free counterfactual prompt, contrasts token log probabilities against the normal rollout, maps the contrast into token weights, and uses these weights to redistribute the response level advantage across tokens. converts it into a group-relative advantage 
+
+Ai = ri − μσ + ϵr
+
+,
+
+where μ and σ are the mean and standard deviation of rewards in the group (Shao et al. 2024). Although the policy loss is evaluated tokenwise, standard GRPO uses the same group-relative advantage Ai for every generated token in response yi. For token position t, define the policy ratio 
+
+ρi,t (θ) = πθ (yi,t | x+, y i,<t )
+
+πθold (yi,t | x+, y i,<t ) .
+
+Following the PPO-style clipped surrogate (Schulman et al. 2017), let 
+
+¯ρi,t (θ) = clip( ρi,t (θ), 1 − ϵclip , 1 + ϵclip ) .
+
+The GRPO loss can be written as 
+
+LGRPO = −Ei,t [min( ρi,t Ai, ¯ρi,t Ai)] ,
+
+where the expectation is over sampled responses and their generated tokens. This objective is agnostic to which tokens express the rubric criteria: the same response-level advantage coefficient is applied across the response. 
+
+Advantage redistribution. Our goal is not to call a new verifier or change the scalar outcome reward, but to redis-tribute the same response-level advantage within each sam-pled response. Let Ti be the length of response yi. We require token weights wi,t to satisfy 
+
+1
+
+TiTiX
+
+> t=1
+
+wi,t = 1 ,
+
+Algorithm 1 CoRT pipeline for one prompt group 
+
+Require: Full prompt x+, criteria-free prompt x−, re-sponses {yi}Gi=1 , rewards {ri}Gi=1 
+
+1: Compute group-relative advantages Ai from rewards. 
+
+2: Obtain full-prompt log probabilities ℓ+ 
+
+> i,t
+
+on sampled re-sponses. 
+
+3: Score the same response token sequences under x− to obtain ℓ−
+
+> i,t
+
+.
+
+4: Compute counterfactual contrasts ∆i,t = ℓ+ 
+
+> i,t
+
+− ℓ−
+
+> i,t
+
+.
+
+5: Map contrasts to bounded replay-margin scores si,t .
+
+6: Apply scheduled response normalization to obtain wi,t .
+
+7: Optimize the clipped policy objective with bAi,t =sg( wi,t )Ai.so that the average shaped advantage remains 
+
+1
+
+TiTiX
+
+> t=1
+
+bAi,t = 1
+
+TiTiX
+
+> t=1
+
+wi,t Ai = Ai.
+
+Under this constraint, token weights reallocate the signed advantage across tokens while preserving the response-level reward and group-relative normalization. CoRT realizes this by deriving wi,t from counterfactual replay and response normalization, replacing the uniform broadcast of Ai with rubric-dependent token weights. 
+
+# CoRT 
+
+CoRT converts a sparse response-level GRPO advantage into dense token-level credit for the same sampled response. Figure 2 provides an overview of the pipeline, while Algo-rithm 1 gives the corresponding training procedure. For each prompt group, the standard GRPO path first converts scalar rubric rewards into response-level advantages. CoRT keeps the sampled responses and rewards fixed, then adds a counter-factual replay pass that scores the same response tokens un-der the criteria-free prompt. Comparing these scores with the factual full-prompt scores yields tokenwise log-probability contrasts, which indicate which tokens depend more strongly on the rubric context. These contrasts are mapped to bounded token weights and normalized within each response before being multiplied with the original advantage. In this way, the replay signal determines how the update is distributed across tokens, while the signed GRPO advantage still determines whether those tokens are reinforced or suppressed. Thus, the method changes only within-response credit allocation while leaving the rollout, verifier reward, and response-level update direction unchanged. The result is a credit-weighting mech-anism that is tied to the rubric context but still anchored by the original group-relative reward signal. 
+
+Counterfactual Scoring 
+
+For each sampled response yi, CoRT scores the same ob-served token trajectory under two contexts: the original prompt with rubric criteria, x+ 
+
+> i
+
+, and the counterfactual prompt without these criteria, x− 
+
+> i
+
+. It computes 
+
+ℓ+ 
+
+> i,t
+
+= log π¯θ (yi,t | x+ 
+
+> i
+
+, y i,<t ),ℓ− 
+
+> i,t
+
+= log π¯θ (yi,t | x− 
+
+> i
+
+, y i,<t ).
+
+Here ¯θ denotes the frozen scoring policy for the current batch. In implementation, ℓ+ 
+
+> i,t
+
+is available from the normal rollout log probabilities, while ℓ− 
+
+> i,t
+
+is computed by replaying the same response tokens under the counterfactual prompt x−
+
+> i
+
+and evaluating their per token log probabilities. The replay contrast ∆i,t = ℓ+ 
+
+> i,t
+
+− ℓ− 
+
+> i,t
+
+compares the log probability as-signed to the same next token under the criteria-conditioned and criteria-free contexts. Since the prefix and target token are fixed, positive contrasts indicate stronger dependence on the rubric criteria relative to the criteria-free baseline, while small or negative contrasts indicate weak or reversed depen-dence. We use this contrast as a proxy for rubric dependence, rather than as a calibrated measure of token importance. 
+
+Replay-Margin Token Credit 
+
+The replay contrasts ∆i,t are unbounded and can be heavy-tailed or model-scale dependent. We therefore map them to a bounded score before constructing token credit weights: 
+
+si,t = sigmoid( τ (∆ i,t − b)) − 12 ,
+
+˜wi,t = 1 + ηλ ksi,t .
+
+Here b centers the replay contrast and τ controls the sharp-ness of the sigmoid transform. The resulting score si,t lies in 
+
+(− 12 , 12 ) and becomes zero when ∆i,t = b. The schedule co-efficient λk ∈ [0 , 1] controls how strongly replay weighting is activated at trainer step k, while η controls the overall weight-ing strength, giving provisional weights in (1 − ηλ k 
+
+> 2
+
+, 1+ ηλ k 
+
+> 2
+
+).
+
+Scheduled Response Normalization 
+
+CoRT does not use the replay weights at full strength from the first update. Let k denote the trainer step and define the normalized progress uk after warmup as 
+
+uk = clip 
+
+ k − k0
+
+K , 0, 1
+
+
+
+,λk = 3 u2 
+
+> k
+
+− 2u3
+
+> k
+
+.
+
+where k0 is the warmup offset and K is the ramp length. This is the standard cubic Hermite SmoothStep schedule (Perlin 1985), satisfying λk = 0 before the ramp, λk = 1 after the ramp, and zero slope at both endpoints. The schedule keeps early updates close to GRPO and smoothly introduces token-level weighting only after the rollout and reward statistics become more stable. The resulting provisional weights are normalized within each response: 
+
+¯wi = 1
+
+TiTiX
+
+> t=1
+
+˜wi,t , wi,t = ˜wi,t 
+
+¯wi
+
+.
+
+By construction, 1
+
+> Ti
+
+PTi 
+
+> t=1
+
+wi,t = 1 and 1
+
+> Ti
+
+PTi 
+
+> t=1
+
+wi,t Ai =
+
+Ai. This keeps the tokenwise coefficients on the original GRPO advantage scale while redistributing the signed ad-vantage across response tokens. 
+
+Policy Objective 
+
+The token-shaped advantage is 
+
+bAi,t = sg( wi,t )Ai,
+
+where sg( ·) stops gradients through the replay-derived weight. CoRT uses the same clipped surrogate form as GRPO, but replaces the uniform response-level advantage 
+
+Ai with the token-dependent advantage bAi,t :
+
+gi,t (a) = min( ρi,t a, ¯ρi,t a) .
+
+The resulting policy loss is 
+
+LCoRT = −Ei,t 
+
+h
+
+gi,t ( bAi,t )
+
+i
+
+,
+
+where the expectation is over sampled responses and their generated tokens. Thus, wi,t controls the magnitude of the signed update at each token, while the original group-relative advantage Ai determines whether the token is reinforced or suppressed during the policy update. 
+
+Computation. CoRT adds one additional forward scor-ing pass for each sampled response under the criteria-free prompt x− 
+
+> i
+
+. This pass reuses the generated response tokens and computes their per-token log probabilities, without extra generation, verifier calls, rejection sampling, or token-level relevance labels. Since the factual log probabilities under 
+
+x+ 
+
+> i
+
+are already available from rollout, the additional com-putation is limited to counterfactual scoring and response normalization for advantage construction. Thus, CoRT re-mains a lightweight modification to GRPO compared with methods that require a separate relevance-learning stage. Experimental Setup 
+
+Training data. Training uses HIR-16k (Zhang et al. 2025). Each example provides a prompt without the instruction list and the corresponding instruction list, allowing us to con-struct the two contexts required by CoRT. We obtain x+ by appending the instruction list to the end of the prompt and use it throughout the main RL loop. The original prompt without the list is used as x− only for counterfactual scoring. 
+
+Reward modes. Following RTT (Xu et al. 2026), we eval-uate two rubric reward granularities: Constraint Satisfaction Rate (CSR) and All-or-Nothing (AON). Let M be the num-ber of positive criteria for a response, and let zj ∈ { 0, 1}
+
+indicate whether the j-th criterion is satisfied. CSR assigns the fraction of satisfied criteria, while AON assigns reward one only when all positive criteria are satisfied: 
+
+rCSR = 1
+
+M
+
+> M
+
+X
+
+> j=1
+
+zj , rAON = 1
+
+
+
+> M
+
+X
+
+> j=1
+
+zj = M
+
+ .
+
+These rewards are used for RL training only; validation uses the official metrics of each benchmark. 
+
+Models and optimization. The main matrix contains Qwen3-4B-Instruct and Qwen2.5-7B-Instruct, each trained under CSR and AON (Yang et al. 2025a,b). All runs use a prompt batch size of 64, sample 8 responses per prompt, set maximum prompt and response lengths to 2048 and 4096, and use rollout temperature 1.0, top-p 0.99, and top-k 100. The actor learning rate is 10 −6 with warmup ratio 0.03 and weight decay 0.1. We do not use an explicit reward-KL term or an auxiliary actor-KL loss. The lower and upper clipping bounds are 0.2 and 0.27, respectively. 
+
+CoRT instantiation. Unless otherwise stated, CoRT uses a zero-centered replay-margin transform with unit tempera-ture, η = 0 .5, a 100-step SmoothStep ramp, and response-mean normalization. Before response normalization, this bounds the active token multiplier in (0 .75 , 1.25) . The replay-derived weights are applied to positive and nega-tive group-relative advantages, so the method changes token credit rather than the reward definition. 
+
+Evaluation. Validation uses IFBench, IFEval, Multi-DimIF, and AdvancedIF (Pyatkin et al. 2026; Zhou et al. 2023b; Ye et al. 2025; He et al. 2025). IFBench and IFE-val report strict prompt-level and instruction-level accu-racy. MultiDimIF reports accuracy over multi-dimensional instruction constraints. AdvancedIF follows its judge-based protocol with o3-mini . For all benchmarks, all methods are evaluated with 5 sampled responses per prompt, temper-ature 0.7, top-p 0.8, and top-k 20. Following the validation protocol of RTT (Xu et al. 2026), we report the best vali-dation score within the first 500 trainer steps for IFBench, IFEval, and MultiDimIF under this shared protocol. To make the fixed-checkpoint behavior transparent, we also report the corresponding step-500 CoRT results in Table 4. To limit the cost of judge-based evaluation, AdvancedIF uses the same 5-sample decoding protocol but is evaluated only at step 500. 
+
+# Results 
+
+Table 1 reports the main validation results, organized by model family and training reward. Within each CSR or AON group, GRPO, RTT, and CoRT are compared under the same reward setting. Shaded rows denote CoRT, and bold and un-derlined values mark the best and second-best results within each model block. SFT, DPO, and RTT denote supervised fine-tuning, direct preference optimization, and Rubrics-to-Tokens, respectively. CSR and AON denote Constraint Sat-isfaction Rate and All-or-Nothing rewards. Overall, CoRT performs strongly and consistently across the main evaluation matrix. Under the same reward family, it improves over response-level GRPO in most comparisons across models, reward settings, and benchmarks. Compared with RTT, CoRT is competitive and often stronger, while avoiding a learned token-level relevance discriminator. 
+
+Main comparison. The most controlled comparison is within each reward family, where GRPO and CoRT use the same rollout prompts, scalar rewards, and group-relative nor-malization. Across CSR and AON settings, CoRT improves over response-level GRPO in most comparisons across mod-els and benchmarks. The gains also hold on AdvancedIF under the fixed-step judge-based protocol, where CoRT im-proves over matched GRPO across the reported metrics. These results show that the same response-level rubric sig-nal can become more effective when its advantage is redis-tributed across tokens, without changing the verifier reward or group-relative normalization. 
+
+Comparison with learned token relevance. RTT directly targets the response-to-token credit gap by training a token-level relevance discriminator (Xu et al. 2026). CoRT explores a different tradeoff by deriving token weights from policy-internal counterfactual likelihood contrasts rather than learn-ing a separate relevance model. Across the main compar-isons, CoRT is competitive with and often stronger than RTT under the same evaluation protocol, while avoiding a sepa-rate relevance-learning stage. This suggests that explicit to-ken relevance training is not always necessary for token-level credit assignment in rubric-conditioned GRPO. 
+
+Qwen3-14B results. Table 2 evaluates whether CoRT ex-tends to a larger model scale. Under CSR, CoRT improves all reported metrics; under AON, it improves IFBench and Mul-tiDimIF while trailing GRPO on IFEval. These results show that replay-based credit weighting remains effective at 14B scale, with metric-specific variation under sparse rewards. 
+
+Compatibility with policy optimization objectives. Be-cause CoRT redistributes token credit after the response-level advantage is computed, it can be combined with differ-ent policy optimization objectives. We integrate CoRT into DAPO (Yu et al. 2026) and GSPO (Zheng et al. 2025) un-der the CSR reward on Qwen3-4B-Instruct-2507. As shown in Table 3, adding CoRT improves all reported metrics over DAPO and improves four of the five metrics over GSPO, with only a small decrease on MultiDimIF. These results indicate that replay-derived token credit is complementary to changes in the underlying policy objective. IFEval IFBench MultiDimIF AdvancedIF Method Prompt Instruction Prompt Instruction Accuracy Overall Rubric                                                                                                                               
+
+> Qwen3-4B-Instruct
+> Instruct 83.40 88.13 30.95 32.83 56.08 44.31 79.17 SFT 83.73 88.85 29.59 31.64 56.50 45.07 79.23 DPO 82.62 87.77 29.93 32.84 55.83 45.71 79.33
+> CSR reward
+> GRPO 84.29 89.21 32.31 33.43 74.38 46.02 79.81 + RTT 85.03 90.17 34.01 36.12 76.33 48.39 80.77 + CoRT 86.06 +1.77 90.48 +1.27 34.49+2.18 36.24+2.81 80.48+6.10 49.18 +3.16 81.14 +1.33
+> AON reward
+> GRPO 82.99 88.61 32.99 35.52 74.25 47.29 79.69 + RTT 85.21 88.73 34.69 37.61 76.75 47.48 80.79 + CoRT 84.66+1.67 89.50+0.89 35.10 +2.11 37.37+1.85 81.60 +7.35 48.03+0.74 80.10+0.41
+> Qwen2.5-7B-Instruct
+> Instruct 69.68 77.93 25.85 27.16 51.08 29.48 71.31 SFT 71.90 79.38 28.23 30.15 52.83 29.71 69.61 DPO 71.16 78.90 27.55 28.96 51.08 30.82 70.90
+> CSR reward
+> GRPO 78.56 84.41 28.23 29.85 66.67 30.91 72.00 + RTT 81.15 86.33 32.31 34.63 69.67 33.74 73.72
+> + CoRT 81.92+3.36 87.51 +3.10 34.63 +6.40 36.30 +6.45 78.52+11.85 34.18 +3.27 73.28+1.28
+> AON reward
+> GRPO 79.67 85.13 31.97 33.13 69.41 32.10 72.33 + RTT 82.26 87.29 32.31 33.43 71.83 32.51 72.70 + CoRT 82.00+2.33 87.36+2.23 29.66-2.31 31.22-1.91 79.63 +10.22 33.75+1.65 73.57+1.24
+
+Table 1: Main validation results on instruction following benchmarks. Rows are grouped by model family and reward setting. Baseline rows, including Instruct, SFT, DPO, GRPO, and RTT, are taken from RTT (Xu et al. 2026); CoRT rows are our runs under the same evaluation protocol. Deltas are vs. matched GRPO. Shaded rows indicate CoRT; bold and underlined values mark the best and second-best results within each model block.                            
+
+> Method IFEval IFBench MultiDimIF Prompt Inst. Prompt Inst. Acc.
+> CSR reward
+> GRPO 87.87 92.34 39.93 42.53 82.59 + CoRT 89.17 93.28 40.68 43.11 83.48
+> AON reward
+> GRPO 90.13 93.94 35.84 37.92 83.43 + CoRT 89.80 93.48 38.50 41.09 84.08
+
+Table 2: Qwen3-14B results. 
+
+# Training Diagnostics 
+
+Figure 3 examines whether the integration components in CoRT stabilize training dynamics as intended. We use Qwen2.5-7B under the CSR reward and compare the full recipe with variants that remove response normalization, re-move the SmoothStep ramp, or both. This ablation separates scale control from scheduled activation and tests whether these components keep replay-derived token weighting close to the GRPO update scale throughout the full training run. With the full recipe, the mean token weight stays close to                            
+
+> Method IFEval IFBench MultiDimIF Prompt Inst. Prompt Inst. Acc.
+> Qwen3-4B-Instruct
+> DAPO 87.10 88.90 40.27 45.79 83.41 + CoRT 87.95 90.20 41.30 47.02 84.06
+> GSPO 86.14 91.10 35.97 38.74 82.26
+> + CoRT 86.54 91.20 36.11 39.42 81.96
+
+Table 3: CoRT with DAPO and GSPO (CSR). one, length clipping remains near zero, and the actor gradient norm and entropy stay stable. Removing response normaliza-tion causes the mean token weight to drift upward, approach-ing 1.04 near the end of training. This scale drift coincides with a sharp late increase in length clipping, gradient norm, and entropy, suggesting that unnormalized replay weights can act as a response-level multiplier. Removing the ramp keeps the mean token weight controlled by response normal-ization, but the abrupt use of replay-derived weights leads to a late gradient and entropy spike with higher length clip-ping than the full recipe. The variant without both controls 0.0 
+
+> 0.5
+> 1.0
+> Grad.
+
+Actor grad. norm 
+
+> 0.0
+> 0.1
+> 0.2
+> Clip
+
+Length clip ratio   
+
+> 0250 500
+> Trainer step
+> 1.00
+> 1.02
+> 1.04
+> Weight
+
+Mean token weight   
+
+> 0250 500
+> Trainer step
+> 2
+> 4
+> Entropy
+
+Actor entropy 
+
+> Full CoRT
+> w/o response norm
+> w/o ramp
+> w/o ramp & norm
+
+Figure 3: Qwen2.5-7B CSR training diagnostics for CoRT integration variants over the first 500 trainer steps. Curves are smoothed over a 21-step window. also shows elevated mean weights and higher length clip-ping than the full recipe. These patterns indicate that the two controls address different stability issues: response normal-ization controls coefficient scale, while scheduled activation reduces abrupt changes in the token-weighted update. The post-500 continuation in Figure 4 gives the same message from the validation side. The full recipe keeps the strongest validation average and the highest 10-step trailing training reward around the nominal 500-step horizon, while the ablations show larger checkpoint-to-checkpoint move-ment. IFBench is the main exception: some ablations obtain higher IFBench accuracy even as their reward, IFEval, or MultiDimIF behavior is weaker. This is consistent with IF-Bench being sensitive to local constraint satisfaction under CSR, and suggests that single-metric gains are not enough to replace integration controls. Values are reported in Table 10. Overall, these diagnostics support the integration design of CoRT in this setting. The full recipe is the only variant that keeps the average token coefficient on the GRPO scale while maintaining low length clipping and stable gradient norms, and it also preserves the strongest average validation and training reward around the 500-step horizon. The ablations are not strictly monotonic because the two controls address different failure modes: response normalization controls up-date scale, while the ramp controls how abruptly token-level redistribution is introduced. This suggests that CoRT works best when replay-derived token weights are both response-normalized and introduced gradually throughout the run. 
+
+# Conclusion 
+
+We presented CoRT, a lightweight credit assignment method for rubric-based instruction following RL. The central obser-vation is that response-level criteria rewards are optimized 60 
+
+> 75
+> 85
+> Acc.
+
+IFEval 
+
+> 28
+> 34
+> 40
+
+IFBench 
+
+> 60
+> 72
+> 84
+> Acc.
+
+MultiDimIF 
+
+> 0.60
+> 0.76
+> 0.92
+> Reward
+
+Train Reward   
+
+> Full CoRT
+> w/o response norm
+> w/o ramp
+> w/o ramp & norm
+> Full CoRT
+> w/o response norm
+> w/o ramp
+> w/o ramp & norm
+> 500 520 530
+
+Figure 4: Post-500 continuation for Qwen2.5-7B CSR inte-gration ablations. Validation reports internal mean@5 accu-racy at steps 500, 520, and 530; training reward is a 10-step trailing mean ending at each checkpoint. through tokenwise policy updates, yet GRPO assigns the same response advantage to all generated tokens. CoRT ad-dresses this within-response mismatch by using counterfac-tual replay to rescore sampled responses after removing the criteria, and by converting the resulting likelihood contrast into normalized token credit weights. These weights redis-tribute the signed GRPO advantage toward tokens that de-pend more strongly on the criteria context, while keeping the original rollout distribution, verifier, scalar reward, and clipped GRPO surrogate structure intact without training a separate token relevance model. The bounded replay-margin transform, response normalization, and scheduled activation further make this redistribution stable in practice. Across instruction following benchmarks and reward gran-ularities, CoRT improves over response-level GRPO in most comparisons and remains competitive with learned token relevance methods. Its consistent gains when combined with DAPO and GSPO further show that replay-derived token credit is not specific to standard GRPO and can be integrated with different policy optimization algorithms. The training diagnostics further show that response normalization and scheduled activation help keep token weights on the GRPO advantage scale and reduce unstable training behavior. These results support the view that structured criteria can be useful not only for scoring responses, but also for guiding where credit is assigned within a response. Since CoRT estimates criteria reliance along observed trajectories, its signal can be weaker when criteria have little effect on token likelihoods, when they are redundant with the original prompt, or when the response-level reward is noisy. Future work can explore finer-grained interventions, criterion-specific allocation, and longer-horizon credit across turns, actions, and tool calls. References 
+
+Andrychowicz, M.; Wolski, F.; Ray, A.; Schneider, J.; Fong, R.; Welinder, P.; McGrew, B.; Tobin, J.; Abbeel, P.; and Zaremba, W. 2017. Hindsight Experience Replay. Advances in Neural Information Processing Systems , 30. Cohen-Wang, B.; Shah, H.; Georgiev, K.; and Mądry, A. 2024. Contextcite: Attributing model generation to con-text. Advances in Neural Information Processing Systems ,37: 95764–95807. Gu, Z.; Sun, X.; Lian, F.; Kang, Z.; Xu, C.; and Fan, J. 2024. DINGO: Towards Diverse and Fine-Grained Instruction-Following Evaluation. In Proceedings of the Thirty-Eighth AAAI Conference on Artificial Intelligence , volume 38, 18108–18116. Gunjal, A.; Wang, A.; Lau, E.; Nath, V.; He, Y.; Liu, B.; and Hendryx, S. M. 2025. Rubrics as Rewards: Reinforce-ment Learning Beyond Verifiable Domains. In NeurIPS 2025 Workshop on Efficient Reasoning .Guo, D.; Yang, D.; Zhang, H.; Song, J.; Wang, P.; Zhu, Q.; Xu, R.; Zhang, R.; Ma, S.; Bi, X.; et al. 2025. DeepSeek-R1 incentivizes reasoning in LLMs through reinforcement learning. Nature , 645(8081): 633–638. He, Q.; Zeng, J.; He, Q.; Liang, J.; and Xiao, Y. 2024. From complex to simple: Enhancing multi-constraint complex in-struction following ability of large language models. In 
+
+Findings of the Association for Computational Linguistics: EMNLP 2024 , 10864–10882. He, Y.; Li, W.; Zhang, H.; Li, S.; Mandyam, K.; Khosla, S.; Xiong, Y.; Wang, N.; Peng, X.; Li, B.; et al. 2025. Advancedif: Rubric-based benchmarking and reinforcement learning for advancing llm instruction following. arXiv preprint arXiv:2511.10507 .Jaech, A.; Kalai, A.; Lerer, A.; Richardson, A.; El-Kishky, A.; Low, A.; Helyar, A.; Madry, A.; Beutel, A.; Carney, A.; et al. 2024. Openai o1 system card. arXiv preprint arXiv:2412.16720 .Li, S.; Zhao, J.; Wei, M.; Ren, H.; Zhou, Y.; Yang, J.; Liu, S.; Zhang, K.; and Chen, W. 2026. RubricHub: A Comprehensive and Highly Discriminative Rubric Dataset via Automated Coarse-to-Fine Generation. arXiv preprint arXiv:2601.08430 .Lightman, H.; Kosaraju, V.; Burda, Y.; Edwards, H.; Baker, B.; Lee, T.; Leike, J.; Schulman, J.; Sutskever, I.; and Cobbe, K. 2024. Let’s verify step by step. In International Con-ference on Learning Representations , volume 2024, 39578– 39601. Liu, S.-Y.; Dong, X.; Lu, X.; Diao, S.; Belcak, P.; Liu, M.; Chen, M.-H.; Yin, H.; Wang, Y.-C. F.; Cheng, K.-T.; et al. 2026. Gdpo: Group reward-decoupled normalization policy optimization for multi-reward rl optimization. arXiv preprint arXiv:2601.05242 .Liu, X.; Wang, K.; Wu, Y.; Huang, F.; Li, Y.; Zhang, J.; and Jiao, J. 2025. Agentic reinforcement learning with implicit step rewards. arXiv preprint arXiv:2509.19199 .Lou, R.; Zhang, K.; Xie, J.; Sun, Y.; Ahn, J.; Xu, H.; Su, Y.; and Yin, W. 2024. Muffin: Curating multi-faceted in-structions for improving instruction following. In Inter-national Conference on Learning Representations , volume 2024, 21464–21493. Ouyang, L.; Wu, J.; Jiang, X.; Almeida, D.; Wainwright, C. L.; Mishkin, P.; Zhang, C.; Agarwal, S.; Slama, K.; Ray, A.; Schulman, J.; Hilton, J.; Kelton, F.; Miller, L.; Simens, M.; Askell, A.; Welinder, P.; Christiano, P. F.; Leike, J.; and Lowe, R. 2022. Training language models to follow instruc-tions with human feedback. Advances in neural information processing systems , 35: 27730–27744. Parthasarathi, P.; Reymond, M.; Chen, B.; Cui, Y.; and Chan-dar, S. 2025. GRPO-\lambda : Credit Assignment improves LLM Reasoning. arXiv preprint arXiv:2510.00194 .Pearl, J. 2009. Causality: Models, Reasoning, and Inference .Cambridge University Press, 2 edition. Peng, H.; Qi, Y.; Wang, X.; Xu, B.; Hou, L.; and Li, J. 2025. Verif: Verification engineering for reinforcement learning in instruction following. In Proceedings of the 2025 Confer-ence on Empirical Methods in Natural Language Processing ,30312–30327. Peng, J.; Liu, Y.; Zhou, R.; Fleming, C.; Wang, Z.; Garcia, A.; and Hong, M. 2026. Hiper: Hierarchical reinforcement learning with explicit credit assignment for large language model agents. arXiv preprint arXiv:2602.16165 .Perlin, K. 1985. An Image Synthesizer. In Proceedings of the 12th Annual Conference on Computer Graphics and Interactive Techniques , 287–296. Pitis, S.; Creager, E.; and Garg, A. 2020. Counterfactual Data Augmentation using Locally Factored Dynamics. Advances in Neural Information Processing Systems , 33: 3976–3990. Pyatkin, V.; Malik, S.; Graf, V.; Ivison, H.; Huang, S.; Dasigi, P.; Lambert, N.; and Hajishirzi, H. 2026. Generalizing veri-fiable instruction following. Advances in Neural Information Processing Systems , 38. Rafailov, R.; Sharma, A.; Mitchell, E.; Manning, C. D.; Er-mon, S.; and Finn, C. 2023. Direct preference optimization: Your language model is secretly a reward model. Advances in neural information processing systems , 36: 53728–53741. Sarti, G.; Chrupała, G.; Nissim, M.; and Bisazza, A. 2024. Quantifying the plausibility of context reliance in neural ma-chine translation. In International Conference on Learning Representations , volume 2024, 25526–25554. Schulman, J.; Wolski, F.; Dhariwal, P.; Radford, A.; and Klimov, O. 2017. Proximal policy optimization algorithms. 
+
+arXiv preprint arXiv:1707.06347 .Shao, Z.; Wang, P.; Zhu, Q.; Xu, R.; Song, J.; Bi, X.; Zhang, H.; Zhang, M.; Li, Y.; Wu, Y.; and Guo, D. 2024. Deepseek-math: Pushing the limits of mathematical reasoning in open language models. arXiv preprint arXiv:2402.03300 .Shilpika, S.; Graziani, C.; Lusch, B.; Vishwanath, V.; and Papka, M. E. 2026. Probabilistic Attribution For Large Lan-guage Models. arXiv preprint arXiv:2605.21726 .Sun, H.; Liu, L.; Li, J.; Wang, F.; Dong, B.; Lin, R.; and Huang, R. 2024. Conifer: Improving complex constrained instruction-following ability of large language models. arXiv preprint arXiv:2404.02823 .Tan, H.-Z.; Yang, X.-W.; Chen, H.; Shao, J.-J.; Wen, Y.; Shen, Y.; Luo, W.; Du, X.; Guo, L.-Z.; and Li, Y.-F. 2026. Hindsight credit assignment for long-horizon llm agents. arXiv preprint arXiv:2603.08754 .Wachter, S.; Mittelstadt, B.; and Russell, C. 2017. Coun-terfactual explanations without opening the black box: Automated decisions and the GDPR. arXiv preprint arXiv:1711.00399 .Wang, J.; Ouyang, X.; Chen, Z.; Hu, Y.; Pan, Z.; Li, X.; and Guo, L.-Z. 2026. TRACE: Distilling Where It Matters via Token-Routed Self On-Policy Alignment. arXiv preprint arXiv:2605.10194 .Wang, P.; Li, L.; Shao, Z.; Xu, R.; Dai, D.; Li, Y.; Chen, D.; Wu, Y.; and Sui, Z. 2024. Math-shepherd: Verify and reinforce llms step-by-step without human annotations. In 
+
+Proceedings of the 62nd Annual Meeting of the Associa-tion for Computational Linguistics (Volume 1: Long Papers) ,9426–9439. Xu, C.; Sun, Q.; Zheng, K.; Geng, X.; Zhao, P.; Feng, J.; Tao, C.; Lin, Q.; and Jiang, D. 2024. WizardLM: Empow-ering large pre-trained language models to follow complex instructions. In International Conference on Learning Rep-resentations , volume 2024, 30745–30766. Xu, T.; Zheng, Y.; Lu, P.; Ye, L.; Wu, Y.; Zhang, Z.; Yu, Y.; Ma, C.; Zhu, J.; Liu, P.; Dong, B.; Zhu, H.; Huang, R.; and Yu, G. 2026. Rubrics to Tokens: Bridging Response-level Rubrics and Token-level Rewards in Instruction Following Tasks. arXiv preprint arXiv:2604.02795 .Yang, A.; Li, A.; Yang, B.; Zhang, B.; Hui, B.; Zheng, B.; Yu, B.; Gao, C.; Huang, C.; Lv, C.; et al. 2025a. Qwen3 technical report. arXiv preprint arXiv:2505.09388 .Yang, A.; Yang, B.; Zhang, B.; Hui, B.; Zheng, B.; Yu, B.; Li, C.; Liu, D.; Huang, F.; Wei, H.; Lin, H.; et al. 2025b. Qwen2.5 Technical Report. Yang, C.; Qin, C.; Si, Q.; Chen, M.; Gu, N.; Yao, D.; Lin, Z.; Wang, W.; Wang, J.; and Duan, N. 2026. Self-distilled rlvr. 
+
+arXiv preprint arXiv:2604.03128 .Ye, J.; Huang, C.; Chen, Z.; Fu, W.; Yang, C.; Yang, L.; Wu, Y.; Wang, P.; Zhou, M.; Yang, X.; Tao, G.; Zhang, Q.; Shi, J.; and Huang, X. 2025. A multi-dimensional constraint frame-work for evaluating and improving instruction following in large language models. arXiv preprint arXiv:2505.07591 .Yu, Q.; Zhang, Z.; Zhu, R.; Yuan, Y.; Zuo, X.; Yue, Y.; Dai, W.; Fan, T.; Liu, G.; Liu, L.; et al. 2026. Dapo: An open-source llm reinforcement learning system at scale. Advances in Neural Information Processing Systems , 38: 113222– 113244. Zhang, K.; Yao, Q.; Liu, S.; Zhang, W.; Cen, M.; Zhou, Y.; Fang, W.; Zhao, Y.; Lai, B.; and Song, M. 2025. Replay fail-ures as successes: Sample-efficient reinforcement learning for instruction following. arXiv preprint arXiv:2512.23457 .Zheng, C.; Liu, S.; Li, M.; Chen, X.-H.; Yu, B.; Gao, C.; Dang, K.; Liu, Y.; Men, R.; Yang, A.; Zhou, J.; and Lin, J. 2025. Group sequence policy optimization. arXiv preprint arXiv:2507.18071 .Zhou, C.; Liu, P.; Xu, P.; Iyer, S.; Sun, J.; Mao, Y.; Ma, X.; Efrat, A.; Yu, P.; Yu, L.; et al. 2023a. Lima: Less is more for alignment. Advances in Neural Information Processing Systems , 36: 55006–55021. Zhou, J.; Lu, T.; Mishra, S.; Brahma, S.; Basu, S.; Luan, Y.; Zhou, D.; and Hou, L. 2023b. Instruction-following evaluation for large language models. arXiv preprint arXiv:2311.07911 .Additional Results 
+
+Fixed Step-500 CoRT Checkpoints 
+
+The main table selects the best official validation checkpoint within the first 500 trainer steps for IFBench, IFEval, and MultiDimIF. Table 4 reports the corresponding CoRT results at exactly step 500. This table is included to make the fixed-checkpoint behavior transparent; it is not used to replace the best-within-window selection rule in the main comparison.                         
+
+> Method IFEval IFBench MultiDimIF Prompt Instruction Prompt Instruction Accuracy Qwen3-4B CoRT-CSR 86.06 90.48 34.49 36.24 80.48 CoRT-AON 84.66 89.50 32.31 34.44 81.60 Qwen2.5-7B CoRT-CSR 81.77 87.36 34.63 36.30 78.52 CoRT-AON 81.81 87.29 29.32 30.27 78.62
+
+Table 4: CoRT results at exactly step 500 for the main exper-iment matrix. 
+
+General Capability Checks 
+
+Table 5 reports mean@5 evaluation on Math500, GPQA-Diamond, and MMLU-Pro for the original instruction-tuned models and the step-500 CoRT checkpoints. These evalu-ations use the same original instruction-tuned checkpoint for the CSR and AON comparisons; only the CoRT check-point changes with the reward granularity. This provides a complementary check on whether instruction-following op-timization changes the model’s general math and knowledge capabilities. Across both model families, CoRT largely pre-serves this general capability profile.            
+
+> Method Math500 GPQA MMLU-Pro Avg. Qwen3-4B Instruct 86.28 57.98 70.16 71.47 CoRT-CSR 86.52 +0.24 59.09 +1.11 69.62 -0.54 71.74 +0.27 CoRT-AON 86.36 +0.08 57.78 -0.20 70.18 +0.02 71.44 -0.03 Qwen2.5-7B Instruct 70.64 33.23 55.48 53.12 CoRT-CSR 69.32 -1.32 33.84 +0.61 54.34 -1.14 52.50 -0.62 CoRT-AON 70.20 -0.44 33.64 +0.41 55.27 -0.21 53.04 -0.08
+
+Table 5: General capability checks under mean@5 evalu-ation. Deltas are relative to the original instruction-tuned model within each family. 
+
+Relation to Self-OPD 
+
+On-policy self-distillation and CoRT share the goal of mak-ing sparse response-level supervision produce denser token-level training signals on trajectories sampled from the cur-rent policy. Self-Distilled RLVR derives token-level pol-icy differences from a privileged context while keeping the RLVR reward as the update direction (Yang et al. 2026). TRACE further routes self-OPD signals to critical spans, re-ducing updates on redundant tokens and limiting privileged-information leakage (Wang et al. 2026). CoRT differs in the source and role of the dense signal. It does not use a privileged answer trace, span annotation, or external target distribution. Instead, it keeps the sampled response fixed, removes the rubric criteria from the prompt, and treats the criteria-free log probability as a background likelihood baseline. The re-sulting full-vs.-criteria-free contrast is then multiplied by the signed GRPO advantage: successful responses reinforce to-kens whose likelihood depends on the rubric context, while unsuccessful responses suppress such tokens more strongly. Thus, CoRT is closer to signed counterfactual contrast shap-ing than to self-distillation, even though both approaches use on-policy token-level modulation. 
+
+Replay Case Studies 
+
+We include several HIR replay examples to clarify what the replay contrast measures on actual generated responses. These examples serve three purposes. First, standard replay cases show whether high-contrast tokens correspond to vis-ible criteria-controlled spans. Second, matched context con-trols test whether the signal is explained only by removing prompt text or by changing the length of the prompt. Third, criterion-wise removal checks whether removing a specific criterion produces localized changes on the tokens that real-ize that criterion. Together, these examples show that replay contrast is a policy-internal sensitivity signal to criteria. The first case uses a HIR prompt asking why a balanced diet matters for athletes. The criteria include several vis-ible formatting requirements, including English output, at least five sentences, exactly three Markdown bullet points, a postscript beginning with P.S. , a fixed final phrase, and enclosing double quotation marks. We sample a response from the step-500 Qwen3-4B CoRT checkpoint under the full criteria-conditioned prompt and replay the same fixed response after removing the criteria. The text below shows the prompt, criteria, and response excerpt used in the replay analysis. We abbreviate non-critical explanatory content with ellipses, while preserving the visi-ble criteria-controlled spans that appear in Table 6.         
+
+> Prompt. Provide a detailed response to the following query: “Explain the importance of maintaining a balanced diet for athletes.”
+> Rubric criteria. The response should be in English, contain at least five sentences, contain exactly three Markdown bullet points, add a postscript beginning with P.S. , finish with the exact phrase “Is there anything else I can help with?”, and wrap the entire response with double quotation marks.
+> Generated response excerpt. “Maintaining a balanced diet is crucial for athletes because it directly impacts their per-formance, recovery, and overall health. A well-balanced diet provides the necessary nutrients that fuel physical activity, support muscle repair, and enhance immune function. . . . Here are three key reasons why a balanced diet is important for athletes:
+> *This is point 1. It ensures consistent energy supply during prolonged physical activity. *This is point 2. It supports muscle growth and repair through adequate protein intake.
+> *This is point 3. It strengthens the immune system and promotes better overall health. . . .
+> P.S. Remember that individual nutritional needs may vary based on sport, age, gender, and activity level, so athletes should consult with a sports nutritionist to tailor their diet effectively. Is there anything else I can help with?”
+
+Table 6 reports representative high-contrast tokens from the same fixed response. The selected tokens align with the visible requirements in the criteria: the opening quotation mark realizes the wrapping constraint, three reflects the required number of bullet points, * marks the Markdown bullet structure, P and .S realize the required postscript prefix, and Is and ?" correspond to the fixed final phrase and closing quote. In contrast, these tokens are not simply generic content words about nutrition or athletes. This case therefore shows that the replay contrast highlights positions whose likelihood is tied to the removed criteria, supporting its use as a policy-internal proxy for criteria dependence.                         
+
+> Token Rubric cue ∆twt
+> "opening quotation mark 26.37 1.19
+> three exact number of bullet points 16.96 1.19
+> *Markdown bullet marker 20.75 1.19
+> Pstart of postscript 12.62 1.19
+> .S postscript continuation 7.47 1.19
+> Is start of fixed final phrase 13.61 1.19
+> ?" final phrase and closing quote 3.17 1.17
+
+Table 6: Replay contrasts from the balanced-diet HIR case generated by the step-500 Qwen3-4B CoRT checkpoint. We next use a pandemic-economy prompt as a control-friendly case. Unlike the balanced-diet example, this prompt contains several separable local requirements, including sec-tion headers, Markdown bullets, highlighted spans, and the keyword pandemic . This makes it suitable for the matched-context and criterion-wise removal controls below. Table 7 first verifies the basic replay pattern on this response: high-contrast tokens appear on the required output elements before we apply the control replays.                      
+
+> Token Rubric cue ∆twt
+> Section start of required section label 34.88 1.17
+> *highlighted-span marker 23.59 1.17
+> highlight highlighted-span content 14.11 1.17
+> -Markdown bullet marker 11.31 1.17
+> point bullet-list template word 11.70 1.17
+> pandemic required repeated keyword 4.35 1.17
+
+Table 7: Replay contrasts from the pandemic HIR case gen-erated by the step-500 Qwen3-4B CoRT checkpoint. We next run matched context controls on the same pan-demic response to test whether the signal is mainly an arti-fact of prompt removal. Table 8 compares the criteria-free replay with two alternatives: replacing the criteria with neu-tral filler of similar length, and replacing them with crite-ria from another HIR example. In all three settings, visible criteria-controlled tokens have larger average contrast than other tokens. This suggests that the observed signal is not explained only by prompt length or by the presence of an instruction block.                   
+
+> Control context Cue ¯∆Other ¯∆Representative high-contrast tokens Criteria-free prompt 6.11 1.02 Section ,*,
+> highlight ,
+> -
+> Length-matched neutral filler 6.67 1.20 Section ,*,
+> highlight ,
+> -
+> Shuffled HIR criteria 5.76 0.97 Section ,-,repeated sec-tion markers
+
+Table 8: Matched context controls for the pandemic case. Cue tokens are visible criteria-controlled tokens such as sec-tion labels, Markdown markers, highlight markers, and the required keyword. Criterion-wise removal provides a more local control. We rescore the same fixed response after removing one criterion at a time from the full criteria list. Table 9 shows that local criteria produce localized effects. Removing the bullet crite-rion emphasizes bullet markers and bullet template words; removing the highlight criterion emphasizes emphasis mark-ers and highlight ; and removing the section criterion emphasizes Section . In contrast, removing global crite-ria such as English language or minimum sentence count has little concentrated effect on visible cue tokens. These controls support the interpretation that replay contrast cap-tures criterion-dependent likelihood changes when a crite-rion leaves a local trace in the response, while global or absence-style criteria may remain diffuse.                                    
+
+> Removed criterion Cue ¯∆Other ¯∆Highest affected tokens At least five sentences 0.07 0.11 newline and generic opening tokens English language -0.01 -0.00 no concentrated rubric cue Keyword pandemic 0.67 0.21 pandemic (6.36, 4.08), nearby temporal words Exactly two bullets 2.29 0.37 -(35.87), point
+> (18.74), This (12.13) Highlighted spans 4.67 0.37 *(27.76, 23.33),
+> highlight (14.24) Two section labels 3.85 0.27 Section (43.25, 18.09)
+
+Table 9: Criterion-wise removal controls on the pandemic case. Values are computed as full-prompt log probability minus the log probability after removing one criterion. 
+
+Post-500 Training and Validation Continuation 
+
+Table 10 reports the values behind Figure 4. Validation uses the internal mean@5 fields from the Qwen2.5-7B CSR integration-ablation runs. IFEval, IFBench, and MultiDimIF 0.7 
+
+> 0.8
+> 0.9
+> Reward
+
+Training reward   
+
+> 0250 500
+
+Trainer step 
+
+> 0.00
+> 0.05
+> Clip ratio
+
+Length clip ratio 
+
+> Full CoRT
+> w/o ramp & norm
+> CoRT-only perturb.
+
+Figure 5: Qwen3-4B CSR failure-mode diagnostics for a CoRT-only perturbation variant over the first 500 trainer steps. Curves are smoothed over a 21-step window. are evaluated at selected trainer steps, and the average is the unweighted mean of these three accuracies. Training reward is reported as a 10-step trailing mean ending at each selected step, rather than as a single rollout batch.                                                     
+
+> Variant Step IFEval IFBench MultiDimIF Avg. Train R. Full 500 82.59 32.90 78.33 64.61 0.869 520 82.77 33.52 79.72 65.34 0.878 530 82.77 33.38 78.04 64.73 0.876 w/o norm 500 76.19 38.29 76.56 63.68 0.724 520 71.46 38.91 68.96 59.78 0.674 530 72.42 38.70 66.57 59.23 0.666 w/o ramp 500 77.67 36.38 73.68 62.58 0.817 520 78.48 35.63 74.21 62.77 0.690 530 77.49 35.09 72.59 61.72 0.781 w/o both 500 80.37 33.11 79.67 64.38 0.856 520 78.48 37.41 76.82 64.24 0.825 530 76.27 37.75 68.93 60.98 0.788
+
+Table 10: Qwen2.5-7B CSR post-500 continuation for CoRT integration ablations. Validation values are internal mean@5 
+
+accuracies at the selected trainer steps; training reward is a 10-step trailing mean. 
+
+Failure-Mode Diagnostics 
+
+Figures 3 and 5 summarize the diagnostic runs used to check CoRT’s integration controls. In Qwen2.5-7B CSR runs, re-moving response normalization leads to elevated length clip-ping and a larger token-weight scale, while removing the activation ramp increases late-training gradient and entropy relative to the full recipe. In Qwen3-4B CSR runs, a CoRT-only perturbation variant that applies replay-derived pertur-bations without the standard GRPO advantage path shows lower training reward and larger length clipping; this run was stopped shortly after step 500. These patterns clarify how the integration controls inter-act. Response normalization keeps the average token mul-tiplier on the GRPO scale, so replay-derived weights re-distribute credit within a response instead of changing the response-level update magnitude. The SmoothStep ramp de-lays the full strength of token weighting until the early roll-out and reward statistics have stabilized, reducing abrupt changes in the policy-gradient multiplier. The GRPO ad-vantage path supplies the signed reward direction: high-advantage responses reinforce rubric-sensitive tokens, while low-advantage responses suppress them. When replay per-turbations are used without this reward-conditioned direc-tion, the token contrast can still change the policy, but the update is no longer anchored to group-relative outcome im-provement. The failure-mode curves are consistent with this design choice, showing that CoRT works best as a credit allo-cator for an existing advantage rather than as an independent token-level training signal.

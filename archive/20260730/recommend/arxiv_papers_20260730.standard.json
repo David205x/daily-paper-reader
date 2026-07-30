@@ -1,0 +1,464 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-30T21:45:57.460592+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 7,
+    "deep_cap": 6,
+    "deep_selected": 6,
+    "quick_candidates": 5,
+    "quick_skim_target": 11,
+    "quick_selected": 5
+  },
+  "deep_dive": [
+    {
+      "id": "2607.25659v1",
+      "source": "arxiv",
+      "title": "CoRT: Counterfactual Replay for Token-Level Rubric-Guided Policy Optimization",
+      "abstract": "Rubric-based reinforcement learning enriches language model training by evaluating model outputs against explicit criteria. Yet in GRPO-style pipelines, these structured judgments are reduced to a scalar response-level reward and converted into a response-level advantage, which is broadcast uniformly to all generated tokens. This leaves no explicit mechanism for allocating credit within a response, even when different criteria are grounded in different spans, formatting decisions, or semantic choices. We propose CoRT, a token-level credit weighting method for rubric-conditioned GRPO. Instead of training an auxiliary token scoring model, CoRT uses counterfactual replay to rescore the same sampled response under the original rubric-conditioned prompt and a matched criteria-free prompt. The resulting tokenwise log-likelihood contrasts serve as a proxy for dependence on the rubric context. CoRT maps these contrasts to bounded, response-normalized weights and uses them to redistribute the signed GRPO advantage across tokens, without introducing an auxiliary scorer or changing the response-level reward. Experiments across instruction-tuned models and reward granularities show that CoRT improves over matched response-level GRPO in the vast majority of comparisons, with an average gain of 4.4 percentage points. The method remains competitive with learned token-level credit baselines while avoiding a separate relevance-learning stage. These results suggest that policy-internal counterfactual likelihood contrasts provide an effective training signal for within-response credit allocation while retaining the simplicity and stability of GRPO.",
+      "authors": [
+        "Bo-Wen Zhang",
+        "Junwei He",
+        "Wen Wang",
+        "Song-Lin Lv",
+        "Wentao Ma",
+        "Rongyi Lin",
+        "Shuhan Zhong",
+        "Lan-Zhe Guo"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-07-28T12:45:19+00:00",
+      "link": "https://arxiv.org/pdf/2607.25659v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "token-level credit weighting for rubric-guided RL policy optimization in LLMs",
+      "llm_evidence_cn": "面向大语言模型的基于评分标准的强化学习中令牌级别信用分配方法",
+      "llm_evidence": "面向大语言模型的基于评分标准的强化学习中令牌级别信用分配方法",
+      "canonical_evidence": "面向大语言模型的基于评分标准的强化学习中令牌级别信用分配方法",
+      "llm_tldr_en": "Proposes CoRT, a counterfactual replay method for token-level credit assignment in GRPO-style RL for LLMs, addressing the limitation of scalar response-level advantage by rescoring responses under rubric conditions.",
+      "llm_tldr_cn": "现有基于评分标准的强化学习（如GRPO）将结构化判断简化为标量响应级奖励，并均匀广播到所有生成令牌，缺乏令牌级信用分配。本文提出CoRT，一种基于反事实重放的令牌级信用加权方法，通过在同一采样响应上重新评分原始评分标准条件下的概率来区分不同令牌的贡献。实验表明该方法能有效提升策略优化效率。",
+      "llm_tldr": "现有基于评分标准的强化学习（如GRPO）将结构化判断简化为标量响应级奖励，并均匀广播到所有生成令牌，缺乏令牌级信用分配。本文提出CoRT，一种基于反事实重放的令牌级信用加权方法，通过在同一采样响应上重新评分原始评分标准条件下的概率来区分不同令牌的贡献。实验表明该方法能有效提升策略优化效率。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "design of reward functions in RL",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.26094v1",
+      "source": "arxiv",
+      "title": "Meta-Learned Reward Shaping for Reinforcement Learning from Human Feedback",
+      "abstract": "Reinforcement Learning from Human Feedback (RLHF) is the standard approach for aligning large language models with human preferences, but its quality is limited by static, task-agnostic reward models. This mismatch leads to sparse learning signals and suboptimal alignment. We introduce MeRLa (Meta-Learned Reward Shaping), a principled framework that meta-learns a task-aware shaping function $Φ(x,y;φ)$ across auxiliary tasks before RLHF training. The learned shaping produces a composite reward that preserves policy optimality while providing task-specific learning signals. Our meta-objective combines task discrimination, entropy regularization, and potential-based conservation for stable convergence. We provide theoretical guarantees for policy invariance, analyze representation drift sensitivity, and formally address incentive misalignment from entropy maximization. Experiments on LLaMA-3-8B across four benchmarks show consistent improvements over PPO, DPO, GRPO, and DAPO, achieving a 90.8% length-controlled win rate on AlpacaEval 2.0 and a score of 9.14 on MT-Bench, with 41% less training instability. MeRLa retains its benefits when combined with process-based and rubric-based enhanced rewards.",
+      "authors": [
+        "Yunpeng Chu"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.CL"
+      ],
+      "published": "2026-07-28T02:09:26+00:00",
+      "link": "https://arxiv.org/pdf/2607.26094v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Meta-learned reward shaping for RLHF",
+      "llm_evidence_cn": "基于元学习的奖励塑形方法用于RLHF",
+      "llm_evidence": "基于元学习的奖励塑形方法用于RLHF",
+      "canonical_evidence": "基于元学习的奖励塑形方法用于RLHF",
+      "llm_tldr_en": "MeRLa meta-learns a task-aware shaping function for RLHF, providing dense learning signals while preserving policy optimality, improving LLM alignment.",
+      "llm_tldr_cn": "基于人类反馈的强化学习（RLHF）中静态奖励模型导致稀疏学习信号和对齐次优。MeRLa提出元学习奖励塑形框架，在辅助任务上预训练任务感知的塑形函数，生成复合奖励。理论证明该塑形保持策略最优性，实验显示在多种对齐任务上超越标准RLHF。该方法有效缓解了奖励稀疏问题，提升了LLM与人类偏好的一致性。",
+      "llm_tldr": "基于人类反馈的强化学习（RLHF）中静态奖励模型导致稀疏学习信号和对齐次优。MeRLa提出元学习奖励塑形框架，在辅助任务上预训练任务感知的塑形函数，生成复合奖励。理论证明该塑形保持策略最优性，实验显示在多种对齐任务上超越标准RLHF。该方法有效缓解了奖励稀疏问题，提升了LLM与人类偏好的一致性。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "reinforcement learning from human feedback for llm alignment",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.26784v1",
+      "source": "arxiv",
+      "title": "SkillRise: Agentic Reinforcement Learning for Cross-Task Skill Evolution",
+      "abstract": "Large language model agents often encounter related yet distinct tasks that share reusable solution patterns. Yet standard agentic reinforcement learning treats tasks as independent episodes, while existing approaches to skill learning either focus on repeated attempts of one task or use pipelines with multiple stages that entangle extraction, retrieval, and execution. We introduce SkillRise, a unified reinforcement learning framework for learning skills across tasks. SkillRise organizes related instances into progressively challenging sequences and uses a single policy to alternate between task solving and curating an evolving skill document passed directly to the next task. Decoupled credit assignment across tasks supervises solving with the current task outcome and curation with discounted downstream outcomes. Experiments on ALFWorld, WebShop, and ScienceWorld show that SkillRise achieves the strongest Pass@1 performance among the compared methods, with gains over the strongest baseline ranging from 2.3 to 8.5 percentage points. Although trained across distinct tasks, its learned curation policy remains effective for repeated attempts on the same task. Further analysis reveals scaling at test time across tasks: performance improves with longer sequences of related tasks even when each task is attempted only once. This trend suggests that SkillRise reuses transferable skills across tasks rather than benefiting from repeated sampling of the same task. SkillRise further retains strong performance while substantially reducing the runtime overhead of skill learning pipelines with multiple stages. Together, these results provide a simple and efficient training paradigm for LLM agents to extract, refine, and reuse transferable skills across tasks.",
+      "authors": [
+        "Zhiyuan Yao",
+        "Yuxin Chen",
+        "Zhengxi Lu",
+        "Zishan Xu",
+        "Yueqing Sun",
+        "Yifu Guo",
+        "Yuquan Lu",
+        "Zhengzhou Cai",
+        "Kangning Zhang",
+        "Zhuowen Han",
+        "Zi-Han Wang",
+        "Ziang Ye",
+        "Qi Gu",
+        "Xunliang Cai",
+        "Weiwen Liu",
+        "Yongliang Shen"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-07-29T11:26:33+00:00",
+      "link": "https://arxiv.org/pdf/2607.26784v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "reinforcement learning for cross-task skill evolution in LLM agents",
+      "llm_evidence_cn": "面向LLM智能体跨任务技能进化的强化学习",
+      "llm_evidence": "面向LLM智能体跨任务技能进化的强化学习",
+      "canonical_evidence": "面向LLM智能体跨任务技能进化的强化学习",
+      "llm_tldr_en": "SkillRise uses unified RL to learn cross-task skills in LLM agents via progressive task sequences and evolving skill documents.",
+      "llm_tldr_cn": "针对LLM智能体在多任务中需要共享技能但现有方法要么独立处理要么多阶段分离的问题，提出SkillRise统一强化学习框架，通过逐渐增加难度的任务序列和持续更新的技能文档，实现跨任务技能学习。解耦的跨任务信用分配有效监督技能演化，在多个复合任务上显著提升迁移效率。",
+      "llm_tldr": "针对LLM智能体在多任务中需要共享技能但现有方法要么独立处理要么多阶段分离的问题，提出SkillRise统一强化学习框架，通过逐渐增加难度的任务序列和持续更新的技能文档，实现跨任务技能学习。解耦的跨任务信用分配有效监督技能演化，在多个复合任务上显著提升迁移效率。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "reinforcement learning for large language model",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.26862v1",
+      "source": "arxiv",
+      "title": "ReCo: Reweighting GRPO Against Distributional Concentration",
+      "abstract": "Group Relative Policy Optimization (GRPO) has become a standard reinforcement learning method for post-training language models. Recent work shows that GRPO can reduce the base model's reasoning capacity and underperform it in Pass@k when k is large, indicating reduced coverage of reasoning paths. We find that this reduction is associated with GRPO concentrating on responses that the base model already generates with high probability. We trace this concentration to two mechanisms in the GRPO update. At the response level, high-probability responses dominate the group gradient through repeated occurrence. At the token level, GRPO's importance ratio scales gradients, further reinforcing tokens that become more likely under the current policy. We propose ReCo, a reweighting method that addresses both effects. Response contributions are normalized by their expected occurrence within the rollout group, and the token-level importance ratio is replaced with a variance-based ratio that gives larger update scale to non-saturated decision points where alternative token choices remain plausible. Across Qwen2.5-Math-1.5B/7B and Llama-3.1-8B-Instruct on five mathematical reasoning benchmarks, ReCo improves Pass@k for large values of k and is comparable to GRPO for small values of k.",
+      "authors": [
+        "Junoh Park",
+        "Junseo Hwang",
+        "Wonguk Cho",
+        "Taesup Kim"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-07-29T12:45:55+00:00",
+      "link": "https://arxiv.org/pdf/2607.26862v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "improving GRPO for LLM post-training via reweighting against distribution concentration",
+      "llm_evidence_cn": "通过重加权对抗分布集中，改进LLM后训练的GRPO方法",
+      "llm_evidence": "通过重加权对抗分布集中，改进LLM后训练的GRPO方法",
+      "canonical_evidence": "通过重加权对抗分布集中，改进LLM后训练的GRPO方法",
+      "llm_tldr_en": "ReCo reweights GRPO to prevent distribution concentration that reduces reasoning coverage, improving Pass@k and policy diversity.",
+      "llm_tldr_cn": "针对GRPO在LLM后训练中导致响应分布集中、降低推理路径覆盖的问题，分析发现响应层面和令牌层面的双重机制，提出ReCo重加权方法。通过抑制高概率响应在梯度中的主导地位，恢复模型推理多样性。实验表明ReCo提升了Pass@k指标，保持了模型推理能力。",
+      "llm_tldr": "针对GRPO在LLM后训练中导致响应分布集中、降低推理路径覆盖的问题，分析发现响应层面和令牌层面的双重机制，提出ReCo重加权方法。通过抑制高概率响应在梯度中的主导地位，恢复模型推理多样性。实验表明ReCo提升了Pass@k指标，保持了模型推理能力。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "reinforcement learning for large language model",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.26873v1",
+      "source": "arxiv",
+      "title": "SERPO: Self-Evolving Rubric Policy Optimization for Open-Ended Test-Time Reinforcement Learning",
+      "abstract": "Test-time reinforcement learning (TTRL) enables language models to self-evolve at inference time without labeled feedback. Existing methods rely on answer voting and therefore do not extend naturally to open-ended generation, where valid responses cannot be mapped to a shared canonical answer. Without external reward models or stronger judges, adaptation must instead construct reliable rewards from the model's own outputs. We introduce SERPO (Self-Evolving Rubric Policy Optimization), which replaces answer voting with a closed loop that co-evolves response evidence, query-specific rubrics, and policy parameters. Good-Normal-Bad (G-N-B) response evolution organizes maximally separated rollouts into ordered archives; rubric evolution retains criteria that discriminate these archives; probabilistic criterion scoring converts verdict-token likelihoods into reward signals; and policy evolution optimizes the actor with the resulting signals. New actor rollouts then refresh both the archives and rubrics, closing the three-way evolution loop. Across two model configurations, two in-domain benchmarks, and four OOD benchmarks, SERPO improves HealthBench and ResearchQA by up to 20.63 and 20.31 points over the corresponding base models, raises the six-benchmark macro-average by up to 8.06 points, and supports OOD transfer and continued cross-benchmark evolution.",
+      "authors": [
+        "Jianze Wang",
+        "Kunwang Zheng",
+        "Ying Liu",
+        "Yu Cao",
+        "Qilong Zhang",
+        "Jinlong Chen",
+        "Hua Yang",
+        "Qianglong Chen"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-07-29T13:03:07+00:00",
+      "link": "https://arxiv.org/pdf/2607.26873v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "self-evolving rubric policy optimization for open-ended test-time RL in LLMs",
+      "llm_evidence_cn": "用于大模型开放式测试时强化学习的自演化评分策略优化",
+      "llm_evidence": "用于大模型开放式测试时强化学习的自演化评分策略优化",
+      "canonical_evidence": "用于大模型开放式测试时强化学习的自演化评分策略优化",
+      "llm_tldr_en": "SERPO introduces a closed-loop policy optimization that co-evolves response evidence, rubrics, and policy parameters for open-ended test-time reinforcement learning without external rewards.",
+      "llm_tldr_cn": "针对现有测试时强化学习方法依赖答案投票、难以处理开放式生成的问题，本文提出SERPO（自演化评分策略优化），通过闭环反馈共同演化响应证据、查询特定评分准则和策略参数，实现无需外部奖励模型的开放式强化学习。实验表明该方法在多种开放式任务上有效提升了模型的自适应能力，为语言模型推理时自适应提供了新范式。",
+      "llm_tldr": "针对现有测试时强化学习方法依赖答案投票、难以处理开放式生成的问题，本文提出SERPO（自演化评分策略优化），通过闭环反馈共同演化响应证据、查询特定评分准则和策略参数，实现无需外部奖励模型的开放式强化学习。实验表明该方法在多种开放式任务上有效提升了模型的自适应能力，为语言模型推理时自适应提供了新范式。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "reinforcement learning for large language model",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.26604v1",
+      "source": "arxiv",
+      "title": "WikiLoop: Jointly Learning to Build and Navigate Agent-Native Wikis with Downstream Feedback",
+      "abstract": "Knowledge-base construction and querying are typically optimized in isolation: retrieval-augmented agents operate over a fixed, externally maintained index, whereas construction receives no signal from downstream use. We present WikiLoop, a feedback-coupled framework that jointly learns to build and navigate an agent-native Wiki, a persistent linked-page knowledge base designed for machine navigation. A role-conditioned shared policy supports two interfaces: a Navigator retrieves evidence from the Wiki to answer queries, and a Builder proposes structured edits evaluated through downstream navigation. The Navigator follows a sufficiency-before-efficiency objective that applies retrieval-cost penalties only after full evidence has been collected. The Builder learns from utility differences: a frozen Navigator scores each candidate edit by its change in downstream performance, while a guard penalty discourages regressions on unrelated queries. Training combines sequential role-specific optimization with a final joint stage over role-homogeneous batches. With Qwen3.5-9B as the common backbone, WikiLoop reaches 62.6 aggregate Answer Correctness on AuthTrace, 6.3 points above LLM-Wiki, base, with the largest gains on multi-document queries. Controlled comparisons support the intended effects of both objectives, and the learned edits remain useful to a held-out Navigator. Paired comparisons indicate that the final shared policy largely retains both role-specific capabilities, improves Navigator and end-to-end Answer Correctness by 0.4 points relative to the corresponding specialist references, and consolidates both interfaces into one model. Without dataset-specific training, WikiLoop also improves over the same-backbone LLM-Wiki, base on HotpotQA and MuSiQue.",
+      "authors": [
+        "Haoliang Ming",
+        "Feifei Li",
+        "Wenhui Que"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-07-29T08:28:30+00:00",
+      "link": "https://arxiv.org/pdf/2607.26604v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "joint learning of building and navigating knowledge base with retrieval feedback",
+      "llm_evidence_cn": "联合学习构建和导航知识库，带有检索反馈",
+      "llm_evidence": "联合学习构建和导航知识库，带有检索反馈",
+      "canonical_evidence": "联合学习构建和导航知识库，带有检索反馈",
+      "llm_tldr_en": "WikiLoop jointly learns to build and navigate an agent-native Wiki using downstream retrieval feedback, optimizing both construction and querying.",
+      "llm_tldr_cn": "针对知识库构建与查询分离导致检索效果受限的问题，提出WikiLoop反馈耦合框架，通过共享策略同时训练构建者与导航者，使知识库构建直接受益于下游检索需求。在多种知识密集型任务上，该框架提升了检索准确性与效率，实现了端到端的持续优化。",
+      "llm_tldr": "针对知识库构建与查询分离导致检索效果受限的问题，提出WikiLoop反馈耦合框架，通过共享策略同时训练构建者与导航者，使知识库构建直接受益于下游检索需求。在多种知识密集型任务上，该框架提升了检索准确性与效率，实现了端到端的持续优化。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "retrieval augmented generation for knowledge intensive tasks",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2607.26643v1",
+      "source": "arxiv",
+      "title": "Rethinking Self-Evolution: A Constrained Exploration-Exploitation Process for Mitigating Skill Overfitting",
+      "abstract": "Enabling large language model (LLM) agents to accumulate and reuse experience from past interactions remains a central challenge in real-world applications. A promising solution is to treat skills as trainable states and optimize them in the same way as model parameters in neural network training. However, data-driven skill optimization is prone to overfitting to the limited trajectories collected from real environments. Overexploiting these trajectories overfits the current batch, while unconstrained exploration causes regression on previously solved cases. This tension motivates a constrained search view of skill self-evolution, governed by an exploration--exploitation trade-off. We propose SkillBoost, a three-stage framework that mitigates both risks: structured exploitation localizes observed failures to editable skill components, prior-guided exploration draws on prior knowledge in the LLM to generate diverse repair candidates, and verified acceptance commits a candidate only when it improves performance within a regression bound. Experiments across 23 model--benchmark configurations show that SkillBoost achieves state-of-the-art performance while mitigating overfitting, outperforming both human-crafted and LLM-generated skills. Transfer experiments further show that optimized skills can be reused by other agents on similar tasks.",
+      "authors": [
+        "Hongqiang Lin",
+        "Chao Liu",
+        "Xiaofan Bai",
+        "Xuan Jin",
+        "Yuhong Li",
+        "Nenggan Zheng",
+        "Xipeng Cao"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI",
+        "cs.LG"
+      ],
+      "published": "2026-07-29T09:05:40+00:00",
+      "link": "https://arxiv.org/pdf/2607.26643v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "LLM agent skill optimization via constrained exploration-exploitation",
+      "llm_evidence_cn": "大语言模型智能体的技能优化，通过约束探索-利用过程",
+      "llm_evidence": "大语言模型智能体的技能优化，通过约束探索-利用过程",
+      "canonical_evidence": "大语言模型智能体的技能优化，通过约束探索-利用过程",
+      "llm_tldr_en": "Proposes SkillBoost to mitigate skill overfitting in LLM agents by treating skill optimization as a constrained exploration-exploitation process, balancing exploitation of past trajectories and exploration to prevent regression.",
+      "llm_tldr_cn": "针对大语言模型智能体在技能积累中容易过拟合有限轨迹的问题，提出SkillBoost，将技能优化视为受约束的探索-利用过程。通过三阶段方法平衡对已有轨迹的利用和新技能的探索，避免技能退化和过拟合。实验表明该方法能有效提升智能体在长期任务中的表现。",
+      "llm_tldr": "针对大语言模型智能体在技能积累中容易过拟合有限轨迹的问题，提出SkillBoost，将技能优化视为受约束的探索-利用过程。通过三阶段方法平衡对已有轨迹的利用和新技能的探索，避免技能退化和过拟合。实验表明该方法能有效提升智能体在长期任务中的表现。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2607.25718v2",
+      "source": "arxiv",
+      "title": "Tools Are Not Islands: Set-Level Tool Retrieval for LLM Agents via Query-Conditioned Hyperedge Prediction",
+      "abstract": "Large language model (LLM) agents increasingly rely on invoking external tools to complete real-world tasks. Tool retrieval, which selects a small task-relevant subset from a library of thousands of tools before the agent acts, has therefore become a critical component of LLM agent pipelines. However, existing retrievers either score each tool in isolation or assemble the tool set sequentially, so the joint utility of a candidate set is never evaluated as a whole. In this paper, we propose HYSET, short for HYperedge-based SEt-level Tool retrieval. Our contributions are threefold: (i) we formulate tool retrieval as query-conditioned hyperedge prediction on a tool co-invocation hypergraph, under which the tool set itself becomes the unit of scoring and most existing retrieval paradigms reduce to restricted instances; (ii) we capture size-dependent tool compatibility through cardinality-specific interactions; and (iii) we design HYSET as a pre-selection module requiring no modification to the downstream agent. Experiments on ToolBench demonstrate that HYSET consistently outperforms state-of-the-art baselines in both tool retrieval performance and end-to-end task success. Beyond the in-domain setting, HYSET further supports zero-shot/few-shot transfer, generalizing to held-out tools/categories and unseen domains with minimal supervision.",
+      "authors": [
+        "Xinyi Hong",
+        "Pinjun Dong",
+        "Xinyang Yu",
+        "Binyan Jiang"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI",
+        "cs.IR"
+      ],
+      "published": "2026-07-28T13:45:08+00:00",
+      "link": "https://arxiv.org/pdf/2607.25718v2",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "proposes set-level tool retrieval for LLM agents via hyperedge prediction enabling task automation",
+      "llm_evidence_cn": "提出基于超边预测的集合级工具检索方法支持LLM智能体任务自动化",
+      "llm_evidence": "提出基于超边预测的集合级工具检索方法支持LLM智能体任务自动化",
+      "canonical_evidence": "提出基于超边预测的集合级工具检索方法支持LLM智能体任务自动化",
+      "llm_tldr_en": "Proposes HYSET, a set-level tool retrieval method for LLM agents using hyperedge prediction on a tool co-invocation graph to select optimal tool sets.",
+      "llm_tldr_cn": "针对LLM智能体工具选择问题，提出基于超边预测的集合级工具检索方法HYSET。通过构建工具共调超图，将工具集选择转化为查询条件超边预测。实验证明HYSET相比逐工具检索显著提升任务完成率。该工作推动了LLM智能体自动化任务的发展。",
+      "llm_tldr": "针对LLM智能体工具选择问题，提出基于超边预测的集合级工具检索方法HYSET。通过构建工具共调超图，将工具集选择转化为查询条件超边预测。实验证明HYSET相比逐工具检索显著提升任务完成率。该工作推动了LLM智能体自动化任务的发展。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.22982v1",
+      "source": "arxiv",
+      "title": "Finite-Time Analysis of the Natural Policy Gradient in Finite-Horizon Markov Decision Processes",
+      "abstract": "Natural Policy Gradient (NPG) is a well-established Reinforcement Learning algorithm that underlies widely used methods such as Trust Region Policy Optimization and Proximal Policy Optimization, both of which have demonstrated strong empirical success. In this paper, we study exact NPG in finite-horizon Markov Decision Processes with known dynamics and horizon-dependent transition kernels. We provide the first finite-time convergence guarantees for this algorithm in this setting, for which we consider both constant and increasing step size regimes. With a constant step size $η_t=η$, we prove that NPG converges sublinearly with a rate of $\\mathcal{O}(H^{2}/t)$ after $t$ iterations, where $H$ is the horizon length. We also extend this constant step size analysis to linear MDPs in an exact population-projection oracle under a full support projection distribution, recovering the same sublinear rate as in the tabular setting. Furthermore, with increasing step sizes, we prove that this algorithm achieves a linear convergence rate of $\\mathcal{O}\\left(\\left(1-\\frac{1}{\\vartheta_ρ}\\right)^t\\right)$ for a problem-dependent constant $\\vartheta_ρ> 1$, and the horizon-only robust schedule of the form $η_t=η_0(H/(H-1))^t$ where $η_0>0$ and $H \\geq 2$, attains this same geometric rate.",
+      "authors": [
+        "Asha Barua",
+        "Sajad Khodadadian"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "math.OC",
+        "stat.ML"
+      ],
+      "published": "2026-07-25T01:37:26+00:00",
+      "link": "https://arxiv.org/pdf/2607.22982v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "finite-time analysis of natural policy gradient in MDPs",
+      "llm_evidence_cn": "有限时域马尔可夫决策过程中自然策略梯度的有限时间分析",
+      "llm_evidence": "有限时域马尔可夫决策过程中自然策略梯度的有限时间分析",
+      "canonical_evidence": "有限时域马尔可夫决策过程中自然策略梯度的有限时间分析",
+      "llm_tldr_en": "This paper provides the first finite-time convergence guarantees for exact Natural Policy Gradient in finite-horizon MDPs with known dynamics.",
+      "llm_tldr_cn": "自然策略梯度（NPG）是TRPO和PPO等策略梯度方法的基础。本文在有限时域MDP中首次提供了NPG的有限时间收敛保证，证明了常数步长下O(H^2/t)的次线性收敛速率。该理论分析为策略梯度方法在复杂任务中的应用提供了依据。",
+      "llm_tldr": "自然策略梯度（NPG）是TRPO和PPO等策略梯度方法的基础。本文在有限时域MDP中首次提供了NPG的有限时间收敛保证，证明了常数步长下O(H^2/t)的次线性收敛速率。该理论分析为策略梯度方法在复杂任务中的应用提供了依据。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "policy gradient methods for language generation",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.25825v1",
+      "source": "arxiv",
+      "title": "CHILL-Harness: Counterfactual Harness Learning for Efficient Reasoning in Long-Horizon Agents",
+      "abstract": "Agent harnesses have become the operational infrastructure of modern large language model agents, coordinating context, tools, verification, and execution control to translate latent model capability into reliable long-horizon behavior. However, reliable long-horizon behavior requires harness control to adapt to task demands, execution environments, and evolving execution states, whereas current harnesses predominantly rely on hand-crafted or globally fixed policies; this mismatch manifests as unnecessary computational overhead and, in adverse cases, reduced task success. To address this limitation, we formulate the task of enabling adaptive orchestration in harness systems as a causal learning problem and propose Counterfactual Harness Intervention Learning for Long-Horizon Agents (CHILL-Harness). CHILL-Harness intervenes at the orchestration layer to enable advantage-guided workflow adaptation, thereby improving reasoning and execution efficiency while preserving task performance. Specifically, we develop causal intervention effect learning as the effect-estimation component of CHILL-Harness to estimate intervention-relative workflow advantage from confidence-weighted execution evidence and identify advantageous workflow adaptations. We further introduce advantage-realizing causal orchestration as its realization component to adaptively allocate counterfactual reasoning and realize only workflow adjustments supported by sufficient expected advantage. Finally, we incorporate a success-preserving objective and advantage-margin authorization constraints into CHILL-Harness to promote reliable adaptation. Extensive experiments on heterogeneous long-horizon tasks spanning information seeking, software engineering, and terminal interaction show that CHILL-Harness consistently preserves or improves task success while substantially reducing token consumption and execution time.",
+      "authors": [
+        "Jiarun Fu",
+        "Lizhong Ding",
+        "Sida Chen",
+        "Honglei Xin",
+        "Chunhui Zhang",
+        "Pengqi Li",
+        "Qiuning Wei",
+        "Ye Yuan",
+        "Guoren Wang"
+      ],
+      "primary_category": "cs.MA",
+      "categories": [
+        "cs.MA"
+      ],
+      "published": "2026-07-28T15:06:00+00:00",
+      "link": "https://arxiv.org/pdf/2607.25825v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Adaptive harness learning for long-horizon LLM agents",
+      "llm_evidence_cn": "自适应框架学习用于长期任务大语言模型智能体",
+      "llm_evidence": "自适应框架学习用于长期任务大语言模型智能体",
+      "canonical_evidence": "自适应框架学习用于长期任务大语言模型智能体",
+      "llm_tldr_en": "Proposes counterfactual harness learning to enable adaptive orchestration in LLM agent harnesses, formulating it as a causal learning problem to improve efficiency and task success in long-horizon tasks.",
+      "llm_tldr_cn": "针对大语言模型智能体框架依赖固定策略导致计算浪费和任务成功率低的问题，提出反事实框架学习方法。将自适应编排形式化为因果学习问题，使框架能根据任务和执行状态动态调整。实验表明该方法在减少开销的同时提升了长期任务的成功率。",
+      "llm_tldr": "针对大语言模型智能体框架依赖固定策略导致计算浪费和任务成功率低的问题，提出反事实框架学习方法。将自适应编排形式化为因果学习问题，使框架能根据任务和执行状态动态调整。实验表明该方法在减少开销的同时提升了长期任务的成功率。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.26358v1",
+      "source": "arxiv",
+      "title": "Post-Training at the Edge of Detectability: A Game-Theoretic Approach to Fine-Tuning",
+      "abstract": "Reinforcement learning (RL) fine-tuning is widely used in language model training to improve model performance on a target task while limiting drift from a reference policy. A standard way to balance this trade-off is via a KL-regularized RL objective, although this formulation does not by itself provide a principled way to set the regularization coefficient. In practice, the coefficient is typically chosen heuristically or via hyperparameter search, which can lead to unnecessary overhead in training cost or undesirable reward-retention trade-offs. We instead propose a game-theoretic framework that gives this trade-off an explicit statistical interpretation. Specifically, we study a sequential game in which an agent chooses a policy to maximize cumulative reward while a monitor observes policy outputs over time and tests for deviations from the reference policy. Although not originating from the same perspective, we show that the resulting equilibrium policy can nonetheless be expressed as the solution to a KL-regularized RL problem for an optimal regularization parameter that can be viewed as maximizing reward per unit of statistical distinguishability. Drawing on classical results from concave-convex fractional programming, we provide a principled method for learning this equilibrium coefficient via reduction to the KL-regularized RL objective, thus allowing for flexible integration into standard fine-tuning pipelines. In experiments with Qwen3-8B and Llama-3.2-1B, we demonstrate that our methods result in competitive reward-retention trade-offs in a continual learning setting, and illustrate how our framework may be used to audit API providers serving open-source models.",
+      "authors": [
+        "Keegan Harris",
+        "Brian W. Lee",
+        "Ian Waudby-Smith",
+        "Philip Amortila",
+        "Nika Haghtalab",
+        "Michael I. Jordan"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI",
+        "cs.GT"
+      ],
+      "published": "2026-07-29T00:19:09+00:00",
+      "link": "https://arxiv.org/pdf/2607.26358v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Game-theoretic approach to RL fine-tuning with KL regularization",
+      "llm_evidence_cn": "博弈论方法平衡KL正则化与奖励，用于语言模型微调",
+      "llm_evidence": "博弈论方法平衡KL正则化与奖励，用于语言模型微调",
+      "canonical_evidence": "博弈论方法平衡KL正则化与奖励，用于语言模型微调",
+      "llm_tldr_en": "Proposes a game-theoretic framework for RL fine-tuning of language models, providing a principled way to set the KL regularization coefficient and improving the reward-retention trade-off.",
+      "llm_tldr_cn": "针对语言模型强化学习微调中KL正则化系数难以确定的问题，提出博弈论框架，将奖励与漂移的权衡建模为序列博弈。理论分析给出了系数选择的统计解释，实验表明该方法在减少超参数搜索的同时提升了奖励保留与模型性能的平衡。",
+      "llm_tldr": "针对语言模型强化学习微调中KL正则化系数难以确定的问题，提出博弈论框架，将奖励与漂移的权衡建模为序列博弈。理论分析给出了系数选择的统计解释，实验表明该方法在减少超参数搜索的同时提升了奖励保留与模型性能的平衡。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "reinforcement learning from human feedback for llm alignment",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    }
+  ]
+}

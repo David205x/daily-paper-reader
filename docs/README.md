@@ -6,71 +6,53 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-07-29
-- 运行时间：2026-07-29 21:29:03 UTC
+- 最新运行日期：2026-07-30
+- 运行时间：2026-07-30 21:53:05 UTC
 - 运行状态：成功
-- 本次总论文数：17
+- 本次总论文数：11
 - 精读区：6
-- 速读区：11
+- 速读区：5
 
 ### 今日简报（AI）
-今日精读6篇速读11篇，重点攻坚搜索智能体强化学习与小型语言模型鲁棒性方向。最值得关注《EviBack》提出的证据约束教师回退机制（9.0/10）和《Towards Robust RL》对小型语言模型智能体的鲁棒性改进（9.0/10）。下一步可优先精读这两篇论文，并尝试将EviBack的框架迁移至多模态或开源模型场景。
-- 详情：[/202607/29/README](/202607/29/README)
+今日日报聚焦于强化学习与语言模型对齐，重点分析了反事实推理和元奖励塑造两大高影响力方法。最值得关注的是精读中两篇9.0分论文——《CoRT: Counterfactual Replay for Token-Level Rubric-Guided Policy Optimization》和《Meta-Learned Reward Shaping for Reinforcement Learning from Human Feedback》，前者通过反事实重放优化分词级策略，后者引入元学习动态调整奖励函数。建议普通读者优先研读这两篇，了解如何利用反事实和元学习提升模型对齐效率。
+- 详情：[/202607/30/README](/202607/30/README)
 
 ### 精读区论文标签
-1. [EviBack: Search-Agent Reinforcement Learning via Evidence-Constrained Teacher Backoff](/202607/29/2607.23955v1-eviback-search-agent-reinforcement-learning-via-evidence-constrained-teacher-backoff)  
+1. [CoRT: Counterfactual Replay for Token-Level Rubric-Guided Policy Optimization](/202607/30/2607.25659v1-cort-counterfactual-replay-for-token-level-rubric-guided-policy-optimization)  
    标签：评分：9.0/10、query:rl
-   evidence：基于证据约束教师退出的搜索代理强化学习，用于检索增强生成
-2. [Towards Robust Reinforcement Learning for Small-Scale Language Model Agents](/202607/29/2607.25091v1-towards-robust-reinforcement-learning-for-small-scale-language-model-agents)  
+   evidence：面向大语言模型的基于评分标准的强化学习中令牌级别信用分配方法
+2. [Meta-Learned Reward Shaping for Reinforcement Learning from Human Feedback](/202607/30/2607.26094v1-meta-learned-reward-shaping-for-reinforcement-learning-from-human-feedback)  
    标签：评分：9.0/10、query:rl
-   evidence：使用PPO的鲁棒强化学习用于小规模语言模型代理
-3. [ODYSSE: Episode-wise Policy Optimization for Personalized Agentic Reasoning](/202607/29/2607.25369v1-odysse-episode-wise-policy-optimization-for-personalized-agentic-reasoning)  
+   evidence：基于元学习的奖励塑形方法用于RLHF
+3. [SkillRise: Agentic Reinforcement Learning for Cross-Task Skill Evolution](/202607/30/2607.26784v1-skillrise-agentic-reinforcement-learning-for-cross-task-skill-evolution)  
    标签：评分：9.0/10、query:rl
-   evidence：基于逐回合策略优化的强化学习用于个性化代理推理
-4. [A Control System, a Dataset, and a Recipe for Making Frozen LLM Agents Learn a Domain](/202607/29/2607.25415v1-a-control-system-a-dataset-and-a-recipe-for-making-frozen-llm-agents-learn-a-domain)  
+   evidence：面向LLM智能体跨任务技能进化的强化学习
+4. [ReCo: Reweighting GRPO Against Distributional Concentration](/202607/30/2607.26862v1-reco-reweighting-grpo-against-distributional-concentration)  
    标签：评分：9.0/10、query:rl
-   evidence：经典强化学习策略学习冻结LLM智能体控制套件
-5. [HiSkill: Empowering LLM Agents with Hierarchical Skill Graphs](/202607/29/2607.25853v1-hiskill-empowering-llm-agents-with-hierarchical-skill-graphs)  
+   evidence：通过重加权对抗分布集中，改进LLM后训练的GRPO方法
+5. [SERPO: Self-Evolving Rubric Policy Optimization for Open-Ended Test-Time Reinforcement Learning](/202607/30/2607.26873v1-serpo-self-evolving-rubric-policy-optimization-for-open-ended-test-time-reinforcement-learning)  
    标签：评分：9.0/10、query:rl
-   evidence：层次化技能图增强LLM智能体，支持任务分解和复用
-6. [Traceable LLM Reasoning for Fake-Order Fraud Detection](/202607/29/2607.23075v1-traceable-llm-reasoning-for-fake-order-fraud-detection)  
+   evidence：用于大模型开放式测试时强化学习的自演化评分策略优化
+6. [WikiLoop: Jointly Learning to Build and Navigate Agent-Native Wikis with Downstream Feedback](/202607/30/2607.26604v1-wikiloop-jointly-learning-to-build-and-navigate-agent-native-wikis-with-downstream-feedback)  
    标签：评分：8.0/10、query:rl
-   evidence：用于欺诈检测的LLM推理的RL框架
+   evidence：联合学习构建和导航知识库，带有检索反馈
 
 ### 速读区论文标签
-1. [Offline-Online Curriculum RL for Multimodal Reasoning](/202607/29/2607.23700v1-offline-online-curriculum-rl-for-multimodal-reasoning)  
+1. [Rethinking Self-Evolution: A Constrained Exploration-Exploitation Process for Mitigating Skill Overfitting](/202607/30/2607.26643v1-rethinking-self-evolution-a-constrained-exploration-exploitation-process-for-mitigating-skill-overfitting)  
    标签：评分：8.0/10、query:rl
-   evidence：课程强化学习提升多模态大模型推理
-2. [EviBack: Search-Agent Reinforcement Learning via Evidence-Constrained Teacher Backoff](/202607/29/2607.23955v2-eviback-search-agent-reinforcement-learning-via-evidence-constrained-teacher-backoff)  
-   标签：评分：8.0/10、query:rl
-   evidence：使用证据约束教师回退的强化学习用于Agentic RAG多轮搜索
-3. [From Proprietary to Open-Source: Bridging the Distribution Gap via Multi-Agent Protocol Distillation in Agentic Search](/202607/29/2607.24280v1-from-proprietary-to-open-source-bridging-the-distribution-gap-via-multi-agent-protocol-distillation-in-agentic-search)  
-   标签：评分：8.0/10、query:rl
-   evidence：多智能体协议蒸馏结合强化学习监督的智能搜索
-4. [SearchArt: Training Long-Horizon Search Agent with Scalable Synthetic and Verified Task](/202607/29/2607.24850v1-searchart-training-long-horizon-search-agent-with-scalable-synthetic-and-verified-task)  
-   标签：评分：8.0/10、query:rl
-   evidence：SearchArt训练长程搜索智能体实现任务自动化，使用合成数据
-5. [Inverse RL Helps Align AI by Imitating Humans](/202607/29/2607.24900v1-inverse-rl-helps-align-ai-by-imitating-humans)  
-   标签：评分：8.0/10、query:rl
-   evidence：从演示中逆向强化学习奖励，用于AI对齐
-6. [Tools Are Not Islands: Set-Level Tool Retrieval for LLM Agents via Query-Conditioned Hyperedge Prediction](/202607/29/2607.25718v1-tools-are-not-islands-set-level-tool-retrieval-for-llm-agents-via-query-conditioned-hyperedge-prediction)  
-   标签：评分：8.0/10、query:rl
-   evidence：面向LLM智能体集合级工具检索
-7. [LAMAR: An Open Language-Aware Multilingual Alignment Reranker](/202607/29/2607.22042v2-lamar-an-open-language-aware-multilingual-alignment-reranker)  
+   evidence：大语言模型智能体的技能优化，通过约束探索-利用过程
+2. [Tools Are Not Islands: Set-Level Tool Retrieval for LLM Agents via Query-Conditioned Hyperedge Prediction](/202607/30/2607.25718v2-tools-are-not-islands-set-level-tool-retrieval-for-llm-agents-via-query-conditioned-hyperedge-prediction)  
    标签：评分：7.0/10、query:rl
-   evidence：多语言RAG流水线中的重排序器
-8. [Co-Evolving Graph and Text Memory for Training-Free Multi-Hop Question Answering](/202607/29/2607.23278v1-co-evolving-graph-and-text-memory-for-training-free-multi-hop-question-answering)  
+   evidence：提出基于超边预测的集合级工具检索方法支持LLM智能体任务自动化
+3. [CHILL-Harness: Counterfactual Harness Learning for Efficient Reasoning in Long-Horizon Agents](/202607/30/2607.25825v1-chill-harness-counterfactual-harness-learning-for-efficient-reasoning-in-long-horizon-agents)  
    标签：评分：7.0/10、query:rl
-   evidence：提出Co-E无训练多跳问答系统，利用图-文本同步记忆，与检索增强生成相关
-9. [MemChain: Learning Interpretable Memory Traces for Memory-Augmented LLM Agents](/202607/29/2607.24097v1-memchain-learning-interpretable-memory-traces-for-memory-augmented-llm-agents)  
+   evidence：自适应框架学习用于长期任务大语言模型智能体
+4. [Post-Training at the Edge of Detectability: A Game-Theoretic Approach to Fine-Tuning](/202607/30/2607.26358v1-post-training-at-the-edge-of-detectability-a-game-theoretic-approach-to-fine-tuning)  
    标签：评分：7.0/10、query:rl
-   evidence：可训练的后检索记忆策略，用于检索增强生成
-10. [Structure-aware Relative Policy Optimization for Ranking](/202607/29/2607.25268v1-structure-aware-relative-policy-optimization-for-ranking)  
-   标签：评分：7.0/10、query:rl
-   evidence：使用强化学习的排序策略优化
-11. [The Case Against Generation for Retrieval: Discriminative Language Models as Effective Retrievers](/202607/29/2607.25346v1-the-case-against-generation-for-retrieval-discriminative-language-models-as-effective-retrievers)  
+   evidence：博弈论方法平衡KL正则化与奖励，用于语言模型微调
+5. [Finite-Time Analysis of the Natural Policy Gradient in Finite-Horizon Markov Decision Processes](/202607/30/2607.22982v1-finite-time-analysis-of-the-natural-policy-gradient-in-finite-horizon-markov-decision-processes)  
    标签：评分：6.0/10、query:rl
-   evidence：提出基于LLM的判别式检索器，高效检索，可直接用于检索增强生成
+   evidence：有限时域马尔可夫决策过程中自然策略梯度的有限时间分析
 
 
 <div class="dpr-home-promo-card">

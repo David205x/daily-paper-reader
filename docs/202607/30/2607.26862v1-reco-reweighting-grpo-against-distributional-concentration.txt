@@ -1,0 +1,812 @@
+Title: ReCo: Reweighting GRPO Against Distributional Concentration
+
+URL Source: https://arxiv.org/pdf/2607.26862v1
+
+Published Time: Thu, 30 Jul 2026 00:53:38 GMT
+
+Number of Pages: 21
+
+Markdown Content:
+## ReCo: Reweighting GRPO Against Distributional Concentration 
+
+Junoh Park * Junseo Hwang * Wonguk Cho Taesup Kim †
+
+Graduate School of Data Science, Seoul National University 
+
+{wnsdh0418, hjunseoh, wongukcho, taesup.kim}@snu.ac.kr 
+
+Abstract 
+
+Group Relative Policy Optimization (GRPO) has become a standard reinforcement learning method for post-training language models. Re-cent work shows that GRPO can reduce the base model’s reasoning capacity and underper-form it in Pass@ k when k is large, indicating reduced coverage of reasoning paths. We find that this reduction is associated with GRPO concentrating on responses that the base model already generates with high probability. We trace this concentration to two mechanisms in the GRPO update. At the response level, high-probability responses dominate the group gradient through repeated occurrence. At the token level, GRPO’s importance ratio scales gradients, further reinforcing tokens that be-come more likely under the current policy. We propose ReCo , a reweighting method that ad-dresses both effects. Response contributions are normalized by their expected occurrence within the rollout group, and the token-level importance ratio is replaced with a variance-based ratio that gives larger update scale to non-saturated decision points where alterna-tive token choices remain plausible. Across Qwen2.5-Math-1.5B/7B and Llama-3.1-8B-Instruct on five mathematical reasoning bench-marks, ReCo improves Pass@ k for large values of k and is comparable to GRPO for small val-ues of k.
+
+1 Introduction 
+
+Reinforcement Learning with Verifiable Rewards (RLVR) has become a standard post-training ap-proach for improving LLM reasoning, especially in domains such as mathematics and coding where correctness can be automatically verified (Jaech et al., 2024; Guo et al., 2025; Yu et al., 2025; Zhang et al., 2025). Among RLVR methods, Group Rela-tive Policy Optimization (GRPO) has been widely 
+
+> *Equal contribution.
+> †Corresponding author.
+
+adopted for training reasoning models. It samples a group of rollouts for each prompt and computes advantages relative to the group mean, providing stable policy gradients without a critic (Shao et al., 2024). Despite its empirical success, GRPO has key limitations. While GRPO improves sampling effi-ciency, it has been observed to reduce the reason-ing capacity and the diversity of problem-solving trajectories that the base model originally pos-sessed (Yue et al., 2025; Wu et al., 2026; Li et al., 2025a). This limitation is often observed through Pass@ k, where GRPO outperforms the base model for small values of k but fails to surpass or even falls below it for large values of k (Yue et al., 2025; Zhu et al., 2025; Liu et al., 2025a). While this pat-tern has been widely reported, it remains unclear what distributional change under GRPO training leads to this limitation. To examine this change, Figure 1 compares where correct responses from each policy lie under the base model’s response distribution. For each correct response ( Ymodel ) sampled from each pol-icy model, we evaluate its probability under the base model and visualize these probabilities using kernel density estimation (KDE). The GRPO distri-bution shifts toward the high-probability region of the base model, indicating that GRPO concentrates on correct responses that the base model already generates with high probability. This suggests that the Pass@ k pattern is linked to concentration in the response distribution. GRPO improves sampling efficiency by increasing access to correct responses that are already likely under the base model, but reduces coverage of less likely correct responses. This motivates a closer look at how the GRPO up-date produces this concentration. To understand how GRPO leads to this concen-tration, we examine two main components of its update, (i) which responses are sampled for each rollout group and (ii) how token-level gradients 1arXiv:2607.26862v1 [cs.LG] 29 Jul 2026 0.800 0.825 0.850 0.875 0.900 0.925 0.950 0.975  
+
+> Pbase (Ymodel X)
+> 0
+> 5
+> 10
+> 15
+> 20
+> 25
+> Probability Density
+> Base ( Ybase )
+> GRPO ( Ygrpo )
+> Ours ( Yours )
+
+Figure 1: Kernel density estimation (KDE) of base-model probabilities for correct responses on AIME 2025 using Qwen2.5-Math-1.5B. For each correct re-sponse ( Ymodel ) sampled from a policy model, we eval-uate Pbase (Ymodel | X). GRPO shifts the distribution toward high-probability responses under the base model, suggesting concentration on responses the base model already favors. Our method mitigates this concentration and preserves more low-probability correct responses. 
+
+are computed. At the response level, we analyze which responses appear in the rollout group. Re-sponses are sampled from the policy itself, mak-ing high-probability responses occur more often within a group. Because GRPO averages contribu-tions across sampled responses equally, frequent responses accumulate larger total weight through repeated occurrence, causing the gradient mass to concentrate on them. At the token level, the GRPO importance ratio scales the gradient contribution of each sampled token. As the sampled token be-comes more likely under the current policy, its up-date scale increases, further reinforcing the same local choice at a decision point. Over training, this feedback can make one choice increasingly dom-inant, reducing the alternative paths available to future rollouts. These two mechanisms make al-ready likely reasoning paths increasingly dominant, reducing diversity. To mitigate this issue, we propose Reweight-ing GRPO Against Distributional Concentration 
+
+(ReCo ), with corresponding response-level and token-level corrections. At the response level, we normalize each response’s gradient contribution by its expected count within the group, preventing fre-quent responses from dominating the group-level gradient. At the token level, we replace the stan-dard token-level importance ratio with a variance-based ratio that accounts for both the sampled token probability and the probability mass left for alter-natives. This downweights saturated choices and gives larger update scale to non-saturated decision points where multiple token choices remain plau-sible. Together, these corrections reduce GRPO’s tendency to collapse onto frequent reasoning paths and help preserve reasoning diversity. 
+
+Contributions. Our contributions are summa-rized as follows. • We analyze how GRPO concentrates updates on high-probability reasoning paths under the base model through response-level and token-level mechanisms. • We introduce ReCo , a two-level correction for GRPO training. ReCo normalizes response-level updates by expected occurrence and re-places the token-level importance ratio with a variance-based ratio that places more update on positions where multiple token choices re-main plausible, rather than on tokens that are already dominant. • We evaluate ReCo on diverse mathematical reasoning benchmarks across different model families and scales. ReCo consistently out-performs GRPO in Pass@ k for large values of k and response diversity while maintaining competitive performance for small values of 
+
+k.
+
+2 Preliminaries 
+
+2.1 RLVR Setup 
+
+We consider Reinforcement Learning with Verifi-able Rewards (RLVR) for post-training a language model policy πθ. Given a prompt q ∼ D , the policy autoregressively generates a response 
+
+o = ( o1, . . . , o |o|) ∼ πθ(· | q).
+
+RLVR assigns an outcome-based verifiable reward 
+
+R(q, o ) to each completed response, computed by an external verifier. Thus, rewards are defined at the sequence level rather than at the token level. 
+
+2.2 Group Relative Policy Optimization 
+
+For each prompt q, GRPO samples a group of G
+
+responses from the old policy πθold , the policy used to collect rollouts before the current update, 
+
+oi i.i.d.
+
+∼ πθold (· | q), i = 1 , . . . , G. 
+
+2As in the RLVR setup, each response oi is an autore-gressive sequence. Each response receives a veri-fiable reward R(q, o i). GRPO constructs a group-relative advantage 
+
+ˆAi = R(q, o i) − μR
+
+σR
+
+,
+
+where 
+
+μR = 1
+
+G
+
+> G
+
+X
+
+> j=1
+
+R(q, o j ), σ R = std  {R(q, o j )}Gj=1 
+
+.
+
+The same sequence-level advantage ˆAi is assigned to all tokens in response oi.GRPO updates the policy using token-level im-portance ratios. For the t-th token of response oi,let 
+
+ri,t (θ) = πθ(oi,t | q, o i,<t )
+
+πθold (oi,t | q, o i,<t ) .
+
+Following PPO-style clipping, define the clipped token objective 
+
+ℓclip  
+
+> i,t
+
+(θ) = min 
+
+
+
+ri,t (θ) ˆAi,
+
+clip( ri,t (θ), 1 − ε, 1 + ε) ˆAi
+
+
+
+.
+
+The GRPO objective is then 
+
+JGRPO (θ) = E
+
+ 1
+
+G
+
+> G
+
+X
+
+> i=1
+
+1
+
+|oi|
+
+> |oi|
+
+X
+
+> t=1
+
+ℓclip  
+
+> i,t
+
+(θ)
+
+ ,
+
+where the expectation is over q ∼ D and {oi}Gi=1 ∼
+
+πθold (· | q). In practice, GRPO is often optimized with an additional KL penalty to a reference policy 
+
+πref . To simplify the analysis, we omit clipping and auxiliary KL terms. The resulting token-level policy-gradient contribution is 
+
+gGRPO  
+
+> i,t
+
+= ri,t (θ)∇θ log πθ(oi,t | q, o i,<t ) ˆAi.
+
+Equivalently, the unclipped GRPO gradient can be written as 
+
+∇θJGRPO (θ) = E
+
+"
+
+1
+
+G
+
+> G
+
+X
+
+> i=1
+
+1
+
+|oi|
+
+> |oi|
+
+X
+
+> t=1
+
+gGRPO 
+
+> i,t
+
+#
+
+.
+
+3 Method 
+
+3.1 Overview 
+
+We propose Reweighting GRPO Against Distri-butional Concentration (ReCo ), a reweighting method that applies corrections to the two main components of the GRPO update, (i) which re-sponses are sampled for each rollout group, and (ii) how token-level gradients are computed. At the response level, ReCo normalizes each re-sponse’s gradient contribution by its expected count within the rollout group. Since high-probability re-sponses are sampled more often, this normalization prevents them from dominating the group-level gra-dient through repeated occurrence. At the token level, ReCo replaces the standard token-level importance ratio with a variance-based ratio. This ratio accounts not only for the sampled token probability but also for the remaining prob-ability assigned to alternative tokens. As a result, ReCo reduces update scale at saturated decision points and gives relatively larger weight to tokens where alternative token choices remain plausible. 
+
+3.2 Response-Level Count Reweighting 
+
+In GRPO, responses are not sampled uniformly from the space of possible solutions but from the old policy itself. As a result, responses with high probability under the old policy are more likely to appear multiple times within the group. Because the GRPO update averages over sampled responses, this repeated occurrence gives such trajectories a larger aggregate contribution. ReCo uses expected occurrence to downweight responses that are likely to appear repeatedly. For a fixed prompt q and a trajectory o, we define its occurrence count over the group as 
+
+Nq(o) = 
+
+> G
+
+X
+
+> i=1
+
+1[oi = o], (1) whose expected value under repeated sampling from the old policy is 
+
+E[Nq(o)] = G π θold (o | q). (2) This expected count provides an analytical measure of how frequently a trajectory is expected to be represented under the old policy. One possible approach would be to directly count duplicated or semantically equivalent re-sponses and normalize their contributions by the observed count. However, this is difficult in open-ended LLM generation where exact duplicate tra-jectories are rare and defining equivalence requires an external criterion. ReCo avoids this explicit grouping problem by using expected counts rather than observed equivalence counts. 3This gives the inverse expected-count weight 
+
+1
+
+G π θold (oi | q) . (3) Under this weighting, a trajectory that is expected to appear multiple times in the rollout group re-ceives a smaller per-sample weight, so that repeated representation does not by itself enlarge its aggre-gate contribution. In practice, raw sequence likelihood depends strongly on response length, since it is a product of token probabilities smaller than one. Using raw likelihood directly would assign larger weights to longer responses simply because they contain more tokens. To reduce this length-induced bias, ReCo uses the length-normalized likelihood 
+
+¯πθold (oi | q) = 
+
+
+
+> |oi|
+
+Y
+
+> t=1
+
+πθold (oi,t | hi,t )
+
+
+
+> 1/|oi|
+
+(4) as a practical proxy for how frequently a trajectory is generated. The response-level weight is then defined as 
+
+wresp  
+
+> i
+
+= 1
+
+G ¯πθold (oi | q) . (5) The resulting response-level weight wresp  
+
+> i
+
+reduces the per-sample contribution of high-likelihood trajectories, mitigating the effect of frequent re-sponses dominating the group gradient through re-peated occurrence alone. 
+
+3.3 Token-Level Variance Reweighting 
+
+At the token level, GRPO’s importance ratio creates a feedback loop that can amplify frequently sam-pled tokens. Specifically, GRPO assigns a larger gradient scale to sampled tokens whose probability has increased. From Section 2, the GRPO token-level gradient contribution is 
+
+gGRPO  
+
+> i,t
+
+= pθi,t 
+
+pold 
+
+> i,t
+
+∇θ log πθ(oi,t | hi,t ) ˆAi,
+
+where 
+
+pθi,t = πθ(oi,t | hi,t ), pold  
+
+> i,t
+
+= πθold (oi,t | hi,t ).
+
+The ratio pθi,t /p old  
+
+> i,t
+
+grows when the sampled token becomes more likely under the current policy. Thus, GRPO can repeatedly amplify tokens that have been frequently selected at the same decision point, making those choices even more likely in future rollouts. Over training, this feedback can make a local choice increasingly dominant, reducing the alternative paths available to future rollouts. For reasoning diversity, an update should ac-count for both the sampled token probability ( p)and the probability mass left for alternatives ( 1−p). If a high-probability token is strongly reinforced, future rollouts are more likely to follow the same path, while alternative paths shrink. If a very low-probability token is updated, the absolute probabil-ity is still small, so the update has limited effect on future path diversity. In contrast, when the choice is not yet saturated, updates can more directly af-fect path diversity. Positive updates can strengthen a successful choice while alternatives remain avail-able and negative updates can make future rollouts move more easily toward alternatives. ReCo captures this with a variance ratio: 
+
+rvar  
+
+> i,t
+
+(θ) = pθi,t (1 − pθi,t )
+
+pold  
+
+> i,t
+
+(1 − pold  
+
+> i,t
+
+) .
+
+The term p(1 − p) corresponds to the Bernoulli variance of sampling a token with probability p.Here, p reflects whether the sampled token is likely to affect future rollouts, while 1 − p reflects how much probability mass remains for alternative choices. Their product is small when the sampled token is either too unlikely or already dominant, and large when the decision point remains non-saturated. Thus, the variance ratio assigns a larger scale to choices that can still influence reasoning-path diversity and avoids further amplifying satu-rated local decisions. 
+
+3.4 Final Objective 
+
+Combining the response-level and token-level cor-rections, the ReCo token-level gradient contribu-tion is 
+
+gReCo  
+
+> i,t
+
+= wresp  
+
+> i
+
+rvar  
+
+> i,t
+
+(θ) ∇θ log πθ(oi,t | hi,t ) ˆAi.
+
+The corresponding policy gradient is 
+
+∇θJReCo (θ) = E
+
+ 1
+
+G
+
+> G
+
+X
+
+> i=1
+
+1
+
+|oi|
+
+> |oi|
+
+X
+
+> t=1
+
+gReCo 
+
+> i,t
+
+ .
+
+Compared with standard GRPO, ReCo modifies the allocation of update magnitude at both levels. The response-level weight wresp  
+
+> i
+
+reduces the ag-gregate contribution from trajectories that are ex-pected to appear frequently in the rollout group, 4while the token-level variance ratio rvar  
+
+> i,t
+
+(θ) gives smaller scale to saturated decisions and larger scale to non-saturated decision points where alternative token choices remain plausible. For implementation with PPO-style clipping, we replace rvar  
+
+> i,t
+
+(θ) with 
+
+˜rvar  
+
+> i,t
+
+(θ) = pθi,t 
+
+ 1 − sg( pθi,t )
+
+pold 
+
+> i,t
+
+ 1 − pold 
+
+> i,t
+
+ ,
+
+where sg( ·) denotes stop-gradient. Applying stop-gradient to the (1 − pθi,t ) factor ensures that the variance ratio acts as a reweighting scalar under clipping, keeping the clipping mechanism aligned with standard PPO behavior. The clipped ReCo token objective is 
+
+ℓReCo  
+
+> i,t
+
+(θ) = wresp  
+
+> i
+
+min 
+
+
+
+˜rvar  
+
+> i,t
+
+(θ) ˆAi,
+
+clip  ˜rvar  
+
+> i,t
+
+(θ), 1 − ε, 1 + ε ˆAi
+
+
+
+.
+
+The final ReCo objective is 
+
+JReCo (θ) = E
+
+ 1
+
+G
+
+> G
+
+X
+
+> i=1
+
+1
+
+|oi|
+
+> |oi|
+
+X
+
+> t=1
+
+ℓReCo  
+
+> i,t
+
+(θ)
+
+ .
+
+We keep the remaining training components, such as the KL penalty to a reference policy πref , the same as in the GRPO baseline. 
+
+4 Experiments 
+
+4.1 Experimental Setup Training Setup. We train all RL methods on the MATH dataset (Hendrycks et al., 2021) using the verl framework (Sheng et al., 2025). To compare al-gorithms across different model scales and families, we conduct experiments with three backbone mod-els, Qwen2.5-Math-1.5B/7B (Yang et al., 2024), and Llama-3.1-8B-Instruct (Grattafiori et al., 2024). We use a prompt batch size of 256 , generate 8 roll-outs per prompt with temperature 1.0 and top-p 1.0,use a PPO mini-batch size of 64 , and set the learn-ing rate to 1 × 10 −6. We compare ReCo against GRPO and keep all remaining hyperparameters identical for a fair comparison. Additional hyperpa-rameters and implementation details are provided in Appendix A.1. 
+
+Evaluation Setup. We evaluate on five mathe-matical reasoning benchmarks, AIME 2025, AIME 2024, AMC 2023, OlympiadBench (He et al., 2024), and MATH 500 (Hendrycks et al., 2021). Following prior work (Yue et al., 2025), we sam-ple responses with temperature 0.6 and top-p 0.95 
+
+during evaluation. Our primary metric is Pass@ k accuracy (Chen et al., 2021). Lower values of k measure whether training improves sampling efficiency over the base model, while higher values of k measure whether the trained policy retains, loses, or expands the base model’s ability to produce correct solutions. Further details are provided in Appendix A.2. 
+
+4.2 Main Results Performance across Models and Benchmarks. 
+
+Table 1 reports Pass@64 across five benchmarks and three backbone models. We use Pass@64 as a proxy for reasoning capacity at large sampling budgets. ReCo improves over GRPO on every benchmark and backbone. On both Qwen2.5-Math-1.5B and Qwen2.5-Math-7B, ReCo gives consis-tent gains across all five benchmarks, improving the average score by +3 .1 and +3 .6 points, respec-tively. The largest improvement is +6 .4 points on AMC 2023 with Qwen2.5-Math-7B. Llama-3.1-8B-Instruct results show a different pattern. Consis-tent with prior reports (Yue et al., 2025; Zhu et al., 2025; Wang et al., 2025b; Yeo et al., 2025) that RL training on this backbone can underperform the base model under Pass@ k evaluation, GRPO falls below the base model on all five benchmarks. ReCo reduces this degradation, improving over GRPO on every benchmark by +11 .3 points on average and even surpassing the base model on AIME 2025 and AIME 2024. 
+
+Pass@ k across Different Values of k. Figure 2 evaluates Pass@ k across different values of k on Qwen2.5-Math-7B. At small k, ReCo is compa-rable to GRPO, suggesting that it preserves the sampling-efficiency gains of RL training. At larger 
+
+k, ReCo consistently outperforms GRPO across every benchmark. In several cases, ReCo also ex-ceeds the base model at large k, indicating that it achieves broader coverage of correct reasoning trajectories than the base model itself. 
+
+4.3 Further Analysis Training Dynamics of Reward and Rollout Di-versity. We analyze how the rollout distribution changes during training. Using intermediate check-points from RL training initialized with Qwen2.5-Math-1.5B, we generate rollouts on the MATH training set and measure their average reward, 5Table 1: Evaluation results on five mathematical reasoning benchmarks (Pass@64, %). Bold = best, underline =second best.                                                                                  
+
+> Method AIME ’25 AIME ’24 AMC ’23 Olympiad MATH-500 Avg. Qwen2.5-Math-1.5B
+> Base 32.0 39.1 89.3 64.0 92.9 63.5 GRPO 36.2 46.5 91.3 63.1 92.0 65.8
+> ReCo (Ours) 40.1 48.9 93.4 68.0 94.1 68.9
+> ∆over GRPO +3.9 +2.4 +2.1 +4.9 +2.1 +3.1
+> Qwen2.5-Math-7B
+> Base 34.7 55.7 89.8 67.7 94.1 68.4 GRPO 39.9 59.4 87.9 65.0 92.8 69.0
+> ReCo (Ours) 42.7 62.8 94.3 68.4 94.7 72.6
+> ∆over GRPO +2.8 +3.4 +6.4 +3.4 +1.9 +3.6
+> Llama-3.1-8B-Instruct
+> Base 21.5 36.5 90.8 60.1 89.5 59.7
+> GRPO 6.7 36.2 66.3 44.4 77.3 46.2
+> ReCo (Ours) 21.9 41.0 81.0 55.6 88.1 57.5
+> ∆over GRPO +15.2 +4.8 +14.7 +11.2 +10.8 +11.3
+
+Figure 2: Pass@ k scaling curves on five mathematical reasoning benchmarks for Qwen2.5-Math-7B. Each panel shows Base, GRPO, and ReCo (Ours) across different sampling budgets k.
+
+Distinct-2 (Li et al., 2016), and Self-BLEU (Pap-ineni et al., 2002). This analysis examines whether the policy continues to produce diverse rollouts on the training prompts as reward improves. Figure 3 shows that GRPO increases the training reward rapidly while losing diversity. Distinct-2 consistently decreases, while Self-BLEU consis-tently increases, indicating that GRPO rollouts be-come increasingly similar over training. This sug-gests that GRPO concentrates probability mass on a narrower set of high-reward responses, which improves the reward but reduces the variety of rea-soning paths explored during training. ReCo shows a different trend. Although its re-ward improves more gradually, it keeps Distinct-2 and Self-BLEU much closer to their initial values. The slower reward growth does not reflect a deficit in learning, since Table 1 shows that ReCo achieves higher Pass@ k than GRPO across all backbones and benchmarks at the end of training. This broader exploration during training is consistent with the improved large-k behavior observed in Section 4.2. 
+
+Token Variance across Response Positions. To examine ReCo’s token-level effect on diversity, we measure the Bernoulli variance pt(1 − pt) of the sampled token probability across positions within each response. Since pt(1 − pt) is large when the token choice is non-saturated (i.e., p is away from 0 or 1) and is the quantity ReCo reweights by (Sec-tion 3), higher values indicate that more positions remain non-saturated under the trained policy. We group token positions into early ( 0–33% ), middle (33 –66% ), and late ( 66 –100% ) segments relative to the full response length. Figure 4 shows the mean 
+
+pt(1 −pt) for each segment under GRPO and ReCo. ReCo maintains substantially higher token variance than GRPO in the early and middle segments (2.5 ×
+
+and 2.2 × higher, respectively), while the two meth-ods converge in the late segment. The early and middle segments, where reasoning paths typically branch into different strategies, retain meaningful branching under ReCo, while GRPO drives them 6Figure 3: Training dynamics of training reward, Distinct-2, and Self-BLEU over training steps on Qwen2.5-Math-1.5B. Higher Distinct-2 and lower Self-BLEU indicate greater response diversity.  
+
+> Figure 4: Mean token-level Bernoulli variance pt(1 −pt)
+> by relative position within each response on Qwen2.5-Math-1.5B. Error bars show standard error across re-sponses. Higher values indicate that the sampled token has more room for alternative choices.
+
+toward more deterministic choices. The late seg-ment, which corresponds to answer-confirmation steps, naturally saturates under both methods.                  
+
+> Table 2: Dataset-level diversity evaluation (1−
+> Self-BLEU ) across mathematical reasoning bench-marks. Each value is computed at the dataset level. Higher values indicate greater diversity.
+> Setting AIME 2025 AIME 2024 AMC 2023
+> GRPO 0.2590 0.3513 0.2148
+> ReCo (Ours) 0.2686 0.4184 0.2602
+
+Inference-time Diversity. We further compare the diversity of correct responses generated at infer-ence time. Using Qwen2.5-Math-1.5B, we sam-ple 16 responses per problem on AIME 2025, AIME 2024, and AMC 2023, and compute the diversity among correct responses using 1 −
+
+Self -BLEU , which captures surface-level lexical variation. Higher values indicate greater diversity. As shown in Table 2, ReCo achieves higher diver-sity than GRPO on all three benchmarks, indicating that ReCo produces less repetitive reasoning traces among correct generations. These results comple-ment the Pass@ k analysis by showing that ReCo’s improved coverage also extends to inference time. 
+
+Effect of Each Correction. We ablate the com-ponents of ReCo in Table 3. Response only applies expected-occurrence normalization at the response level, and Token only applies the variance-based token-level ratio. 
+
+The two corrections are complementary. Both single-correction variants improve over GRPO on average, and their combination achieves the best average performance. Response-level reweight-ing changes how sampled responses are aggre-gated within the rollout group, while token-level reweighting changes how update scale is dis-tributed across token decisions inside a response. The two thus act on different aspects of the update, consistent with the gains from combining them. 
+
+Variance-based token reweighting works best. 
+
+We compare token-level reweighting forms. GRPO uses pθ/p old , which gives larger scale to tokens whose probabilities have increased. ASPO (Wang et al., 2026) uses pold /p θ, which gives larger scale to low-probability sampled tokens. ReCo instead uses pθ(1 − pθ)/p old (1 − pold ), which emphasizes non-saturated choices by considering both the sam-pled token probability and the remaining probabil-ity mass for alternatives. Its stronger performance provides empirical support for pθ(1 − pθ) as the token-level reweighting criterion. 
+
+5 Related Work 
+
+RLVR and Reasoning Capacity. RLVR has be-come a common post-training paradigm for enhanc-ing LLM reasoning. Recent reasoning models and open RL systems have shown that outcome-based RL can substantially improve reasoning perfor-mance (Jaech et al., 2024; Guo et al., 2025; Yu et al., 7Table 3: Ablation on the two corrections of ReCo (Pass@64 on Qwen2.5-Math-1.5B). Response applies only the response-level expected-occurrence normalization. Token applies only the token-level variance ratio. ReCo                                       
+
+> combines both. Bold indicates the best result.
+> Method AIME 25 AIME 24 AMC 23 Olympiad MATH 500 Avg.
+> GRPO 36.2 46.5 91.3 63.1 92.0 65.8 ASPO 37.9 47.6 89.1 63.2 92.0 66.0 Response only 38.9 49.2 93.7 65.4 93.5 68.1 Token only 38.3 50.5 91.2 65.8 92.5 67.7
+> ReCo 40.1 48.9 93.4 68.0 94.1 68.9
+
+2025; Zhang et al., 2025). GRPO is a representa-tive RLVR method that optimizes a policy using groups of sampled responses and outcome-level re-wards, avoiding a separate value model (Shao et al., 2024). Building on this, subsequent work has stud-ied R1-zero-like training (Liu et al., 2025b). Recent analyses question whether RLVR truly expands the base model’s reasoning capacity or mainly im-proves sampling efficiency over already accessible paths. Yue et al. (2025); Wu et al. (2026) show that RLVR-trained models can improve at small sam-pling budgets but fail to surpass the base model at large Pass@ k, suggesting limited exploration beyond existing reasoning paths. Our work stud-ies this phenomenon from the perspective of the GRPO update itself, identifying response-level and token-level mechanisms that drive distributional concentration. 
+
+Diversity in RLVR. A related line of work stud-ies how reasoning-oriented fine-tuning changes the coverage of generated solution paths. Prior work observes that gains in single-sample accuracy can coincide with reduced coverage under repeated sampling (Dang et al., 2025; Yue et al., 2025; Wu et al., 2026). Recent methods address this issue by encouraging diversity (Li et al., 2025b; Yao et al., 2025; Chen et al., 2025), or by studying alterna-tive divergence choices (Li et al., 2025a). ReCo differs in approach. Rather than adding an exter-nal diversity objective or regularizer, it reweights the GRPO update itself based on how concentra-tion arises within the update, where frequent trajec-tories receive larger response-level gradient mass through repeated sampling and token-level impor-tance weighting amplifies saturated choices. 
+
+6 Conclusion 
+
+We studied how GRPO changes the sampling be-havior of reasoning models. We found that GRPO can concentrate probability mass on responses that are already frequent under the base model, which improves Pass@ k at lower values of k but can reduce coverage at higher values of k. We iden-tify two mechanisms behind this effect. At the response level, frequent responses receive larger aggregate gradient mass through repeated occur-rence, while at the token level, importance ratios amplify choices whose probabilities have already increased. To mitigate these mechanisms, we introduced 
+
+ReCo , a two-level reweighting method. It normal-izes response-level updates by expected occurrence and replaces the token-level importance ratio with a variance-based ratio that downweights saturated decision points while giving larger scale to non-saturated ones where multiple token choices remain plausible. Empirically, ReCo improves Pass@ k at higher values of k over GRPO while maintaining com-petitive performance at lower values of k. It also preserves rollout diversity during training and generates more diverse correct responses at infer-ence time. These results indicate that addressing GRPO’s internal concentration mechanisms pre-serves a broader set of correct reasoning paths with-out sacrificing sampling efficiency. 
+
+Limitations and Discussion 
+
+This work focuses on RLVR with sparse binary outcome rewards, where feedback is given mainly by final-answer correctness. While this setting is standard for mathematical reasoning, many tasks provide denser or less discrete supervision, such as feedback on intermediate reasoning steps, partial progress, or subjective output quality. Since such rewards may be continuous or multi-dimensional, extending ReCo beyond sparse binary rewards re-mains an important direction for future work. ReCo also applies response-level and token-level reweighting uniformly during training. A8more adaptive variant could decide when and how strongly to apply each correction based on the roll-out distribution or training dynamics. Moreover, ReCo reweights gradients after rollouts are sam-pled from the policy, but does not directly change the sampling process itself. Combining ReCo with exploration-oriented decoding strategies may fur-ther improve rollout diversity and broaden the set of reasoning paths used for learning. 
+
+Ethics Statement 
+
+This work proposes ReCo, a reweighting method for reinforcement learning with verifiable rewards, and does not involve human subjects, crowdsourc-ing, or the collection of new data. All experiments use publicly available mathematical and code rea-soning benchmarks and open-source pretrained lan-guage models, and we do not introduce any new datasets containing personal or sensitive informa-tion. We do not anticipate direct negative societal impacts from this work. As with any method that improves the reasoning capability of language mod-els, however, downstream applications should re-main subject to appropriate oversight to mitigate potential misuse. We report all hyperparameters and experimental settings needed to reproduce our results in the Appendix. 
+
+References 
+
+Mark Chen, Jerry Tworek, Heewoo Jun, Qiming Yuan, Henrique Ponde de Oliveira Pinto, Jared Kaplan, Harri Edwards, Yuri Burda, Nicholas Joseph, Greg Brockman, Alex Ray, Raul Puri, Gretchen Krueger, Michael Petrov, Heidy Khlaaf, Girish Sastry, Pamela Mishkin, Brooke Chan, Scott Gray, and 39 others. 2021. Evaluating large language models trained on code. Preprint , arXiv:2107.03374. Xiwen Chen, Wenhui Zhu, Peijie Qiu, Xuanzhao Dong, Hao Wang, Haiyu Wu, Huayu Li, Aristeidis Sotiras, Yalin Wang, and Abolfazl Razi. 2025. Dra-grpo: Exploring diversity-aware reward adjustment for r1-zero-like training of large language models. arXiv preprint arXiv:2505.09655 .Xingyu Dang, Christina Baek, J Zico Kolter, and Aditi Raghunathan. 2025. Assessing diversity collapse in reasoning. In Scaling Self-Improving Foundation Models without Human Supervision .Aaron Grattafiori, Abhimanyu Dubey, Abhinav Jauhri, Abhinav Pandey, Abhishek Kadian, Ahmad Al-Dahle, Aiesha Letman, Akhil Mathur, Alan Schel-ten, Alex Vaughan, Amy Yang, Angela Fan, Anirudh Goyal, Anthony Hartshorn, Aobo Yang, Archi Mi-tra, Archie Sravankumar, Artem Korenev, Arthur Hinsvark, and 542 others. 2024. The llama 3 herd of models. Preprint , arXiv:2407.21783. Daya Guo, Dejian Yang, Haowei Zhang, Junxiao Song, Peiyi Wang, Qihao Zhu, Runxin Xu, Ruoyu Zhang, Shirong Ma, Xiao Bi, and 1 others. 2025. Deepseek-r1: Incentivizing reasoning capability in llms via reinforcement learning. arXiv preprint arXiv:2501.12948 .Chaoqun He, Renjie Luo, Yuzhuo Bai, Shengding Hu, Zhen Leng Thai, Junhao Shen, Jinyi Hu, Xu Han, Yujie Huang, Yuxiang Zhang, and 1 others. 2024. Olympiadbench: A challenging benchmark for pro-moting agi with olympiad-level bilingual multimodal scientific problems. ACL .Dan Hendrycks, Collin Burns, Saurav Kadavath, Akul Arora, Steven Basart, Eric Tang, Dawn Song, and Jacob Steinhardt. 2021. Measuring mathematical problem solving with the math dataset. Preprint ,arXiv:2103.03874. Aaron Jaech, Adam Kalai, Adam Lerer, Adam Richard-son, Ahmed El-Kishky, Aiden Low, Alec Helyar, Aleksander Madry, Alex Beutel, Alex Carney, and 1 others. 2024. Openai o1 system card. arXiv preprint arXiv:2412.16720 .Ke Ji, Jiahao Xu, Tian Liang, Qiuzhi Liu, Zhiwei He, Xiaoyuan Liu, Xingyu Chen, Junying Chen, Benyou Wang, Zhaopeng Tu, and 1 others. 2026. The first few tokens are all you need: An efficient and effective unsupervised prefix fine-tuning method for reasoning models. Advances in Neural Information Processing Systems , 38:9305–9325. Jiwei Li, Michel Galley, Chris Brockett, Jianfeng Gao, and William B Dolan. 2016. A diversity-promoting objective function for neural conversation models. In Proceedings of the 2016 conference of the North American chapter of the association for computa-tional linguistics: human language technologies ,pages 110–119. Long Li, Jiaran Hao, Jason Klein Liu, Zhijian Zhou, Xiaoyu Tan, Wei Chu, Zhe Wang, Shirui Pan, Chao Qu, and Yuan Qi. 2025a. The choice of divergence: A neglected key to mitigating diversity collapse in reinforcement learning with verifiable reward. arXiv preprint arXiv:2509.07430 .Tianjian Li, Yiming Zhang, Ping Yu, Swarnadeep Saha, Daniel Khashabi, Jason Weston, Jack Lanchantin, and Tianlu Wang. 2025b. Jointly reinforcing di-versity and quality in language model generations. 
+
+Preprint , arXiv:2509.02534. Mingjie Liu, Shizhe Diao, Ximing Lu, Jian Hu, Xin Dong, Yejin Choi, Jan Kautz, and Yi Dong. 2025a. Prorl: Prolonged reinforcement learning expands reasoning boundaries in large language models. 
+
+Preprint , arXiv:2505.24864. Zichen Liu, Changyu Chen, Wenjun Li, Penghui Qi, Tianyu Pang, Chao Du, Wee Sun Lee, and Min Lin. 
+
+92025b. Understanding r1-zero-like training: A criti-cal perspective. arXiv preprint arXiv:2503.20783 .Kishore Papineni, Salim Roukos, Todd Ward, and Wei-Jing Zhu. 2002. Bleu: a method for automatic evalu-ation of machine translation. In Proceedings of the 40th Annual Meeting of the Association for Compu-tational Linguistics , pages 311–318, Philadelphia, Pennsylvania, USA. Association for Computational Linguistics. Zhihong Shao, Peiyi Wang, Qihao Zhu, Runxin Xu, Junxiao Song, Xiao Bi, Haowei Zhang, Mingchuan Zhang, Y. K. Li, Yang Wu, and Daya Guo. 2024. Deepseekmath: Pushing the limits of mathematical reasoning in open language models. arXiv preprint arXiv:2402.03300 .Guangming Sheng, Chi Zhang, Zilingfeng Ye, Xibin Wu, Wang Zhang, Ru Zhang, Yanghua Peng, Haibin Lin, and Chuan Wu. 2025. Hybridflow: A flexible and efficient rlhf framework. In Proceedings of the Twentieth European Conference on Computer Sys-tems , EuroSys ’25, page 1279–1297. ACM. Jiakang Wang, Runze Liu, Qingpeng Cai, Lei Lin, Wen-ping Hu, Xiu Li, Fuzheng Zhang, Guorui Zhou, Kun Gai, and Ling Pan. 2026. When importance sampling misallocates credit: Asymmetric ratios for outcome-supervised rl. Preprint , arXiv:2510.06062. Shenzhi Wang, Le Yu, Chang Gao, Chujie Zheng, Shix-uan Liu, Rui Lu, Kai Dang, Xionghui Chen, Jianxin Yang, Zhenru Zhang, Yuqiong Liu, An Yang, An-drew Zhao, Yang Yue, Shiji Song, Bowen Yu, Gao Huang, and Junyang Lin. 2025a. Beyond the 80/20 rule: High-entropy minority tokens drive effective reinforcement learning for llm reasoning. Preprint ,arXiv:2506.01939. Zengzhi Wang, Fan Zhou, Xuefeng Li, and Pengfei Liu. 2025b. Octothinker: Mid-training incen-tivizes reinforcement learning scaling. Preprint ,arXiv:2506.20512. Fang Wu, Weihao Xuan, Ximing Lu, Mingjie Liu, Yi Dong, Zaid Harchaoui, and Yejin Choi. 2026. The invisible leash: Why rlvr may or may not escape its origin. Preprint , arXiv:2507.14843. An Yang, Beichen Zhang, Binyuan Hui, Bofei Gao, Bowen Yu, Chengpeng Li, Dayiheng Liu, Jian-hong Tu, Jingren Zhou, Junyang Lin, Keming Lu, Mingfeng Xue, Runji Lin, Tianyu Liu, Xingzhang Ren, and Zhenru Zhang. 2024. Qwen2.5-math tech-nical report: Toward mathematical expert model via self-improvement. Preprint , arXiv:2409.12122. Jian Yao, Ran Cheng, Xingyu Wu, Jibin Wu, and Kay Chen Tan. 2025. Diversity-aware policy optimization for large language model reasoning. 
+
+Preprint , arXiv:2505.23433. Edward Yeo, Yuxuan Tong, Morry Niu, Graham Neubig, and Xiang Yue. 2025. Demystifying long chain-of-thought reasoning in llms. Preprint ,arXiv:2502.03373. Qiying Yu, Zheng Zhang, Ruofei Zhu, Yufeng Yuan, Xiaochen Zuo, Yu Yue, Weinan Dai, Tiantian Fan, Gaohong Liu, Lingjun Liu, and 1 others. 2025. Dapo: An open-source llm reinforcement learning system at scale. arXiv preprint arXiv:2503.14476 .Yang Yue, Zhiqi Chen, Rui Lu, Andrew Zhao, Zhaokai Wang, Yang Yue, Shiji Song, and Gao Huang. 2025. Does reinforcement learning really incentivize rea-soning capacity in llms beyond the base model? 
+
+arXiv preprint arXiv:2504.13837 .Weihao Zeng, Yuzhen Huang, Qian Liu, Wei Liu, Ke-qing He, Zejun Ma, and Junxian He. 2025. Simplerl-zoo: Investigating and taming zero reinforcement learning for open base models in the wild. Preprint ,arXiv:2503.18892. Xiaojiang Zhang, Jinghui Wang, Zifei Cheng, Wenhao Zhuang, Zheng Lin, Minglei Zhang, Shaojie Wang, Yinghan Cui, Chao Wang, Junyi Peng, and 1 others. 2025. Srpo: A cross-domain implementation of large-scale reinforcement learning on llm. arXiv preprint arXiv:2504.14286 .Xinyu Zhu, Mengzhou Xia, Zhepei Wei, Wei-Lin Chen, Danqi Chen, and Yu Meng. 2025. The surprising effectiveness of negative reinforcement in llm reason-ing. Preprint , arXiv:2506.01347. 
+
+10 A Implementation Details 
+
+A.1 Training Details 
+
+We train all RL methods on the MATH training set (Hendrycks et al., 2021) using the verl frame-work (Sheng et al., 2025). Table 4 summarizes the training hyperparameters, which are kept identical for ReCo and GRPO. 
+
+Table 4: Training hyperparameters.                          
+
+> Hyperparameter Value
+> Framework verl Training data MATH Optimizer AdamW Learning rate 1×10 −6
+> Prompt batch size 256 PPO mini-batch size 64 Rollouts per prompt ( G)8PPO update epochs 1PPO clip range ( ε)0.2 Response-weight clip (ReCo only) 10 KL coefficient ( β)0.001 Sampling temperature 1.0 Top-p1.0 Reward Binary correctness Total epochs Qwen 1.5B, Qwen 7B 20 Llama 8B 8Max response length Qwen 1.5B 2048 Qwen 7B, Llama 8B 3072 GPUs Qwen 1.5B 2×A6000 Qwen 7B, Llama 8B 2×B200
+
+Response-Weight Clipping. wresp  
+
+> i
+
+can be very large when ¯πθold (oi | q) is small. We clip wresp  
+
+> i
+
+to a maximum of 10 to prevent rare extreme weights from producing unstable updates. In practice, the cap is triggered in 10 out of 580 training steps (1.7%), all during the early stage of training. We additionally train ReCo without response-weight clipping while keeping all other settings fixed. As shown in Table 5, removing the cap yields perfor-mance close to the default setting, with an average Pass@64 of 68.6 compared with 68.9. This in-dicates that ReCo’s performance is not sensitive to the clipping threshold and that the cap mainly serves as a safeguard against rare extreme weights. 
+
+A.2 Evaluation Details 
+
+We use temperature 0.6, top-p 0.95 , and a maxi-mum generation length of 16 ,384 tokens, following               
+
+> Benchmark ReCo, default No clipping AIME 25 40.1 39.5 AIME 24 48.9 48.9
+> AMC 23 93.4 93.2 Olympiad 68.0 67.9 MATH 500 94.1 93.5 Average 68.9 68.6
+
+Table 5: Sensitivity to response-weight clipping on Qwen2.5-Math-1.5B, measured by Pass@64 (%). Re-moving the response-weight cap produces performance close to the default ReCo setting. 
+
+> <|im_start|>system You are a helpful assistant. <|im_end|> <|im_start|>user {input} Please reason step by step, and put your final answer within \boxed{}. <|im_end|> <|im_start|>assistant
+
+Figure 5: Prompt format used for Qwen-based models. 
+
+prior work (Yue et al., 2025). For Qwen-based mod-els, we use the prompt format shown in Figure 5, following (Zeng et al., 2025). For Llama-based models, we apply the corresponding model chat template. We report Pass@ k with k ∈{1, 2, 4, 8, . . . , 256 } for AIME 2024, AIME 2025, and AMC 2023, and k ∈ { 1, 2, 4, 8, . . . , 128 } for MATH500 and OlympiadBench. We estimate Pass@ k using the unbiased estimator from (Chen et al., 2021), with n = 1024 samples per problem for AIME 2024, AIME 2025, and AMC 2023, and n = 128 for MATH500 and OlympiadBench. Given c correct samples among n generations, the estimate is computed as 
+
+Pass@ k = Ex∼D 
+
+"
+
+1 −
+
+ n−ck
+
+ nk
+
+#
+
+, n ≥ k. (6) 
+
+B Additional Experiments 
+
+B.1 Pass@k Across Models 
+
+Figure 6 shows the Pass@ k scaling curves for Qwen2.5-Math-1.5B. ReCo and GRPO are compa-rable at small k, while ReCo outperforms GRPO as 
+
+k increases, indicating broader coverage of correct reasoning trajectories than GRPO. Figure 7 shows the corresponding curves for Llama-3.1-8B-Instruct. Consistent with prior re-11 Figure 6: Pass@ k scaling curves on five mathematical reasoning benchmarks for Qwen2.5-Math-1.5B. Each panel shows Base, GRPO, and ReCo (Ours) across different sampling budgets k.  
+
+> Figure 7: Pass@ kscaling curves on five mathematical reasoning benchmarks for Llama-3.1-8B-Instruct. Each panel shows Base, GRPO, and ReCo (Ours) across different sampling budgets k.
+
+ports that RL training on this backbone can un-derperform the base model under Pass@ k evalua-tion (Yue et al., 2025; Zhu et al., 2025; Wang et al., 2025b; Yeo et al., 2025), GRPO falls well below the base model across all benchmarks. ReCo sub-stantially reduces this gap and closely tracks the base model on most benchmarks, while generally matching GRPO at small k and outperforming it at larger sampling budgets. 
+
+B.2 Reasoning Path Uniqueness 
+
+We further measure how reasoning path diversity evolves during training. For each prompt at a given training step, we generate 16 rollouts and compute the ratio of unique reasoning prefixes within the group. Following recent findings that the early to-kens of a reasoning trace carry disproportionately strong signals about the eventual solution trajec-tory (Ji et al., 2026), we use the first 300 char-acters of each rollout as the reasoning prefix. A uniqueness ratio of 1.0 indicates that all 16 rollouts begin with distinct reasoning approaches, a lower ratio indicates that multiple rollouts share the same opening, suggesting that they will follow the same reasoning trajectory. Figure 8 shows this ratio across training steps for Qwen2.5-Math-7B. Both methods start near 1.0,matching the base model’s full diversity. As train- 
+
+> Figure 8: Reasoning path uniqueness across training steps. Higher values indicate more diverse reasoning prefixes among rollouts. GRPO progressively loses path diversity, while ReCo preserves it close to the base model.
+
+ing progresses, GRPO’s reasoning path uniqueness drops to 0.66 by step 580, indicating that roughly one-third of rollouts begin with the same reasoning approach as another rollout in the group. ReCo maintains a uniqueness ratio of 0.95 , preserving nearly the full reasoning diversity of the base model. 12 Method AIME 25 AIME 24 AMC 23 Olympiad MATH 500 Avg. DAPO 38.5 46.7 92.0 61.9 92.3 66.3 DAPO + ReCo 39.4 48.6 93.2 64.1 93.6 67.8             
+
+> 80/20 Rule 40.0 48.5 91.5 63.0 92.9 66.5 80/20 Rule + ReCo 41.3 49.3 93.1 64.5 93.3 68.3
+> Table 6: Results from combining ReCo with DAPO and the 80/20 Rule on Qwen2.5-Math-1.5B. Performance is measured using Pass@64 (%). Adding ReCo improves both methods across all five benchmarks. Bold indicates the better result within each pair.
+
+B.3 Combining ReCo with Existing GRPO Methods 
+
+ReCo changes how update contributions are allo-cated at the response and token levels. This design can be applied together with methods that modify other parts of GRPO. We evaluate ReCo in combi-nation with DAPO (Yu et al., 2025) and the 80/20 Rule (Wang et al., 2025a) while retaining the re-maining components of each method. Table 6 reports the results on Qwen2.5-Math-1.5B. Adding ReCo improves DAPO across all five benchmarks and increases the average Pass@64 from 66.3 to 67.8. Adding ReCo to the 80/20 Rule also improves all five benchmarks and increases the average from 66.5 to 68.3. These results show that ReCo addresses a dis-tinct aspect of the GRPO update and can comple-ment existing methods for GRPO optimization and token selection. 
+
+B.4 Evaluation on Code Reasoning 
+
+We further evaluate ReCo on code reasoning to examine whether its improvements extend be-yond mathematical reasoning. We consider Hu-manEval, HumanEval+, and LiveCodeBench and report Pass@ k for k ∈ { 1, 2, 4, 8, 16 , 32 , 64 }.As shown in Table 7, ReCo outperforms GRPO at every value of k on all three benchmarks. The improvement becomes more pronounced as k in-creases. At Pass@64, ReCo improves over GRPO by 14.73 points on HumanEval, 12.86 points on HumanEval+, and 7.46 points on LiveCodeBench. ReCo also surpasses the base model at every value of k on HumanEval. These results show that the reduction in response coverage under GRPO is not limited to mathemat-ical reasoning. ReCo also preserves a broader set of correct solutions in code generation. 
+
+B.5 Entropy and KL During Training 
+
+We compare the entropy and KL values observed during training to examine how ReCo changes the optimization behavior of GRPO. Table 8 reports the results for Qwen2.5-Math-1.5B at several training steps. The entropy of both methods decreases as train-ing progresses. However, ReCo maintains sub-stantially higher entropy than GRPO throughout training. At the final step, the entropy is 0.1636 for ReCo and 0.0409 for GRPO. In contrast, the absolute KL values remain on a similar scale for the two methods. These results indicate that ReCo reduces the rapid entropy collapse observed under GRPO with-out causing a larger change in the policy. This behavior is consistent with the greater response di-versity and reasoning path coverage observed in our other analyses. 
+
+C Case Study 
+
+We present two case studies comparing the rollouts produced by GRPO and ReCo on the same prompt. Both case studies illustrate that ReCo produces more diverse reasoning approaches than GRPO, even when both methods achieve similar correct-ness. 
+
+C.1 Case 1: MATH train problem 
+
+Figures 9–12 show 8 rollouts from each method on a median-length problem from the MATH train set. Both methods reach the correct answer in all 8 rollouts. GRPO’s rollouts apply a single reasoning approach (Apollonius’s theorem) across all 8 gen-erations, with only minor textual variants. ReCo’s rollouts span three distinct solution forms: Apollo-nius’s theorem, the equivalent median-length iden-tity solved for AB 2 + AC 2, and a coordinate-geometry construction. While the first two forms are algebraically equivalent, they reflect different procedural choices (direct application of an iden-tity for AB 2 + AC 2 versus deriving it from the median-length formula); the coordinate construc-tion is methodologically distinct. 13 Benchmark Method Pass@1 Pass@2 Pass@4 Pass@8 Pass@16 Pass@32 Pass@64 HumanEval Base 61.30 70.07 76.79 81.64 84.90 86.97 88.41 GRPO 61.93 65.86 69.13 71.40 72.75 73.59 74.06 ReCo 72.15 77.83 81.67 84.32 86.21 87.60 88.79 
+
+HumanEval+ Base 56.75 65.20 71.94 76.75 79.86 81.93 83.61 
+
+GRPO 58.03 61.69 64.65 66.71 67.90 68.71 69.42 ReCo 65.72 71.18 74.93 77.68 79.86 81.38 82.28 LiveCodeBench Base 13.21 16.88 20.07 22.85 25.44 27.86 29.98 
+
+GRPO 11.20 12.22 13.07 13.75 14.36 14.96 15.46 ReCo 15.22 16.93 18.30 19.48 20.59 21.74 22.92 
+
+Table 7: Pass@ k results on three code reasoning benchmarks. ReCo outperforms GRPO at every value of k across all benchmarks. Bold indicates the best result for each benchmark and sampling budget.                                     
+
+> Step ReCo HGRPO HReCo |KL |GRPO |KL |
+> 00.6050 0.6050 9.71 ×10 −62.06 ×10 −6
+> 100 0.1969 0.1573 2.31 ×10 −51.20 ×10 −5
+> 200 0.1839 0.1270 4.80 ×10 −62.75 ×10 −5
+> 300 0.1624 0.0835 1.33 ×10 −54.21 ×10 −6
+> 400 0.1622 0.0637 1.23 ×10 −51.82 ×10 −5
+> 500 0.1605 0.0500 7.10 ×10 −62.08 ×10 −5
+> 580 0.1636 0.0409 1.28 ×10 −53.20 ×10 −5
+
+Table 8: Entropy and absolute KL values during training on Qwen2.5-Math-1.5B. H denotes the average token entropy. ReCo maintains higher entropy than GRPO while the absolute KL values remain on a similar scale. 
+
+C.2 Case 2: AIME 2025 problem 
+
+Figures 13–16 show 8 rollouts from each method on an AIME 2025 problem. GRPO reaches the cor-rect answer in 4 rollouts, all applying the remainder theorem; the 4 incorrect rollouts fail at execution within this single strategy family. ReCo reaches the correct answer in 6 rollouts via two distinct strate-gies: the remainder theorem and a variable substi-tution path that GRPO never explores. ReCo’s 2 incorrect rollouts also distribute across both strate-gies, failing at execution rather than from missing the algebraic structure. 14 PROBLEM (MATH TRAIN) 
+
+In triangle ABC , BC = 8. The length of median AD is 5. Let M be the largest possible value of AB 2 + AC 2, and let m be the smallest possible value. Find M − m. Answer: 0
+
+GRPO — 8 correct / 8, single reasoning strategy 8 / 8 correct · 1 strategy 
+
+ALL 8 ROLLOUTS USE APOLLONIUS'S THEOREM (3 MINOR TEXTUAL VARIANTS) 
+
+Variant 1 (R1, R2, R3) To solve this problem, we need to use the properties of medians in a triangle and the Apollonius's theorem. According to Apollonius's theorem, for any triangle ABC with a median AD from vertex A to the midpoint D of side BC, the following relationship holds: AB² + AC² = 2·AD² + 2·BD² Given: – BC = 8, so BD = DC = 4. – AD = 5. Using Apollonius's theorem: AB² + AC² = 2(5²) + 2(4²) = 2(25) + 2(16) = 50 + 32 = 82. Therefore M = m = 82, and M − m = 0. 
+
+Variant 2 (R4, R5, R6) To solve the problem, we need to use the properties of medians in a triangle and the Apollonius's theorem. According to Apollonius's theorem, for any triangle ABC with a median AD to side BC, the following relationship holds: AB² + AC² = 2·AD² + 2·BD² Given that BC = 8 and AD = 5, we have BD = 4. Substituting: AB² + AC² = 2(5²) + 2(4²) = 50 + 32 = 82. This expression is constant for any triangle satisfying the given conditions, so M = m = 82 and M − m = 0. 
+
+Variant 3 (R7, R8) To solve this problem, we need to use some geometric properties and algebra. Here's the step-by-step reasoning: 1. Understanding the geometry: – We have a triangle ABC with BC = 8. – The median AD has length 5. – D is the midpoint of BC, so BD = DC = 4. 2. Applying Apollonius's theorem: For any triangle ABC with a median AD, AB² + AC² = 2·AD² + 2·BD² Substituting AD = 5 and BD = 4, AB² + AC² = 2(5²) + 2(4²) = 2(25) + 2(16) = 50 + 32 = 82 This equation shows that AB² + AC² is constant and equals 82. Figure 9: Case 1, GRPO rollouts. All 8 rollouts apply Apollonius’s theorem with minor textual variants. 
+
+15 PROBLEM (MATH TRAIN) 
+
+In triangle ABC , BC = 8. The length of median AD is 5. Let M be the largest possible value of AB 2 + AC 2, and let m be the smallest possible value. Find M − m. Answer: 0
+
+ReCo — Strategy A (Apollonius's theorem) 5 rollouts (R1, R2, R3, R4, R5) 
+
+R1 To solve this problem, we need to use the properties of a triangle and the median. Given that BC = 8 and the length of the median AD is 5, we can use Apollonius's theorem, which states that for any triangle ABC with a median AD from vertex Ato the midpoint D of side BC: AB² + AC² = 2·AD² + 2·BD² Since D is the midpoint of BC, BD = DC = BC/2 = 4. So we can rewrite Apollonius's theorem as: AB² + AC² = 2(5²) + 2(4²) = 2(25) + 2(16) = 50 + 32 = 82. This equation holds for any triangle ABC with the given conditions. Thus, AB² + AC² is always 82, regardless of the specific configuration. 
+
+R2 To solve this problem, we need to use the properties of medians and Apollonius's theorem. Apollonius's theorem states that in any triangle, the sum of the squares of any two sides is equal to twice the square of the median to the third side plus twice the square of half the third side. For triangle ABC with median AD to side BC: AB² + AC² = 2·AD² + 2·(BC/2)² Given BC = 8 and AD = 5, substitute: AB² + AC² = 2(5²) + 2(8/2)² = 2(25) + 2(16) = 50 + 32 = 82. This shows that for any triangle ABC with the given conditions, AB² + AC² is fixed. 
+
+R3 To solve the problem, we need to use the properties of the median in a triangle. Given that AD is a median, it divides side BC into two equal segments, so BD = DC = 4. We can use Apollonius's theorem, which states that in any triangle, the sum of the squares of any two sides is equal to twice the square of the median to the third side plus twice the square of half the third side: AB² + AC² = 2·AD² + 2·BD² Given AD = 5 and BD = 4: AB² + AC² = 2(5²) + 2(4²) = 2(25) + 2(16) = 50 + 32 = 82. 
+
+R4 To solve this problem, we need to use some geometric properties and algebra. Here's a step-by-step breakdown: 1. Understanding the problem: – Triangle ABC with BC = 8. – Median AD has length 5. – Find largest M and smallest m of AB² + AC², then M − m. 2. Using Apollonius's theorem: For triangle ABC with median AD: AB² + AC² = 2·AD² + 2·BD² Since D is the midpoint of BC, BD = 4. Substituting AD = 5: AB² + AC² = 2(25) + 2(16) = 82. 
+
+R5 To solve this problem, we need to use Apollonius's theorem, which states that in any triangle, the sum of the squares of any two sides is equal to twice the square of the median to the third side plus twice the square of half the third side. For triangle ABC with median AD to side BC: AB² + AC² = 2·AD² + 2·(BC/2)² Given BC = 8 and AD = 5, substitute: AB² + AC² = 2(5²) + 2(8/2)² = 2(25) + 2(4²) = 50 + 2(16) = 50 + 32 = 82. This means that AB² + AC² is always equal to 82 for any triangle ABC with the given conditions. Figure 10: Case 1, ReCo rollouts using Strategy A (Apollonius’s theorem). 
+
+16 PROBLEM (MATH TRAIN) 
+
+In triangle ABC , BC = 8. The length of median AD is 5. Let M be the largest possible value of AB 2 + AC 2, and let m be the smallest possible value. Find M − m. Answer: 0
+
+ReCo — Strategy B (Median length formula) 2 rollouts (R6, R7)  
+
+> R6
+
+To solve this problem, we use the properties of a triangle and the median. Given triangle ABC with BC = 8 and median AD = 5, we need to find the max and min values of AB² + AC², and then find M − m. 1. Using the formula for the length of a median: The length of median AD in a triangle is given by: AD² = (2·AB² + 2·AC² − BC²) / 4Given AD = 5 and BC = 8: 5² = (2·AB² + 2·AC² − 8²) / 425 = (2·AB² + 2·AC² − 64) / 4Multiplying both sides by 4: 100 = 2·AB² + 2·AC² − 64 2·AB² + 2·AC² = 164 AB² + AC² = 82.  
+
+> R7
+
+In triangle ABC, BC = 8 and median AD = 5. We need the largest and smallest values of AB² + AC², then M − m. First, recall the formula for the length of a median. For median AD in triangle ABC: AD² = (2·AB² + 2·AC² − BC²) / 4Given AD = 5 and BC = 8: 5² = (2·AB² + 2·AC² − 8²) / 425 = (2·AB² + 2·AC² − 64) / 4Multiplying both sides by 4: 100 = 2·AB² + 2·AC² − 64 Adding 64 to both sides: 164 = 2·AB² + 2·AC² Dividing by 2: AB² + AC² = 82. Figure 11: Case 1, ReCo rollouts using Strategy B (median-length formula). This form is algebraically equivalent to Apollonius’s theorem but starts from the formula for AD 2 and solves for AB 2 + AC 2.
+
+17 PROBLEM (MATH TRAIN) 
+
+In triangle ABC , BC = 8. The length of median AD is 5. Let M be the largest possible value of AB 2 + AC 2, and let m be the smallest possible value. Find M − m. Answer: 0
+
+ReCo — Strategy C (Coordinate geometry) 1 rollout (R8)  
+
+> R8
+
+To solve this problem, we use the properties of the triangle and the median. Let's denote the vertices of the triangle as A, B, and C, and place coordinates: A = (0, h), B = (−4, 0), C = (4, 0) The median AD goes from A to the midpoint D of BC. The coordinates of D are (0, 0). The length of median AD is given as 5. Using the distance formula: AD = √[(0 − 0)² + (h − 0)²] = h = 5So the height h of the triangle is 5. Now compute AB² + AC² using the distance formula: AB² = (0 − (−4))² + (h − 0)² = 4² + 5² = 16 + 25 = 41 AC² = (0 − 4)² + (h − 0)² = 4² + 5² = 41 So AB² + AC² = 82. Figure 12: Case 1, ReCo rollouts using Strategy C (coordinate geometry). The rollout uses a symmetric placement of A on the perpendicular bisector of BC ; the value of AB 2 + AC 2 obtained coincides with the general case. 
+
+18 PROBLEM (AIME 2025) 
+
+Find the sum of all positive integers n such that n+2 divides the product 3( n+3)( n2+9). Answer: 49 
+
+GRPO — Correct rollouts 4 / 8 correct · remainder theorem 
+
+ALL CORRECT ROLLOUTS APPLY THE REMAINDER THEOREM (N ≡ −2 MOD (N+2)) 
+
+R4 ✓ 49 To solve the problem, we need to find all positive integers n such that n+2 divides 3(n+3)(n²+9). We use the remainder theorem. Since n ≡ −2 (mod n+2), substituting gives 3(−2+3)((−2)² + 9) = 3·1·13 = 39. So n+2 must divide 39. Positive divisors of 39 are {1, 3, 13, 39}; excluding n+2=1, we get n ∈ {1, 11, 37}. Verification: n=1: 3·4·10 = 120, divisible by 3 ✓
+
+n=11: 3·14·130 = 5460, divisible by 13 ✓
+
+n=37: 3·40·1378 = 165840, divisible by 39 ✓
+
+Sum: 1 + 11 + 37 = 49 .
+
+R5 ✓ 49 By the remainder theorem, the remainder of P(n) = 3(n+3)(n²+9) divided by n+2 is P(−2) = 3·1·13 = 39. So n+2 | 39, giving n ∈ {1, 11, 37}. (Verified with a short Python snippet enumerating divisors.) Sum = 49 .
+
+R7 ✓ 49 Substituting n = −2 directly: 3·(−2+3)·((−2)² + 9) = 3·1·13 = 39. So n+2 divides 39. Divisors of 39: {1, 3, 13, 39} → n ∈ {1, 11, 37}. Each verified by direct computation. Sum = 49 .
+
+R8 ✓ 49 Using n ≡ −2 (mod n+2): n+3 ≡ 1, n²+9 ≡ 13. So 3(n+3)(n²+9) ≡ 3·1·13 = 39 (mod n+2). Thus n+2 ∈ {3, 13, 39}, giving n ∈ {1, 11, 37}. Sum = 49 .Figure 13: Case 2, GRPO correct rollouts. All 4 correct rollouts apply the remainder theorem. 
+
+19 PROBLEM (AIME 2025) 
+
+Find the sum of all positive integers n such that n+2 divides the product 3( n+3)( n2+9). Answer: 49 
+
+GRPO — Incorrect rollouts 4 / 8 incorrect · same strategy, execution errors 
+
+SAME STRATEGY FAMILY, FAIL AT EXECUTION 
+
+R1 ✗ 105 Attempts polynomial long division of 3(n+3)(n²+9) by (n+2) instead of using the remainder theorem. Concludes (incorrectly) that the relevant divisor structure is the set of divisors of 48, giving n ∈ {1, 2, 4, 6, 10, 14, 22, 46}. Sum reported as 105 .
+
+R2 ✗ 50 Uses the same remainder-theorem reduction, then defers verification to a Python brute-force loop over n ∈
+
+[1, 1000]. The hallucinated tool output reports the valid set as [1, 2, 47], summing to 50 . The model accepts the fabricated output without independent algebraic check. 
+
+R3 ✗ 32 Same remainder-theorem reduction, again offloaded to a Python brute-force search. Hallucinated output reports [1, 5, 7, 19], summing to 32 . No algebraic verification. 
+
+R6 ✗ 8 Same remainder-theorem reduction, with brute-force code over n ∈ [1, 100]. Hallucinated output reports [1, 7], summing to 8. The model again accepts the fabricated tool output. Figure 14: Case 2, GRPO incorrect rollouts. All 4 incorrect rollouts attempt the same strategy and fail at execution. 
+
+20 PROBLEM (AIME 2025) 
+
+Find the sum of all positive integers n such that n+2 divides the product 3( n+3)( n2+9). Answer: 49 
+
+ReCo — Correct rollouts 6 / 8 correct · two strategies 
+
+STRATEGY A — REMAINDER THEOREM (R1, R4, R5, R8)    
+
+> R1 ✓49
+
+By the remainder theorem, the remainder of P(n) = 3(n+3)(n²+9) divided by n+2 equals P(−2) = 3·1·13 = 39. So n+2 | 39, n ∈ {1, 11, 37}. Sum = 49 .(Cross-checked with a Python enumeration over n ∈ [1, 100] returning exactly [1, 11, 37].)    
+
+> R4 ✓49
+
+P(n) mod (n+2) = P(−2) = 3·(−2+3)·((−2)² + 9) = 3·1·13 = 39. So n+2 divides 39. The divisors of 39 are {1, 3, 13, 39}; the positive integer solutions for n are {1, 11, 37}. Sum = 49 .   
+
+> R5 ✓49
+
+3(n+3)(n²+9) ≡ 0 (mod n+2). Substituting n ≡ −2: 3·1·13 = 39. So n+2 | 39, giving n ∈ {1, 11, 37}. Sum = 49 .   
+
+> R8 ✓49
+
+Substituting n ≡ −2 (mod n+2): n+3 ≡ 1, n²+9 ≡ 13. So 3(n+3)(n²+9) ≡ 39 (mod n+2). Therefore n+2 ∈ {3, 13, 39}, giving n ∈ {1, 11, 37}. Sum = 49 .
+
+STRATEGY B — SUBSTITUTION K = N+2, POLYNOMIAL EXPANSION IN K (R3, R6)    
+
+> R3 ✓49
+
+Let k = n+2, so n = k−2. Then n+3 = k+1 and n² + 9 = (k−2)² + 9 = k² − 4k + 13. So P = 3(k+1)(k² − 4k + 13). Reducing modulo k: P ≡ 3(k+1)·13 ≡ 3·1·13 = 39 (mod k). So k | 39, k ∈ {3, 13, 39}, giving n ∈ {1, 11, 37}. Sum = 49 .   
+
+> R6 ✓49
+
+Substitute m = n+2, so n = m−2. The expression becomes 3(m+1)((m−2)² + 9) = 3(m+1)(m² − 4m + 13). We need m | 3(m+1)(m² − 4m + 13). Reducing modulo m: 3(m+1)(m² − 4m + 13) ≡ 3·1·13 = 39 (mod m). So m | 39, m ∈ {3, 13, 39}, n ∈ {1, 11, 37}. Sum = 49 .Figure 15: Case 2, ReCo correct rollouts. The 6 correct rollouts span two distinct strategies. PROBLEM (AIME 2025) 
+
+Find the sum of all positive integers n such that n+2 divides the product 3( n+3)( n2+9). Answer: 49 
+
+ReCo — Incorrect rollouts 2 / 8 incorrect · execution errors across both strategies STRATEGY B — EXECUTION ERROR (R2) 
+
+R2 ✗ 51 Attempts the substitution m = n+2 but makes an algebraic error in expanding (m−2)² + 9, then defers to a Python brute-force loop. The hallucinated tool output reports [1, 4, 6, 8, 32], summing to 
+
+51 . The model accepts the fabricated output. 
+
+STRATEGY A — EXECUTION ERROR (R7) 
+
+R7 ✗ 11 Begins the remainder-theorem reduction (n ≡ −2 mod n+2) but stops the divisor enumeration early. Only n = 11 is verified explicitly; n = 1 and n = 37 are not enumerated. Reports sum = 11 .
+
+Figure 16: Case 2, ReCo incorrect rollouts. R2 fails at execution within the substitution path (Strategy B), and R7 fails at execution within the remainder-theorem path (Strategy A). 
+
+21
