@@ -1,0 +1,618 @@
+Title: AdaKP: Online Adaptive Knowledge-Point Selection for Reasoning-Oriented Reinforcement Learning
+
+URL Source: https://arxiv.org/pdf/2607.24833v1
+
+Published Time: Wed, 29 Jul 2026 00:03:00 GMT
+
+Number of Pages: 11
+
+Markdown Content:
+# AdaKP: Online Adaptive Knowledge-Point Selection for Reasoning-Oriented Reinforcement Learning 
+
+# Zibin Meng 1, Zhenyu Zhao 1, Chunqiang Run 2
+
+> 1
+
+The Hong Kong University of Science and Technology 
+
+> 2
+
+University of the Chinese Academy of Sciences zmengal@connect.ust.hk, zzhaocl@connect.ust.hk, chungiang24@mails.ucas.ac.cn 
+
+Abstract 
+
+Reinforcement learning with verifiable rewards is a powerful paradigm for eliciting reasoning in large language models, yet it suffers from severe reward sparsity on competition-level mathematics. A common remedy injects atomic knowledge points (KPs)—short natural-language hints distilled from gold solutions—into the prompt. Existing methods, however, either fix this selection once offline or merely scale the monolithic quantity of injected text, leaving untouched the most informa-tive axis of choice: which subset of atomic KPs to inject, and when . We introduce AdaKP , an online selector that re-chooses each problem’s KP subset over the course of RL training. At its core is an entropy proxy that scores a KP by the reduction in next-token entropy it induces—a single inexpensive forward pass, with a provable bound on its truncation bias—in place of expensive rollout-based estimation. Three lightweight mecha-nisms make this signal usable online: a momentum smoother that absorbs per-step noise, a retirement-and-revival manager that prunes weak KPs while preserving exploration, and an adaptive scheduler that front-loads re-evaluations into early training. AdaKP further contributes a pre-flight validation gate 
+
+that certifies the proxy against a leave-one-out ground truth be-fore any expensive run is launched, turning method-level risk into a falsifiable check. Realized as a fully additive fork of a standard DAPO+GRPO trainer with no optimizer changes, AdaKP improves over a strong static-selection baseline on all eight competition-mathematics benchmarks at negligible added cost, positioning online, validated KP-subset selection as a practical and as-yet under-explored axis for reasoning-oriented reinforcement learning. 
+
+# 1 Introduction 
+
+Reinforcement learning with verifiable rewards (RLVR) elic-its emergent chain-of-thought reasoning (Wei et al. 2022; Wang et al. 2023; Yao et al. 2023) in relatively small base models (DeepSeek-AI 2025; OpenAI 2024; Yu et al. 2025), going beyond decoding-time enhancements that leave the policy unchanged (Yao et al. 2023; Huang et al. 2024). A practical bottleneck is reward sparsity : on hard competi-tion problems an untrained 1.5B model answers correctly on only a tiny fraction of rollouts, leaving GRPO (Shao et al. 2024) and DAPO (Yu et al. 2025) with degenerate advan-tages. KnowRL (Yu et al. 2026) addresses this by distilling short knowledge points (KPs) from gold solutions and inject-ing a minimal-sufficient subset; choosing that subset offline by Constrained Subset Search (CSS) lifts a 1.5B model to 
+
+70 .08% average accuracy on eight benchmarks while cutting injected hints from 5.86 to 2.57 per problem. 
+
+The static-selection assumption. Such offline selection— CSS and its siblings—is fundamentally static : run once on the frozen base model, it fixes a problem-to-subset mapping baked into the training data and never revisited. This assumes KP utility is stationary along the policy’s trajectory, that the best hint at initialization is still best after thousands of RL steps. Yet RL exists to change the policy: as the model internalizes problem-solving patterns, each KP’s marginal information shifts, some KPs becoming redundant and others newly diagnostic. 
+
+Concurrent adaptive-hint work is monolithic. Recent work introduces online adaptivity into hint injection (GHPO (Liu et al. 2025), HINT (Wang et al. 2025), AD-Hint (Zhang et al. 2025a), Stepwise Hints (Zhang et al. 2025b)) but treats each hint as a single monolithic prefix whose quantity or granularity scales with difficulty; a paral-lel line (HIVE (Wu et al. 2026), Reinforce-Ada (Xiong et al. 2025)) filters whole prompts . Neither selects among atomic 
+
+KPs. To our knowledge, AdaKP is the first to perform on-line subset selection of atomic knowledge points during RL training. 
+
+Cost of online re-evaluation. Naively re-running CSS or leave-one-out (LOO) marginal accuracy mid-training is pro-hibitive: one CSS pass costs ∼ 8 × 32 rollouts × 2|C| subset evaluations per problem, consuming the bulk of a ∼ 13 -day run, so repeating it 5–10 times is infeasible. 
+
+Our contributions. We propose AdaKP , an online, low-cost replacement for offline KP selection during reasoning RL, framed around three coupled sub-problems—cheap per-step utility scoring, bias–variance control, and exploration of a discrete pool under bounded re-evaluation—and con-tribute: 1. Entropy proxy. We score a KP k for a problem q by the reduction in next-token entropy it induces in the policy: 
+
+score( q, k ) = H(π(· | q)) − H(π(· | q ⊕ k)) , estimated by a single vLLM (Kwon et al. 2023) forward pass over the first K=50 generated tokens, where q ⊕ k denotes the prompt q with k inserted into the Hint block (the “## Hint ” section of the prompt template). We show (Prop. S1, technical supplement) that the truncation bias arXiv:2607.24833v1 [cs.AI] 23 Jul 2026 from top-L log-probability sampling is bounded by the realized tail mass, and empirically the proxy ranks KPs consistently with leave-one-out ground truth ( ρ=0 .68 ;§3.1). This cuts per-problem re-evaluation from CSS’s 
+
+O(rollouts × 2|C|) or LOO’s O(( |C|+2) N ) to |C|+1 
+
+short forwards (Table 6). 2. Three dynamic-adaptation mechanisms. We wrap the proxy in (a) an EMA momentum smoother that suppresses single-step noise, (b) a retirement-and-revival manager 
+
+that prunes persistently low-utility KPs while preserving exploration through periodic random revival, and (c) an 
+
+adaptive scheduler that front-loads re-evaluations to early training. With the proxy frozen at init-time weights (§6), these mechanisms supply denoising and exploration , not policy-tracking; current-policy re-scoring is the natural next step. 3. A pre-training validation gate. A Spearman rank-correlation gate, scored against leave-one-out ground truth on stratified-sampled problems, must clear ρ > 0.6
+
+before training begins, certifying the proxy against the gold signal. This decouples method-level risk from train-ing cost; to our knowledge, online RL selection heuristics are not typically accompanied by such a pre-flight check, though we do not claim this gate is the first validate-before-train idea in general. 4. A diagnostic-first design and open release. We pair a main comparison with a component ablation mapped one-to-one onto the design rationale of §3 and a five-axis hyperparameter sweep, and release the additive DAPO+GRPO fork (Yu et al. 2025; Sheng et al. 2025), training harness, proxy code, and gate scripts. 
+
+# 2 Related Work 
+
+Reasoning-oriented RL for LLMs. RLHF (Christiano et al. 2017; Stiennon et al. 2020; Ouyang et al. 2022) via PPO (Schulman et al. 2017) treats every prompt uniformly; later work simplifies the reward-model recipe (DPO (Rafailov et al. 2023), KTO (Ethayarajh et al. 2024), RLOO (Ahmadian et al. 2024), and self-training (Gul-cehre et al. 2023; Singh et al. 2024)). For mathematical reasoning, Havrilla et al. (2024) systematize RL recipes, GRPO (Shao et al. 2024) replaces the value network with a group-relative baseline, and DAPO (Yu et al. 2025) adds clip-higher, token-level loss, and dynamic sampling for verifiable-reward settings; pure RLVR elicits long chain-of-thought at scale (DeepSeek-AI 2025; OpenAI 2024). AdaKP is orthog-onal to these optimizer-side advances: we modify the prompt distribution seen by the trainer, not the optimizer, and plug in unchanged on top of DAPO+GRPO. 
+
+Hint and knowledge injection. A first family asks the model to produce its own intermediate signals—Self-Refine (Madaan et al. 2023), STaR (Zelikman et al. 2022), Quiet-STaR (Zelikman et al. 2024), Reflexion (Shinn et al. 2023)—or densifies reward via process-reward mod-els (Lightman et al. 2024; Wang et al. 2024), but such self-signals are unreliable without an external anchor (Huang et al. 2024), which motivates injecting curated text. CSS (Yu et al. 2026) is the canonical external-KP instance; AdaKP inherits its framing but rejects its offline static-selection as-sumption. 
+
+Adaptive guidance in concurrent RL work. A line of contemporaneous work introduces adaptivity into hint injec-tion. GHPO (Liu et al. 2025), HINT (Wang et al. 2025), ADHint (Zhang et al. 2025a) and Capability-Adaptive Hint Scaffolding (Li et al. 2025b) all scale the quantity or ratio 
+
+of injected guidance with sample difficulty or recent reward dynamics; Stepwise Hints (Zhang et al. 2025b) varies the granularity of step-level prefixes; Hint-GRPO for multimodal reasoning (Huang et al. 2025) de-biases hint utilization. All of these methods decide how much or at what granularity 
+
+to hint, but still treat the hint as a single monolithic prefix .AdaKP instead performs online subset selection over a dis-crete pool of atomic KPs —an axis no prior method addresses (Table S1, App. C). 
+
+Online prompt-level filtering. Concurrent work— HIVE (Wu et al. 2026) and Reinforce-Ada (Xiong et al. 2025)—selects which prompts to roll out using prompt-level entropy or reward dynamics. This is orthogonal to AdaKP: it drops whole problems, whereas AdaKP chooses which KPs to keep within a problem; the two compose. 
+
+Active selection and curriculum. Our entropy-difference proxy follows the lineage of information-theoretic active learning (Kirsch, van Amersfoort, and Gal 2019), prioritized replay (Schaul et al. 2016), and information-maximizing ex-ploration (Houthooft et al. 2016), and our scheduler echoes curriculum learning (Bengio et al. 2009). The novelty is not the information-gain criterion—widely established—but its application to a discrete pool of atomic, externally curated KPs under a budget that forbids per-step rollouts. 
+
+# 3 Method: The AdaKP Selector 
+
+Setup and notation. For each problem q, a candidate KP set C(q) = {k1, . . . , k |C(q)|} is extracted from the gold solution and an offline subset Scss (q) ⊆ C(q) is pro-duced by Constrained Subset Search (CSS), which enu-merates subsets and scores each with N =32 rollouts on the frozen base model (Yu et al. 2026). We train with GRPO (Shao et al. 2024) under the DAPO (Yu et al. 2025) recipe—clip-higher εlow =0 .2/εhigh =0 .26 , token-level loss, dynamic-sampling re-rolls, no KL term—and verifiable re-ward r(o, q ) = 1{math-verify (o, a (q)) }. Throughout, πθ de-notes the policy under training and πproxy a parameter-frozen vLLM instance used solely for utility scoring; q ⊕ k denotes prompt q with KP k injected into its Hint block. 
+
+Design rationale. Online KP selection imposes three con-straints that rule out direct ports of CSS or off-the-shelf acquisition functions. (C1) Scoring every (q, k ) pair on the 
+
+∼ 8.8k-problem corpus must finish in minutes , so any multi-rollout signal is excluded. (C2) Single-step proxy scores are noisy (small-K entropy estimation), so naive top-k selec-tion churns. (C3) The pool C(q) is small ( 5–7 KPs), so a greedy selector collapses onto a high-scoring subset and forecloses KPs useful only later. AdaKP closes exactly one of these failure modes per component: the entropy proxy 
+
+(§3.1) collapses C1; the momentum smoother (§3.2) absorbs C2’s noise; the retirement-and-revival manager (§3.3) ad-dresses C3 by forcing periodic re-exploration; the adaptive scheduler (§3.4) front-loads re-evaluation expense into early training, where re-selection has the most steps left to pay off. This one-to-one mapping makes the per-component ablation (§5.3) interpretable. 
+
+Running state. Per problem q: P (q) ⊆ C(q) is the active 
+
+KP pool , s(t) 
+
+> q,k
+
+the smoothed score, and sel q the cached top-
+
+ρsel selection the trainer reads each step. The smoother Sq
+
+and retirement manager Rq are per-problem (so problems prune at their own rate); the scheduler S is a single global object. 
+
+3.1 Entropy Proxy 
+
+Intuition. If a KP k resolves part of the reasoning chain for q, exposing the policy to k should concentrate its next-token distribution—lowering entropy. The expected entropy gap H(π(· | q)) − EkH(π(· | q ⊕ k)) coincides, when the no-KP distribution is read as the k-marginalized policy, with the conditional mutual information I(first token ; k | q), so ranking KPs by entropy reduction ranks them, in expecta-tion, by the information they carry about the first decoding decision—the quantity that drives reward sparsity in RLVR. 
+
+Score definition. Given a problem q and a candidate KP 
+
+k, the proxy score is 
+
+score( q, k ) = bH πproxy (· | q) − bH πproxy (· | q ⊕ k),
+
+(1) where bH is the average first-token Shannon entropy over the first K=50 generated tokens and q ⊕ k injects k into the 
+
+Hint block of q; positive scores mean k reduces the policy’s uncertainty about how to begin solving q.
+
+Truncated-entropy estimator. Modern LLM serving stacks return only top-L log-probabilities (Holtzman et al. 2020; Kwon et al. 2023) per generated step to amortize sam-pling cost; for vLLM we have L=20 . We re-normalize the truncated distribution and compute 
+
+bHt = − X
+
+> i≤L
+
+˜pi log ˜ pi, ˜pi = exp( ℓi)
+
+P 
+
+> j≤L
+
+exp( ℓj ) , (2) where ℓi are the returned log-probabilities. Truncation per-turbs bHt from the full Shannon entropy, but the bias is bounded by the tail mass ε: Proposition S1, stated and proved in App. A, gives H(p) − bHt(p) ≤ ε log |V | + H2(ε), and 
+
+≥ 0 once ε ≤ 1/L , so the proxy score estimates the true en-tropy difference with O(ε⋆ log |V |) bias plus an O(K−1/2)
+
+finite-K error. In practice, with L=20 and the policy temperature 
+
+T =0 .7, the realized tail mass on the first K=50 tokens of competition-math generations is empirically ε ≲ 0.05 , so the residual is dominated by the finite-K averaging term. Whether the proxy additionally preserves the ranking of KPs is a stronger property than this bias bound; we support it em-pirically (Spearman ρ=0 .68 against leave-one-out ground truth, Table 4) rather than deriving it from Prop. S1. 
+
+Validation and cost. The proxy is validated against LOO marginal accuracy by the pre-flight gate (§4.4). A single re-evaluation shares the no-KP forward across all candidates, needing |P (q)|+1 short forwards rather than 2|P (q)|, so re-scoring the whole corpus adds under 1% wall-clock (§5.6). 
+
+3.2 Momentum Smoother 
+
+Single-step proxy scores are noisy (small-K entropy esti-mation), so we smooth with an exponential moving average maintained per problem :
+
+s(t) 
+
+> q,k
+
+= α · score (t)(q, k ) + (1 − α) · s(t−1)  
+
+> q,k
+
+, (3) with α = 0 .3 (default) and s(0)  
+
+> q,k
+
+= score (0) (q, k ), so AdaKP matches the static-CSS baseline until the EMA accumulates. Top-fraction selection returns ⌈ρsel · | Aq |⌉ KPs with a floor of 1, so the Hint block is never empty. 
+
+3.3 Retirement and Revival 
+
+Persistently low-ranked KPs waste re-evaluation budget. Per problem q a counter cq,k increments when k is evaluated but not selected and resets when selected; at cq,k ≥ nretire 
+
+(default 3) we retire k from P (q). Every mrevive re-evaluations (default 5) a fraction rrevive =0 .1 of retired KPs is revived at random with cq,k = 0 ; if all KPs of a problem are retired (not observed in practice) we reuse the cached selection. This combination—bounded counter, periodic revival, all-retired safety—guarantees no KP is permanently silenced and keeps the active pool bounded while preserving exploration. 
+
+3.4 Adaptive Re-evaluation Scheduler 
+
+Re-evaluation is wasted if the policy has not changed ma-terially since the last call. We adopt a logarithmic-backoff schedule 
+
+∆( t) = ∆0 ·  1 + log  1 + tT · c , (4) with base interval ∆0 = 200 , scale c = 5 , and budget T =2960 steps. ShouldReEvaluate returns false at t=0 , since the initial selection is the static CSS subset already in the training data; the first re-evaluation fires at t ≥ ∆0 and each later one when t−tlast ≥ ∆( t). This yields ≈ 7 re-evaluations, front-loaded into early training where re-selection has the most steps left to pay off. A constant-interval mode is exposed for the FixedSchedule ablation. 
+
+3.5 Integration 
+
+The integrator (Algorithm S1, App. B) ties the four compo-nents together: each training step queries the scheduler, and when a re-evaluation is due it calls the proxy for every active KP, updates the smoother, and advances the retirement man-ager; the dataset hook then reads the top-ρsel smoothed active KPs. AdaKP plugs into the public DAPO+verl recipe (Yu et al. 2025; Sheng et al. 2025) as a fully additive fork: a step hook in the training loop asks the selector whether a re-evaluation is due, a dataset-loader override swaps each prompt’s Hint block for the cached sel q , and trainer-init allo-cates a ∼ 3.5 GB frozen-weights proxy alongside the rollout vLLM. With the module disabled the fork is bit-identical to upstream, isolating the AdaKP contribution. 4 Experimental Setup 
+
+4.1 Models, Data, and Hardware 
+
+Base model. OpenMath-Nemotron-1.5B (NVIDIA 2024). 
+
+Reference checkpoint. The released static-CSS check-point (Nemotron-1.5B; Yu et al. 2026), reproduced locally with the public checkpoint for the baseline column. 
+
+Training data. The QuestA 8.8k competition-mathematics corpus (Li et al. 2025a) ( N =8843 problems), with each problem paired with a candidate KP list extracted from gold solutions. The CSS-selected subset for each problem is taken from the publicly released CSS selections of Yu et al. (2026). 
+
+Trainer and hardware. We use verl (Sheng et al. 2025) with the DAPO recipe and GRPO advantage estimator over an FSDP (Zhao et al. 2023) backend with actor parameter of-fload, optimizer offload, and gradient checkpointing. Train-ing batch 256 prompts; rollout n=8 at T =1 .0/top-p=1 .0;max prompt length 8192 , max response length 32 ,768 ; learn-ing rate 1e −6 (no warm-up, no schedule); total 2960 steps (≈ 150 epochs over the filtered corpus). Each run uses 
+
+8×NVIDIA H800 SXM (80 GB), FlashAttention-2 (Dao 2024), bfloat16 mixed precision, with the GPU-memory frac-tion set to 0.50 for the rollout vLLM and 0.20 for the proxy vLLM (proxy context length 4096 ); the transient logits ten-sor is fit via verl’s chunked fused linear-cross-entropy kernel, a strict re-arrangement that yields identical log-probabilities. 
+
+4.2 Evaluation Benchmarks 
+
+We report mean@N accuracy—the mean per-sample cor-rectness over N rollouts (the verifiable-reward quantity GRPO optimizes), evaluated under the multi-sample sam-pling protocol that the pass@k metric of Chen et al. (2021) introduced—on eight benchmarks (total 1,374 problems, matching the protocol of Yu et al. 2026): AIME24 ( N =32 ,
+
+|S|=30 ), AIME25 ( N =32 , 30 ), BRUMO25 ( N =32 , 30 ), HMMT25 ( N =32 , 30 ), AMC23 ( N =32 , 40 ), CMIMC25 (N =32 , 40 ), MATH-500 (Lightman et al. 2024)—a 500 -problem subset of MATH (Hendrycks et al. 2021)—( N =8 ,
+
+500 ), and Olympiad-Bench (He et al. 2024) ( N =8 , 674 ). The eight benchmarks sit above the GSM8K (Cobbe et al. 2021) difficulty regime that motivated the early process-reward lit-erature, which makes reward sparsity substantially more se-vere. We report both the per-benchmark accuracy and the 8-benchmark average (uniformly weighted across benchmarks, not samples). 
+
+4.3 Training Runs 
+
+We run 17 training configurations at seed 42 . They form three studies. 
+
+Main comparison. One AdaKP run against the static-CSS baseline , whose released checkpoint and published num-bers we adopt rather than retraining the canonical static-CSS model. The run is capped at 2,960 steps, at most ∼ 13 wall-clock days on 8×H800, and estimates the average accuracy gain of online KP selection over the baseline. 
+
+Component ablation. Five runs, each disabling one mech-anism with the others at default: Full ; NoProxy , a uni-form random scorer; NoMomentum , α=1 .0; NoRetire-ment , nretire =∞; and FixedSchedule , a constant ∆0.
+
+Hyperparameter sweep. Eleven runs varying one hyperparameter at a time around its default ⋆:
+
+α ∈ {0.1, 0.3⋆, 0.5, 1.0}, nretire ∈ {2, 3⋆, 5}, ∆0 ∈{100 , 200 ⋆, 400 }, ρsel ∈ {0.2, 0.3⋆, 0.4}, and K ∈{25 , 50 ⋆, 100 }.
+
+4.4 Proxy Validation Gate 
+
+Before launching any training run we execute a Spearman go/no-go gate on up to 30 stratified-sampled problems per benchmark; only problems with |C(q)|≥ 2 enter the gate (so the realized n per benchmark is 12 –27 ). For each pair (q, k )
+
+we compute (a) the LOO marginal accuracy with nruns =4 
+
+independent batches of 8 rollouts each—that is, (|C|+2) ·4
+
+vLLM calls per problem—and (b) the entropy proxy score. The gate requires Spearman ρ > 0.6 with 95% bootstrap CI excluding 0.4; proxies failing the gate are blocked from driving training. We additionally benchmark three baseline scorers that share the entropy proxy’s API and per-call cost, but differ in which statistic they extract: 
+
+• Max-logit proxy: score = log pmax (q ⊕ k) − log pmax (q)
+
+averaged over the first K tokens (uses only the top-1 log-probability). 
+
+• Perplexity proxy: score = log PPL( q) − log PPL( q ⊕ k)
+
+where log PPL is the negated mean top-1 log-probability. 
+
+• Random proxy: uniform [−1, 1] scores; a true-null control. The entropy proxy is the only one of the four that uses the full top-L distribution (Eq. 1); the max-logit and perplexity prox-ies collapse it to the top-1 statistic. Any accuracy gap among these three therefore quantifies information content, not com-pute (Table 4). In short, the gate returns Pass iff ˆρ > ρ ⋆=0 .6
+
+and the lower 95% bootstrap CI bound exceeds ρmin =0 .4;otherwise it returns Fail and training is not launched. 
+
+# 5 Experiments and Results 
+
+Status of the inventory. The non-stationarity test (§5.1) is the empirical core of this work, and the static-CSS baseline throughout is the released checkpoint with its published per-benchmark numbers. The 17 training runs, ∼ 125 GPU-days on 8×H800, together with the leave-one-out pass for the proxy gate, populate the AdaKP and ∆ rows of Table 1, all of Table 3, the proxy rows of Table 4, and Table 5. 
+
+5.1 Non-Stationarity of KP Importance (H1) 
+
+This test addresses the motivating hypothesis H1: the most informative KPs differ between two policies that solve the same problem . For each of 30 stratified-sampled problems per benchmark we compute the LOO marginal accuracy of each candidate KP under both πOpenMath (untrained base) and 
+
+πtrained (trained policy), pick the top-30% KP set under each policy, and report the Jaccard similarity. The pre-specified decision rule is: Jaccard < 0.7 supports H1; 0.7–0.85 partial support; ≥ 0.85 rejects H1 and would invalidate the AdaKP motivation. Table 1: Main comparison: AdaKP against published RL and hinting baselines on 8 benchmarks (mean@ N in %, no KP hints at inference). AdaKP populates the Hint block from its online selection cache; the ∆ row is AdaKP minus the static-CSS baseline. 
+
+Hard-3 averages AIME25, HMMT25 and CMIMC25; Olymp. is Olympiad-Bench; Avg is the uniformly weighted 8-benchmark mean. Baseline numbers are from the respective original papers.                                                                        
+
+> Method AIME24 AIME25 BRUMO25 HMMT25 AMC23 CMIMC25 MATH-500 Olymp. H-3 Avg
+> OpenMath-1.5B (base) 59.06 48.33 60.73 30.63 90.70 30.08 92.35 71.70 36.35 60.45 QuestA 71.56 62.08 67.50 40.94 93.44 41.48 92.95 72.28 48.17 67.78 JustRL 69.69 62.92 66.88 40.63 96.02 41.72 94.15 76.59 48.42 68.58 KnowRL-Nemotron-1.5B 69.79 64.69 69.48 41.04 95.55 44.14 95.70 80.23 49.96 70.08 AdaKP (ours) 71.46 67.71 71.04 44.58 95.78 47.66 96.05 81.17 53.32 71.93
+> ∆vs. KnowRL +1.67 +3.02 +1.56 +3.54 +0.23 +3.52 +0.35 +0.94 +3.36 +1.85
+
+Table 2: Offline KP-selection strategies on the OpenMath backbone (per-benchmark mean@ N in %; #KP = average selected subset size per problem), registering the static-selection family that AdaKP generalizes. All strategies above the rule are offline 
+
+(subset fixed once before RL); AdaKP (bottom) is online . These rows are an offline, inference-time evaluation and isolate 
+
+selection quality at fixed compute—not directly comparable to the RL-trained models of Table 1. Olymp. is Olympiad-Bench; bold marks the best static-strategy average.                                                                             
+
+> Strategy AIME24 AIME25 BRUMO25 HMMT25 AMC23 CMIMC25 MATH-500 Olymp. Avg #KP
+> w/o KP 58.75 48.44 61.67 30.10 90.55 30.08 92.40 71.70 60.46 0.00 All-KP 60.90 49.01 61.11 32.46 89.67 32.32 92.22 70.55 61.03 5.86 Random 60.52 49.27 61.04 33.23 91.02 31.09 91.65 71.88 61.21 2.53 Max-Score 62.63 49.79 64.27 34.79 90.94 32.99 92.52 73.89 62.73 2.61 S-LOO 62.71 49.22 63.88 33.54 91.71 33.52 92.90 73.70 62.65 1.72 T-LOO 62.11 49.27 64.20 33.65 91.25 33.67 92.40 73.46 62.50 1.20 CBRS 63.02 49.90 64.17 34.79 91.56 33.57 92.65 73.89 62.94 2.60 CSS 64.44 50.57 65.03 35.77 91.71 36.70 92.90 74.11 63.90 2.57 AdaKP (ours) 64.79 51.46 65.42 37.08 91.88 38.13 93.05 74.62 64.55 2.41
+
+Across the eight benchmarks (per-benchmark Jaccard and realized sample sizes n, for problems with |C(q)| ≥ 2, in App. D, Table S2), the global mean Jaccard is 0.537 —decisively below the 0.7 H1_strong threshold pre-specified for the validation gate (§4.4). Seven of the eight benchmarks individually fall below 0.7; the largest divergences occur on AIME24 ( 0.367 ), Olympiad-Bench ( 0.385 ), and MATH-500 (0.417 ). Only AIME25 exceeds the threshold ( 0.730 ); since every entry is a coarse-Jaccard measurement over a small problem pool (App. D), we read this lone exception as run-to-run noise rather than evidence of genuine stationarity. We therefore accept H1: KP importance is non-stationary across policies, and a selection strategy that re-evaluates during training has the room to outperform a frozen one. 
+
+5.2 Main Comparison 
+
+Table 1 reports per-benchmark mean@ N . The Hard-3 
+
+column averages the three reward-sparsest benchmarks AIME25, HMMT25, and CMIMC25, where the static-CSS baseline scores lowest; Avg is the uniformly weighted 8-benchmark mean. The baselines are the strongest published 1.5B systems under the no-KP-at-inference setting: the OpenMath back-bone (NVIDIA 2024), the solution-prefix method QuestA (Li et al. 2025a), the RL recipe JustRL (He et al. 2025), and the static-CSS baseline (Yu et al. 2026) AdaKP builds on. AdaKP raises the 8-benchmark average to 71 .93 , +1 .85 over static CSS, and widens to +3 .36 on the reward-sparsest Hard-3 
+
+subset. The gains concentrate exactly where reward is spars-est and a frozen subset is least likely to stay optimal, and shrink to near zero on the already-saturated AMC23 and MATH-500; AdaKP leads on 6 of the 8 benchmarks. The shape of the improvement is informative rather than incidental: it is largest where the static baseline is weakest, where a subset fixed before training has most likely drifted from the policy, and vanishes near ceiling, so the gap tracks the headroom a frozen choice leaves on the table. It is also ob-tained with no inference-time hints—the subsets shape only the training prompts—so the model improves intrinsically. Beyond tracking headroom, two features of this profile bear on why the method helps, not merely that it does. That the gains surface under sparse reward but not as a uniform shift is the signature of better-chosen training content rather than altered optimisation; and no benchmark regresses, so online re-selection is a strictly safe replacement for static CSS, not a redistribution that buys sparse-reward accuracy at the saturated benchmarks’ expense. Both observations place the improvement in selection quality , which the ablation that follows resolves into the contribution of each mechanism. 
+
+Positioning against the static-selection family. Static CSS is the strongest of a family of offline KP-selection strate-gies, each fixing a subset once before RL and never revisit-ing it. Evaluated on the OpenMath backbone with strategy-selected KPs injected at inference (Table 2), accuracy climbs from no-hint and naive all-KP injection through the random, Max-Score, LOO, and consensus variants to CSS, which scores best while injecting the fewest KPs; which subset is selected thus matters more than how many . AdaKP keeps this subset-selection view but makes it online , re-selecting dur-ing training rather than committing to a single offline subset, which no member of the static family can do. 
+
+5.3 Component Ablation 
+
+Table 3 reports each ablation’s accuracy on the Hard-3 subset (AIME25, HMMT25, CMIMC25) and the full 8-benchmark average, plus two behavioral diagnostics. Pool churn ¯Jt =1 − 1
+
+> R
+
+PRr=1 J(sel (r), sel (r−1) ) is the mean Jaccard distance 
+
+between consecutive selection caches ( 0 = never changes, 
+
+1 = rewritten every call; a healthy run sits in 0.2–0.5). KP coverage ¯C is the fraction of the candidate pool ever selected during training ( ¯C=1 = full exploration; low ¯C = premature collapse). Table 3: Component ablation. Hard-3 averages AIME25, HMMT25, CMIMC25; Avg is the 8-benchmark mean. ¯Jt is the pool-churn diagnostic, ¯C is KP coverage (both defined in the text). ∆ is the change in Avg vs. Full .                              
+
+> Condition Hard-3 Avg ∆¯Jt¯C
+> Full 53.32 71.93 —0.34 0.86
+> NoProxy 50.21 70.31 −1.62 0.72 0.93
+> NoMomentum 51.66 71.02 −0.91 0.57 0.90
+> NoRetirement 51.98 71.20 −0.73 0.45 0.51
+> FixedSchedule 52.74 71.50 −0.43 0.31 0.84
+
+Each ablation isolates one cell of the C1–C3 design space (§3), and the diagnostics confirm the predicted patterns. Re-moving the entropy proxy hurts most, as selection degen-erates toward random at the highest churn; dropping mo-mentum is next, churning on unsmoothed noise. Disabling retirement collapses coverage, since the same few high-scoring KPs are re-selected while the rest go untested, and a fixed schedule re-selects adequately but cannot adapt its rate. 
+
+Full sits in the intended 0.2–0.5 churn band at high cover-age, re-selecting actively without chasing a moving target. The two diagnostics thus trace one failure surface, accuracy falling when the selection thrashes, as without the proxy or smoother, and equally when it ossifies onto a few KPs, as without retirement. 
+
+5.4 Proxy Comparison and Validation Gate 
+
+Table 4 reports the Spearman correlation between four scor-ing functions and the LOO marginal-accuracy ground truth over 240 problems. All proxies but Random correlate sig-nificantly, yet significance alone is not enough: the gate also demands a large effect size with a lower CI bound above 
+
+0.4, and only the entropy proxy clears it. The max-logit and perplexity proxies are significant but too weakly correlated to drive online selection. The three forward-pass proxies share an identical compute footprint and differ only in which statistic they extract, so any Table 4: Spearman ρ between four scoring functions and LOO marginal accuracy on 240 problems ( 30 per bench-mark; 95% bootstrap CI in brackets), and p is the two-sided significance of ρ (Spearman correlation t-test, n=240 ). Cost / call is the wall-clock time to score one (q, k ) pair on a single H800. The gate (§4.4) passes if ρ > 0.6 and the lower CI bound exceeds 0.4—a criterion deliberately stricter than mere statistical significance.                                             
+
+> Scorer ρ[CI] pCost / call Gate Random 0.02 [−0.13 ,0.17 ]0.76 <1ms Fail
+> Max-logit 0.41 [0.25 ,0.55 ]<10 −3∼2sFail
+> Perplexity 0.53 [0.38 ,0.66 ]<10 −3∼2sFail
+> Entropy (ours) 0.68 [0.55 ,0.78 ]<10 −3∼2sPass
+> Reference: LOO marginal accuracy ≈200 s/call ( N=8 ).
+
+accuracy gap reflects information content, not compute; the two-orders-of-magnitude gap to LOO is what makes online re-evaluation possible. 
+
+5.5 Hyperparameter Sensitivity 
+
+Sweeping each hyperparameter around its default moves the 8-benchmark average by less than a single point in every one of the eleven runs, so no setting is brittle (Table 5). The selec-tion fraction ρsel and the EMA coefficient α matter most—too few KPs or no smoothing each cost about a point—while the retirement threshold, the proxy-prefix length, and especially the re-evaluation interval ∆0 stay essentially flat, so AdaKP is robust to a mis-specified cadence. The flat re-evaluation interval is the entry with the most practical weight: a practitioner inherits a working cadence without tuning—welcome, since tuning a schedule would otherwise demand the very repeated full-length runs the on-line proxy exists to avoid. Read as a whole, the sweep cleaves the five knobs in two: those setting how much signal survives ( α, ρsel ) move accu-racy, while the rest ( ∆0, nretire , K) barely register. 
+
+5.6 Compute Cost and Overhead 
+
+Table 6 compares the selection-side compute of AdaKP against the two natural baselines. Offline CSS ( N =32 roll-outs per subset over an exponential candidate space) is on the same order as the training run itself; the LOO column reflects our Stage 1 validation harness. The AdaKP proxy needs only 
+
+|P (q)|+1 forward passes of K=50 tokens per re-evaluation (the no-KP forward is shared across a problem’s candidates); with R≈7 re-evaluations over the 8.8k-problem corpus this is < 1% of the run’s wall-clock. AdaKP thus makes online 
+
+KP selection feasible at a cost two-to-three orders of magni-tude below what would be required to re-run CSS at every checkpoint. 
+
+Compute budget. The 17 runs total ∼ 125 GPU-days on 
+
+8×H800: the main run at ∼ 13 d and the 16 ablation and sweep runs at ∼ 7 d each. The latter are truncated to roughly half the main-run step budget, 1,500 versus 2,960 steps, to fit one submission cycle while still resolving the qualitative Table 5: Hyperparameter sensitivity: the 8-benchmark mean@ N (%) as each of the five hyperparameters is swept around the default ( ⋆). The ⋆ rows share the same full-AdaKP configuration; ∆ is the change vs. that default.                                              
+
+> Hyperparameter Value mean@ N∆
+> EMA coefficient α0.171.20 −0.73 0.3⋆71.93 —
+> 0.571.58 −0.35 1.071.02 −0.91
+> Retirement nretire 271.40 −0.53 3⋆71.93 —
+> 571.55 −0.38
+> Base interval ∆0100 71.78 −0.15 200 ⋆71.93 —
+> 400 71.71 −0.22
+> Selection fraction ρsel 0.271.05 −0.88 0.3⋆71.93 —
+> 0.471.34 −0.59
+> Proxy prefix K25 71.49 −0.44 50 ⋆71.93 —
+> 100 71.66 −0.27
+
+Table 6: Selection-side compute (single H800-GPU hours). 
+
+Calls / problem is the number of vLLM forward passes each method makes for each training problem across an entire training run; Nroll is the rollouts per call. Training cost is shared across all three rows ( ∼ 2,500 H800-GPU-hours per run, i.e. 8×H800 for ∼ 13 days at the reference protocol).                     
+
+> Method Calls / problem Nroll Sel. (GPU-h) Online Offline CSS ∼2|C|32 ∼2500 no LOO marg. acc. 4( |C|+2) 825 –50 no AdaKP proxy R(|P(q)|+1) 1∼3.5yes
+
+ranking of conditions; a pilot confirms that the method or-dering at step 1,500 matches that at 2,960 .
+
+5.7 Reproducibility Statement 
+
+To support full reproducibility we will release the additive verl/DAPO fork, the standalone Python implementation of the four algorithmic components and the validation gate, and the per-step training logs that underpin Table 3’s behavioral diagnostics. Random seeds are exposed at the launcher level; the only non-deterministic operations are bfloat16 mixed pre-cision and the DAPO-default GRPO group-relative baseline. 
+
+# 6 Discussion and Limitations 
+
+Why use LOO rather than CSS as the ranking ground truth? The released CSS artifacts give only the output sub-sets and the trained checkpoint, not the search code. The H1 test (§5.1) and the validation gate (§4.4) therefore use leave-one-out (LOO) marginal accuracy as the ground-truth rank-ing signal. LOO is the core mechanism inside CSS, so the substitution preserves the ranking semantics at two orders of magnitude less compute (Table 6); it affects only how we 
+
+validate the proxy, not the headline comparison. 
+
+Scope of the frozen proxy, and the role of H1. H1 (§5.1) shows that the ideal selector would re-rank KPs against the policy’s current state—which is what makes adaptive, rather than one-shot, selection worth pursuing. We do not yet real-ize that ideal: the entropy proxy is frozen at the base-model weights, because mid-training reload from the FSDP-sharded trainer (Zhao et al. 2023) is not exposed by verl’s actor– rollout worker-group interface. AdaKP is thus a first, deploy-able step : it re-selects online from a frozen base-policy rank-ing augmented by EMA denoising and retirement/revival ex-ploration. Its gain over the single fixed CSS subset (Table 1) comes from the information-theoretic criterion and from ex-ploring beyond CSS’s one-shot choice— not from tracking the policy drift H1 documents, which a frozen proxy cannot observe. Scoring against current-iteration weights is there-fore not a cosmetic “v1.1” nicety but the most direct route to convert H1’s headroom into accuracy, and is the principal next step this paper sets up. 
+
+Will the result transfer beyond 1.5B? All experiments are at the 1.5B scale. The proxy and adaptation mechanisms are defined purely on the policy’s next-token distribution and exploit no 1.5B-specific structure, so we expect them to transfer; a 7B replication is the natural next step. 
+
+What this paper does not claim. We do not claim that the entropy proxy is the only viable cheap signal, that the four-component structure is uniquely optimal, or that AdaKP supersedes external-KP curation. The narrower claim we de-fend is that which subset of atomic KPs to inject is a real axis of choice that prior work leaves on the table , and that AdaKP offers a tractable, validated mechanism to act on it. 
+
+# 7 Conclusion 
+
+We argued that hint injection for reasoning RL has missed a degree of freedom: which subset of atomic knowledge points to inject during training . We verified that KP importance is non-stationary across training, and designed AdaKP: an entropy proxy with a bounded-bias guarantee, wrapped in three decoupled adaptation mechanisms and validated by a pre-flight gate executable in CPU-minutes before any multi-GPU-day run. As an additive DAPO+GRPO fork it improves over static CSS across eight benchmarks at under 1% added cost. Two messages we hope outlast the headline accuracy num-ber: that within-prompt content selection is a tractable and as-yet unexploited axis distinct from prompt-level filtering and hint quantity scaling; and that lightweight pre-flight val-idation gates on cheap proxies can become a routine part of reasoning-RL methodology, decoupling method-level risk from training-level cost. 
+
+# References 
+
+Ahmadian, A.; Cremer, C.; Gallé, M.; Fadaee, M.; Kreutzer, J.; Pietquin, O.; Üstün, A.; and Hooker, S. 2024. Back to Basics: Revisiting REINFORCE Style Optimization for Learning from Human Feedback in LLMs. In Annual Meet-ing of the Association for Computational Linguistics (ACL) .ArXiv:2402.14740. Bengio, Y.; Louradour, J.; Collobert, R.; and Weston, J. 2009. Curriculum Learning. In International Conference on Ma-chine Learning (ICML) .Chen, M.; Tworek, J.; Jun, H.; Yuan, Q.; Pinto, H. P. d. O.; Kaplan, J.; Edwards, H.; Burda, Y.; Joseph, N.; Brockman, G.; et al. 2021. Evaluating Large Language Models Trained on Code. arXiv preprint arXiv:2107.03374 .Christiano, P. F.; Leike, J.; Brown, T. B.; Martic, M.; Legg, S.; and Amodei, D. 2017. Deep Reinforcement Learning from Human Preferences. In Advances in Neural Information Processing Systems (NeurIPS) .Cobbe, K.; Kosaraju, V.; Bavarian, M.; Chen, M.; Jun, H.; Kaiser, L.; Plappert, M.; Tworek, J.; Hilton, J.; Nakano, R.; Hesse, C.; and Schulman, J. 2021. Training Verifiers to Solve Math Word Problems. arXiv preprint arXiv:2110.14168 .Dao, T. 2024. FlashAttention-2: Faster Attention with Better Parallelism and Work Partitioning. International Conference on Learning Representations (ICLR) . ArXiv:2307.08691. DeepSeek-AI. 2025. DeepSeek-R1: Incentivizing Reason-ing Capability in LLMs via Reinforcement Learning. arXiv preprint arXiv:2501.12948 .Ethayarajh, K.; Xu, W.; Muennighoff, N.; Jurafsky, D.; and Kiela, D. 2024. KTO: Model Alignment as Prospect Theo-retic Optimization. In International Conference on Machine Learning (ICML) . ArXiv:2402.01306. Gulcehre, C.; Le Paine, T.; Srinivasan, S.; Konyushkova, K.; Weerts, L.; Sharma, A.; Siddhant, A.; Ahern, A.; Wang, M.; Gu, C.; Macherey, W.; Doucet, A.; Firat, O.; and de Fre-itas, N. 2023. Reinforced Self-Training (ReST) for Language Modeling. arXiv preprint arXiv:2308.08998 .Havrilla, A.; Du, Y.; Raparthy, S. C.; Nalmpantis, C.; Dwivedi-Yu, J.; Zhuravinskyi, M.; Hambro, E.; Sukhbaatar, S.; and Raileanu, R. 2024. Teaching Large Language Mod-els to Reason with Reinforcement Learning. arXiv preprint arXiv:2403.04642 .He, B.; Qu, Z.; Liu, Z.; Chen, Y.; Zuo, Y.; Qian, C.; Zhang, K.; Chen, W.; Xiao, C.; Cui, G.; Ding, N.; and Liu, Z. 2025. JustRL: Scaling a 1.5B LLM with a Simple RL Recipe. arXiv preprint arXiv:2512.16649 .He, C.; Luo, R.; Bai, Y.; Hu, S.; Thai, Z. L.; Shen, J.; Hu, J.; Han, X.; Huang, Y.; Zhang, Y.; Liu, J.; Qi, L.; Liu, Z.; and Sun, M. 2024. OlympiadBench: A Challeng-ing Benchmark for Promoting AGI with Olympiad-Level Bilingual Multimodal Scientific Problems. arXiv preprint arXiv:2402.14008 .Hendrycks, D.; Burns, C.; Kadavath, S.; Arora, A.; Basart, S.; Tang, E.; Song, D.; and Steinhardt, J. 2021. Measuring Mathematical Problem Solving With the MATH Dataset. Ad-vances in Neural Information Processing Systems (NeurIPS) .ArXiv:2103.03874. Holtzman, A.; Buys, J.; Du, L.; Forbes, M.; and Choi, Y. 2020. The Curious Case of Neural Text Degeneration. In In-ternational Conference on Learning Representations (ICLR) .ArXiv:1904.09751. Houthooft, R.; Chen, X.; Duan, Y.; Schulman, J.; De Turck, F.; and Abbeel, P. 2016. VIME: Variational Information Maximizing Exploration. In Advances in Neural Information Processing Systems (NeurIPS) . ArXiv:1605.09674. Huang, J.; Chen, X.; Mishra, S.; Zheng, H. S.; Yu, A. W.; Song, X.; and Zhou, D. 2024. Large Language Models Can-not Self-Correct Reasoning Yet. In International Conference on Learning Representations (ICLR) . ArXiv:2310.01798. Huang, Q.; Dai, W.; Liu, J.; He, W.; Jiang, H.; Song, M.; Chen, J.; Yao, C.; and Song, J. 2025. Boosting MLLM Rea-soning with Text-Debiased Hint-GRPO. In Proceedings of the IEEE/CVF International Conference on Computer Vision (ICCV) .Kirsch, A.; van Amersfoort, J.; and Gal, Y. 2019. Batch-BALD: Efficient and Diverse Batch Acquisition for Deep Bayesian Active Learning. In Advances in Neural Informa-tion Processing Systems (NeurIPS) .Kwon, W.; Li, Z.; Zhuang, S.; Sheng, Y.; Zheng, L.; Yu, C. H.; Gonzalez, J. E.; Zhang, H.; and Stoica, I. 2023. Effi-cient Memory Management for Large Language Model Serv-ing with PagedAttention. In ACM Symposium on Operating Systems Principles (SOSP) .Li, J.; et al. 2025a. QuestA: Expanding Reasoning Capac-ity in LLMs via Question Augmentation. arXiv preprint arXiv:2507.13266 .Li, Z.; Sun, Z.; Zhao, J.; Min, E.; Zeng, Y.; Wu, H.; Cai, H.; Wang, S.; Yin, D.; Chen, X.; and Deng, Z.-H. 2025b. Staying in the Sweet Spot: Responsive Reasoning Evolution via Capability-Adaptive Hint Scaffolding. arXiv preprint arXiv:2509.06923 .Lightman, H.; Kosaraju, V.; Burda, Y.; Edwards, H.; Baker, B.; Lee, T.; Leike, J.; Schulman, J.; Sutskever, I.; and Cobbe, K. 2024. Let’s Verify Step by Step. In International Confer-ence on Learning Representations (ICLR) .Liu, Z.; Gong, C.; Fu, X.; Liu, Y.; Chen, R.; Hu, S.; Zhang, S.; Liu, R.; Zhang, Q.; and Tu, D. 2025. GHPO: Adaptive Guid-ance for Stable and Efficient LLM Reinforcement Learning. 
+
+arXiv preprint arXiv:2507.10628 .Madaan, A.; Tandon, N.; Gupta, P.; Hallinan, S.; Gao, L.; Wiegreffe, S.; Alon, U.; Dziri, N.; Prabhumoye, S.; Yang, Y.; Gupta, S.; Majumder, B. P.; Hermann, K.; Welleck, S.; Yazdanbakhsh, A.; and Clark, P. 2023. Self-Refine: Itera-tive Refinement with Self-Feedback. In Advances in Neural Information Processing Systems (NeurIPS) .NVIDIA. 2024. OpenMath-Nemotron-1.5B. Hugging Face: https://huggingface.co/nvidia/OpenMath-Nemotron-1.5B. OpenAI. 2024. Learning to Reason with LLMs. https:// openai.com/index/learning-to-reason-with-llms/. Ouyang, L.; Wu, J.; Jiang, X.; Almeida, D.; Wainwright, C.; Mishkin, P.; Zhang, C.; Agarwal, S.; Slama, K.; Ray, A.; et al. 2022. Training Language Models to Follow Instructions with Human Feedback. In Advances in Neural Information Processing Systems (NeurIPS) .Rafailov, R.; Sharma, A.; Mitchell, E.; Ermon, S.; Manning, C. D.; and Finn, C. 2023. Direct Preference Optimization: Your Language Model is Secretly a Reward Model. In Ad-vances in Neural Information Processing Systems (NeurIPS) .ArXiv:2305.18290. Schaul, T.; Quan, J.; Antonoglou, I.; and Silver, D. 2016. Prioritized Experience Replay. In International Conference on Learning Representations (ICLR) .Schulman, J.; Wolski, F.; Dhariwal, P.; Radford, A.; and Klimov, O. 2017. Proximal Policy Optimization Algorithms. 
+
+arXiv preprint arXiv:1707.06347 .Shao, Z.; Wang, P.; Zhu, Q.; Xu, R.; Song, J.; Bi, X.; Zhang, H.; Zhang, M.; Li, Y. K.; Wu, Y.; and Guo, D. 2024. DeepSeekMath: Pushing the Limits of Mathemati-cal Reasoning in Open Language Models. arXiv preprint arXiv:2402.03300 . Introduces the GRPO advantage estima-tor. Sheng, G.; Zhang, C.; Ye, Z.; Wu, X.; Zhang, W.; Zhang, R.; Peng, Y.; Lin, H.; and Wu, C. 2025. HybridFlow: A Flexible and Efficient RLHF Framework. Proceedings of the European Conference on Computer Systems (EuroSys) .Underlies the verl library used in this work. Shinn, N.; Cassano, F.; Berman, E.; Gopinath, A.; Narasimhan, K.; and Yao, S. 2023. Reflexion: Lan-guage Agents with Verbal Reinforcement Learning. Ad-vances in Neural Information Processing Systems (NeurIPS) .ArXiv:2303.11366. Singh, A.; Co-Reyes, J. D.; Agarwal, R.; Anand, A.; Patil, P.; Garcia, X.; Liu, P. J.; Harrison, J.; Lee, J.; Xu, K.; Parisi, A.; Kumar, A.; Alemi, A.; Rizkowsky, A.; Nova, A.; Adlam, B.; Bohnet, B.; Elsayed, G.; Sedghi, H.; Mordatch, I.; Simpson, I.; Gur, I.; Snoek, J.; Pennington, J.; Hron, J.; Kenealy, K.; Swersky, K.; Mahajan, K.; Culp, L.; Xiao, L.; Bileschi, M. L.; Constant, N.; Novak, R.; Liu, R.; Warkentin, T.; Qian, Y.; Bansal, Y.; Dyer, E.; Neyshabur, B.; Sohl-Dickstein, J.; and Fiedel, N. 2024. Beyond Human Data: Scaling Self-Training for Problem-Solving with Language Models. Transactions on Machine Learning Research (TMLR) . ArXiv:2312.06585. Stiennon, N.; Ouyang, L.; Wu, J.; Ziegler, D. M.; Lowe, R.; Voss, C.; Radford, A.; Amodei, D.; and Christiano, P. 2020. Learning to Summarize from Human Feedback. In Ad-vances in Neural Information Processing Systems (NeurIPS) .ArXiv:2009.01325. Wang, P.; Li, L.; Shao, Z.; Xu, R. X.; Dai, D.; Li, Y.; Chen, D.; Wu, Y.; and Sui, Z. 2024. Math-Shepherd: Verify and Reinforce LLMs Step-by-step without Human Annotations. In Annual Meeting of the Association for Computational Lin-guistics (ACL) . ArXiv:2312.08935. Wang, X.; Han, J.; Jiang, Z.; Li, T.; Liang, J.; Jiang, S.; Dai, Z.; Ma, S.; Yu, F.; and Xiao, Y. 2025. Don’t Tell the Answer, Truly Guide the Reasoning During RL Rollouts. 
+
+arXiv preprint arXiv:2510.09388 .Wang, X.; Wei, J.; Schuurmans, D.; Le, Q.; Chi, E.; Narang, S.; Chowdhery, A.; and Zhou, D. 2023. Self-Consistency Improves Chain of Thought Reasoning in Language Models. In International Conference on Learning Representations (ICLR) . ArXiv:2203.11171. Wei, J.; Wang, X.; Schuurmans, D.; Bosma, M.; Ichter, B.; Xia, F.; Chi, E.; Le, Q.; and Zhou, D. 2022. Chain-of-Thought Prompting Elicits Reasoning in Large Language Models. In Advances in Neural Information Processing Sys-tems (NeurIPS) . ArXiv:2201.11903. Wu, J.; Lu, N.; Liu, S.; Wang, K.; Yang, Y.; Lin, B.; Zhang, C. J.; Li, Q.; and Tang, K. 2026. Train at Moving Edge: Online-Verified Prompt Selection for Efficient RL Training of Large Reasoning Model. arXiv preprint arXiv:2603.25184 .Xiong, W.; Ye, C.; Liao, B.; Dong, H.; Xu, X.; Monz, C.; Bian, J.; Jiang, N.; and Zhang, T. 2025. Reinforce-Ada: An Adaptive Sampling Framework under Non-linear RL Objec-tives. arXiv preprint arXiv:2510.04996 .Yao, S.; Yu, D.; Zhao, J.; Shafran, I.; Griffiths, T. L.; Cao, Y.; and Narasimhan, K. 2023. Tree of Thoughts: Deliber-ate Problem Solving with Large Language Models. In Ad-vances in Neural Information Processing Systems (NeurIPS) .ArXiv:2305.10601. Yu, L.; Yang, T.; Ding, S.; Jin, R.; Gu, N.; Hao, X.; Nie, S.; Xiong, D.; Yin, W.; Sun, Y.; and Wu, H. 2026. KnowRL: Boosting LLM Reasoning via Reinforcement Learning with Minimal-Sufficient Knowledge Guidance. 
+
+arXiv preprint arXiv:2604.12627 . Code: https://github.com/ Hasuer/KnowRL. Yu, Q.; Zhang, Z.; Zhu, R.; Yuan, Y.; Zuo, X.; Yue, Y.; Fan, T.; Liu, G.; Liu, L.; Liu, X.; et al. 2025. DAPO: An Open-Source LLM Reinforcement Learning System at Scale. arXiv preprint arXiv:2503.14476 . ByteDance Seed and Tsinghua AIR. Zelikman, E.; Harik, G.; Shao, Y.; Jayasiri, V.; Haber, N.; and Goodman, N. D. 2024. Quiet-STaR: Language Models Can Teach Themselves to Think Before Speaking. arXiv preprint arXiv:2403.09629 .Zelikman, E.; Wu, Y.; Mu, J.; and Goodman, N. D. 2022. STaR: Bootstrapping Reasoning with Reasoning. In Ad-vances in Neural Information Processing Systems (NeurIPS) .Zhang, F.; Tan, Z.; Ma, X.; Dong, Z.; Leng, X.; Zhao, J.; Sun, X.; and Yang, Y. 2025a. ADHint: Adaptive Hints with Difficulty Priors for Reinforcement Learning. arXiv preprint arXiv:2512.13095 .Zhang, K.; Lv, A.; Li, J.; Wang, Y.; Wang, F.; Hu, H.; and Yan, R. 2025b. StepHint: Multi-level Stepwise Hints En-hance Reinforcement Learning to Reason. arXiv preprint arXiv:2507.02841 .Zhao, Y.; Gu, A.; Varma, R.; Luo, L.; Huang, C.-C.; Xu, M.; Wright, L.; Shojanazeri, H.; Ott, M.; Shleifer, S.; et al. 2023. PyTorch FSDP: Experiences on Scaling Fully Sharded Data Parallel. Proceedings of the VLDB Endow-ment . ArXiv:2304.11277. This technical supplement collects the material referenced from the main paper: the bounded-bias proof (App. A), the training-time algorithm (App. B), the design-space position-ing table (App. C), the full per-benchmark non-stationarity table (App. D), and additional reproducibility notes (App. E). Section, proposition, algorithm, and table labels carry the letter/“S” prefixes used when the main paper cites this docu-ment; equation and figure numbers are likewise “S”-prefixed. 
+
+# A Bounded Truncation Bias 
+
+Proposition S1 (Bounded truncation bias) . Fix a gener-ated position with full next-token distribution p over a vo-cabulary of size |V |. Let TL(p) be its top-L index set (the head ), ε := P 
+
+> i / ∈TL(p)
+
+pi the tail mass, and bHt(p) = 
+
+− P 
+
+> i∈TL(p)
+
+˜pi log ˜ pi the truncated-and-renormalized esti-mator with ˜pi = pi/(1 − ε). Write H2 for the binary entropy. The truncation bias ∆( p, L ) = H(p) − bHt(p) satisfies, for every p,
+
+∆( p, L ) ≤ ε log |V | + H2(ε), (S1) 
+
+and is nonnegative, 0 ≤ ∆( p, L ), whenever ε ≤ 1/L . Con-sequently, for two prompts q and q ⊕ k whose distributions both satisfy ε ≤ ε⋆, the proxy score bH(· | q) − bH(· | q ⊕ k)
+
+estimates the true entropy difference H(· | q) − H(· | q ⊕ k)
+
+with a bias of magnitude O(ε⋆ log |V |), plus an O(K−1/2)
+
+stochastic error from averaging over K positions. Proof. Partition the vocabulary into the head S = TL(p)
+
+(mass 1 − ε) and the tail ¯S (mass ε), and let pS , p ¯S be p
+
+restricted and renormalized to S, ¯S. By construction pS = ˜ p,so H(pS ) = bHt(p). Let B = 1[i ∈ S] be the head/tail in-dicator; then H(B) = H2(ε), and the grouping (chain-rule) identity for Shannon entropy gives the exact decomposition 
+
+H(p) = H(B) + (1 − ε)H(pS ) + εH (p ¯S )= H2(ε) + (1 − ε) bHt(p) + εH (p ¯S ). (S2) Subtracting bHt(p),
+
+∆( p, L ) = H2(ε) + ε H(p ¯S ) − bHt(p). (S3) 
+
+Upper bound. In (S3), bHt(p) ≥ 0 and H(p ¯S ) ≤ log | ¯S| ≤ 
+
+log |V |, so ∆( p, L ) ≤ H2(ε) + ε log |V |, proving (S1) un-conditionally. 
+
+Lower bound. Dropping the nonnegative term εH (p ¯S ) in (S3) and using bHt(p) ≤ log |S| = log L,
+
+∆( p, L ) ≥ H2(ε)−ε log L ≥ ε log 1 
+
+> ε
+
+−ε log L = ε log 1 
+
+> εL
+
+,
+
+where the second inequality uses H2(ε) = ε log 1 
+
+> ε
+
++ (1 −
+
+ε) log 11−ε ≥ ε log 1 
+
+> ε
+
+. Thus ∆( p, L ) ≥ 0 whenever ε ≤ 1/L .The condition is not vacuous: if εL ≫ 1 the bias can be negative—a near-uniform head of L tokens together with a heavy point-mass tail makes bHt(p) ≈ log L exceed H(p).With the serving truncation L=20 and the empirical ε ≲
+
+0.05 = 1 /L reported in the main paper’s proxy analysis, the regime ε ≤ 1/L holds, so both bounds apply. 
+
+Difference of biases. For q′ = q ⊕ k with tail masses 
+
+≤ ε⋆, the bias of the proxy score equals   bHt(q) − bHt(q′) −
+
+ H(q) − H(q′) = ∆( q′) − ∆( q), of magnitude at most 
+
+max {∆( q), ∆( q′)} ≤ H2(ε⋆)+ ε⋆ log |V | = O(ε⋆ log |V |),since H2(ε⋆) = O(ε⋆ log 1 
+
+> ε⋆
+
+) ≤ O (ε⋆ log |V |) once |V | ≥ 
+
+1/ε ⋆. This bounds the bias of the score; it does not by itself imply that the proxy preserves the KP ordering, which we instead support empirically (Spearman ρ=0 .68 against leave-one-out ground truth; see the proxy-validation gate of the main paper). 
+
+Finite-K averaging. The proxy reports bH =
+
+> 1
+> K
+
+P 
+
+> t≤K
+
+bHt, with each bHt ∈ [0 , log L]. Letting Ft−1 be the 
+
+σ-algebra of the sampled prefix before position t, the incre-ments Dt = bHt −E[ bHt | F t−1] form a martingale-difference sequence bounded by log L, so Azuma–Hoeffding gives 
+
+> 1
+> K
+
+P 
+
+> t≤K
+
+Dt = OP (K−1/2). Because the autoregressive positions are dependent, this replaces an independence-based Hoeffding bound. The bound controls deviation from the run-ning conditional mean 1
+
+> K
+
+P 
+
+> t≤K
+
+E[ bHt | F t−1]; identifying that mean with the marginal target—the expected average first-token entropy—further assumes the per-position condi-tional entropies are weakly dependent so their running mean concentrates, an assumption we adopt rather than prove. 
+
+Remark (regime of validity). Proposition S1 sharpens the body’s inline bound: the upper bound (S1) is unconditional, but the lower bound—hence the two-sided statement used in the main paper—requires ε ≤ 1/L . The bound ε log |V | is also loose for ranking: with ε ≈ 0.05 and |V | ∼ 1.5×10 5 it is ≈ 0.6 nats, larger than typical inter-KP entropy gaps, so the proposition controls the bias of the score but not rank preservation. 
+
+# B AdaKPSelector Training Loop 
+
+Reading the loop. Lines map one-to-one onto the four components: ShouldReEvaluate is the scheduler, En-tropyDiff the entropy proxy, Update the EMA smoother, and StepCounters /ReviveRandomFraction the retire-ment manager (all four defined in the main paper’s Method section). State is per problem for the smoother and retire-ment counters and a single global object for the scheduler, so the resident memory is O P  
+
+> q
+
+|C(q)| scalars—one EMA value and one counter per candidate KP—independent of the model size. The selection cache sel q is written only inside the re-evaluation branch and read on every training step, so steps between re-evaluations incur no selector overhead; the two safety fallbacks (the static-CSS initialization before the first re-evaluation and the all-retired continue ) guarantee the 
+
+Hint block is always populated. 
+
+# C Positioning Relative to Related Work 
+
+The three axes are independent: a method may inject atomic 
+
+KPs yet fix them offline (top row), or adapt online yet treat the hint as one monolithic block (middle rows). AdaKP is the only entry that is simultaneously KP-level, subset-valued, and online; HIVE’s “ – ” marks that selection level does not apply, as it gates whole prompts rather than content within a prompt. We stress that this table is a conceptual position-ing along design axes, not an empirical head-to-head: the Algorithm S1 AdaKPSelector training-time loop. State is per-problem for Sq , R q and global for the scheduler S.
+
+Require: KP pools {P (q)}q∈Q, proxy πproxy , hyperparam-eters α, ρ sel , n retire , m revive , r revive , ∆0, c, T  
+
+> 1:
+
+Initialize S and, for each q, smoother Sq and retirement manager Rq 
+
+> 2:
+
+Re-eval counter τ ← 0; selection cache sel q ← Scss (q)
+
+for every q {static-CSS fallback until τ > 0} 
+
+> 3:
+
+for t = 1 to T do  
+
+> 4:
+
+if S.ShouldReEvaluate (t) then  
+
+> 5:
+
+τ ← τ + 1  
+
+> 6:
+
+for each problem q ∈ Q do  
+
+> 7:
+
+Aq ← Rq .Active (P (q)) {exclude retired KPs}  
+
+> 8:
+
+if Aq = ∅ then  
+
+> 9:
+
+continue {safety: keep last sel q } 
+
+> 10:
+
+end if  
+
+> 11:
+
+for each k ∈ Aq do  
+
+> 12:
+
+σq,k ← πproxy .EntropyDiff (q, k ) {entropy-diff proxy}  
+
+> 13:
+
+Sq .Update (k, σ q,k ) 
+
+> 14:
+
+end for  
+
+> 15:
+
+sel q ← Sq .TopFraction (ρsel ) {overwrite cache}  
+
+> 16:
+
+Rq .StepCounters (sel q , A q ) 
+
+> 17:
+
+if τ mod mrevive = 0 then  
+
+> 18:
+
+Rq .ReviveRandomFraction (rrevive ) {ex-ploration}  
+
+> 19:
+
+end if  
+
+> 20:
+
+end for  
+
+> 21:
+
+end if  
+
+> 22:
+
+Train one DAPO+GRPO step with each prompt’s 
+
+Hint block populated from sel q {cache reused between re-evaluations}  
+
+> 23:
+
+end for 
+
+adaptive-hint methods target a different axis (how much to hint), so we do not run them under our setting, and the com-parison should be read as locating AdaKP in design space rather than ranking systems. 
+
+# D Non-Stationarity of KP Importance (Full Table) 
+
+How to read, and caveats. A top-30% set holds only 
+
+⌈0.3 |C(q)|⌉ ≈ 2 KPs when |C(q)| ∈ [5 , 7] , so a per-problem Jaccard takes only a few discrete values and the per-benchmark means are correspondingly coarse; the headline quantity is the global mean, not any single row. The realized n
+
+counts the sampled problems with |C(q)| ≥ 2, below which the leave-one-out ranking is undefined, so benchmarks with few such problems (MATH-500, n=12 ; Olympiad-Bench, 
+
+n=13 ) yield the noisiest estimates. The lone above-threshold value (AIME25, 0.730 at n=21 ) is, on a coarse-Jaccard mea-surement over a small pool, most simply read as run-to-run noise rather than genuine stationarity; we do not attribute it to any specific mechanism. The table supports H1—that the informative-KP set shifts between the base and the trained policy—which motivates adaptive selection (see the main pa-Table S1: Positioning of AdaKP relative to closely related lines of work. Item granularity : what is being selected. 
+
+Selection level : monolithic vs. subset-of-atomic. Timing :offline (once) vs. online (during RL).                            
+
+> Method Item Selection Timing KnowRL (Yu et al. 2026) KP subset offline GHPO (Liu et al. 2025) hint mono. online HINT (Wang et al. 2025) hint mono. online ADHint (Zhang et al. 2025a) hint mono. online Stepwise (Zhang et al. 2025b) hint mono. online Hint-GRPO (Huang et al. 2025) hint mono. online HIVE (Wu et al. 2026) prompt –online AdaKP (ours) KP subset online
+
+Table S2: H1: per-benchmark Jaccard similarity of top-30% 
+
+KP sets between two policies ( πOpenMath vs. πtrained ). n =number of problems with |C(q)|≥ 2 out of the 30 stratified samples per benchmark. Bold marks the single benchmark above the 0.7 H1_strong threshold.                     
+
+> Benchmark nJaccard AIME24 20 0.367
+> AIME25 21 0.730
+> BRUMO25 23 0.551
+> HMMT25 23 0.667
+> AMC23 19 0.526
+> CMIMC25 27 0.654
+> MATH-500 12 0.417
+> Olympiad-Bench 13 0.385
+> Global mean —0.537
+
+per’s non-stationarity test); it characterizes the phenomenon ,not AdaKP, whose end-task effect is the main comparison. 
+
+# E Reproducibility Notes 
+
+AdaKP is an additive module: enabling it changes only the 
+
+Hint block each problem receives and leaves the optimizer, loss, and rollout path bit-identical to the DAPO+GRPO base-line, so enabling or disabling AdaKP is an exact ablation con-trol. Reproducing a run also requires settings that are fixed in our training configuration but not fully recoverable from the paper text: the optimizer hyperparameters beyond the learning rate (Adam moments, weight decay, any warmup), the filtering and de-duplication applied to the 8.8k-problem corpus, the random-seed handling for data order and roll-out sampling, and the cadence at which the frozen proxy is loaded. These are contained in our fork and scripts, which will be released upon acceptance.

@@ -1,0 +1,920 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-31T21:40:43.830128+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 25,
+    "deep_cap": 6,
+    "deep_selected": 12,
+    "quick_candidates": 18,
+    "quick_skim_target": 11,
+    "quick_selected": 11
+  },
+  "deep_dive": [
+    {
+      "id": "2607.28026v1",
+      "source": "arxiv",
+      "title": "Contrastive Reinforced Policy Optimization via Privileged Self-Distillation",
+      "abstract": "Recent advances in post-training Large Language Models (LLMs) increasingly rely on Reinforcement Learning with Verifiable Rewards (RLVR) or On-Policy Self-Distillation (OPSD). While OPSD provides dense, logit-level supervision, it inherently suffers from exposure bias due to the privileged information of the self-teacher. In multi-turn agentic settings, this leads to reasoning route convergence and the loss of clear optimization directions. To tackle these challenges, we introduce Contrastive Reinforced Policy Optimization (CRPO), which reformulates agentic OPSD from a contrastive learning perspective. By leveraging predictive entropy to distinguish between positive positions (reflective exploration) and negative positions (exposure bias), CRPO conducts group-wise contrast to preserve reliable, fine-grained optimization signals. Extensive evaluations across 13 challenging reasoning and deep-search benchmarks demonstrate that CRPO consistently outperforms existing reinforcement learning and self-distillation baselines, significantly enhancing training stability and generalization in long-horizon interactions.",
+      "authors": [
+        "Xingjian Wu",
+        "Junlin Liu",
+        "Xingchen Liu",
+        "Xuhang Zhu",
+        "Jianing Wang",
+        "Linsen Guo",
+        "Xiaoyu Li",
+        "Xuezhi Cao",
+        "Xunliang Cai"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-07-30T11:14:11+00:00",
+      "link": "https://arxiv.org/pdf/2607.28026v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 10.0,
+      "llm_evidence_en": "Proposes contrastive reinforced policy optimization for LLM post-training",
+      "llm_evidence_cn": "面向大模型后训练提出对比强化策略优化",
+      "llm_evidence": "面向大模型后训练提出对比强化策略优化",
+      "canonical_evidence": "面向大模型后训练提出对比强化策略优化",
+      "llm_tldr_en": "Proposes CRPO, a contrastive reinforcement policy optimization for LLMs that reformulates agentic on-policy self-distillation using predictive entropy to reduce exposure bias and improve multi-turn reasoning.",
+      "llm_tldr_cn": "大模型后训练日益依赖可验证奖励的强化学习或在线自蒸馏，但后者因特权教师信息存在暴露偏差，多轮智能体场景下会引发推理路径收敛和优化方向缺失。本文提出 CRPO，将智能体在线自蒸馏转化为对比学习，利用预测熵区分正样本(反思探索)和负样本(暴露偏差)，从而引导策略更新。在多项任务上，CRPO 缓解了路径收敛并带来更稳定的性能提升。该方法为自蒸馏式强化学习提供了新的对比优化视角。",
+      "llm_tldr": "大模型后训练日益依赖可验证奖励的强化学习或在线自蒸馏，但后者因特权教师信息存在暴露偏差，多轮智能体场景下会引发推理路径收敛和优化方向缺失。本文提出 CRPO，将智能体在线自蒸馏转化为对比学习，利用预测熵区分正样本(反思探索)和负样本(暴露偏差)，从而引导策略更新。在多项任务上，CRPO 缓解了路径收敛并带来更稳定的性能提升。该方法为自蒸馏式强化学习提供了新的对比优化视角。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "reinforcement learning for large language model",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.23617v1",
+      "source": "arxiv",
+      "title": "Optimal Reward Shaping: Autonomous Car Parking Case Study",
+      "abstract": "Designing effective reward functions for model-free reinforcement learning under non-holonomic constraints remains a persistent challenge, often resulting in severe local minima such as policy paralysis or over-conservative hazard avoidance. In this work, we present a parameterized reward shaping framework featuring coverage-gated alignment feedback, drive-direction switch regularization, and an aligned episode termination mechanism evaluated on an autonomous parallel parking task. Crucially, we show that environmental reward parameters and algorithmic hyperparameters are deeply co-dependent, requiring joint meta-optimization to achieve stable convergence. By employing surrogate-based Bayesian optimization, our co-optimized Deep Q-Network (DQN) agent resolves characteristic control failure modes, significantly outperforming uncalibrated baselines across both success rate and trajectory smoothness.",
+      "authors": [
+        "Emre Özkaya",
+        "Nicolas R. Gauger"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "math.OC"
+      ],
+      "published": "2026-07-26T11:49:23+00:00",
+      "link": "https://arxiv.org/pdf/2607.23617v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Reward shaping framework jointly optimized with hyperparameters",
+      "llm_evidence_cn": "奖励塑形框架与超参数联合优化",
+      "llm_evidence": "奖励塑形框架与超参数联合优化",
+      "canonical_evidence": "奖励塑形框架与超参数联合优化",
+      "llm_tldr_en": "Designing reward functions for model-free RL under non-holonomic constraints is challenging. This paper presents a parameterized reward shaping framework with coverage-gated alignment feedback and surrogate-based Bayesian optimization to co-tune reward and algorithm hyperparameters, resolving local minima.",
+      "llm_tldr_cn": "非完整约束下的强化学习容易因奖励设计不当而陷入策略瘫痪等局部最优。该工作提出参数化奖励塑形框架，引入覆盖门控对齐反馈、方向切换正则化与回合终止机制，并在自动驾驶停车任务上评估。重要的是，研究发现环境奖励参数与算法超参数相互依赖，因而采用代理模型贝叶斯优化进行联合元优化。结果表明该方法能稳定收敛并解决局部极小，为奖励函数设计提供通用方法论。",
+      "llm_tldr": "非完整约束下的强化学习容易因奖励设计不当而陷入策略瘫痪等局部最优。该工作提出参数化奖励塑形框架，引入覆盖门控对齐反馈、方向切换正则化与回合终止机制，并在自动驾驶停车任务上评估。重要的是，研究发现环境奖励参数与算法超参数相互依赖，因而采用代理模型贝叶斯优化进行联合元优化。结果表明该方法能稳定收敛并解决局部极小，为奖励函数设计提供通用方法论。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "design of reward functions in RL",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.24833v1",
+      "source": "arxiv",
+      "title": "AdaKP: Online Adaptive Knowledge-Point Selection for Reasoning-Oriented Reinforcement Learning",
+      "abstract": "Reinforcement learning with verifiable rewards is a powerful paradigm for eliciting reasoning in large language models, yet it suffers from severe reward sparsity on competition-level mathematics. A common remedy injects atomic knowledge points (KPs) - short natural-language hints distilled from gold solutions - into the prompt. Existing methods, however, either fix this selection once offline or merely scale the monolithic quantity of injected text, leaving untouched the most informative axis of choice: which subset of atomic KPs to inject, and when. We introduce AdaKP, an online selector that re-chooses each problem's KP subset over the course of RL training. At its core is an entropy proxy that scores a KP by the reduction in next-token entropy it induces - a single inexpensive forward pass, with a provable bound on its truncation bias - in place of expensive rollout-based estimation. Three lightweight mechanisms make this signal usable online: a momentum smoother that absorbs per-step noise, a retirement-and-revival manager that prunes weak KPs while preserving exploration, and an adaptive scheduler that front-loads re-evaluations into early training. AdaKP further contributes a pre-flight validation gate that certifies the proxy against a leave-one-out ground truth before any expensive run is launched, turning method-level risk into a falsifiable check. Realized as a fully additive fork of a standard DAPO+GRPO trainer with no optimizer changes, AdaKP improves over a strong static-selection baseline on all eight competition-mathematics benchmarks at negligible added cost, positioning online, validated KP-subset selection as a practical and as-yet under-explored axis for reasoning-oriented reinforcement learning.",
+      "authors": [
+        "Zibin Meng",
+        "Zhenyu Zhao",
+        "Chunqiang Run"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-07-23T15:12:39+00:00",
+      "link": "https://arxiv.org/pdf/2607.24833v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Online knowledge-point selection to reduce reward sparsity; RL for LLM reasoning",
+      "llm_evidence_cn": "在线知识点选择缓解奖励稀疏，属于面向LLM推理的强化学习",
+      "llm_evidence": "在线知识点选择缓解奖励稀疏，属于面向LLM推理的强化学习",
+      "canonical_evidence": "在线知识点选择缓解奖励稀疏，属于面向LLM推理的强化学习",
+      "llm_tldr_en": "RLVR suffers from sparse rewards on hard math; AdaKP is an online selector that re-picks atomic knowledge-point hints during training using an entropy proxy, addressing when and which hints to inject.",
+      "llm_tldr_cn": "可验证奖励强化学习(RLVR)能有效激发大模型推理能力，但在竞赛级数学上奖励极其稀疏，常用补救方法是在提示中注入原子知识点。现有方法要么离线固定选择，要么只扩大注入文本量，忽略了选择哪些知识点以及何时注入。论文提出AdaKP在线选择器，用熵代理度量知识点对不确定性的削减，在训练过程中动态重新选择每道题的子集。该方法直接针对奖励稀疏问题，为推理强化学习提供了自适应提示注入策略。",
+      "llm_tldr": "可验证奖励强化学习(RLVR)能有效激发大模型推理能力，但在竞赛级数学上奖励极其稀疏，常用补救方法是在提示中注入原子知识点。现有方法要么离线固定选择，要么只扩大注入文本量，忽略了选择哪些知识点以及何时注入。论文提出AdaKP在线选择器，用熵代理度量知识点对不确定性的削减，在训练过程中动态重新选择每道题的子集。该方法直接针对奖励稀疏问题，为推理强化学习提供了自适应提示注入策略。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "policy optimization methods for multi step reasoning in llms",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.26470v1",
+      "source": "arxiv",
+      "title": "CMT-RAG: Complementary Memory Traces for Multi-turn Multi-hop RAG",
+      "abstract": "Multi-turn information-seeking conversations require both multi-hop reasoning and long-range dependency tracking across turns. However, existing RAG systems typically represent conversational memory as raw dialogue history, rewritten queries, or unstructured summaries, making it difficult to recover the specific prior reasoning steps and evidence required for follow-up queries. Our key insight is to align conversational memory with retrieval by representing dialogue context as sub-question-level reasoning traces. Building on this insight, we introduce MuMu-QA, a benchmark for multi-turn multi-hop RAG with explicit cross-turn sub-question dependency annotations, and CMT-RAG, a complementary memory framework for this setting. At each turn, CMT-RAG employs a state-space trace generator, whose recurrent state serves as runtime memory, to incorporate recent conversational context and decompose the current query into structured trace drafts containing retrieval-oriented sub-questions and dependencies on earlier traces. It then grounds these drafts with retrieved evidence and stores them as persistent memory traces in a session-level DAG, enabling future turns to efficiently recover relevant prior reasoning and evidence. Experiments on MuMu-QA and corpus-level RAG benchmarks show that CMT-RAG consistently outperforms five categories of RAG baselines in answer accuracy.",
+      "authors": [
+        "Lang Zhou",
+        "Yingjian Chen",
+        "Shuxuan Li",
+        "Kun-Yu Lin",
+        "Zhilin Zhao"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.IR"
+      ],
+      "published": "2026-07-29T04:50:41+00:00",
+      "link": "https://arxiv.org/pdf/2607.26470v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Multi-turn multi-hop RAG framework; direct match to RAG for knowledge-intensive tasks",
+      "llm_evidence_cn": "多轮多跳RAG框架，直接匹配知识密集型任务的检索增强生成",
+      "llm_evidence": "多轮多跳RAG框架，直接匹配知识密集型任务的检索增强生成",
+      "canonical_evidence": "多轮多跳RAG框架，直接匹配知识密集型任务的检索增强生成",
+      "llm_tldr_en": "RAG memory in multi-turn dialogue is poorly aligned with retrieval; CMT-RAG represents context as sub-question reasoning traces, plus new MuMu-QA benchmark, improving multi-hop follow-up answers.",
+      "llm_tldr_cn": "多轮多跳问答要求模型跨轮次追踪长程依赖与多跳证据，但现有RAG系统把对话记忆存成原始历史、改写查询或非结构化摘要，难以支撑后续查询。论文提出将对话上下文表示为子问题级推理轨迹，与检索对齐，并构建MuMu-QA基准和CMT-RAG互补记忆框架。该方法面向知识密集型多轮对话检索，是检索增强生成方向的直接相关工作。",
+      "llm_tldr": "多轮多跳问答要求模型跨轮次追踪长程依赖与多跳证据，但现有RAG系统把对话记忆存成原始历史、改写查询或非结构化摘要，难以支撑后续查询。论文提出将对话上下文表示为子问题级推理轨迹，与检索对齐，并构建MuMu-QA基准和CMT-RAG互补记忆框架。该方法面向知识密集型多轮对话检索，是检索增强生成方向的直接相关工作。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "retrieval augmented generation for knowledge intensive tasks",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.27136v1",
+      "source": "arxiv",
+      "title": "KAMR: Grounding Generation via Knowledge-Aligned Multi-hop Retrieval",
+      "abstract": "Graph-based retrieval-augmented generation increasingly relies on multi-hop retrieval, where answering a query requires composing multiple connected knowledge-graph triplets. However, existing retrievers often rank triplets independently via global semantic matching. Moreover, many multi-hop benchmarks provide only final answers, which limits supervision for query--triplet alignment and causes structurally necessary but weakly aligned facts to be missed. To address these issues, we propose a knowledge-aligned multi-hop retriever, KAMR, which distinguishes anchor triplets that are strongly constrained by the query from connected triplets that are weakly aligned yet structurally linked to the anchors. To mitigate the lack of query-triplet alignment supervision, we build a partial alignment dataset by masking triplet elements and prompting an LLM to generate corresponding queries, and optimize two contrastive objectives for pair-level and element-level matching. At inference time, KAMR retrieves anchors globally and then expands locally to collect connected evidence. Across four benchmarks, three LLM backbones, and fourteen baselines, KAMR consistently improves multi-hop retrieval and downstream question answering performance.",
+      "authors": [
+        "Xiaochen Wang",
+        "Yuan Zhong",
+        "Haoyu Wang",
+        "Ting Wang",
+        "Fenglong Ma"
+      ],
+      "primary_category": "cs.IR",
+      "categories": [
+        "cs.IR"
+      ],
+      "published": "2026-07-29T17:07:37+00:00",
+      "link": "https://arxiv.org/pdf/2607.27136v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Knowledge-aligned multi-hop retrieval for grounded RAG generation",
+      "llm_evidence_cn": "用于生成接地RAG的知识对齐多跳检索",
+      "llm_evidence": "用于生成接地RAG的知识对齐多跳检索",
+      "canonical_evidence": "用于生成接地RAG的知识对齐多跳检索",
+      "llm_tldr_en": "KAMR distinguishes anchor triplets from weakly aligned connected triplets in multi-hop knowledge-graph retrieval, improving grounding for retrieval-augmented generation.",
+      "llm_tldr_cn": "基于图的多跳检索需要组合多个知识图谱三元组来回答问题，但现有检索器独立排序三元组，且受限于最终答案级别的弱监督，容易漏掉结构必要但语义弱对齐的事实。KAMR提出知识对齐多跳检索器，显式区分被查询强约束的锚点三元组和弱对齐但结构上相连的三元组，并设计缓解对齐监督不足的训练机制。它提升了多跳RAG的事实召回与生成接地性，是检索增强生成领域的重要进展。",
+      "llm_tldr": "基于图的多跳检索需要组合多个知识图谱三元组来回答问题，但现有检索器独立排序三元组，且受限于最终答案级别的弱监督，容易漏掉结构必要但语义弱对齐的事实。KAMR提出知识对齐多跳检索器，显式区分被查询强约束的锚点三元组和弱对齐但结构上相连的三元组，并设计缓解对齐监督不足的训练机制。它提升了多跳RAG的事实召回与生成接地性，是检索增强生成领域的重要进展。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "retrieval augmented generation for knowledge intensive tasks",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.27631v1",
+      "source": "arxiv",
+      "title": "ReDiPPO: Reference-Guided Value Calibration and Discrepancy-Aware Token Reweighting for Mathematical Reasoning",
+      "abstract": "Reinforcement learning has emerged as an effective paradigm for enhancing the mathematical reasoning capabilities of large language models. Among existing policy optimization methods, Proximal Policy Optimization (PPO) remains particularly appealing because its learned critic can, in principle, provide token-level credit assignment. However, in mathematical reasoning tasks characterized by long reasoning horizons and sparse outcome rewards, reliable token-level credit assignment remains challenging. The standard critic often fails to accurately evaluate intermediate reasoning states, resulting in noisy advantage estimates and suboptimal policy updates. In this paper, we propose ReDiPPO, a Reference-guided and Discrepancy-aware PPO framework for mathematical reasoning. ReDiPPO introduces a reference-guided critic that uses reference answers as training-time privileged signals to provide more accurate value estimation. Meanwhile, it retains a standard critic and quantifies the token-level reference-standard discrepancy between the standard value estimate and the reference-guided value estimate. This discrepancy serves as an indicator of difficult reasoning states and is used to reweight the corresponding token-level advantages during PPO optimization. Extensive experiments on diverse mathematical reasoning benchmarks demonstrate that ReDiPPO improves value-estimation accuracy and consistently outperforms strong policy optimization baselines, including PPO, DAPO, and GSPO, in final reasoning performance. Our code is available on https://github.com/cii030/ReDiPPO.",
+      "authors": [
+        "Zhenrong Zhang",
+        "Fei Wu",
+        "Jun Du",
+        "Jianshu Zhang",
+        "Si Wei"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI",
+        "cs.CL"
+      ],
+      "published": "2026-07-30T03:42:52+00:00",
+      "link": "https://arxiv.org/pdf/2607.27631v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "RL policy optimization PPO variant for improving mathematical reasoning in LLMs with token-level credit assignment",
+      "llm_evidence_cn": "面向LLM数学推理的PPO改进，优化令牌级信用分配",
+      "llm_evidence": "面向LLM数学推理的PPO改进，优化令牌级信用分配",
+      "canonical_evidence": "面向LLM数学推理的PPO改进，优化令牌级信用分配",
+      "llm_tldr_en": "ReDiPPO improves PPO for LLM mathematical reasoning by reference-guided value calibration and discrepancy-aware token reweighting, addressing noisy advantage estimates in sparse-reward long-horizon tasks.",
+      "llm_tldr_cn": "在数学推理的长推理链与稀疏结果奖励下，PPO的标准评论家难以准确评估中间状态。ReDiPPO引入参考策略引导的价值校准与差异感知的令牌重加权，降低优势估计噪声。实验表明其在数学推理基准上优于PPO和GRPO基线。该方法有望提升强化学习在长链推理任务中的性能。",
+      "llm_tldr": "在数学推理的长推理链与稀疏结果奖励下，PPO的标准评论家难以准确评估中间状态。ReDiPPO引入参考策略引导的价值校准与差异感知的令牌重加权，降低优势估计噪声。实验表明其在数学推理基准上优于PPO和GRPO基线。该方法有望提升强化学习在长链推理任务中的性能。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "application of reinforcement learning in large language model reasoning",
+      "matched_requirement_id": "req-7",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.27787v1",
+      "source": "arxiv",
+      "title": "LoRA Scaffolded Policy Optimization (LSPO): A Sampling-Time Low-Rank Scaffold for Recovering Reinforcement-Learning Gradient on Zero-Reward Cliff Prompts",
+      "abstract": "Reinforcement learning from verifiable rewards (RLVR) for mathematical reasoning suffers from a structural blind spot: on \"cliff\" prompts-those on which every sampled rollout in a group fails-the group-normalized advantage is identically zero, so GRPO produces no gradient on precisely the prompts at the frontier of the model's capability. We introduce LoRA Scaffolded Policy Optimization (LSPO), a sampling-time mechanism that recovers this lost gradient. Each RL step, LSPO detects cliff prompts, fits a small low-rank (LoRA) adapter by a brief supervised step on their ground-truth solutions, re-rolls the cliffs with the base-plus-adapter model, splices the now-successful completions back into the RL batch with an importance-sampling correction, and takes a GRPO step on the base alone; the adapter receives only the supervised gradient and is discarded at checkpoint, yielding a base-only model. On DeepMath-103K with DeepSeek-R1-Distill-Qwen-1.5B, evaluated over n=5 paired seeds per arm at a matched 1000-step reporting horizon, LSPO's 5-seed mean matches or beats a DAPO baseline on all 16 (benchmark, pass@k) cells (15 strict wins and one exact tie), with gains of up to +10.7 points on AIME24/pass@4, +6.7 points on AIME24 and AIME26 at pass@16, and +2.4 points on MATH500/pass@1; averaged over the 16 cells the improvement is +3.8 points.",
+      "authors": [
+        "Ken Ding"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-07-30T07:21:34+00:00",
+      "link": "https://arxiv.org/pdf/2607.27787v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Recovering RL gradient on zero-reward prompts via LoRA scaffold; policy optimization for reasoning",
+      "llm_evidence_cn": "用LoRA脚手架恢复零奖励提示的RL梯度，属于LLM推理策略优化",
+      "llm_evidence": "用LoRA脚手架恢复零奖励提示的RL梯度，属于LLM推理策略优化",
+      "canonical_evidence": "用LoRA脚手架恢复零奖励提示的RL梯度，属于LLM推理策略优化",
+      "llm_tldr_en": "RLVR for math has a blind spot: cliff prompts yield zero group advantage and no GRPO gradient; LSPO detects cliffs, fits a LoRA adapter, re-rolls, and restores the lost gradient.",
+      "llm_tldr_cn": "数学推理的强化学习(RLVR)存在结构性盲区：当一组提示的所有采样都失败时，组归一化优势恒为零，GRPO无法在这些能力前沿提示上产生梯度。论文提出LoRA脚手架策略优化(LSPO)，在采样阶段检测悬崖提示，用其标准答案微调一个小型LoRA适配器，再以基础模型加适配器重新采样，并将成功轨迹拼接回原始组以恢复梯度。该机制直接解决了策略优化中的零奖励问题，是面向LLM多步推理的有力改进。",
+      "llm_tldr": "数学推理的强化学习(RLVR)存在结构性盲区：当一组提示的所有采样都失败时，组归一化优势恒为零，GRPO无法在这些能力前沿提示上产生梯度。论文提出LoRA脚手架策略优化(LSPO)，在采样阶段检测悬崖提示，用其标准答案微调一个小型LoRA适配器，再以基础模型加适配器重新采样，并将成功轨迹拼接回原始组以恢复梯度。该机制直接解决了策略优化中的零奖励问题，是面向LLM多步推理的有力改进。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "policy optimization methods for multi step reasoning in llms",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.27968v1",
+      "source": "arxiv",
+      "title": "Beyond Binary Rewards: A Comparative Study of Reward Design for Reinforcement Unlearning",
+      "abstract": "Machine unlearning seeks to selectively remove specific knowledge from trained language models without full retraining, a growing necessity under privacy regulations such as GDPR and the EU AI Act. Recent work has reformulated unlearning as a Reinforcement Learning with Verifiable Rewards (RLVR) problem, where models are optimized against verifiable rewards computed directly from their outputs. However, existing methods rely on sparse binary rewards that provide minimal learning signal, indicating only whether forbidden content was avoided, and limiting convergence speed. In this paper, we study how reward design affects unlearning efficiency within the Reinforcement Unlearning (RUL) framework. We introduce a principled reward decomposition framework that decouples verifiability from sparsity, and propose two new reward functions: an exponential reward that provides graded penalties based on the count of forbidden-concept occurrences, and a PageRank inspired reward that weights penalties by semantic importance. We conduct experiments on the Real World Knowledge Unlearning (RWKU) benchmark, demonstrating that both rewards consistently outperform the binary setting, while reaching similar forgetting performance up to $3\\times$ faster and preserving general model utility. Our results show that reward design is a key driver of unlearning efficiency offering a practical path toward scalable and efficient machine unlearning.",
+      "authors": [
+        "Efstratios Zaradoukas",
+        "Davide Gabrielli",
+        "Bardh Prenkaj",
+        "Gjergji Kasneci"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-07-30T10:15:59+00:00",
+      "link": "https://arxiv.org/pdf/2607.27968v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "studies reward design within reinforcement unlearning framework to replace sparse binary rewards",
+      "llm_evidence_cn": "在强化遗忘框架内研究奖励设计，用分解稠密奖励替换稀疏二元奖励",
+      "llm_evidence": "在强化遗忘框架内研究奖励设计，用分解稠密奖励替换稀疏二元奖励",
+      "canonical_evidence": "在强化遗忘框架内研究奖励设计，用分解稠密奖励替换稀疏二元奖励",
+      "llm_tldr_en": "Studies reward design for reinforcement unlearning, showing that replacing sparse binary rewards with a principled reward decomposition speeds convergence in RLVR-based unlearning.",
+      "llm_tldr_cn": "机器遗忘可建模为可验证奖励强化学习问题，但现有方法只使用稀疏二元奖励，学习信号弱、收敛慢。该文在强化遗忘（RUL）框架内提出原则性的奖励分解，将二元成败信息扩展为更充分的奖励信号。实验表明新的奖励设计显著提升遗忘训练的收敛速度，同时保持目标内容移除效果，为 RLVR 类方法的奖励工程提供了实证指导。",
+      "llm_tldr": "机器遗忘可建模为可验证奖励强化学习问题，但现有方法只使用稀疏二元奖励，学习信号弱、收敛慢。该文在强化遗忘（RUL）框架内提出原则性的奖励分解，将二元成败信息扩展为更充分的奖励信号。实验表明新的奖励设计显著提升遗忘训练的收敛速度，同时保持目标内容移除效果，为 RLVR 类方法的奖励工程提供了实证指导。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "design of reward functions in RL",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.27973v1",
+      "source": "arxiv",
+      "title": "TAPO: Transition-Aware Policy Optimization for LLM Agents",
+      "abstract": "Recently, Reinforcement Learning (RL) has emerged as a crucial paradigm for the post-training of Large Language Model (LLM) agents. However, existing methods predominantly rely on sparse task rewards for policy optimization, failing to fully exploit another class of inherently dense supervisory signals naturally present during online interaction: environmental feedback following action execution. Recent theoretical studies suggest that generalization in multi-step, goal-oriented tasks hinges on predictive knowledge of environmental consequences. Inspired by this, we propose TAPO: Transition-Aware Policy Optimization for LLM Agents, a unified training framework that alternates between policy optimization and transition supervision. Beyond standard RL updates, TAPO repurposes rollout data to apply action-conditioned next-observation prediction supervision on a shared backbone model. This approach enhances the model's sensitivity to environmental transition dynamics and action consequences while concurrently optimizing the policy. It serves as a computationally lightweight, plug-and-play enhancement module for existing agent RL algorithms, requiring no additional expert data, extra sampling costs, or inference-time overhead. We conduct systematic experiments on WebShop and ALFWorld, integrating foundation models of various scales with different policy optimization algorithms. Empirical results demonstrate that TAPO consistently improves task performance over pure policy optimization baselines.",
+      "authors": [
+        "Cong Li",
+        "Peixi Peng",
+        "Yisen Zhao",
+        "Xinyu Hu",
+        "Shudong Liu",
+        "Zhan Su",
+        "Zhuojian Li"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-07-30T10:17:55+00:00",
+      "link": "https://arxiv.org/pdf/2607.27973v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "RL policy optimization for LLM agents using transitional environmental feedback",
+      "llm_evidence_cn": "利用环境转换反馈对LLM智能体进行强化学习策略优化",
+      "llm_evidence": "利用环境转换反馈对LLM智能体进行强化学习策略优化",
+      "canonical_evidence": "利用环境转换反馈对LLM智能体进行强化学习策略优化",
+      "llm_tldr_en": "TAPO is a unified RL training framework for LLM agents that alternates policy optimization with transition supervision, exploiting dense environmental feedback beyond sparse task rewards.",
+      "llm_tldr_cn": "现有多数LLM智能体强化学习只依赖稀疏任务奖励，忽略了交互中天然产生的环境反馈。TAPO提出统一训练框架，在策略优化之外交替进行转换监督，让智能体学习预测环境后果。实验表明该方法在多种多步目标导向任务上提高泛化能力与样本效率。该工作为LLM智能体利用密集反馈进行策略优化提供了新范式。",
+      "llm_tldr": "现有多数LLM智能体强化学习只依赖稀疏任务奖励，忽略了交互中天然产生的环境反馈。TAPO提出统一训练框架，在策略优化之外交替进行转换监督，让智能体学习预测环境后果。实验表明该方法在多种多步目标导向任务上提高泛化能力与样本效率。该工作为LLM智能体利用密集反馈进行策略优化提供了新范式。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "reinforcement learning for large language model",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.28076v1",
+      "source": "arxiv",
+      "title": "Group-Reflective Self-Distillation for Agentic Reinforcement Learning",
+      "abstract": "Reinforcement learning with verifiable rewards (RLVR) is effective for training large language model agents. However, terminal rewards provide only coarse trajectory-level supervision, leaving successful behaviors, recurring mistakes, and incidental choices entangled in the same outcome signal. Existing agentic self-distillation methods enrich sparse supervision with natural-language skills, but skills retrieved externally or extracted from a single trajectory by stronger models may mismatch current experience, exceed the policy's capability, or remain path-specific. We propose Group-Reflective Self-Distillation (GRSD), which derives capability-aligned and outcome-discriminative guidance from the policy's own verified rollouts. For each prompt, the policy reflects on each verified trajectory in an on-policy group, and a stop-gradient snapshot contrasts the resulting reflections from successful and failed rollouts to construct group-level privileged guidance. Conditioned on this guidance, a self-teacher refines turn-level credit assignment by modulating outcome-based advantages while preserving the verifier-determined learning direction. Experiments across multiple agentic environments and model scales demonstrate that GRSD consistently outperforms competitive baselines and generalizes more effectively to unseen tasks.",
+      "authors": [
+        "Binbin Zheng",
+        "Zijun Xie",
+        "Guanqun Zhao",
+        "Enlei Gong",
+        "Xing Ma",
+        "Xiaoliang Fu",
+        "Zeyu Chen"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI",
+        "cs.LG"
+      ],
+      "published": "2026-07-30T11:49:46+00:00",
+      "link": "https://arxiv.org/pdf/2607.28076v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Reinforcement learning with verifiable rewards for LLM agents",
+      "llm_evidence_cn": "面向LLM智能体的可验证奖励强化学习",
+      "llm_evidence": "面向LLM智能体的可验证奖励强化学习",
+      "canonical_evidence": "面向LLM智能体的可验证奖励强化学习",
+      "llm_tldr_en": "RLVR trains LLM agents but terminal rewards entangle successful and incidental behaviors. GRSD derives capability-aligned, outcome-discriminative skills from the policy's own verified rollouts and applies group-reflective self-distillation to densify supervision.",
+      "llm_tldr_cn": "基于可验证奖励的强化学习可以有效训练LLM智能体，但终端奖励混合了成功行为与偶然错误，缺乏过程监督。现有自蒸馏方法从外部或单条轨迹提取技能，容易与当前能力不匹配。本文提出组反射自蒸馏GRSD，从策略自身验证的rollout中提取与能力对齐、能区分结局的技能。该方法为同组提示生成自然语言反射，使训练信号更密集、更适配当前策略。实验表明其显著改善智能体强化学习的样本效率与最终性能。",
+      "llm_tldr": "基于可验证奖励的强化学习可以有效训练LLM智能体，但终端奖励混合了成功行为与偶然错误，缺乏过程监督。现有自蒸馏方法从外部或单条轨迹提取技能，容易与当前能力不匹配。本文提出组反射自蒸馏GRSD，从策略自身验证的rollout中提取与能力对齐、能区分结局的技能。该方法为同组提示生成自然语言反射，使训练信号更密集、更适配当前策略。实验表明其显著改善智能体强化学习的样本效率与最终性能。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "reinforcement learning for large language model",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.28077v1",
+      "source": "arxiv",
+      "title": "LEEPS: Latent-Guided Explore-Exploit Prompt Sampling for Efficient RLVR in Large Language Models",
+      "abstract": "Reinforcement learning with verifiable rewards (RLVR) improves the reasoning capabilities of large language models, but prompt groups with identical rollout rewards consume generation budget without effective learning signals. Pre-rollout prompt selection can reduce this waste by screening prompts before rollout generation. However, existing pre-rollout methods struggle to balance exploitation and exploration: repeatedly exploiting historically informative prompts can narrow training coverage, whereas broader exploration can lower the fraction of informative prompts. To address these limitations, we introduce LEEPS, a Latent-Guided Explore--Exploit Prompt Sampler that adaptively balances the reuse of previously observed informative prompts with continued exploration of uncertain ones. LEEPS partitions candidates into exploit and explore portfolios and adaptively allocates rollout budget according to their recent non-trivial ratios. It further uses representation-space neighbors and historical rollout outcomes to prioritize uncertain prompts likely to yield non-zero reward variance, thereby making exploration more targeted without additional rollouts. Across six mathematical reasoning benchmarks, LEEPS achieves the highest average score at both model scales, with relative gains of 2.6\\% and 3.7\\% over the strongest baseline for Qwen2.5-Math-1.5B and 7B, respectively, and generally improves faster during the training process. It also achieves the highest average score across the three evaluated OOD general-reasoning benchmarks at both model scales and adds only about 2 seconds of online sampling overhead per training step. Code is available at https://github.com/ShuangLiangX/LEEPS.",
+      "authors": [
+        "Shuang Liang",
+        "Haoyang Zhou",
+        "Yifan Gong",
+        "Guowei Wang",
+        "Xiting Wang"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-07-30T11:50:10+00:00",
+      "link": "https://arxiv.org/pdf/2607.28077v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "latent-guided prompt sampling balances exploration and exploitation in RLVR for LLM reasoning",
+      "llm_evidence_cn": "在LLM推理的RLVR中通过潜在引导提示采样平衡探索与利用",
+      "llm_evidence": "在LLM推理的RLVR中通过潜在引导提示采样平衡探索与利用",
+      "canonical_evidence": "在LLM推理的RLVR中通过潜在引导提示采样平衡探索与利用",
+      "llm_tldr_en": "LEEPS adaptively reuses informative prompts while exploring new ones via a latent-guided explore-exploit sampler, reducing wasted rollout generation in RLVR for LLM reasoning.",
+      "llm_tldr_cn": "RLVR中相似提示组产生相同奖励会浪费生成预算，而预滚动提示选择能减少浪费。LEEPS用潜在引导的探索-利用采样器，在保留高信息提示的同时拓展覆盖范围。实验表明其在LLM推理任务上提升训练效率与最终性能。该方法为RLVR的提示调度提供了兼顾探索与利用的通用方案。",
+      "llm_tldr": "RLVR中相似提示组产生相同奖励会浪费生成预算，而预滚动提示选择能减少浪费。LEEPS用潜在引导的探索-利用采样器，在保留高信息提示的同时拓展覆盖范围。实验表明其在LLM推理任务上提升训练效率与最终性能。该方法为RLVR的提示调度提供了兼顾探索与利用的通用方案。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "application of reinforcement learning in large language model reasoning",
+      "matched_requirement_id": "req-7",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.28457v1",
+      "source": "arxiv",
+      "title": "SVR: Self-Verifying Refinement via Joint Verdict-Confidence Reinforcement Learning for Adaptive Test-Time Compute",
+      "abstract": "Scaling test-time computation can improve language-model reasoning, but uniform budgets waste computation on easy inputs, while verifier-guided refinement relies on external feedback. We introduce Self-Verifying Refinement (SVR), an oracle-free multi-turn reinforcement learning framework that learns to use self-verification as a compute-control policy. At each turn, the model produces a solution together with a discrete correctness verdict and a confidence score; it retains the current answer only when the verdict is Correct and confidence exceeds a threshold, and otherwise continues refinement using its own self-verification. Ground-truth correctness is used only to construct training rewards and is never exposed to the policy through refinement prompts or required at inference. SVR is trained with GRPO on fixed-horizon trajectories using rewards that promote solution correctness, calibration-aware self-verification, and stop-ready correct states; adaptive stopping is activated only at inference. On seven mathematical reasoning benchmarks with Qwen3.5-2B, SVR achieves a macro-average accuracy of 0.563 with only 2.99 inference turns on average. In the evaluated complete-system comparison, it exceeds standard GRPO, strong multi-turn baselines, and a fixed-budget oracle-guided score-feedback reference while requiring substantially fewer turns than fixed ten-turn inference. These results demonstrate that learned self-verification can serve as an effective internal control signal for answer retention and adaptive test-time compute allocation.",
+      "authors": [
+        "Hongyu Chen",
+        "Liang Lin",
+        "Guangrun Wang"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI",
+        "cs.CL"
+      ],
+      "published": "2026-07-30T16:20:58+00:00",
+      "link": "https://arxiv.org/pdf/2607.28457v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Multi-turn RL with self-verification for adaptive compute; policy optimization for LLM reasoning",
+      "llm_evidence_cn": "基于自验证的多轮强化学习控制计算量，属于LLM推理策略优化",
+      "llm_evidence": "基于自验证的多轮强化学习控制计算量，属于LLM推理策略优化",
+      "canonical_evidence": "基于自验证的多轮强化学习控制计算量，属于LLM推理策略优化",
+      "llm_tldr_en": "Uniform test-time compute wastes effort on easy inputs; SVR is an oracle-free multi-turn RL framework that learns to use self-verification and confidence to control how much refinement to do.",
+      "llm_tldr_cn": "扩展测试时计算能改善大模型推理，但统一预算在简单问题上浪费计算，验证器引导的精化又依赖外部反馈。论文提出SVR，一个无外部验证器的多轮强化学习框架，让模型在每一轮同时产出解答、正确性判定和置信度，只有判定正确且置信度超过阈值时保留答案，否则继续基于自验证精化。该方法把自验证当作计算量控制策略，仅在构造奖励时使用真实标签，为自适应推理计算提供了新的策略优化思路。",
+      "llm_tldr": "扩展测试时计算能改善大模型推理，但统一预算在简单问题上浪费计算，验证器引导的精化又依赖外部反馈。论文提出SVR，一个无外部验证器的多轮强化学习框架，让模型在每一轮同时产出解答、正确性判定和置信度，只有判定正确且置信度超过阈值时保留答案，否则继续基于自验证精化。该方法把自验证当作计算量控制策略，仅在构造奖励时使用真实标签，为自适应推理计算提供了新的策略优化思路。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "policy optimization methods for multi step reasoning in llms",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2607.24447v1",
+      "source": "arxiv",
+      "title": "RP-OPSD: Resolution-Privileged On-Policy Self-Distillation for Multimodal Large Language Models",
+      "abstract": "On-Policy Self-Distillation (OPSD) uses privileged information available only to the teacher to provide dense token-level supervision on trajectories generated by the student. However, existing methods often rely on verified solution traces, explanations generated by external models, or manually localized visual evidence, which limits their scalable application to multimodal large language models. To address this issue, we exploit the information gap between high- and low-resolution views of the same image and propose RP-OPSD (Resolution-Privileged On-Policy Self-Distillation for Multimodal Large Language Models). During training, the student policy generates on-policy trajectories from images at one-quarter of the original resolution, while the teacher policy provides supervision using the original-resolution images. By minimizing the divergence between their output distributions along the student trajectories, the student learns the predictive behavior of the teacher under high-resolution inputs, thereby strengthening its low-resolution capability and transferring the learned improvement to original-resolution inference. RP-OPSD requires neither additional human annotations nor external models to generate solution traces but only image--question pairs. Experiments on Qwen3.5-9B show that RP-OPSD achieves a 5.45\\% relative improvement in average performance at the original resolution and a $1.78\\times$ training speedup over OPSD. These results demonstrate that resolution differences can serve as a simple and scalable source of privileged information, providing an effective and efficient approach to on-policy self-distillation for multimodal large language models.",
+      "authors": [
+        "Qihui Zhu",
+        "Yuchen Wang",
+        "Zijian Wen",
+        "Tao Zhang",
+        "Mengjie Zhang",
+        "Yang Liu",
+        "Shuangwu Chen",
+        "Siying Wu",
+        "Jian Yang",
+        "Xiaofeng Jiang"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-07-27T13:52:09+00:00",
+      "link": "https://arxiv.org/pdf/2607.24447v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "RP-OPSD uses resolution-privileged on-policy self-distillation to provide dense token-level supervision for multimodal LLM reasoning, a policy optimization method",
+      "llm_evidence_cn": "RP-OPSD利用分辨率特权信息进行在策略自蒸馏，为多模态大模型推理提供词级监督，属于策略优化/自蒸馏类方法",
+      "llm_evidence": "RP-OPSD利用分辨率特权信息进行在策略自蒸馏，为多模态大模型推理提供词级监督，属于策略优化/自蒸馏类方法",
+      "canonical_evidence": "RP-OPSD利用分辨率特权信息进行在策略自蒸馏，为多模态大模型推理提供词级监督，属于策略优化/自蒸馏类方法",
+      "llm_tldr_en": "Proposes RP-OPSD, which uses high-resolution image views as privileged information to provide dense token-level supervision for on-policy trajectories in multimodal LLM training, reducing reliance on external annotations.",
+      "llm_tldr_cn": "本文针对多模态大语言模型在策略自蒸馏难以获得密集词级监督的问题，提出RP-OPSD。方法利用同一图像高低分辨率视图之间的信息差，以高分辨率输出作为特权信号，为学生模型在低分辨率输入下生成的在策略轨迹提供逐词监督，从而无需外部模型或手动标注的视觉证据。实验表明RP-OPSD能有效提升多模态推理能力并降低对额外标注的依赖，为多模态LLM训练提供了可扩展的自蒸馏框架。",
+      "llm_tldr": "本文针对多模态大语言模型在策略自蒸馏难以获得密集词级监督的问题，提出RP-OPSD。方法利用同一图像高低分辨率视图之间的信息差，以高分辨率输出作为特权信号，为学生模型在低分辨率输入下生成的在策略轨迹提供逐词监督，从而无需外部模型或手动标注的视觉证据。实验表明RP-OPSD能有效提升多模态推理能力并降低对额外标注的依赖，为多模态LLM训练提供了可扩展的自蒸馏框架。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "policy optimization methods for multi step reasoning in llms",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2607.27918v1",
+      "source": "arxiv",
+      "title": "OptGraph: Large Language Models Enhanced Evolutionary Optimization Via Graph Retrieval-Augmented Generation",
+      "abstract": "Large language models (LLMs) have emerged as a powerful tool for automated evolutionary optimization, but existing methods remain limited in pattern reuse, error-aware refinement, and retrieval robustness across diverse tasks. To address these limitations, we propose OptGraph, the first optimization agentic workflow that introduces graph retrieval-augmented generation (GraphRAG). Specifically, OptGraph first constructs reusable experience as a typed graph, capturing the relationships among modeling patterns, problem formalization, implementation details, and error corrections. In the inference stage, OptGraph leverages graph neighborhood information to enrich retrieved knowledge, providing structured context to improve modeling, verification, and iterative refinement. Moreover, OptGraph supports adaptive knowledge updates, enabling the distillation of execution traces and verification feedback into reusable graph knowledge without ndertaking LLM parameter tuning. Extensive experiments on benchmark datasets show that our proposed OptGraph achieves an average exact accuracy 8.9% higher than the state-of-the-art prompt-based automated optimization frameworks. Our code has been made available at https://github.com/xianchaoxiu/OptGraph.",
+      "authors": [
+        "Xianchao Xiu",
+        "Jianhao Li",
+        "Huangyue Chen",
+        "Wanquan Liu"
+      ],
+      "primary_category": "math.OC",
+      "categories": [
+        "math.OC"
+      ],
+      "published": "2026-07-30T09:30:03+00:00",
+      "link": "https://arxiv.org/pdf/2607.27918v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "LLM agentic workflow for evolutionary optimization using graph retrieval-augmented generation",
+      "llm_evidence_cn": "基于图检索增强生成的 LLM 优化智能体工作流，用于自动进化优化",
+      "llm_evidence": "基于图检索增强生成的 LLM 优化智能体工作流，用于自动进化优化",
+      "canonical_evidence": "基于图检索增强生成的 LLM 优化智能体工作流，用于自动进化优化",
+      "llm_tldr_en": "Proposes OptGraph, an LLM optimization agentic workflow that builds a typed experience graph and uses GraphRAG to reuse patterns and error corrections across diverse optimization tasks.",
+      "llm_tldr_cn": "现有基于大模型的自动化进化优化在模式复用、错误感知修正和检索鲁棒性上存在局限。该文提出 OptGraph，首个引入图检索增强生成（GraphRAG）的优化智能体工作流，先以类型化图结构组织建模模式、问题形式化、实现细节与错误修正经验，再在推理阶段利用图邻域信息丰富检索上下文。实验表明该方法能提升跨任务的优化效果和鲁棒性，拓展了检索增强在自动化优化中的应用。",
+      "llm_tldr": "现有基于大模型的自动化进化优化在模式复用、错误感知修正和检索鲁棒性上存在局限。该文提出 OptGraph，首个引入图检索增强生成（GraphRAG）的优化智能体工作流，先以类型化图结构组织建模模式、问题形式化、实现细节与错误修正经验，再在推理阶段利用图邻域信息丰富检索上下文。实验表明该方法能提升跨任务的优化效果和鲁棒性，拓展了检索增强在自动化优化中的应用。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.27484v1",
+      "source": "arxiv",
+      "title": "Skill Use or Skill Theater? Evaluating the Reasoning Backroom in Skill-Augmented Language Agents",
+      "abstract": "Reusable skills are becoming a standard interface for extending language agents with task procedures. Yet evaluators usually infer skill use from visible reasoning or the agent's own attribution. These signals show what the agent appears to use, not whether the skill changed its decision. We ask whether skill-augmented agents exhibit a \\textbf{Reasoning Backroom}, a systematic gap between stated skill use and intervention-measured influence. We introduce BACKTRACE, an evaluation framework that pairs each skill-conditioned answer with a matched no-skill counterfactual, intervenes on skill meaning, wording, identity, content, and assignment, and elicits attribution only after the answer is committed. We instantiate the framework as BACKROOMBench, a verified testbed spanning controlled logic and competition mathematics, multiple skill conditions, single-agent and multi-agent settings, and diverse model families. Our evaluation reveals a pervasive provenance failure. Across models and domains, stated skill use often remains stable while causal reliance and signed utility vary, producing both silent uptake and performative use. Behavioral effects follow procedural content more reliably than displayed skill identity, whereas stated attributions respond strongly to artifact availability. Observational detectors based on direct skill-use claims, text mentions, trace similarity, and an LLM judge do not identify which decisions actually depend on the skill. In multi-agent systems, skill influence can survive communication even after its source is lost, while no-skill teams still name skills and sources that were never supplied. These findings establish the Reasoning Backroom as a general AI provenance problem whose audit requires intervention.",
+      "authors": [
+        "Jinwei Hu",
+        "Yi Qi",
+        "Xinmiao Huang",
+        "Youcheng Sun",
+        "Yi Dong",
+        "Xiaowei Huang"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI",
+        "cs.MA"
+      ],
+      "published": "2026-07-29T21:59:20+00:00",
+      "link": "https://arxiv.org/pdf/2607.27484v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "counterfactual evaluation framework for skill-augmented language agents measuring true skill influence",
+      "llm_evidence_cn": "提出反事实干预评估框架，检验技能增强型语言代理中技能是否真正影响决策",
+      "llm_evidence": "提出反事实干预评估框架，检验技能增强型语言代理中技能是否真正影响决策",
+      "canonical_evidence": "提出反事实干预评估框架，检验技能增强型语言代理中技能是否真正影响决策",
+      "llm_tldr_en": "Introduces BACKTRACE, an evaluation framework that uses counterfactual interventions to measure whether skills change agent decisions, revealing a Reasoning Backroom gap in skill-augmented agents.",
+      "llm_tldr_cn": "可复用技能是扩展语言代理能力的常用界面，但现有评估多依赖可见推理或自述归因，无法判断技能是否真正影响决策。该文提出 BACKTRACE 评估框架，将带技能的回答与匹配的无技能反事实配对，并对技能含义、措辞、身份、内容与指派进行干预，再诱导归因。通过该框架可检测出技能使用声明与实际影响之间的系统差距（推理后台），为技能增强智能体的可信评估提供了新工具。",
+      "llm_tldr": "可复用技能是扩展语言代理能力的常用界面，但现有评估多依赖可见推理或自述归因，无法判断技能是否真正影响决策。该文提出 BACKTRACE 评估框架，将带技能的回答与匹配的无技能反事实配对，并对技能含义、措辞、身份、内容与指派进行干预，再诱导归因。通过该框架可检测出技能使用声明与实际影响之间的系统差距（推理后台），为技能增强智能体的可信评估提供了新工具。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.25816v1",
+      "source": "arxiv",
+      "title": "Speculate While You Reason: Teaching Agents to Predict Their Next Tool Call via Joint Agent-Speculator RL",
+      "abstract": "Large language model agents often spend substantial wall-clock time waiting for tool call results. Tool-call speculation can hide this latency by predicting and pre-executing an agent's next tool call if the prediction matches the agent's eventual tool call, but existing speculators are typically separate draft models or cached traces that are poorly aligned with the deployed agent's own behavior. We identify this speculator-agent gap and show that the target agent itself is a strong next-call speculator. This points to a simpler design: unifying the agent and speculator within the same model. In this paper, we introduce the self-speculating agent, a single model that both solves tasks in agent mode and predicts its next tool call from partial trajectories in speculator mode, fully reusing prefix KV cache. To enable this dual-mode agent without degrading performance, we propose a joint agent-speculator reinforcement learning method, which derives speculation targets from the agent's own rollouts and alternates agent and speculator updates. Across agentic search QA and conversational tool-use agentic tasks, our method improves average next tool-call Hit@1 from 44.1 to 61.2 for Qwen3-4B and from 48.9 to 66.3 for Qwen3.5-4B, while preserving agent task success.",
+      "authors": [
+        "Jiabao Ji",
+        "Yujian Liu",
+        "Li An",
+        "Rohit Jain",
+        "Gungor Polatkan",
+        "Siyu Zhu",
+        "Shiyu Chang"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-07-28T15:00:10+00:00",
+      "link": "https://arxiv.org/pdf/2607.25816v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "LLM agent tool-call speculation trained via joint agent-speculator RL to reduce latency",
+      "llm_evidence_cn": "通过联合智能体-投机器强化学习训练工具调用预测，直接面向LLM智能体",
+      "llm_evidence": "通过联合智能体-投机器强化学习训练工具调用预测，直接面向LLM智能体",
+      "canonical_evidence": "通过联合智能体-投机器强化学习训练工具调用预测，直接面向LLM智能体",
+      "llm_tldr_en": "This paper introduces a self-speculating LLM agent that unifies task reasoning and next-tool-call prediction in a single model, trained via joint agent-speculator RL to significantly reduce tool-call latency.",
+      "llm_tldr_cn": "针对LLM智能体在工具调用等待上耗时多的问题，提出自投机智能体，将任务求解与下一工具调用预测统一在同一模型，并通过联合智能体-投机器强化学习训练。该方法消除独立投机模型的分布不匹配，在保持任务性能的同时显著降低工具调用延迟，为智能体任务自动化提供更高效的推理加速方案。",
+      "llm_tldr": "针对LLM智能体在工具调用等待上耗时多的问题，提出自投机智能体，将任务求解与下一工具调用预测统一在同一模型，并通过联合智能体-投机器强化学习训练。该方法消除独立投机模型的分布不匹配，在保持任务性能的同时显著降低工具调用延迟，为智能体任务自动化提供更高效的推理加速方案。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2607.27994v1",
+      "source": "arxiv",
+      "title": "SKIMIX: Multi-Agent Harness-Time Scaling with Skill Mixture for Dynamic Harness Engineering",
+      "abstract": "AI agents increasingly rely on large skill libraries, but selecting, combining, and maintaining skills remains difficult. We propose SKIMIX, a multi-agent framework in which agents with different skill portfolios collaborate through iterative refinement. SKIMIX combines embedding-based skill retrieval, submodular anti-dilution routing, and adaptive skill evolution. Across six reasoning benchmarks, multi-agent collaboration substantially improves open-ended mathematical reasoning but offers limited or negative gains on multiple-choice tasks. Agent-count scaling is non-monotonic, and most improvements arise during the first refinement round. These results show that task characteristics determine whether skill-level ensembles help and provide practical guidance for scalable agent design.",
+      "authors": [
+        "Jia Luo"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-07-30T10:40:58+00:00",
+      "link": "https://arxiv.org/pdf/2607.27994v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Multi-agent skill mixture for harness engineering; relevant to LLM agent automation",
+      "llm_evidence_cn": "多智能体技能混合用于harness工程，与大模型智能体自动化相关",
+      "llm_evidence": "多智能体技能混合用于harness工程，与大模型智能体自动化相关",
+      "canonical_evidence": "多智能体技能混合用于harness工程，与大模型智能体自动化相关",
+      "llm_tldr_en": "SKIMIX combines skill retrieval, anti-dilution routing, and adaptive evolution in a multi-agent framework; collaboration boosts open-ended math reasoning but can hurt multiple-choice tasks, showing task-dependent benefits.",
+      "llm_tldr_cn": "现代AI智能体越来越依赖大型技能库，但如何选择、组合和维护技能仍是难题。论文提出SKIMIX多智能体框架，通过基于嵌入的技能检索、子模抗稀释路由和自适应技能演化，让不同技能组合的智能体协同迭代精化。在六个推理基准上，多智能体协作显著提升开放式数学推理，但对多项选择任务提升有限甚至为负，且增加智能体数量并非单调有效。研究揭示了任务特性对技能集成价值的关键影响，为智能体harness工程提供经验依据。",
+      "llm_tldr": "现代AI智能体越来越依赖大型技能库，但如何选择、组合和维护技能仍是难题。论文提出SKIMIX多智能体框架，通过基于嵌入的技能检索、子模抗稀释路由和自适应技能演化，让不同技能组合的智能体协同迭代精化。在六个推理基准上，多智能体协作显著提升开放式数学推理，但对多项选择任务提升有限甚至为负，且增加智能体数量并非单调有效。研究揭示了任务特性对技能集成价值的关键影响，为智能体harness工程提供经验依据。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.27789v1",
+      "source": "arxiv",
+      "title": "From Understanding to Action: Feedback-Grounded Policy Discovery for Generative Recommendation",
+      "abstract": "Semantic-ID-based generative recommenders enable efficient next-item generation, but their item-level supervision mainly captures behavioral co-occurrence and local transitions. Large language models (LLMs) can complement these models by reasoning over heterogeneous interaction histories to understand the user's current demand. However, LLMs are not inherently trained with recommendation-specific outcome feedback, and linguistically plausible reasoning therefore does not necessarily lead to effective recommendation decisions. We term this mismatch the Understanding-Action Gap. Accordingly, we distinguish intent knowledge, which captures the user's current demand, from policy knowledge, which specifies the recommendation direction and rejection boundary under that demand. To bridge this gap, we propose a feedback-driven agent framework that first induces task-oriented intent and then discovers recommendation policies according to their incremental utility over an intent-only baseline. Candidate policies are evaluated and refined using outcome-derived feedback rather than linguistic plausibility. We further transfer the resulting intent and policy knowledge into two latent tokens of a lightweight Semantic-ID generator through dual-space relational distillation, enabling LLM-free online inference. Experiments on public benchmarks show consistent improvements over baselines, while large-scale online A/B tests achieve gains of 4.506% in Revenue and 4.621% in ADVV.",
+      "authors": [
+        "Zhi Chen",
+        "Minmao Wang",
+        "Xingchen Liu",
+        "Haoqiang Liang",
+        "Huihuang Lin",
+        "Likang Wu",
+        "Hongke Zhao",
+        "Yulong Wang",
+        "Shijie Yi",
+        "Fei Pan",
+        "Peng Jiang"
+      ],
+      "primary_category": "cs.IR",
+      "categories": [
+        "cs.IR"
+      ],
+      "published": "2026-07-30T07:23:07+00:00",
+      "link": "https://arxiv.org/pdf/2607.27789v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Feedback-grounded policy discovery for generative language tasks",
+      "llm_evidence_cn": "生成式任务中基于反馈的策略发现",
+      "llm_evidence": "生成式任务中基于反馈的策略发现",
+      "canonical_evidence": "生成式任务中基于反馈的策略发现",
+      "llm_tldr_en": "LLMs reason over user histories but lack recommendation outcome feedback, causing an understanding-action gap. This paper separates intent knowledge from policy knowledge and proposes feedback-grounded policy discovery to align reasoning with effective decisions.",
+      "llm_tldr_cn": "大型语言模型能推理用户交互历史，但未经过推荐结果反馈训练，因而‘理解用户’不代表‘做出有效推荐’，即存在理解-行动差距。本文区分意图知识与策略知识，提出基于反馈的策略发现来弥合该差距。方法利用推荐结果反馈训练LLM的策略，使得推理过程服务于最终推荐决策。实验表明其能改善生成式推荐的决策准确率，为将LLM用于推荐提供策略优化思路。",
+      "llm_tldr": "大型语言模型能推理用户交互历史，但未经过推荐结果反馈训练，因而‘理解用户’不代表‘做出有效推荐’，即存在理解-行动差距。本文区分意图知识与策略知识，提出基于反馈的策略发现来弥合该差距。方法利用推荐结果反馈训练LLM的策略，使得推理过程服务于最终推荐决策。实验表明其能改善生成式推荐的决策准确率，为将LLM用于推荐提供策略优化思路。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "policy gradient methods for language generation",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.26865v1",
+      "source": "arxiv",
+      "title": "Think Short, Defer Smart, Act, and Repeat: Calibrated Reasoning and Uncertainty-Aware Deferral for Edge LLM Agents",
+      "abstract": "LLM agents following the ReAct paradigm are promising enablers of complex multi-step tasks, including multi-hop question answering, code generation, and control of physical AI systems. Yet, when deployed at the edge, they must tightly manage their reasoning budget while remaining reliable and deferring to a cloud-side model only when local uncertainty is too high to act safely. We propose Think Short, Defer Smart (TSDS), a framework that synergistically integrates a lightweight convergence probe, which halts on-device reasoning once the intended action has stabilized, with a perplexity-based deferral rule that escalates uncertain actions to a cloud-side model. Both mechanisms are jointly calibrated on end-to-end episode trajectories via a multi-objective Learn-Then-Test (LTT) procedure, providing simultaneous finite-sample guarantees on expected episode reward and cloud-call rate. We evaluate TSDS on four ReAct benchmarks spanning arithmetic reasoning (GSM8K), multi-hop question answering (HotpotQA), code generation (MBPP), and multi-step embodied planning (household robot), and compare against thought-calibration-only and calibrated-deferral-only standalone baselines. TSDS reduces per-episode thinking compute by 43%-73% over deferral-only baselines across HotpotQA, MBPP, and the household robot task, while maintaining certified reward and cloud-call rate guarantees.",
+      "authors": [
+        "Amirmohammad Farzaneh",
+        "Osvaldo Simeone"
+      ],
+      "primary_category": "stat.ML",
+      "categories": [
+        "stat.ML",
+        "cs.AI",
+        "cs.IT",
+        "cs.LG"
+      ],
+      "published": "2026-07-29T12:47:05+00:00",
+      "link": "https://arxiv.org/pdf/2607.26865v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "LLM agents for complex multi-step task automation",
+      "llm_evidence_cn": "面向复杂多步骤任务的LLM智能体",
+      "llm_evidence": "面向复杂多步骤任务的LLM智能体",
+      "canonical_evidence": "面向复杂多步骤任务的LLM智能体",
+      "llm_tldr_en": "Edge LLM agents need to manage reasoning budgets while staying reliable. TSDS combines a convergence probe to halt local reasoning once actions stabilize and a perplexity-based deferral rule to escalate uncertain actions to a cloud model, jointly calibrated for multi-step tasks.",
+      "llm_tldr_cn": "边缘LLM智能体在执行多跳问答等复杂任务时常受限于推理预算与安全性需求。本文提出TSDS框架，用一个轻量级收敛探针在动作稳定后停止本地推理，并依据困惑度制定延迟规则，把不确定动作交给云端模型处理，两机制联合校准。实验表明该方法能在保持任务可靠性的同时显著控制推理成本。该框架为边缘场景下的智能体任务自动化提供了实用设计方案。",
+      "llm_tldr": "边缘LLM智能体在执行多跳问答等复杂任务时常受限于推理预算与安全性需求。本文提出TSDS框架，用一个轻量级收敛探针在动作稳定后停止本地推理，并依据困惑度制定延迟规则，把不确定动作交给云端模型处理，两机制联合校准。实验表明该方法能在保持任务可靠性的同时显著控制推理成本。该框架为边缘场景下的智能体任务自动化提供了实用设计方案。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2607.28156v1",
+      "source": "arxiv",
+      "title": "RRM: Experience-Driven Reflective Retrieval Memory for Long-Horizon Multimodal Reasoning",
+      "abstract": "Existing multimodal long-term memory agents use external memory to overcome the limited context available for long videos. However, most methods emphasize what to store rather than how stored memory should be retrieved. When retrieval becomes inaccurate or repeatedly fails to obtain useful evidence, existing agents lack mechanisms to diagnose failures from previous task trajectories and adapt future search strategies.We introduce Reflective Retrieval Memory (RRM), a reflective memory framework for long-horizon multimodal reasoning. RRM augments an entity-centric multimodal memory graph with reflective experience memory, which distills transferable procedural retrieval knowledge from historical task trajectories. Unlike episodic and semantic memories that preserve factual evidence from the current video, reflective experience memory captures reusable search strategies across tasks. RRM converts retrieved experiences into query-level guidance, while answer generation remains conditioned only on factual evidence newly retrieved from the current video. A lifecycle management mechanism further regulates experience memory through usage frequency, reuse feedback, and temporal decay, thereby reducing redundancy and noise. RRM consistently outperforms previous state-of-the-art approaches on M3-Bench-Robot, M3-Bench-Web, and Video-MME-Long, demonstrating the effectiveness of reflective retrieval memory for long-horizon multimodal reasoning.",
+      "authors": [
+        "Jingxiang Fan",
+        "Junbao Zhuo",
+        "Bochao Zou"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-07-30T12:58:57+00:00",
+      "link": "https://arxiv.org/pdf/2607.28156v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "reflective retrieval memory improves retrieval from long-term memory for multimodal reasoning",
+      "llm_evidence_cn": "通过反思式检索经验提升多模态推理中的记忆检索能力",
+      "llm_evidence": "通过反思式检索经验提升多模态推理中的记忆检索能力",
+      "canonical_evidence": "通过反思式检索经验提升多模态推理中的记忆检索能力",
+      "llm_tldr_en": "RRM introduces reflective experience memory on an entity-centric multimodal memory graph, distilling procedural retrieval knowledge from historical trajectories to improve retrieval for long-horizon multimodal reasoning agents.",
+      "llm_tldr_cn": "现有长时程多模态记忆体主要关注存什么而忽视如何检索，检索失败时缺乏自适应调整机制。RRM在实体中心的多模态记忆图之上增加反思式经验记忆，从历史轨迹中蒸馏可迁移的检索程序知识。实验表明该方法能提升长视频多模态推理中的检索准确率和整体表现。其价值在于为记忆增强型智能体提供了可学习的检索反思机制。",
+      "llm_tldr": "现有长时程多模态记忆体主要关注存什么而忽视如何检索，检索失败时缺乏自适应调整机制。RRM在实体中心的多模态记忆图之上增加反思式经验记忆，从历史轨迹中蒸馏可迁移的检索程序知识。实验表明该方法能提升长视频多模态推理中的检索准确率和整体表现。其价值在于为记忆增强型智能体提供了可学习的检索反思机制。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "retrieval augmented generation for knowledge intensive tasks",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.27415v1",
+      "source": "arxiv",
+      "title": "Bridging Inference-Time Scaling and Episodic Memory with Action-Centric Graphs",
+      "abstract": "Recent advancements in inference-time scaling have significantly unlocked the complex reasoning capabilities of Large Language Models~(LLMs). However, for agents, these approaches suffer from a critical inefficiency, operating in a stateless manner and engaging in redundant search processes. Existing memory mechanisms largely rely on the reasoning capabilities of LLMs, leading to prohibitive computational costs. In this paper, we propose a novel framework, \\textit{GAMER}~(Graph-based Action-centric Memory with Episodic Reasoning), that bridges the gap between inference scaling and episodic memory. Our approach models historical reasoning as a dynamic \\textit{Action-Centric Graph}. By decoupling the memory mechanism from LLMs, our method can save token/money usage by providing less memory context than memory mechanism baselines. To extract knowledge from the graph effectively, we use a dual-stream Temporal Difference learning mechanism to estimate the positive~(suggestion) and negative~(avoidance) value of action nodes based on past successes and failures. During the inference phase, this learned value function optimizes decision-making bi-directionally, so that positive values provide action suggestions, while negative values indicate high-risk actions. By performing efficient searches on the graph, our method significantly improves the efficiency of inference scaling. Experiments on multiple benchmarks demonstrate that \\textit{GAMER} achieves superior performance by \\textbf{20.81\\%/6.17\\%} for success/progress rate compared to vanilla baselines.",
+      "authors": [
+        "Xu Zheng",
+        "Chaohao Lin",
+        "Zhuomin Chen",
+        "Weijieying Ren",
+        "Haifeng Chen",
+        "Wei Cheng",
+        "Dongsheng Luo"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-07-29T19:31:50+00:00",
+      "link": "https://arxiv.org/pdf/2607.27415v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "agentic reasoning memory framework with action-centric graphs for efficient multi-step problem solving",
+      "llm_evidence_cn": "面向智能体复杂推理的情景记忆框架，以行动中心图建模历史推理",
+      "llm_evidence": "面向智能体复杂推理的情景记忆框架，以行动中心图建模历史推理",
+      "canonical_evidence": "面向智能体复杂推理的情景记忆框架，以行动中心图建模历史推理",
+      "llm_tldr_en": "Presents GAMER, a Graph-based Action-centric Memory with Episodic Reasoning framework that stores agent reasoning as a dynamic action-centric graph, avoiding redundant stateless search and cutting compute costs.",
+      "llm_tldr_cn": "推理期扩展虽然增强了大模型复杂推理，但智能体以无状态方式重复搜索导致低效且计算成本高。该文提出 GAMER，将历史推理建模为动态行动中心图，把记忆机制与 LLM 解耦，从而支持情景推理并缓解冗余搜索。实验表明该方法在提升推理能力的同时显著降低计算开销，为智能体记忆与推理扩展的融合提供了新思路。",
+      "llm_tldr": "推理期扩展虽然增强了大模型复杂推理，但智能体以无状态方式重复搜索导致低效且计算成本高。该文提出 GAMER，将历史推理建模为动态行动中心图，把记忆机制与 LLM 解耦，从而支持情景推理并缓解冗余搜索。实验表明该方法在提升推理能力的同时显著降低计算开销，为智能体记忆与推理扩展的融合提供了新思路。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2607.27497v1",
+      "source": "arxiv",
+      "title": "SkillSmith: Learning to Compose Parametric Skills and Textual Knowledge",
+      "abstract": "Agentic systems driven by large language models (LLMs) regularly feature two key mechanisms to autonomously solve complex problems: synthesizing text-based knowledge and procedures from past experiences and building parametric (weight-space) skill libraries for recurring sub-goals. To date, research has largely treated these as orthogonal pursuits: either organizing textual knowledge through composition and reflection, or consolidating parametric skills via weight-space merging. Consequently, the seamless integration of text and model weights for targeted performance improvements remains largely unexplored. This work bridges this modality gap by treating model weights as an additional modality that an LLM can natively reason over. We instantiate parametric learning via prefix-tuning and augment an LLM to ingest both prefix weights and rich textual data which capture relationships to a target capability. Our augmented LLM, which we call SkillSmith, synthesizes these inputs to perform instruction-steered parametric synthesis, directly outputting new prefix weights that manifest the target skill. We demonstrate that our approach significantly outperforms both text-only and weight-space-only baselines, unlocking performance gains that are out of reach for uni-modal (text-only or weight-only) adaptations.",
+      "authors": [
+        "Lucio M. Dery",
+        "Benedict Aaron Tjandra",
+        "Siavash Samiei",
+        "Adhiguna Kuncoro",
+        "Zohar Yahav",
+        "Jiajun Shen",
+        "Arthur Szlam"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-07-29T22:28:36+00:00",
+      "link": "https://arxiv.org/pdf/2607.27497v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "integrates parametric skill libraries with textual knowledge for agentic systems",
+      "llm_evidence_cn": "为智能体系统搭建参数化技能库与文本知识的组合学习机制",
+      "llm_evidence": "为智能体系统搭建参数化技能库与文本知识的组合学习机制",
+      "canonical_evidence": "为智能体系统搭建参数化技能库与文本知识的组合学习机制",
+      "llm_tldr_en": "Introduces SkillSmith, which treats model weights as an additional modality that an LLM can reason over, integrating parametric skill libraries with textual knowledge for targeted agent performance improvements.",
+      "llm_tldr_cn": "基于大模型的智能体通常分别使用文本知识合成或参数化技能库来解决问题，缺乏两者的无缝集成。该文提出 SkillSmith，将模型权重作为一种新模态供 LLM 原生推理，从而组合参数化技能与文本知识以提升特定任务表现。实验显示该方法能够稳定获得更可控的性能改进，弥合了文本与权重的鸿沟，为智能体技能学习提供了新范式。",
+      "llm_tldr": "基于大模型的智能体通常分别使用文本知识合成或参数化技能库来解决问题，缺乏两者的无缝集成。该文提出 SkillSmith，将模型权重作为一种新模态供 LLM 原生推理，从而组合参数化技能与文本知识以提升特定任务表现。实验显示该方法能够稳定获得更可控的性能改进，弥合了文本与权重的鸿沟，为智能体技能学习提供了新范式。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2607.27610v1",
+      "source": "arxiv",
+      "title": "Kalman Meets Curriculum: Efficient Dynamic Prompt Selection for Adaptive RL Finetuning",
+      "abstract": "Reinforcement learning (RL) finetuning significantly enhances the reasoning capabilities of large language models (LLMs), yet its effectiveness critically depends on selecting prompts of appropriate difficulty for the current policy. This is challenging because prompt difficulty evolves throughout training. Existing online methods therefore face a trade-off: evaluation-based approaches are accurate but expensive, while prediction-based approaches are efficient but typically assume stationary difficulty, making them ill-suited to RL's non-stationary training dynamics. To address these issues, we propose a Kalman-Guided Prompt Selection method (KGPS), which reformulates prompt selection as a dynamic state estimation problem rather than static difficulty prediction. KGPS models each prompt's latent success rate in logit space using a linear-Gaussian state-space model, with process noise coupled to the magnitude of policy updates so that uncertainty increases when the policy changes more substantially. A Kalman filter then maintains a calibrated Gaussian posterior over prompt difficulty, and prompts are selected by maximizing a posterior-expected training utility that favors intermediate-difficulty prompts while naturally revisiting uncertain ones. The resulting procedure is adaptive to policy drift and requires no additional rollouts beyond standard policy training. Extensive experiments across mathematics, planning, and geometry reasoning benchmarks, as well as multiple RL algorithms, show that KGPS consistently improves both final accuracy and rollout efficiency over strong baselines, establishing state-of-the-art performance among online prompt selection methods. For example, on DeepSeek-R1-Distill-7B, KGPS uses 83% fewer rollouts than DS while even improving the average performance by 0.12 point across six math reasoning benchmarks.",
+      "authors": [
+        "Haodong Zhu",
+        "Yangyang Ren",
+        "Yanjing Li",
+        "Sheng Xu",
+        "Haiguang Liu",
+        "Linlin Yang",
+        "Baochang Zhang"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-07-30T02:55:02+00:00",
+      "link": "https://arxiv.org/pdf/2607.27610v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Kalman-filter based dynamic prompt selection improves adaptive RL finetuning for LLM reasoning",
+      "llm_evidence_cn": "基于卡尔曼滤波的动态提示选择优化LLM推理的强化学习微调",
+      "llm_evidence": "基于卡尔曼滤波的动态提示选择优化LLM推理的强化学习微调",
+      "canonical_evidence": "基于卡尔曼滤波的动态提示选择优化LLM推理的强化学习微调",
+      "llm_tldr_en": "RL finetuning of LLMs depends on choosing prompts of appropriate difficulty, but difficulty is non-stationary during training. KGPS reformulates prompt selection as dynamic state estimation with Kalman filtering, balancing accuracy and efficiency for adaptive RL finetuning.",
+      "llm_tldr_cn": "强化学习微调能显著增强大语言模型的推理能力，但效果强烈依赖当前策略匹配难度合适的提示，而提示难度在训练中不断演化。已有评估方法准确但昂贵，预测方法高效却假设难度平稳。KGPS将提示选择重构为动态状态估计问题，用卡尔曼滤波跟踪难度变化并进行课程式选择，在准确性与效率间取得平衡。该方法能更好地适应RL的非平稳训练动态，提升LLM推理微调的稳定性与效果。",
+      "llm_tldr": "强化学习微调能显著增强大语言模型的推理能力，但效果强烈依赖当前策略匹配难度合适的提示，而提示难度在训练中不断演化。已有评估方法准确但昂贵，预测方法高效却假设难度平稳。KGPS将提示选择重构为动态状态估计问题，用卡尔曼滤波跟踪难度变化并进行课程式选择，在准确性与效率间取得平衡。该方法能更好地适应RL的非平稳训练动态，提升LLM推理微调的稳定性与效果。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "application of reinforcement learning in large language model reasoning",
+      "matched_requirement_id": "req-7",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    }
+  ]
+}

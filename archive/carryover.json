@@ -1,12 +1,320 @@
 {
-  "generated_at": "2026-07-30T21:45:57.461551+00:00",
-  "updated_date": "20260730",
+  "generated_at": "2026-07-31T21:40:43.831393+00:00",
+  "updated_date": "20260731",
   "carryover_days": 9,
   "tag_states": {
     "rl": {
-      "updated_date": "20260730",
+      "updated_date": "20260731",
       "carryover_days": 9,
-      "items": []
+      "items": [
+        {
+          "id": "2607.28609v1",
+          "source": "arxiv",
+          "title": "OSReward: Instituting Standardized Evaluation for Cross-Platform Computer-Use Reward Models",
+          "abstract": "Computer-using agents (CUAs) are advancing rapidly across the digital world. A CUA trajectory records the agent's actions, states, and reasoning. Verifying whether it fulfilled the task instruction is central to CUA evaluation, data curation, and reinforcement learning. Neither human-written verifiers nor human annotators can provide such verification at scale, so the field increasingly turns to vision-language models (VLMs) as judges of CUA trajectories. But a fundamental question has long gone unexamined: are these VLM judges reliable enough? To study it systematically, we introduce OSReward, a realistic, high-quality benchmark that evaluates VLM judges on CUA trajectories. The trajectories come from diverse agent backbones executing human-verified instructions across platforms, then rigorously labeled with ground-truth verdicts through multi-stage human annotation. Building on it, we derive OSReward-Hard, a challenge set concentrating genuinely hard cases, and OSReward-Multi for fine-grained efficiency and alignment scoring. The most comprehensive evaluation of VLM judges to date finds even state-of-the-art models fall short of an ideal judge, sharing a systematic leniency bias that mislabels failed runs as successes. The few reliable enough to trust are too expensive to run at scale, while affordable open models trail far behind. To close this gap, we construct and release OS-Shepherd-100K, an open corpus of reasoning-annotated trajectory judgments for the CUA community. On it, we train OS-Shepherd (9B and 35B), open reward models that supply low-cost, stable, and reliable reward signals, matching commercial judges at 30-60% lower cost than the frontier. Extensive analyses further inform the design of reliable CUA reward at scale. Our code, benchmark, dataset, and model checkpoints are available at https://os-copilot.github.io/OSReward-Home/.",
+          "authors": [
+            "Qiushi Sun",
+            "Kanzhi Cheng",
+            "Yian Wang",
+            "Bowen Yang",
+            "Hang Yan",
+            "Liheng Chen",
+            "Fangzhi Xu",
+            "Zichen Ding",
+            "Nuo Chen",
+            "Jialin Cao",
+            "Xingdong Gong",
+            "Zehao Li",
+            "Kaiming Jin",
+            "Xinfeng Yuan",
+            "Zhoumianze Liu",
+            "Jingyang Gong",
+            "Zhangyue Yin",
+            "Jiahui Gao",
+            "Zhiyong Wu",
+            "Tianbao Xie",
+            "Jianbing Zhang",
+            "Ben Kao",
+            "Lingpeng Kong"
+          ],
+          "primary_category": "cs.AI",
+          "categories": [
+            "cs.AI",
+            "cs.CL",
+            "cs.CV"
+          ],
+          "published": "2026-07-30T17:57:41+00:00",
+          "link": "https://arxiv.org/pdf/2607.28609v1",
+          "tags": [
+            "keyword:rl",
+            "query:rl"
+          ],
+          "llm_score": 8.0,
+          "llm_evidence_en": "OSReward standardizes evaluation of reward models for computer-use agent trajectories, targeting the reliability of reward functions in RL",
+          "llm_evidence_cn": "OSReward系统评估计算机使用智能体的奖励模型，直接关注强化学习奖励函数/奖励模型的设计与评测",
+          "llm_evidence": "OSReward系统评估计算机使用智能体的奖励模型，直接关注强化学习奖励函数/奖励模型的设计与评测",
+          "canonical_evidence": "OSReward系统评估计算机使用智能体的奖励模型，直接关注强化学习奖励函数/奖励模型的设计与评测",
+          "llm_tldr_en": "Presents OSReward, a realistic benchmark that systematically evaluates VLM judges on computer-use agent trajectories, standardizing the assessment of reward models for RL training and evaluation.",
+          "llm_tldr_cn": "本文关注计算机使用智能体（CUA）轨迹验证中视觉语言模型评判者的可靠性问题。尽管VLM被广泛用于CUA轨迹的奖励判断，但其可靠性从未被系统检验。为此作者提出OSReward基准，汇集来自多种智能体骨干的真实轨迹，对VLM评判者进行标准化评测。该基准为CUA奖励模型的选择与迭代提供了重要参考，也促进强化学习训练中奖励信号的可信度提升。",
+          "llm_tldr": "本文关注计算机使用智能体（CUA）轨迹验证中视觉语言模型评判者的可靠性问题。尽管VLM被广泛用于CUA轨迹的奖励判断，但其可靠性从未被系统检验。为此作者提出OSReward基准，汇集来自多种智能体骨干的真实轨迹，对VLM评判者进行标准化评测。该基准为CUA奖励模型的选择与迭代提供了重要参考，也促进强化学习训练中奖励信号的可信度提升。",
+          "llm_tags": [
+            "query:rl"
+          ],
+          "matched_query_tag": "query:rl",
+          "matched_query_text": "design of reward functions in RL",
+          "matched_requirement_id": "req-2",
+          "selection_source": "carryover_cache",
+          "paper_id": "2607.28609v1",
+          "carry_days": 1
+        },
+        {
+          "id": "2607.28301v1",
+          "source": "arxiv",
+          "title": "HARGO: Heterogeneity-Aware Reward-Guided Optimization for RL Post-Training of LLMs on HPC Tasks",
+          "abstract": "Supervised fine-tuning (SFT) can equip large language models (LLMs) with domain knowledge for high-performance computing (HPC) tasks such as data race detection and benchmark question answering. However, knowledge alone does not guarantee task-appropriate behavior: the same SFT model that correctly classifies 88.65\\% of C/C++ data race samples produces verbose, imprecise answers to factual queries, with 65.9\\% of MLPerf responses exceeding 40 characters. Reinforcement learning (RL) post-training addresses this gap by optimizing for task-specific rewards rather than token-level imitation. Yet HPC tasks exhibit extreme heterogeneity, with binary classification, factual QA, and semantic generation differing by 58x in answer length, spanning three distinct reward distributions, and showing widely varying SFT accuracy. This makes uniform-weight RL methods such as GRPO suboptimal. We propose HARGO, Heterogeneity-Aware Reward-Guided Optimization, which introduces per-response importance weighting via confidence-modulated advantage: computing a discrimination signal from group-level reward contrast and a confidence signal from reference model log-probabilities, then modulating the advantage before computing per-response weights, without requiring task-type labels. Across four HPC tasks and nine methods, HARGO achieves the best performance on all three primary metrics: WinRate 54.62\\%, Data Race F1 91.30\\%, and PLP Similarity 0.8558. Ablation confirms complementary contributions from both signals. HARGO establishes the best overall alignment quality among compared methods for heterogeneous HPC tasks.",
+          "authors": [
+            "Tiangang Li",
+            "Xiangbo Tian"
+          ],
+          "primary_category": "cs.LG",
+          "categories": [
+            "cs.LG"
+          ],
+          "published": "2026-07-30T14:41:05+00:00",
+          "link": "https://arxiv.org/pdf/2607.28301v1",
+          "tags": [
+            "keyword:rl",
+            "query:rl"
+          ],
+          "llm_score": 8.0,
+          "llm_evidence_en": "HARGO is a reward-guided optimization framework for RL post-training of LLMs on HPC tasks, a concrete application of RL to LLMs",
+          "llm_evidence_cn": "HARGO提出面向HPC任务的大模型强化学习后训练优化方法，属于将RL应用于大语言模型的具体实践",
+          "llm_evidence": "HARGO提出面向HPC任务的大模型强化学习后训练优化方法，属于将RL应用于大语言模型的具体实践",
+          "canonical_evidence": "HARGO提出面向HPC任务的大模型强化学习后训练优化方法，属于将RL应用于大语言模型的具体实践",
+          "llm_tldr_en": "Introduces HARGO, a reward-guided RL post-training method that handles extreme task heterogeneity (classification, QA, generation) in HPC LLM applications, improving answer quality and length control.",
+          "llm_tldr_cn": "本文针对高性能计算（HPC）任务中大语言模型强化学习后训练面临的任务异构性（如二分类、事实问答、语义生成）问题，提出HARGO异构感知奖励引导优化方法。该方法根据任务类型设计差异化的奖励与优化策略，克服了单一监督微调导致的行为不匹配和冗长回答等缺陷。实验表明HARGO能同时改善多种HPC任务的回答质量与长度控制，验证了异构感知奖励设计在LLM后训练中的有效性。",
+          "llm_tldr": "本文针对高性能计算（HPC）任务中大语言模型强化学习后训练面临的任务异构性（如二分类、事实问答、语义生成）问题，提出HARGO异构感知奖励引导优化方法。该方法根据任务类型设计差异化的奖励与优化策略，克服了单一监督微调导致的行为不匹配和冗长回答等缺陷。实验表明HARGO能同时改善多种HPC任务的回答质量与长度控制，验证了异构感知奖励设计在LLM后训练中的有效性。",
+          "llm_tags": [
+            "query:rl"
+          ],
+          "matched_query_tag": "query:rl",
+          "matched_query_text": "reinforcement learning for large language model",
+          "matched_requirement_id": "req-1",
+          "selection_source": "carryover_cache",
+          "paper_id": "2607.28301v1",
+          "carry_days": 1
+        },
+        {
+          "id": "2607.28582v1",
+          "source": "arxiv",
+          "title": "$β$-OPSD: Deriving with Policy Optimization, Training with Self-Distillation",
+          "abstract": "On-policy self-distillation (OPSD) is a promising approach to improve reasoning language models, but it remains brittle in practice: making it work reliably often requires substantial engineering effort. We identify a structural source of this difficulty: vanilla OPSD is precisely the $β=1$ member of a broader policy-optimization family, where $β$ weights the KL penalty anchoring the student to a reference policy. This equivalence turns $β$ from an implicit value fixed at one into a controllable regularization parameter, yielding a more general formulation that trades off proximity to a reference policy against privileged teacher guidance. We introduce $β$-OPSD and derive its optimal policy as a geometric interpolation between the reference policy and the privileged teacher. Directly optimizing this objective with reinforcement learning, however, would be costly and high-variance. Rather than optimize the RL objective directly, we turn its closed-form solution into a distillation target. Each value of $β$ selects a target along the reference-to-teacher path, which we implement efficiently by mixing their token-level logits. In this way, inexpensive distillation approximates the solution of expensive policy optimization. Return-to-go credit assignment further aligns token updates with the sequence-level objective while retaining the simplicity of OPSD. Experiments on mathematical reasoning benchmarks show that $β$-OPSD consistently outperforms vanilla OPSD, improving optimization stability and downstream reasoning performance. Our results provide a principled route from self-distillation to policy optimization and back without sacrificing the efficiency that makes OPSD practical.",
+          "authors": [
+            "Jiawei Xu",
+            "Minghui Liu",
+            "Juzheng Zhang",
+            "Tom Goldstein",
+            "Furong Huang"
+          ],
+          "primary_category": "cs.LG",
+          "categories": [
+            "cs.LG"
+          ],
+          "published": "2026-07-30T17:41:16+00:00",
+          "link": "https://arxiv.org/pdf/2607.28582v1",
+          "tags": [
+            "keyword:rl",
+            "query:rl"
+          ],
+          "llm_score": 8.0,
+          "llm_evidence_en": "β-OPSD connects on-policy self-distillation to a policy-optimization family and introduces a controllable KL regularizer, addressing multi-step reasoning in LMs",
+          "llm_evidence_cn": "β-OPSD将自蒸馏纳入策略优化框架，通过β控制KL正则，用于推理语言模型的多步推理训练",
+          "llm_evidence": "β-OPSD将自蒸馏纳入策略优化框架，通过β控制KL正则，用于推理语言模型的多步推理训练",
+          "canonical_evidence": "β-OPSD将自蒸馏纳入策略优化框架，通过β控制KL正则，用于推理语言模型的多步推理训练",
+          "llm_tldr_en": "Unifies on-policy self-distillation with a policy optimization family, introducing β-OPSD to control KL penalty and reference policy proximity for stable training of reasoning LMs.",
+          "llm_tldr_cn": "本文指出原始的在策略自蒸馏（OPSD）实际上是广义策略优化族中β=1的特例，β权重控制与参考策略的KL惩罚。基于此，作者提出β-OPSD，将β从固定隐式值变为可调节的正则化参数，从而在参考策略接近度与特权教师引导之间取得平衡。理论推导显示最优策略是参考策略与教师引导的几何插值。实验表明β-OPSD提升了推理语言模型训练的稳定性与最终性能，为自蒸馏与策略优化建立了统一视角。",
+          "llm_tldr": "本文指出原始的在策略自蒸馏（OPSD）实际上是广义策略优化族中β=1的特例，β权重控制与参考策略的KL惩罚。基于此，作者提出β-OPSD，将β从固定隐式值变为可调节的正则化参数，从而在参考策略接近度与特权教师引导之间取得平衡。理论推导显示最优策略是参考策略与教师引导的几何插值。实验表明β-OPSD提升了推理语言模型训练的稳定性与最终性能，为自蒸馏与策略优化建立了统一视角。",
+          "llm_tags": [
+            "query:rl"
+          ],
+          "matched_query_tag": "query:rl",
+          "matched_query_text": "policy optimization methods for multi step reasoning in llms",
+          "matched_requirement_id": "req-9",
+          "selection_source": "carryover_cache",
+          "paper_id": "2607.28582v1",
+          "carry_days": 1
+        },
+        {
+          "id": "2607.27652v1",
+          "source": "arxiv",
+          "title": "Harness-G: A Graph-Structured Harness for Search Agents",
+          "abstract": "Reinforcement learning (RL) search agents commonly model retrieval as free-form natural-language query generation and optimize multi-turn interactions using final-answer rewards. Current studies mainly improve training with denser or more structured credit signals, but rarely examine whether retrieval is properly formulated at the policy-environment interface. We observe pronounced retrieval aliasing during Search-R1 training: rollouts for the same question continue to generate distinct query strings, yet their accumulated evidence sets increasingly overlap. We call this phenomenon retrieval-equivalence collapse; in this regime, trajectories approach utility equivalence with respect to retrieval decisions, leaving within-group returns with little effective retrieval contrast. To address this problem, we propose Harness-G, a graph-structured retrieval framework that redesigns this interface. It reformulates free-form query generation as finite action selection: the policy selects an evidence sentence or entity, or chooses to answer, while the environment constructs the menu, tracks retrieval state, and validates and executes each choice. This interface reduces linguistic aliasing and makes same-state alternatives directly comparable. Building on this interface, we introduce Structured Non-myopic Credit (SNC), which uses a frozen answer scorer to compare the selected action with its alternatives and assigns downstream gains to the earlier actions that enabled them. Across six QA benchmarks, Harness-G achieves the highest average F1 at both evaluated model scales, outperforming the strongest baseline, Graph-R1, by 10.74 points at 1.5B and 3.98 points at 3B.",
+          "authors": [
+            "Yanning Hou",
+            "Haoyuan Chen",
+            "Sihang Zhou",
+            "Xiaoshu Chen",
+            "Xirui Liu",
+            "Duanyang Yuan",
+            "Lingyuan Meng",
+            "Quan Liu",
+            "Jian Huang"
+          ],
+          "primary_category": "cs.CL",
+          "categories": [
+            "cs.CL"
+          ],
+          "published": "2026-07-30T04:05:05+00:00",
+          "link": "https://arxiv.org/pdf/2607.27652v1",
+          "tags": [
+            "keyword:rl",
+            "query:rl"
+          ],
+          "llm_score": 8.0,
+          "llm_evidence_en": "graph-structured harness for RL search agents to mitigate retrieval aliasing and improve multi-turn policy optimization",
+          "llm_evidence_cn": "面向 RL 搜索智能体的图结构控制框架，缓解检索等价坍缩以改进多轮策略优化",
+          "llm_evidence": "面向 RL 搜索智能体的图结构控制框架，缓解检索等价坍缩以改进多轮策略优化",
+          "canonical_evidence": "面向 RL 搜索智能体的图结构控制框架，缓解检索等价坍缩以改进多轮策略优化",
+          "llm_tldr_en": "Identifies retrieval-equivalence collapse in RL search agents and proposes Harness-G, a graph-structured harness that reformulates the policy-environment interface to improve multi-turn RL credit assignment.",
+          "llm_tldr_cn": "强化学习搜索智能体通常用自然语言查询生成建模检索，并用最终答案奖励优化多轮交互，但训练中会出现检索等价坍缩，导致策略梯度信号失效。该文提出图结构控制框架 Harness-G，通过重构策略与环境界面的检索表述来缓解该问题。实验显示 Harness-G 能提供更有效的检索信用分配，提升最终答案奖励下的多轮策略优化效率，为 RL 搜索智能体训练提供了新思路。",
+          "llm_tldr": "强化学习搜索智能体通常用自然语言查询生成建模检索，并用最终答案奖励优化多轮交互，但训练中会出现检索等价坍缩，导致策略梯度信号失效。该文提出图结构控制框架 Harness-G，通过重构策略与环境界面的检索表述来缓解该问题。实验显示 Harness-G 能提供更有效的检索信用分配，提升最终答案奖励下的多轮策略优化效率，为 RL 搜索智能体训练提供了新思路。",
+          "llm_tags": [
+            "query:rl"
+          ],
+          "matched_query_tag": "query:rl",
+          "matched_query_text": "policy optimization methods for multi step reasoning in llms",
+          "matched_requirement_id": "req-9",
+          "selection_source": "carryover_cache",
+          "paper_id": "2607.27652v1",
+          "carry_days": 1
+        },
+        {
+          "id": "2607.27879v1",
+          "source": "arxiv",
+          "title": "ARES: Adaptive Reasoning-Effort Steering for PPA- and Cost-Aware RTL Optimization with LLM Agents",
+          "abstract": "Large language model (LLM) agents optimize the power, performance, and area (PPA) of register-transfer-level (RTL) designs by iterating over edits, synthesis, and PPA analysis, paying a dollar cost for every LLM call. Prior agents report the quality reached without its normalized cost, attribute that quality to an engineered cross-design memory, and hold the reasoning effort of every call fixed. We propose Ares with three corresponding innovations. (1) We introduce a normalized dollar cost per LLM call reported alongside the figure of merit (FoM), enabling fair comparison across effort levels and optimizers. (2) Using this accounting, we find the construction of the long-term memory matters little. An engineered memory brings no dependable gain over a plain concatenation of the same experience. (3) We instead adapt the per-call reasoning effort by escalating to deeper reasoning only once progress at a lower effort stalls, via a patience counter fit on 21 training designs, allocating reasoning where it pays rather than uniformly across all iterations. On three test designs unseen during training, the effort policy lowers the FoM by 23-27% where the best fixed effort reaches 16-23%, at equal normalized cost. Ares closes up to 83% of the gap from an LLM-drafted multiply-accumulate unit to its highly hand-optimized counterpart, and reaches a 25% deeper FoM than state-of-the-art Dr. RTL at 12% of its tokens.",
+          "authors": [
+            "Stef Cuyckens",
+            "Mihaela Jivanescu",
+            "Jun Yin",
+            "Chao Fang",
+            "Marian Verhelst"
+          ],
+          "primary_category": "cs.AR",
+          "categories": [
+            "cs.AR",
+            "cs.AI"
+          ],
+          "published": "2026-07-30T08:53:32+00:00",
+          "link": "https://arxiv.org/pdf/2607.27879v1",
+          "tags": [
+            "keyword:rl",
+            "query:rl"
+          ],
+          "llm_score": 8.0,
+          "llm_evidence_en": "LLM agents automate RTL optimization with cost-aware adaptive reasoning",
+          "llm_evidence_cn": "大模型智能体用于RTL设计自动化，并做成本感知自适应推理",
+          "llm_evidence": "大模型智能体用于RTL设计自动化，并做成本感知自适应推理",
+          "canonical_evidence": "大模型智能体用于RTL设计自动化，并做成本感知自适应推理",
+          "llm_tldr_en": "ARES introduces normalized dollar cost per LLM call for fair comparison of RTL optimization agents, adaptively steers reasoning effort, and finds engineered long-term memory matters little.",
+          "llm_tldr_cn": "大语言模型智能体在RTL设计中通过反复编辑、综合与PPA分析来优化功耗、性能与面积，但以往报告不包含归一化成本，且推理努力固定。ARES提出每次调用的归一化美元成本和品质因数联合报告，并自适应调整推理努力，使不同优化器与努力水平可公平比较。实验表明工程化长期记忆对优化质量影响很小，而成本感知的自适应推理努力能有效控制开销，为硬件设计优化智能体提供了更可靠的评测基准。",
+          "llm_tldr": "大语言模型智能体在RTL设计中通过反复编辑、综合与PPA分析来优化功耗、性能与面积，但以往报告不包含归一化成本，且推理努力固定。ARES提出每次调用的归一化美元成本和品质因数联合报告，并自适应调整推理努力，使不同优化器与努力水平可公平比较。实验表明工程化长期记忆对优化质量影响很小，而成本感知的自适应推理努力能有效控制开销，为硬件设计优化智能体提供了更可靠的评测基准。",
+          "llm_tags": [
+            "query:rl"
+          ],
+          "matched_query_tag": "query:rl",
+          "matched_query_text": "large language model agents for task automation",
+          "matched_requirement_id": "req-4",
+          "selection_source": "carryover_cache",
+          "paper_id": "2607.27879v1",
+          "carry_days": 1
+        },
+        {
+          "id": "2607.27953v1",
+          "source": "arxiv",
+          "title": "AutoPref: Automatic Discovery of Task-Specific Preference Objectives for Neural Combinatorial Optimization",
+          "abstract": "Combinatorial optimization problems (COPs) underpin many real-world decisions, but their exponentially large search spaces make high-quality solutions costly to obtain. Neural combinatorial optimization (NCO) learns fast construction policies, typically with reinforcement learning (RL), while preference-based NCO improves sample efficiency by learning from relative solution quality. However, existing preference objectives combine two distinct design choices in manually specified, one-size-fits-all formulations: what learning signal to extract from each solution pair and how to weight each pair relative to the sampled set. We present AutoPref, the first LLM-guided framework for automated preference-objective discovery in NCO. AutoPref factorizes the objective into a pairwise loss program, which defines the learning signal, and a set-aware weighting program, which determines each pair's relative contribution. Their composition forms a unified programmatic objective space containing existing preference objectives as special cases. To make its search tractable, we introduce a staged conditional search strategy with behavioral gates that filter inadmissible programs before short-horizon training and evaluation. Across TSP, CVRP, FFSP, and JSSP, AutoPref consistently outperforms strong hand-designed baselines across problem scales, demonstrating the benefits and scalability of automated objective discovery for NCO.",
+          "authors": [
+            "Shengda Gu",
+            "Kai Li",
+            "Xinyi Ke",
+            "Haobo Fu",
+            "Yifan Zhang",
+            "Jian Cheng"
+          ],
+          "primary_category": "cs.LG",
+          "categories": [
+            "cs.LG"
+          ],
+          "published": "2026-07-30T10:01:21+00:00",
+          "link": "https://arxiv.org/pdf/2607.27953v1",
+          "tags": [
+            "keyword:rl",
+            "query:rl"
+          ],
+          "llm_score": 8.0,
+          "llm_evidence_en": "LLM-guided automated discovery of preference objectives for RL-based neural combinatorial optimization",
+          "llm_evidence_cn": "用LLM自动发现面向RL的偏好目标函数",
+          "llm_evidence": "用LLM自动发现面向RL的偏好目标函数",
+          "canonical_evidence": "用LLM自动发现面向RL的偏好目标函数",
+          "llm_tldr_en": "AutoPref is the first LLM-guided framework for automated preference-objective discovery in neural combinatorial optimization, replacing manual preference reward design with task-specific automatically discovered objectives.",
+          "llm_tldr_cn": "现有神经组合优化中的偏好目标通常依赖人工设计的统一形式，难以适应不同任务。AutoPref首次用LLM自动发现任务特定的偏好目标，将目标函数设计转化为自动化搜索。实验显示自动发现的目标在多个组合优化问题上优于手工基线。这为奖励函数设计的自动化提供了新途径。",
+          "llm_tldr": "现有神经组合优化中的偏好目标通常依赖人工设计的统一形式，难以适应不同任务。AutoPref首次用LLM自动发现任务特定的偏好目标，将目标函数设计转化为自动化搜索。实验显示自动发现的目标在多个组合优化问题上优于手工基线。这为奖励函数设计的自动化提供了新途径。",
+          "llm_tags": [
+            "query:rl"
+          ],
+          "matched_query_tag": "query:rl",
+          "matched_query_text": "design of reward functions in RL",
+          "matched_requirement_id": "req-2",
+          "selection_source": "carryover_cache",
+          "paper_id": "2607.27953v1",
+          "carry_days": 1
+        },
+        {
+          "id": "2607.28037v1",
+          "source": "arxiv",
+          "title": "ClawTrack: Towards Trace-Level Evaluation and Improvement of Real-World Autonomous Agents",
+          "abstract": "As LLM-based agents are deployed in complex, multi-step workflows, a critical evaluation gap has emerged: most existing benchmarks judge only final outcomes, unable to distinguish reliable reasoning from lucky success or attribute failures to specific process deficiencies, hindering attribution in long-horizon tasks.   In this work, we present ClawTrack, a dual-assessment benchmark that simultaneously measures what an agent achieves (Task Score) and how it achieves it (Process Score). ClawTrack comprises 320 tasks across 8 domains with 25+ deterministic mock services. A Process Grader scores each reasoning turn along four dimensions (goal alignment, efficiency, information utilization, and result verification), anchored by 12,541 task-specific rubric items. Evaluating 21 models over 16,000+ trials, we find that: (1) process scores effectively attribute success and failure to specific reasoning dimensions, filtering lucky passes invisible to outcome-only evaluation; (2) the four dimensions are complementary, with result verification as the systematic bottleneck; (3) the framework is robust to evaluator choice across different judge LLMs; and (4) process-based trajectory filtering yields consistent post-training improvements across model scales.",
+          "authors": [
+            "Xingjian Wu",
+            "Xuhang Zhu",
+            "Xingchen Liu",
+            "Junlin Liu",
+            "Jianing Wang",
+            "Linsen Guo",
+            "Xiaoyu Li",
+            "Xuezhi Cao",
+            "Xunliang Cai"
+          ],
+          "primary_category": "cs.LG",
+          "categories": [
+            "cs.LG"
+          ],
+          "published": "2026-07-30T11:18:47+00:00",
+          "link": "https://arxiv.org/pdf/2607.28037v1",
+          "tags": [
+            "keyword:rl",
+            "query:rl"
+          ],
+          "llm_score": 8.0,
+          "llm_evidence_en": "Trace-level evaluation benchmark for real-world LLM-based autonomous agents",
+          "llm_evidence_cn": "面向真实世界LLM自主智能体的痕量级评估基准",
+          "llm_evidence": "面向真实世界LLM自主智能体的痕量级评估基准",
+          "canonical_evidence": "面向真实世界LLM自主智能体的痕量级评估基准",
+          "llm_tldr_en": "Existing benchmarks judge only final outcomes for LLM agents. ClawTrack adds process-level scoring across reasoning turns to enable fine-grained attribution and improvement in long-horizon tasks.",
+          "llm_tldr_cn": "面向真实世界自主智能体，现有基准只评估最终结果，无法区分侥幸成功与可靠推理，也难以定位长时任务中的失败原因。为此提出 ClawTrack 双评估基准，包含 320 个跨领域任务和约 1.25 万条过程标注，从目标对齐、效率、信息利用与结果验证四个维度逐轮打分。实验表明任务分数与过程分数可以分离，能够揭示中间步骤的具体缺陷并帮助改进。该工作为复杂多步智能体的过程级评测与优化提供了新基线。",
+          "llm_tldr": "面向真实世界自主智能体，现有基准只评估最终结果，无法区分侥幸成功与可靠推理，也难以定位长时任务中的失败原因。为此提出 ClawTrack 双评估基准，包含 320 个跨领域任务和约 1.25 万条过程标注，从目标对齐、效率、信息利用与结果验证四个维度逐轮打分。实验表明任务分数与过程分数可以分离，能够揭示中间步骤的具体缺陷并帮助改进。该工作为复杂多步智能体的过程级评测与优化提供了新基线。",
+          "llm_tags": [
+            "query:rl"
+          ],
+          "matched_query_tag": "query:rl",
+          "matched_query_text": "large language model agents for task automation",
+          "matched_requirement_id": "req-4",
+          "selection_source": "carryover_cache",
+          "paper_id": "2607.28037v1",
+          "carry_days": 1
+        }
+      ]
     }
   }
 }

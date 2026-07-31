@@ -1,0 +1,338 @@
+Title: LoRA Scaffolded Policy Optimization (LSPO): A Sampling-Time Low-Rank Scaffold for Recovering Reinforcement-Learning Gradient on Zero-Reward Cliff Prompts
+
+URL Source: https://arxiv.org/pdf/2607.27787v1
+
+Published Time: Fri, 31 Jul 2026 00:36:25 GMT
+
+Number of Pages: 11
+
+Markdown Content:
+# LoRA Scaffolded Policy Optimization (LSPO): A Sampling-Time Low-Rank Scaffold for Recovering Reinforcement-Learning Gradient on Zero-Reward Cliff Prompts 
+
+Ken Ding 
+
+NVIDIA 
+
+kennethd@nvidia.com 
+
+## Abstract 
+
+Reinforcement learning from verifiable rewards (RLVR) for mathematical reasoning suffers from a structural blind spot: on “cliff” prompts—those on which every sampled rollout in a group fails—the group-normalized advantage is identically zero, so GRPO produces no gradient on precisely the prompts at the frontier of the model’s capability. We introduce LoRA Scaffolded Policy Optimization (LSPO), a sampling-time mechanism that recovers this lost gradient. Each RL step, LSPO detects cliff prompts, fits a small low-rank (LoRA) adapter by a brief supervised step on their ground-truth solutions, re-rolls the cliffs with the base-plus-adapter model, splices the now-successful completions back into the RL batch with an importance-sampling correction, and takes a GRPO step on the base alone; the adapter receives only the supervised gradient and is discarded at checkpoint, yield-ing a base-only model. On DeepMath-103K with DeepSeek-R1-Distill-Qwen-1.5B, evaluated over n=5 paired seeds per arm at a matched 1000-step reporting horizon, LSPO’s 5-seed mean matches or beats a DAPO baseline on all 16 (benchmark, pass@ k) cells (15 strict wins and one exact tie), with gains of up to +10.7 points on AIME24/ pass@ 4, +6.7 points on AIME24 and AIME26 at pass@ 16, and +2.4 points on MATH500/ pass@ 1; averaged over the 16 cells the improvement is +3.8 points. 
+
+## 1 Introduction 
+
+Reinforcement learning from verifiable rewards (RLVR) has become the dominant recipe for eliciting mathematical reasoning from large language models (Shao et al., 2024; DeepSeek-AI et al., 2025). Group Relative Policy Optimization (GRPO) (Shao et al., 2024) and its scaled-up successor DAPO (Yu et al., 2025) dispense with a learned critic by sampling a group of 
+
+K rollouts per prompt and normalizing each rollout’s reward against the group mean to form an advantage. This group-relative construction has a structural blind spot. On a 
+
+cliff prompt—one where all K sampled rollouts are wrong, so the group’s total reward is zero—every rollout carries the same reward, the within-group advantage is identically zero, and the policy-gradient contribution of that prompt vanishes exactly. The model therefore receives no learning signal from precisely the prompts at the frontier of its capability: the problems it cannot yet solve are the ones GRPO is structurally unable to learn from. As training proceeds and the easy prompts are mastered, the unsolved tail accumulates at this frontier, and an increasing share of the batch produces no gradient. Several lines of work attack this regime, and they cleave naturally into two groups. The first targets the cliff directly, recovering the missing signal from ground-truth solutions (Section 2.4). The second group combines RL with a low-rank adapter, though not aimed at the cliff problem specifically. Tina (Wang et al., 2025) trains a LoRA adapter (Hu et al., 2021) by RL and ships the adapted weights as the final model. BRIDGE (Chen et al., 2025) fuses supervised and RL gradients in the base-model update and updates a LoRA teacher using a cooperative-gain meta-objective derived from a bilevel formulation. 
+
+1arXiv:2607.27787v1 [cs.LG] 30 Jul 2026 We introduce LoRA Scaffolded Policy Optimization (LSPO) , a sampling-time mechanism that wraps an existing policy-gradient RL loop and recovers gradient on cliff prompts without modifying the loss. On each step, LSPO detects the all-zero-reward cliffs, attaches a small low-rank adapter and runs a brief supervised step on the cliff prompts’ ground-truth solutions (updating the adapter only, base frozen), re-samples the cliffs with the adapter active to restore within-group reward variance, then splices the now-successful rollouts back into the RL batch and backpropagates the policy-gradient loss into the base alone. What distinguishes LSPO from prior adapter-RL methods is three design choices acting together: a sampling-time low-rank scaffold — the adapter is a transient proposal distribution (never the deliverable), kept low-rank and fine-tuned for only a handful of steps, the intent being to keep the importance-sampling correction well-conditioned rather than in the high-variance regime of further-off-policy proposals; strict gradient routing via a two-optimizer split that sends the supervised gradient to the adapter only and the RL gradient to the base only (no bilevel or meta-objective coupling); and splice-and-discard , in which the adapter is reused only as an importance-sampling proposal for the spliced cliff rows and is stripped at checkpoint. The supervised signal therefore reaches the base only indirectly, through adapter-elicited rollouts, and the deliverable is a base-only model that carries no adapter weights. Figure 1 summarises one training step. Our contributions are as follows: • Method. We introduce LSPO, a sampling-time low-rank scaffold that recovers RL gradient on zero-reward cliff prompts via a two-optimizer split (adapter trained by supervision only, base trained by RL only) and a splice-and-discard pipeline with an importance-sampling correction, yielding a base-only deliverable (Section 3). • Headline empirical result. On DeepMath-103K with DeepSeek-R1-Distill-Qwen-1.5B (DeepSeek-AI et al., 2025), over n=5 paired seeds per arm at a matched 1000-step reporting horizon, the 5-seed mean of LSPO (per-iteration variant) matches or beats a DAPO baseline on all 16 (benchmark, pass@ k) cells—15 strict wins and one exact tie—across MATH500 and AIME24/25/26. The largest gains are +10.7 points on AIME24/pass@4 and +6.7 points on both AIME24 and AIME26 at pass@16; averaged over the 16 cells the improvement is +3.8 points. Notably LSPO improves pass@1 on every benchmark ( +1.3 to +4.7 points), so the gain is not merely a broadening of the sampled distribution (Section 4). • Cliff-conversion efficacy. We measure the mechanism directly: across the 5 runs the scaffold converts ∼43% of otherwise-zero-gradient cliff groups into groups carrying usable policy-gradient signal, with a tight per-seed spread (Section 4.3). 
+
+## 2 Related Work and Background 
+
+2.1 RL with verifiable rewards: GRPO and the DAPO recipe 
+
+Reinforcement learning with verifiable rewards (RLVR) trains a policy πθ to generate a solution y to a prompt x and assigns a binary outcome reward r(x, y) ∈ { 0, 1 } that is 1 iff a verifier accepts the final answer (DeepSeek-AI et al., 2025). Group Relative Policy Optimization (GRPO) (Shao et al., 2024) removes the value network used by PPO (Schulman et al., 2017) by drawing a group of G rollouts {y1, . . . , yG } per prompt and normalizing rewards within the group to form the advantage cAi = ( ri − μ)/σ, where μ and σ are the group reward mean and standard deviation. The policy is then updated with the PPO-style clipped surrogate 
+
+LGRPO = − E
+
+h
+
+min 
+
+
+
+ρt bA, clip (ρt, 1 − εlow , 1 + εhigh ) bA
+
+i 
+
+, ρt = πθ (at | st)
+
+πold (at | st) , (1) where ρt is the importance ratio between the current policy and the sampling (behavior) policy. 
+
+22.2 The cliff problem 
+
+The group-normalized advantage in Eq. (1) creates a sharp failure mode. For a given prompt 
+
+x the outcome falls into one of three cases: (i) all G rollouts succeed, so every reward equals the group mean and all advantages are zero; (ii) the rollouts are mixed, yielding positive advantages for the successes and negative for the failures — the standard learning regime; or (iii) all G rollouts fail, so the group reward sum is zero, σ is zero, and every within-group advantage is identically zero. Case (iii) — a cliff prompt, the “learning cliff” of Zhang et al. (2026) — contributes no gradient to the policy update. These are precisely the prompts at the frontier of the model’s capability: too hard for any of the G samples to solve, yet exactly where a learning signal is most needed. Under standard GRPO the cliff boundary can therefore only advance indirectly, through weight sharing as the model learns on nearby intermediate-difficulty prompts; there is no direct gradient on the cliffs themselves. 
+
+2.3 Low-rank adapters 
+
+Low-Rank Adaptation (LoRA) (Hu et al., 2021) freezes the pretrained weight matrix W0 and learns a low-rank update ∆W = BA with B ∈ Rd×r, A ∈ Rr×k and rank r ≪ min (d, k), so that the adapted forward pass computes (W0 + BA )x. Because only A and B are trainable, adaptation is parameter-efficient and the adapter can be attached, detached, or reset cheaply. LSPO exploits exactly this property: it uses a small, short-lived LoRA adapter purely as a sampling-time mechanism, never shipping it. 
+
+2.4 Related work Rescuing cliffs with a scaffold. A cliff group can be repaired in place, by synthesising a non-zero advantage through entropy-modulated shaping or a confidence-weighted penalty on wrong answers (Le et al., 2026; Feng et al., 2025); this is far cheaper than LSPO, but on an all-fail group it can only push probability mass away from the observed failures, never toward a success. Methods that instead rescue the cliff—LSPO among them—re-sample the failed prompt under privileged guidance and return the successes to the batch. The move predates RLVR: STaR (Zelikman et al., 2022) recovered failed problems by conditioning on the ground-truth answer, within a generate–filter–finetune lineage that consumes the recovered trajectory as a cross-entropy target rather than an RL sample. The closest of these hints in the context and corrects the importance ratio back to the hint-free prompt (Nath et al., 2025). LSPO’s scaffold is a weight perturbation rather than a prompt, so its ratio compares two parameter settings; and it splices only the verifier-passing rows, leaving the rest of the group on-policy, where that method replaces the group wholesale. The others differ mainly in how the hint is constructed—tiered from abstract concepts to concrete steps (Zhang et al., 2026), taken as a prefix of the ground-truth trace (Liu et al., 2025; Zhang et al., 2025), generated by the policy itself (Chen et al., 2026; Liao et al., 2026), or produced by a separate hinter policy (Xia et al., 2026); all place the scaffold in the prompt, so answer leakage into the sampled trajectory is a live concern, which for LSPO it structurally is not. LatentRevise also fits its scaffold rather than writing it: a soft prefix in input-embedding space, optimised against the gold answer and then discarded (Guo et al., 2026). The prefix is still an input, and refitting it per prompt against that prompt’s own answer is a more direct privileged channel than LSPO’s single low-rank update shared across the whole cliff set. 
+
+Off-policy rows and privileged supervision. POPO substitutes a variance-bearing group drawn from a prioritised replay buffer under a decoupled importance correction (Mao et al., 2026); unlike replay, LSPO can help on prompts the policy has never solved. ZPPO argues that injecting a teacher’s response into the policy gradient breaks the on-policy assumption, and so places that response in the prompt instead, as an anonymised candidate the student must pick out (Lee et al., 2026). LSPO reaches the same conclusion by another route: the ground-truth solution trains only the adapter, and what enters the base’s gradient is the model’s own rollout, importance-corrected. LUFFY imports off-policy teacher traces into RLVR directly (Yan et al., 2025)—the further-off-policy regime that Section 3 argues against on variance grounds. 
+
+3p π                  
+
+> ×
+> ×
+> ×
+> ×
+> ×
+> group reward sum = 0
+> (1) Cliff: all rollouts fail
+> π
+> (frozen)
+> φLoRA
+> T
+> ground truth
+> SFT loss
+> (2) Fit φLoRA to the GT
+> π+φLoRA
+> πφLoRA p
+> ×
+> ×
+> ×
+> group reward sum >0
+> (3) Re-rollout: cliff surpassed
+> π+ 0 ·φLoRA
+> πφLoRA
+> (scale = 0 )
+> ×
+> ×
+> ×
+> RL gradient →πonly
+> (4) GRPO step: RL grad to πonly
+
+Figure 1: The LSPO cliff-rescue mechanism. (1) On a cliff prompt p, all K rollouts from the base policy π fail (red); the group reward sum is zero and standard GRPO has no learning signal. (2) A trainable LoRA adapter ϕLoRA is composed with the (frozen) base 
+
+π and fitted via SFT on the dataset’s ground-truth trajectory T. (3) Under the composed policy π + ϕLoRA , some rollouts on the same prompt now pass the verifier (green): the cliff is surpassed. Successful rollouts are spliced into the GRPO batch as positive examples. (4) 
+
+The GRPO step runs on the same batch with the LoRA branch scale set to 0 (dashed grey), so the RL gradient (purple, dotted) lands on π only; ϕLoRA receives no RL gradient and is reset before the next step. 
+
+Where the supervision lands. Hybrid distillation / privileged self-distillation (HDPO) adds a student–teacher divergence term to the RL objective, so that cliff prompts contribute a supervised distillation signal optimised jointly with the policy gradient on the model’s own parameters (Ding, 2026); ReLIFT alternates phases of full-model supervised fine-tuning on hard-prompt ground-truth solutions with phases of RL, supplying cliff signal by overwriting the base weights with expert traces (Ma et al., 2025). In both, a supervised loss is applied to the base’s own parameters—jointly with the policy gradient in the first case, in alternating phases in the second. LSPO applies none: the RL objective is left exactly as it was, the intervention acts only on the proposal distribution, and the supervision terminates in an adapter that is discarded. In BRIDGE neither signal is confined to one weight set: the base takes a fused SFT-plus-RL gradient, and the adapter is updated under a bilevel cooperative-gain objective (Chen et al., 2025). LSPO routes the two to disjoint parameter sets with no meta-objective, maintains two weight sets rather than three, and activates only on cliff prompts. Where Tina’s adapter is trained by RL and shipped as the final model (Wang et al., 2025), LSPO’s receives only supervised gradient and is discarded. 
+
+## 3 Method: LoRA Scaffolded Policy Optimization 
+
+LSPO is a sampling-time mechanism that wraps an existing policy-gradient RL loop (here GRPO (Shao et al., 2024) with a DAPO-style recipe (Yu et al., 2025)) and recovers gradient on cliff prompts—prompts on which every sampled rollout in the group scores zero reward, so the group-relative advantage, and hence the policy gradient on that prompt, is identically zero. The core idea is to attach a small low-rank adapter (Hu et al., 2021) as a transient scaffold : it is supervised-fine-tuned on the cliff prompts’ own ground-truth solutions, used only to re-sample those prompts, and then discarded. Successful adapter-elicited rollouts are spliced back into the RL batch so that the within-group reward variance—and the RL gradient—is restored, while the gradient that actually updates the deliverable flows into the base model alone. 
+
+3.1 Algorithm 
+
+Figure 1 illustrates the mechanism and Algorithm 1 states the per-step loop. Each RL step: 
+
+(A) sample K completions per prompt from the base and flag as cliffs those whose group scores zero total reward; (B) attach a LoRA adapter and run a brief supervised step on the cliff prompts’ ground-truth solutions, base frozen; (C) re-sample the cliff prompts with the adapter on; (D) swap each successful re-rollout into its failed counterpart’s slot, leaving 
+
+4Algorithm 1 LoRA Scaffolded Policy Optimization (per-step loop) 
+
+Require: Base policy πθ , prompt set X , ground truth {y∗}, reward R, rollouts per prompt 
+
+K, clip bounds (εlow , εhigh ), RL optimizer Opt RL (updates θ), SFT optimizer Opt SFT 
+
+(updates adapter ϕ) 
+
+> 1:
+
+for each RL training step do  
+
+> 2:
+
+Sample batch B ⊂ X ; for each x ∈ B draw K rollouts y(k) ∼ πθ (· | x) and record per-row sampler density πsamp ← πθ 
+
+> 3:
+
+Score every rollout with R; C ← { x ∈ B : ∑k R(x, y(k)) = 0} // cliffs: zero RL gradient  
+
+> 4:
+
+if C̸ = ∅ then  
+
+> 5:
+
+Attach low-rank adapter ϕ to πθ (base frozen); ϕ ← Opt SFT on {(x, y∗) : x ∈ C} 
+
+// supervised gradient to ϕ only  
+
+> 6:
+
+Re-sample C with adapter on: ˜ y ∼ πθ+ϕ(· | x); S ← { (x, ˜ y) : R(x, ˜ y) = 1} 
+
+> 7:
+
+Splice S into B in place of the failed cliff rollouts; for each (x, ˜y) ∈ S overwrite 
+
+πsamp ← πθ+ϕ // IS denominator switches to base+adapter  
+
+> 8:
+
+end if  
+
+> 9:
+
+Compute group-normalized advantages ˆAy on the (possibly spliced) batch B 
+
+> 10:
+
+Per-token IS ratio: ρt(θ) = πθ (yt | x, y<t)
+
+πsamp (yt | x, y<t) // πsamp equals πθ for on-policy rows, πθ+ϕ for spliced cliffs  
+
+> 11:
+
+θ ← Opt RL on the clipped surrogate (RL gradient to base only; adapter receives none): 
+
+LGRPO = − 1
+
+T ∑
+
+> (x,y)∈B
+
+# ∑
+
+> t
+
+min  ρt ˆAy, clip (ρt, 1 −εlow , 1 +εhigh ) ˆAy
+
+
+
+where T = ∑(x,y)∈B |y| is the total tokens in the batch  
+
+> 12:
+
+Discard / reset adapter ϕ 
+
+> 13:
+
+end for  
+
+> 14:
+
+return base model πθ // adapter never shipped 
+
+every other row untouched; (E) apply the RL update to the base alone and discard the adapter. The swap in (D) is deliberately minimal: a failed re-rollout carries no signal the group does not already have from its base counterpart, so admitting it would add off-policy mass without adding information. Advantages are recomputed on the spliced batch, and each spliced row’s base-plus-adapter probability is retained for the importance correction (Section 3.3). 
+
+3.2 Gradient routing 
+
+The defining architectural choice of LSPO is that gradient routing is strictly disjoint . We maintain two optimizers. The supervised optimizer Opt SFT updates the low-rank adapter only, on the cross-entropy of the cliff ground-truth solutions (stage B). The RL optimizer Opt RL updates the base only, on the GRPO surrogate over the spliced batch (stage E). No parameter is touched by both objectives: the base never receives supervised gradient, and the adapter never receives RL gradient. The supervised signal reaches the base only indirectly —through the adapter-elicited rollouts that are spliced into the RL batch and then learned by the ordinary policy gradient. Because a fresh adapter is fitted at every step, that signal always measures the gap from the current base to the cliff solutions, with no adapter state carried across steps. 
+
+53.3 Importance-sampling correction 
+
+Spliced rows are off-policy: they were drawn from πμ := πθ+ϕ, not from the base πθ whose parameters the update modifies. The correction is a change of measure. The quantity we want is the base’s policy gradient, and 
+
+Ey∼πθ [A(y) ∇θ log πθ (y)] = Ey∼πμ
+
+ πθ (y)
+
+πμ(y) A(y) ∇θ log πθ (y)
+
+
+
+, (2) so each spliced row must carry the weight πθ (y)/πμ(y), which factorises per token into 
+
+∏t πθ (yt | y<t)/πμ(yt | y<t).The implementation instead uses the corresponding per-token ratio in the clipped surrogate, 
+
+ρt = πθ (yt | y<t)/πprev (yt | y<t) (Schulman et al., 2017; Shao et al., 2024). For ordinary rows πprev is the base; for spliced rows we set πprev = πμ, using the base-plus-adapter log-probabilities recorded at stage (D). No new estimator is introduced — the denominator is simply the distribution that generated the row. Keeping the adapter small keeps that ratio well-conditioned. This is a variance motivation rather than an exactness guarantee. Because the implementation selects verifier-passing proposal rows and applies clipped per-token ratios rather than an unclipped sequence-product weight, we do not claim that its update is an unbiased sequence-level policy-gradient estimator or provide a convergence guarantee; formal characterization is deferred to future work. 
+
+## 4 Experiments 
+
+4.1 Setup 
+
+We evaluate LSPO on mathematical reasoning. The base model is DeepSeek-R1-Distill-Qwen-1.5B (DeepSeek-AI et al., 2025), a distilled reasoning model. Training uses DeepMath-103K (He et al., 2025), a public collection of competition-style mathematics problems with verifiable final answers (HuggingFace zwhe99/DeepMath-103K ). We validate on four held-out benchmarks: MATH500 (Hendrycks et al., 2021; Lightman et al., 2024) and the AIME 2024, 2025, and 2026 competition sets (AIME24/25/26), 1 reporting best pass@ k for k ∈ { 1, 4, 8, 16 }.Validation runs every 10 training steps. pass@ k is computed by the first-k-slice estimator (whether any of the first k of the 16 validation rollouts passes the verifier); it is unbiased for pass@ k under exchangeability of the rollouts, though higher-variance than the combinatorial estimator of Chen et al. (2021) which averages over all size-k subsets. The estimator is applied identically to both arms. 
+
+Seeds and reporting horizon. Both arms are trained with the same seed set 
+
+{42, 43, 44, 45, 46 }, and all analysis is paired seed-by-seed. We fix a 1000-step reporting horizon : runs are launched with a 1500-step budget, and every peak, comparison, and ag-gregate reported in this paper is computed over validation events at step ≤1000, identically for LSPO and DAPO. We do not characterize behavior beyond this horizon in this version. All training is run on 8 ×H100 GPUs. The base RL algorithm is GRPO (Shao et al., 2024) configured with the DAPO recipe (Yu et al., 2025): Clip-Higher with asymmetric ratio clipping ( εlow =0.20, εhigh =0.28), token-level policy-gradient loss, and overlong-reward shaping (a soft length penalty that engages past 7168 generated tokens up to the 8192-token generation limit). Dynamic sampling is disabled. Each step samples 32 prompts with 16 generations per prompt (512 rollouts/step). The base model is updated with AdamW (Loshchilov & Hutter, 2019) at learning rate 1e −6; we apply no reference-policy KL penalty.  
+
+> 1We use the publicly released problem sets from the Mathematical Association of America’s American Invitational Mathematics Examination for 2024, 2025, and 2026. Problems and official answer keys are available via the MAA archive and community wikis such as https://artofproblemsolving. com/wiki/index.php/AIME_Problems_and_Solutions .
+
+6The LSPO scaffold uses a LoRA (Hu et al., 2021) adapter of rank 16 ( α=64) fine-tuned on cliff ground-truth solutions for sft_steps_per_new_cliff =4 steps with a separate AdamW optimizer at learning rate 2.5e −5. Cliffs are groups whose total reward is zero; only successful adapter-elicited rollouts replace their failed counterparts (partial swap), and spliced rows reuse the base-plus-adapter log-probabilities as the importance-sampling denominator. The adapter receives supervised gradient only and the base receives RL gradient only, per Section 3. Unless stated otherwise, LSPO denotes the per-iteration variant (a fresh adapter each step). Our baseline is identical in every respect—data, recipe, optimizer, hardware, and step budget—with the LSPO scaffold disabled, i.e. plain DAPO-style GRPO. This isolates the contribution of the scaffold. 
+
+4.2 Main result: peak-vs-peak comparison 
+
+Table 1 reports the full 16-cell peak comparison at the matched reporting horizon (step 
+
+≤1000) with n=5 paired seeds for both arms. For each (run, benchmark, k) we take the peak value over that run’s validation trace, then average across the five seeds. LSPO’s mean matches or beats DAPO’s on every cell , with 15 strict wins and one exact tie 
+
+(AIME25/pass@8: 46.00 vs. 46.00; at integer counts both arms recover 69 of 150 seed-problem pairs). The advantage is largest on AIME24 (mean +4.7 to +10.7 points across k, peaking at 
+
++10.66 points at pass@4) and on AIME26/pass@16 ( +6.67 points). MATH500 gains are smaller in absolute terms ( +0.4 to +2.4 points) because both arms approach the benchmark ceiling. Notably, LSPO improves pass@1 on every benchmark ( +1.3 to +4.7 points): the improvement is not merely a broadening of the sampled distribution but a shift in single-sample accuracy. Averaged over all 16 cells, LSPO scores 59.90 against DAPO’s 56.08, a 
+
++3.82-point improvement. Because peaks are taken per cell independently, the peak steps differ across cells, so Table 1 reports best-achievable-per-metric during training rather than the performance of any single checkpoint. Both arms are measured under identical protocol, so the paired comparison is unaffected. 
+
+4.3 Cliff-conversion efficacy 
+
+Table 1 measures the outcome; this section measures the mechanism. Across the 5 LSPO runs at step ≤1000, 10 ,864 cliff groups were detected in total. The scaffold — four iterations of LoRA fitting on the cliff ground-truth solutions followed by re-sampling — surpassed approximately 43% of them, i.e. produced at least one verifier-passing rollout on 4 , 680 groups that were originally 0-of-K failures and therefore carried exactly zero policy gradient. The per-seed surpass rate is tight (41.3–45.5%, standard deviation 1.5%). Two details sharpen the interpretation. First, the per-rollout post-scaffold pass rate is only 5.8% (cliff-weighted mean across seeds), so the group-level 43% predominantly reflects one 
+
+of the K=16 re-sampled rollouts succeeding rather than confident solving — which is all GRPO requires, since a single success restores within-group reward variance. Second, the per-step surpass rate is bimodal (31% of cliff-bearing steps have rate 0.0; 21% have rate 1.0), so the aggregate 43% is a mean of extremes rather than a typical value. By construction the DAPO baseline converts 0% of its cliffs: the leave-one-out advantage zeroes those groups’ gradients outright. 
+
+## 5 Limitations 
+
+Scope. We evaluate one model (DeepSeek-R1-Distill-Qwen-1.5B), one dataset (DeepMath-103K), one recipe family (GRPO with the DAPO configuration), and one scaffold configura-tion (per-iteration variant, LoRA rank 16, four SFT steps). The scaffold’s behavior plausibly depends on adapter rank, SFT step count, splice variant, and the size of the dataset’s answer space — a small-integer answer space makes verifier-accepted guessing more likely than a large one — and we do not establish how the results transfer across these axes. 
+
+7Benchmark pass@ k LSPO mean LSPO range DAPO mean DAPO range ∆ (pts)        
+
+> (5 seeds) (5 seeds) MATH500 pass@1 86.28 84.80–87.20 83.88 83.20–84.60
+
++2.40 MATH500 pass@4 94.80 94.60–95.20 93.36 93.00–93.60 +1.44 MATH500 pass@8 96.44 96.00–96.60 95.56 95.40–96.00 +0.88 MATH500 pass@16 97.52 97.20–97.60 97.08 96.80–97.20 +0.44 AIME24 pass@1 37.33 33.33–40.00 32.66 30.00–33.33 +4.67       
+
+> AIME24 pass@4 59.33 53.33–63.33 48.67 46.67–53.33
+
++10 .66       
+
+> AIME24 pass@8 65.33 63.33–70.00 56.67 56.67–56.67
+
++8.66       
+
+> AIME24 pass@16 72.00 70.00–73.33 65.33 63.33–70.00
+
++6.67       
+
+> AIME25 pass@1 28.67 26.67–30.00 27.34 26.67–30.00
+
++1.33 AIME25 pass@4 42.00 40.00–43.33 38.00 36.67–43.33 +4.00       
+
+> AIME25 pass@8 46.00 43.33–50.00 46.00 43.33–46.67
+
++0.00 AIME25 pass@16 54.00 50.00–56.67 51.33 50.00–53.33 +2.67 AIME26 pass@1 30.00 26.67–33.33 25.33 23.33–26.67 +4.67       
+
+> AIME26 pass@4 42.66 40.00–43.33 40.00 36.67–43.33
+
++2.66 AIME26 pass@8 49.33 46.67–53.33 46.00 43.33–50.00 +3.33 AIME26 pass@16 56.67 53.33–60.00 50.00 46.67–53.33 +6.67      
+
+> Mean over 16 cells 59.90 —56.08 —
+
++3.82 
+
+Table 1: Peak pass@ k at the matched 1000-step reporting horizon, averaged across n=5paired seeds per arm, on DeepSeek-R1-Distill-Qwen-1.5B trained with DeepMath-103K (8 ×H100). LSPO is the per-iteration variant; DAPO is the identical recipe with the scaffold disabled. LSPO’s mean matches or beats DAPO’s on all 16 cells (15 strict wins + 1 exact tie at AIME25/pass@8). ∆ entries ≥ +4 points are highlighted in the final column. Peak steps vary by cell. AIME sets have N=30 problems (one problem ≈ 3.33 points), so single-cell deltas are coarse; the pattern across cells is the reliable signal. 
+
+Ground-truth requirement. LSPO requires ground-truth solutions (not merely final an-swers) for the cliff prompts, since the scaffold is fit by supervised learning on those deriva-tions. This is available in DeepMath-103K but restricts applicability to datasets that ship worked solutions. 
+
+## 6 Conclusion 
+
+We introduced LSPO (LoRA Scaffolded Policy Optimization), a sampling-time mechanism that recovers reinforcement-learning gradient on zero-reward “cliff” prompts—those frontier prompts where every sampled rollout fails, the within-group advantage is identically zero, and standard GRPO therefore provides no learning signal. LSPO attaches a small low-rank adapter, fine-tunes it only on the cliff prompts’ ground-truth solutions, re-samples the cliffs with the adapter active to restore within-group reward variance, and splices the resulting successes back into the RL batch. Two design choices keep the deliverable a clean base-only model: strictly disjoint gradient routing via a two-optimizer split (the supervised signal reaches the adapter only and the RL gradient reaches the base only, reusing the standard policy-ratio term as the importance-sampling correction for the spliced rows), and a splice-and-discard policy that strips the adapter at checkpoint so it is never shipped. Over n=5paired seeds at a matched 1000-step reporting horizon, LSPO’s mean matches or beats a DAPO baseline on all 16 peak pass@ k cells (15 strict wins and one exact tie), with gains up to +10.7 points on AIME24/pass@4 and +3.8 points averaged across the 16 cells, and with improvements on pass@1 for every benchmark. The mechanism is directly measurable: roughly 43% of otherwise-zero-gradient cliff groups are converted into groups that carry usable policy-gradient signal. We view LSPO as evidence that the cliff problem can be addressed at sampling time, with the supervision localized in transient low-rank parameters rather than written irreversibly into the base. 
+
+8LLM Usage Statement 
+
+The research idea underlying LSPO—using a transient, sampling-time low-rank scaffold to recover reinforcement-learning gradient on zero-reward cliff prompts—originated with the author. However, an AI language model (Claude, Anthropic) was used extensively throughout this project in ways that go beyond minor writing assistance. Specifically: (1) the paper text, including the related-work survey, the method exposition, and the mechanism-analysis and discussion sections, was substantially drafted and edited with LLM assistance; (2) the LLM was used as a research collaborator to stress-test explanations for the observed behavior, to assemble and check the related-work survey, and to position LSPO against prior methods; a second model (OpenAI Codex, GPT) was used as an independent verifier, recomputing every reported number from the raw training logs and auditing citations; and (3) the importance-sampling correction described in Section 3.3 — reusing the standard PPO/GRPO policy-ratio term with the base-plus-adapter sampling log-probabilities as the ratio’s denominator on spliced cliff rows — was proposed by the LLM during the method-design phase and adopted by the author. All experimental results (training runs, metric measurements, and rollout dumps) were produced by the author without LLM involvement. 
+
+## References 
+
+Justin Chih-Yao Chen, Becky Xiangyu Peng, Prafulla Kumar Choubey, Kung-Hsiang Huang, Jiaxin Zhang, Mohit Bansal, and Chien-Sheng Wu. Nudging the boundaries of LLM reasoning. In International Conference on Learning Representations (ICLR) , 2026. URL 
+
+https://arxiv.org/abs/2509.25666 . arXiv:2509.25666. Liang Chen, Xueting Han, Li Shen, Jing Bai, and Kam-Fai Wong. Beyond two-stage training: Cooperative SFT and RL for LLM reasoning. arXiv preprint arXiv:2509.06948 , 2025. URL 
+
+https://arxiv.org/abs/2509.06948 .Mark Chen, Jerry Tworek, Heewoo Jun, Qiming Yuan, Henrique Ponde de Oliveira Pinto, Jared Kaplan, Harri Edwards, Yuri Burda, Nicholas Joseph, Greg Brockman, et al. Evalu-ating large language models trained on code. arXiv preprint arXiv:2107.03374 , 2021. URL 
+
+https://arxiv.org/abs/2107.03374 .DeepSeek-AI, Daya Guo, Dejian Yang, et al. DeepSeek-R1: Incentivizing reasoning capability in LLMs via reinforcement learning. arXiv preprint arXiv:2501.12948 , 2025. URL https: //arxiv.org/abs/2501.12948 .Ken Ding. HDPO: Hybrid distillation policy optimization via privileged self-distillation. 
+
+arXiv preprint arXiv:2603.23871 , 2026. URL https://arxiv.org/abs/2603.23871 .Yunzhen Feng, Parag Jain, Anthony Hartshorn, Yaqi Duan, and Julia Kempe. Don’t waste mistakes: Leveraging negative RL-groups via confidence reweighting. arXiv preprint arXiv:2510.08696 , 2025. URL https://arxiv.org/abs/2510.08696 .Yiqiu Guo, Xueting Han, Qi Jia, Guangtao Zhai, and Jing Bai. LatentRevise: Learning from zero-hit reasoning. arXiv preprint arXiv:2606.29938 , 2026. URL https://arxiv.org/abs/ 2606.29938 .Zhiwei He, Tian Liang, Jiahao Xu, Qiuzhi Liu, Xingyu Chen, Yue Wang, Linfeng Song, Dian Yu, Zhenwen Liang, Wenxuan Wang, Zhuosheng Zhang, Rui Wang, Zhaopeng Tu, Haitao Mi, and Dong Yu. DeepMath-103K: A large-scale, challenging, decontaminated, and verifiable mathematical dataset for advancing reasoning. arXiv preprint arXiv:2504.11456 ,2025. URL https://arxiv.org/abs/2504.11456 .Dan Hendrycks, Collin Burns, Saurav Kadavath, Akul Arora, Steven Basart, Eric Tang, Dawn Song, and Jacob Steinhardt. Measuring mathematical problem solving with the MATH dataset. In Neural Information Processing Systems , 2021. URL https://arxiv.org/ abs/2103.03874 .
+
+9Edward J. Hu, Yelong Shen, Phillip Wallis, Zeyuan Allen-Zhu, Yuanzhi Li, Shean Wang, Lu Wang, and Weizhu Chen. LoRA: Low-rank adaptation of large language models. 
+
+arXiv preprint arXiv:2106.09685 , 2021. URL https://arxiv.org/abs/2106.09685 .Thanh-Long V. Le, Myeongho Jeon, Kim Vu, Viet Lai, and Eunho Yang. No prompt left behind: Exploiting zero-variance prompts in LLM reinforcement learning via entropy-guided advantage shaping. In International Conference on Learning Representations (ICLR) ,2026. URL https://arxiv.org/abs/2509.21880 . arXiv:2509.21880. Byung-Kwan Lee, Ximing Lu, Shizhe Diao, Minki Kang, Saurav Muralidharan, Karan Sapra, Andrew Tao, Pavlo Molchanov, Yejin Choi, Yu-Chiang Frank Wang, and Ryo Hachiuma. Zone of proximal policy optimization: Teacher in prompts, not gradients. arXiv preprint arXiv:2606.18216 , 2026. URL https://arxiv.org/abs/2606.18216 .Baohao Liao, Hanze Dong, Xinxing Xu, Christof Monz, and Jiang Bian. Self-hinting language models enhance reinforcement learning. arXiv preprint arXiv:2602.03143 , 2026. URL 
+
+https://arxiv.org/abs/2602.03143 .Hunter Lightman, Vineet Kosaraju, Yura Burda, Harri Edwards, Bowen Baker, Teddy Lee, Jan Leike, John Schulman, Ilya Sutskever, and Karl Cobbe. Let’s verify step by step. In 
+
+International Conference on Learning Representations , 2024. URL https://arxiv.org/abs/ 2305.20050 .Ziru Liu, Cheng Gong, Xinyu Fu, Yaofang Liu, Ran Chen, Shoubo Hu, Suiyun Zhang, Rui Liu, Qingfu Zhang, and Dandan Tu. GHPO: Adaptive guidance for stable and efficient LLM reinforcement learning. arXiv preprint arXiv:2507.10628 , 2025. URL https: //arxiv.org/abs/2507.10628 .Ilya Loshchilov and Frank Hutter. Decoupled weight decay regularization. In International Conference on Learning Representations , 2019. URL https://arxiv.org/abs/1711.05101 .Lu Ma, Hao Liang, Meiyi Qiang, Lexiang Tang, Xiaochen Ma, Zhen Hao Wong, Junbo Niu, Chengyu Shen, Runming He, Yanhao Li, Bin Cui, and Wentao Zhang. Learning what reinforcement learning can’t: Interleaved online fine-tuning for hardest questions. arXiv preprint arXiv:2506.07527 , 2025. URL https://arxiv.org/abs/2506.07527 .Yixiu Mao, Yun Qu, Qi Wang, Heming Zou, and Xiangyang Ji. RLVR without ineffective samples: Group prioritized off-policy optimization for LLM reasoning. arXiv preprint arXiv:2606.01281 , 2026. URL https://arxiv.org/abs/2606.01281 .Vaskar Nath, Elaine Lau, Anisha Gunjal, Manasi Sharma, Nikhil Baharte, and Sean Hendryx. Adaptive guidance accelerates reinforcement learning of reasoning models. arXiv preprint arXiv:2506.13923 , 2025. URL https://arxiv.org/abs/2506.13923 .John Schulman, Filip Wolski, Prafulla Dhariwal, Alec Radford, and Oleg Klimov. Proximal policy optimization algorithms. arXiv preprint arXiv:1707.06347 , 2017. URL https:// arxiv.org/abs/1707.06347 .Zhihong Shao, Peiyi Wang, Qihao Zhu, Runxin Xu, Junxiao Song, Xiao Bi, Haowei Zhang, Mingchuan Zhang, Y.K. Li, Y. Wu, and Daya Guo. DeepSeekMath: Pushing the limits of mathematical reasoning in open language models. arXiv preprint arXiv:2402.03300 , 2024. URL https://arxiv.org/abs/2402.03300 .Shangshang Wang, Julian Asilis, Ömer Faruk Akgül, Enes Burak Bilgin, Ollie Liu, and Willie Neiswanger. Tina: Tiny reasoning models via LoRA. arXiv preprint arXiv:2504.15777 , 2025. URL https://arxiv.org/abs/2504.15777 .Yu Xia, Canwen Xu, Zhewei Yao, Julian McAuley, and Yuxiong He. Learning to hint for reinforcement learning. arXiv preprint arXiv:2604.00698 , 2026. URL https://arxiv.org/ abs/2604.00698 .
+
+10 Jianhao Yan, Yafu Li, Zican Hu, Zhi Wang, Ganqu Cui, Xiaoye Qu, Yu Cheng, and Yue Zhang. Learning to reason under off-policy guidance. In Advances in Neural Information Processing Systems (NeurIPS) , 2025. URL https://arxiv.org/abs/2504.14945 . arXiv:2504.14945. Qiying Yu, Zheng Zhang, Ruofei Zhu, Yufeng Yuan, et al. DAPO: An open-source LLM reinforcement learning system at scale. arXiv preprint arXiv:2503.14476 , 2025. URL 
+
+https://arxiv.org/abs/2503.14476 .Eric Zelikman, Yuhuai Wu, Jesse Mu, and Noah D. Goodman. STaR: Bootstrapping reasoning with reasoning. In Advances in Neural Information Processing Systems (NeurIPS) , 2022. URL 
+
+https://arxiv.org/abs/2203.14465 . arXiv:2203.14465. Xichen Zhang, Sitong Wu, Yinghao Zhu, Haoru Tan, Shaozuo Yu, Ziyi He, and Jiaya Jia. Scaf-GRPO: Scaffolded group relative policy optimization for enhancing LLM reasoning. In International Conference on Learning Representations (ICLR) , 2026. URL https://arxiv. org/abs/2510.19807 . arXiv:2510.19807. Xuechen Zhang, Zijian Huang, Yingcong Li, Chenshun Ni, Jiasi Chen, and Samet Oymak. BREAD: Branched rollouts from expert anchors bridge SFT & RL for reasoning. In 
+
+Advances in Neural Information Processing Systems (NeurIPS) , 2025. URL https://arxiv. org/abs/2506.17211 . arXiv:2506.17211. 
+
+11
