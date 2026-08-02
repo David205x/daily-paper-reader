@@ -1,0 +1,176 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-08-02T21:20:20.357323+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 3,
+    "deep_cap": 6,
+    "deep_selected": 3,
+    "quick_candidates": 1,
+    "quick_skim_target": 11,
+    "quick_selected": 1
+  },
+  "deep_dive": [
+    {
+      "id": "2607.26457v1",
+      "source": "arxiv",
+      "title": "DHRCL:Training Code LLMs with Dense Hierarchical Rewards and Curriculum Learning",
+      "abstract": "Reinforcement learning is a natural post-training paradigm for code-oriented large language models because generated programs can be evaluated through parsing, execution, unit tests, and structural analysis.However, existing methods often rely on sparse outcome rewards or statically combine heterogeneous dense signals, even though syntax validity, executability, functional correctness, and structural organization describe different and progressively dependent programming capabilities. We propose DHRCL, a reinforcement learning framework with Dense Hierarchical Rewards and Curriculum Learning. DHRCL decomposes feedback into syntax validation, execution success, unit-test pass rate, and AST-based structural similarity, and organizes these signals through a three-stage Syntax, Execution, Pass & Structural curriculum. Stage duration is determined automatically from recent validation trends rather than manually specified capability thresholds. We further introduce stage-aware probability-based token credit redistribution. The mechanism follows a consolidation-to-refinement principle: it emphasizes established token patterns during syntax-oriented optimization, applies uniform propagation for non-local execution feedback, and allocates more credit or blame to less-established token decisions during final functional optimization. Under a unified Qwen3-8B and KodCode protocol, the experiments compare DHRCL with binary, pass-rate, reward-model-based, and verifiable dense-reward baselines. We further evaluate DHRCL across Qwen3-4B, Qwen3-8B, and Qwen3-14B backbones, showing that its advantage remains consistent as model capacity increases.",
+      "authors": [
+        "Shuhang Wang",
+        "Ziming Li",
+        "Hui Cheng"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-07-29T04:16:33+00:00",
+      "link": "https://arxiv.org/pdf/2607.26457v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Dense hierarchical rewards and curriculum learning for code LLM reinforcement learning",
+      "llm_evidence_cn": "用于代码LLM强化学习的密集层次奖励与课程学习",
+      "llm_evidence": "用于代码LLM强化学习的密集层次奖励与课程学习",
+      "canonical_evidence": "用于代码LLM强化学习的密集层次奖励与课程学习",
+      "llm_tldr_en": "Proposes DHRCL, decomposing code feedback into syntax, execution, unit test, and AST structural rewards with curriculum learning for code LLM RL.",
+      "llm_tldr_cn": "代码大模型的强化学习常依赖稀疏的结果奖励或静态组合异构反馈，忽视了语法合法性、可执行性、功能正确性和结构组织之间的递进关系。DHRCL将反馈分解为语法校验、执行成功、单元测试通过率和AST结构相似度等多层信号，并组织为课程学习以逐步训练模型。实验表明这种密集层次奖励与课程安排能有效提升代码LLM生成的正确性与结构质量，为代码生成RL提供更细粒度监督。",
+      "llm_tldr": "代码大模型的强化学习常依赖稀疏的结果奖励或静态组合异构反馈，忽视了语法合法性、可执行性、功能正确性和结构组织之间的递进关系。DHRCL将反馈分解为语法校验、执行成功、单元测试通过率和AST结构相似度等多层信号，并组织为课程学习以逐步训练模型。实验表明这种密集层次奖励与课程安排能有效提升代码LLM生成的正确性与结构质量，为代码生成RL提供更细粒度监督。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "design of reward functions in RL",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.27888v1",
+      "source": "arxiv",
+      "title": "Not All Tokens Deserve Equal Credit: Counterfactual Sensitivity Credit Reallocation for Long-CoT Reasoning",
+      "abstract": "Reinforcement learning with verifiable rewards (RLVR) is central to improving long-CoT reasoning in large language models. Critic-free methods such as GRPO convert response-level rewards into advantages and uniformly broadcast them across tokens, overlooking their unequal contributions to the final outcome. On-policy self-distillation (OPSD) instead provides dense distributional supervision by minimizing the forward KL divergence between an unprivileged policy and a privileged self-teacher, implicitly assuming that the resulting likelihood shifts encode reliable answer-aligned information. We test this premise by fixing each sampled trajectory and re-scoring it under two opposing outcome conditions, one asserting correctness and the other incorrectness. Most affected tokens shift in the same direction under both conditions, with few sign reversals and substantial overlap in the induced optimization signals. Large shifts also concentrate on highly substitutable surface-form tokens, whereas tokens carrying problem-specific reasoning content are less sensitive. These findings show that privileged shifts fail to provide reliable answer-aligned directions, while their magnitudes primarily reflect counterfactual sensitivity rather than token-level learning value. Based on these observations, we propose Counterfactual Sensitivity Credit Reallocation (CSCR), a simple extension of GRPO that reduces credit for highly sensitive tokens and renormalizes token-level advantages to preserve both the original credit budget and verifier-determined direction. On long-CoT mathematical reasoning benchmarks, CSCR consistently outperforms GRPO baseline with the same number of policy updates. Targeted ablations further corroborate our diagnosis: privilege-induced directions are unreliable, moderate downweighting is most effective, and stronger modulation destabilizes optimization.",
+      "authors": [
+        "Qiangqiang He",
+        "Zhongheng Wu",
+        "ZiJian Wang"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-07-30T09:03:33+00:00",
+      "link": "https://arxiv.org/pdf/2607.27888v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Counterfactual sensitivity credit reallocation for long-CoT reasoning under RLVR, addressing uniform token credit",
+      "llm_evidence_cn": "针对长思维链强化学习的反事实敏感信用再分配，解决token均匀分配问题",
+      "llm_evidence": "针对长思维链强化学习的反事实敏感信用再分配，解决token均匀分配问题",
+      "canonical_evidence": "针对长思维链强化学习的反事实敏感信用再分配，解决token均匀分配问题",
+      "llm_tldr_en": "This paper tests OPSD's assumption of reliable likelihood shifts, re-scores trajectories under opposing outcome conditions, and proposes counterfactual sensitivity reallocation so tokens receive credit proportional to their true contribution to long-CoT reasoning outcomes.",
+      "llm_tldr_cn": "RLVR是改进长思维链推理的核心，但GRPO等方法将响应级奖励均匀分配给所有token，忽略各token对结果的贡献差异；OPSD虽提供密集分布监督，但隐含似然移动可靠性的假设未必成立。论文通过固定轨迹并在正反两种结果条件下重打分来检验该假设，并提出反事实敏感度信用再分配，使token按真实贡献获得信用，从而提升长思维链强化学习的训练质量和推理稳定性。",
+      "llm_tldr": "RLVR是改进长思维链推理的核心，但GRPO等方法将响应级奖励均匀分配给所有token，忽略各token对结果的贡献差异；OPSD虽提供密集分布监督，但隐含似然移动可靠性的假设未必成立。论文通过固定轨迹并在正反两种结果条件下重打分来检验该假设，并提出反事实敏感度信用再分配，使token按真实贡献获得信用，从而提升长思维链强化学习的训练质量和推理稳定性。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "policy optimization methods for multi step reasoning in llms",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.25090v1",
+      "source": "arxiv",
+      "title": "Matryoshka Agent: Unfolding Sub-Agents for Long-Horizon Machine Learning Engineering",
+      "abstract": "Machine learning engineering (MLE) tasks require long-horizon decision making over iterative solution debugging and refinement, under expensive and feedback-driven environment interactions. Developing and training a monolithic agent for such tasks is fundamentally challenging, as it must simultaneously manage extremely long and noisy contexts, explore vast solution spaces, and remain effective under limited model capacity and computational budgets. To address these challenges, we propose Matryoshka Agent, a unified hierarchical agent framework for complex long-horizon tasks. Matryoshka Agent decomposes agentic problem solving into a coordinated hierarchy of decision making and execution: a high-level Orchestrator maintains compact, long-horizon exploration states and issues strategic instructions, while lower-level Sub-Agents execute concrete solution attempts through direct environment interaction, mediated by standardized Tool interface. This design decouples strategic exploration from costly execution, substantially reducing the burden of long-context reasoning and enabling efficient iterative refinement. We further develop an efficient training paradigm for Matryoshka Agent. Experimental results on a broad range of MLE tasks with diverse model types and scales demonstrate that Matryoshka Agent is an effective and scalable paradigm for long-horizon MLE tasks and complex agentic problem solving. Notably, Matryoshka Agent enables Qwen3-4B-Instruct to reach Orchestrator performance comparable to o4-mini. Applying Matryoshka Agent to Qwen3-30B-Coder results in at most 36.7% relative performance gain.",
+      "authors": [
+        "Rushi Qiang",
+        "Changhao Li",
+        "Haotian Sun",
+        "Yuchen Zhuang",
+        "Chao Zhang",
+        "Bo Dai"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI",
+        "cs.LG"
+      ],
+      "published": "2026-07-27T21:30:39+00:00",
+      "link": "https://arxiv.org/pdf/2607.25090v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Hierarchical LLM agent framework for long-horizon machine learning engineering tasks, relevant to LLM agents for task automation.",
+      "llm_evidence_cn": "面向长程机器学习工程的分层LLM智能体框架，属于大模型智能体任务自动化。",
+      "llm_evidence": "面向长程机器学习工程的分层LLM智能体框架，属于大模型智能体任务自动化。",
+      "canonical_evidence": "面向长程机器学习工程的分层LLM智能体框架，属于大模型智能体任务自动化。",
+      "llm_tldr_en": "Matryoshka Agent decomposes long-horizon decision making into a coordinated hierarchy with an orchestrator and sub-agents, tackling expensive feedback-driven ML engineering tasks under limited budgets.",
+      "llm_tldr_cn": "机器学习工程任务往往需要长程决策与反复调试，单一智能体难以在长噪声上下文和有限预算下应对。为此提出Matryoshka Agent，该统一分层智能体框架将复杂任务拆解为高层编排与低层执行，由编排器维护紧凑的长程信息，子智能体聚焦具体操作。通过协调决策与执行，框架在应对昂贵反馈驱动环境时提升了长程任务的可扩展性与效率。",
+      "llm_tldr": "机器学习工程任务往往需要长程决策与反复调试，单一智能体难以在长噪声上下文和有限预算下应对。为此提出Matryoshka Agent，该统一分层智能体框架将复杂任务拆解为高层编排与低层执行，由编排器维护紧凑的长程信息，子智能体聚焦具体操作。通过协调决策与执行，框架在应对昂贵反馈驱动环境时提升了长程任务的可扩展性与效率。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2607.25614v1",
+      "source": "arxiv",
+      "title": "MemSFT: Mitigating Alignment Tax with an External Parametric Memory",
+      "abstract": "Adapting Large Language Models (LLMs) to specialized domains often incurs an alignment tax, as fine-tuning on domain-specific tasks can cause catastrophic forgetting and substantially degrade performance on general tasks. We propose MemSFT, which mitigates the alignment tax by decoupling domain specialization from backbone parameter updates through a plug-and-play parametric memory. The memory is trained to imitate the behavior of a non-parametric retriever operating over domain data, thereby memorizing knowledge and patterns that would otherwise be accessed through retrieval. Once trained on a specific domain, the memory can be reused across LLMs of different sizes. During generation, a learned router dynamically fuses the output distributions of the memory and backbone at each decoding step, allowing domain expertise to be invoked selectively. Across biology, geoscience, and law, evaluations with models ranging from Qwen3-8B to Qwen3-235B-A22B show that MemSFT consistently improves domain performance with negligible degradation in general performance, whereas full SFT suffers severe forgetting on general tasks. Overall, our results demonstrate a practical path to decoupling general model capabilities from domain-specific knowledge at the parameter level, thereby equipping LLMs with new specialized capabilities without compromising their general capabilities.",
+      "authors": [
+        "Jiarui Wang",
+        "Xiang Shi",
+        "Jiaqi Cao",
+        "Rubin Wei",
+        "Xiquan Wang",
+        "Hao Sun",
+        "Jingzhi Wang",
+        "Zhiqi Yang",
+        "Qipeng Guo",
+        "Bowen Zhou",
+        "Zhouhan Lin"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.CL"
+      ],
+      "published": "2026-07-28T11:45:34+00:00",
+      "link": "https://arxiv.org/pdf/2607.25614v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "External parametric memory trained to imitate a retriever for domain adaptation, mitigating alignment tax, related to retrieval augmentation",
+      "llm_evidence_cn": "训练外部参数化记忆模拟检索器来适配领域，缓解对齐税，与检索增强相关",
+      "llm_evidence": "训练外部参数化记忆模拟检索器来适配领域，缓解对齐税，与检索增强相关",
+      "canonical_evidence": "训练外部参数化记忆模拟检索器来适配领域，缓解对齐税，与检索增强相关",
+      "llm_tldr_en": "Proposes MemSFT, a plug-and-play parametric memory that imitates a retriever over domain data, decoupling domain specialization from backbone updates to reduce alignment tax.",
+      "llm_tldr_cn": "特定领域微调常导致'对齐税'，即在通用任务上性能下降。MemSFT将领域专门化与主干参数更新解耦，通过一个即插即用的外部参数化记忆保存领域知识，该记忆被训练为模拟领域数据上的非参数检索器。推理时由学习到的路由器动态融合记忆与主干的输出分布，且该记忆可跨不同尺寸的LLM复用。实验表明MemSFT在缓解灾难性遗忘和保持通用能力的同时有效进行领域适配，为轻量级领域增强提供了无需检索的新路径。",
+      "llm_tldr": "特定领域微调常导致'对齐税'，即在通用任务上性能下降。MemSFT将领域专门化与主干参数更新解耦，通过一个即插即用的外部参数化记忆保存领域知识，该记忆被训练为模拟领域数据上的非参数检索器。推理时由学习到的路由器动态融合记忆与主干的输出分布，且该记忆可跨不同尺寸的LLM复用。实验表明MemSFT在缓解灾难性遗忘和保持通用能力的同时有效进行领域适配，为轻量级领域增强提供了无需检索的新路径。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "retrieval augmented generation for knowledge intensive tasks",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    }
+  ]
+}

@@ -1,0 +1,69 @@
+{
+  "label": "2026-08-02",
+  "date": "2026-08-02",
+  "generated_at": "2026-08-02T21:25:07",
+  "count": 4,
+  "papers": [
+    {
+      "paper_id": "202608/02/2607.26457v1-dhrcltraining-code-llms-with-dense-hierarchical-rewards-and-curriculum-learning",
+      "section": "deep",
+      "title_en": "DHRCL:Training Code LLMs with Dense Hierarchical Rewards and Curriculum Learning",
+      "authors": "Shuhang Wang, Ziming Li, Hui Cheng",
+      "date": "2026-07-29",
+      "pdf": "https://arxiv.org/pdf/2607.26457v1",
+      "score": "9.0",
+      "evidence": "用于代码LLM强化学习的密集层次奖励与课程学习",
+      "tldr": "代码大语言模型后训练中强化学习奖励稀疏且信号异构。本文提出DHRCL，将反馈分解为语法、执行、测试和AST结构四种密度信号，并设计三阶段课程学习，阶段长度自动调整。同时提出阶段感知的令牌信用重分配机制。在Qwen3系列上实验表明，DHRCL优于多种基线，且随模型规模增大优势保持。",
+      "tags": "query:rl",
+      "abstract_en": "Reinforcement learning is a natural post-training paradigm for code-oriented large language models because generated programs can be evaluated through parsing, execution, unit tests, and structural analysis.However, existing methods often rely on sparse outcome rewards or statically combine heterogeneous dense signals, even though syntax validity, executability, functional correctness, and structural organization describe different and progressively dependent programming capabilities. We propose DHRCL, a reinforcement learning framework with Dense Hierarchical Rewards and Curriculum Learning. DHRCL decomposes feedback into syntax validation, execution success, unit-test pass rate, and AST-based structural similarity, and organizes these signals through a three-stage Syntax, Execution, Pass & Structural curriculum. Stage duration is determined automatically from recent validation trends rather than manually specified capability thresholds. We further introduce stage-aware probability-based token credit redistribution. The mechanism follows a consolidation-to-refinement principle: it emphasizes established token patterns during syntax-oriented optimization, applies uniform propagation for non-local execution feedback, and allocates more credit or blame to less-established token decisions during final functional optimization. Under a unified Qwen3-8B and KodCode protocol, the experiments compare DHRCL with binary, pass-rate, reward-model-based, and verifiable dense-reward baselines. We further evaluate DHRCL across Qwen3-4B, Qwen3-8B, and Qwen3-14B backbones, showing that its advantage remains consistent as model capacity increases.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202608/02/2607.27888v1-not-all-tokens-deserve-equal-credit-counterfactual-sensitivity-credit-reallocation-for-long-cot-reasoning",
+      "section": "deep",
+      "title_en": "Not All Tokens Deserve Equal Credit: Counterfactual Sensitivity Credit Reallocation for Long-CoT Reasoning",
+      "authors": "Qiangqiang He, Zhongheng Wu, ZiJian Wang",
+      "date": "2026-07-30",
+      "pdf": "https://arxiv.org/pdf/2607.27888v1",
+      "score": "9.0",
+      "evidence": "针对长思维链强化学习的反事实敏感信用再分配，解决token均匀分配问题",
+      "tldr": "长CoT推理中，无批评者RL方法如GRPO将响应级优势均匀分配给所有token，忽略贡献差异；OPSD的分布监督经测试也不可靠，偏移方向缺乏答案对齐性。本文提出CSCR，基于反事实敏感性降低高敏感token的信用并重新归一化优势，在数学推理基准上以相同更新次数超越GRPO，且证明适度降权最有效、强调制损害稳定性。",
+      "tags": "query:rl",
+      "abstract_en": "Reinforcement learning with verifiable rewards (RLVR) is central to improving long-CoT reasoning in large language models. Critic-free methods such as GRPO convert response-level rewards into advantages and uniformly broadcast them across tokens, overlooking their unequal contributions to the final outcome. On-policy self-distillation (OPSD) instead provides dense distributional supervision by minimizing the forward KL divergence between an unprivileged policy and a privileged self-teacher, implicitly assuming that the resulting likelihood shifts encode reliable answer-aligned information. We test this premise by fixing each sampled trajectory and re-scoring it under two opposing outcome conditions, one asserting correctness and the other incorrectness. Most affected tokens shift in the same direction under both conditions, with few sign reversals and substantial overlap in the induced optimization signals. Large shifts also concentrate on highly substitutable surface-form tokens, whereas tokens carrying problem-specific reasoning content are less sensitive. These findings show that privileged shifts fail to provide reliable answer-aligned directions, while their magnitudes primarily reflect counterfactual sensitivity rather than token-level learning value. Based on these observations, we propose Counterfactual Sensitivity Credit Reallocation (CSCR), a simple extension of GRPO that reduces credit for highly sensitive tokens and renormalizes token-level advantages to preserve both the original credit budget and verifier-determined direction. On long-CoT mathematical reasoning benchmarks, CSCR consistently outperforms GRPO baseline with the same number of policy updates. Targeted ablations further corroborate our diagnosis: privilege-induced directions are unreliable, moderate downweighting is most effective, and stronger modulation destabilizes optimization.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202608/02/2607.25090v1-matryoshka-agent-unfolding-sub-agents-for-long-horizon-machine-learning-engineering",
+      "section": "deep",
+      "title_en": "Matryoshka Agent: Unfolding Sub-Agents for Long-Horizon Machine Learning Engineering",
+      "authors": "Rushi Qiang, Changhao Li, Haotian Sun, Yuchen Zhuang, Chao Zhang, Bo Dai",
+      "date": "2026-07-27",
+      "pdf": "https://arxiv.org/pdf/2607.25090v1",
+      "score": "8.0",
+      "evidence": "面向长程机器学习工程的分层LLM智能体框架，属于大模型智能体任务自动化。",
+      "tldr": "机器学习工程任务需长期决策与迭代调试，单智能体难以兼顾长上下文、大解空间和有限算力。本文提出Matryoshka Agent分层框架，高层Orchestrator维护紧凑探索状态并下发策略指令，低层Sub-Agents通过标准工具接口执行具体尝试，从而解耦策略与执行。实验表明该框架高效可扩展，使Qwen3-4B达到o4-mini级性能，并赋予30B模型最高36.7%相对提升。",
+      "tags": "query:rl",
+      "abstract_en": "Machine learning engineering (MLE) tasks require long-horizon decision making over iterative solution debugging and refinement, under expensive and feedback-driven environment interactions. Developing and training a monolithic agent for such tasks is fundamentally challenging, as it must simultaneously manage extremely long and noisy contexts, explore vast solution spaces, and remain effective under limited model capacity and computational budgets. To address these challenges, we propose Matryoshka Agent, a unified hierarchical agent framework for complex long-horizon tasks. Matryoshka Agent decomposes agentic problem solving into a coordinated hierarchy of decision making and execution: a high-level Orchestrator maintains compact, long-horizon exploration states and issues strategic instructions, while lower-level Sub-Agents execute concrete solution attempts through direct environment interaction, mediated by standardized Tool interface. This design decouples strategic exploration from costly execution, substantially reducing the burden of long-context reasoning and enabling efficient iterative refinement. We further develop an efficient training paradigm for Matryoshka Agent. Experimental results on a broad range of MLE tasks with diverse model types and scales demonstrate that Matryoshka Agent is an effective and scalable paradigm for long-horizon MLE tasks and complex agentic problem solving. Notably, Matryoshka Agent enables Qwen3-4B-Instruct to reach Orchestrator performance comparable to o4-mini. Applying Matryoshka Agent to Qwen3-30B-Coder results in at most 36.7% relative performance gain.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202608/02/2607.25614v1-memsft-mitigating-alignment-tax-with-an-external-parametric-memory",
+      "section": "quick",
+      "title_en": "MemSFT: Mitigating Alignment Tax with an External Parametric Memory",
+      "authors": "Jiarui Wang, Xiang Shi, Jiaqi Cao, Rubin Wei, Xiquan Wang, Hao Sun, Jingzhi Wang, Zhiqi Yang, Qipeng Guo, Bowen Zhou, Zhouhan Lin",
+      "date": "2026-07-28",
+      "pdf": "https://arxiv.org/pdf/2607.25614v1",
+      "score": "7.0",
+      "evidence": "训练外部参数化记忆模拟检索器来适配领域，缓解对齐税，与检索增强相关",
+      "tldr": "全量微调大语言模型适配专业领域常引发对齐税，因灾难性遗忘而严重损害通用任务性能。MemSFT采用可插拔参数化记忆模仿检索器，将领域知识从骨干参数中解耦，并以学习路由器在解码每步动态融合输出分布。在生物学、地球科学和法律等测试域上，该方法在Qwen3-8B至235B-A22B等多种规模模型上稳定提升领域性能，而通用性能几乎无损。这一参数级解耦策略为低成本扩展大语言模型领域能力提供了实际路径。",
+      "tags": "query:rl",
+      "abstract_en": "Adapting Large Language Models (LLMs) to specialized domains often incurs an alignment tax, as fine-tuning on domain-specific tasks can cause catastrophic forgetting and substantially degrade performance on general tasks. We propose MemSFT, which mitigates the alignment tax by decoupling domain specialization from backbone parameter updates through a plug-and-play parametric memory. The memory is trained to imitate the behavior of a non-parametric retriever operating over domain data, thereby memorizing knowledge and patterns that would otherwise be accessed through retrieval. Once trained on a specific domain, the memory can be reused across LLMs of different sizes. During generation, a learned router dynamically fuses the output distributions of the memory and backbone at each decoding step, allowing domain expertise to be invoked selectively. Across biology, geoscience, and law, evaluations with models ranging from Qwen3-8B to Qwen3-235B-A22B show that MemSFT consistently improves domain performance with negligible degradation in general performance, whereas full SFT suffers severe forgetting on general tasks. Overall, our results demonstrate a practical path to decoupling general model capabilities from domain-specific knowledge at the parameter level, thereby equipping LLMs with new specialized capabilities without compromising their general capabilities.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}

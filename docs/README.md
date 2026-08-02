@@ -6,47 +6,32 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-08-01
-- 运行时间：2026-08-01 21:28:47 UTC
+- 最新运行日期：2026-08-02
+- 运行时间：2026-08-02 21:25:01 UTC
 - 运行状态：成功
-- 本次总论文数：9
-- 精读区：6
-- 速读区：3
+- 本次总论文数：4
+- 精读区：3
+- 速读区：1
 
 ### 今日简报（AI）
-今日共读9篇论文，精读6篇，重点聚焦LLM后训练与智能体搜索优化。最值得关注HARGO（9.0分）提出的异构感知奖励引导优化，以及Harness-G（8.0分）的图结构搜索代理框架。建议优先关注结合硬件特性的奖励建模与图式搜索控制，对提升AI任务效率更具实操参考。
-- 详情：[/202608/01/README](/202608/01/README)
+今日精读3篇、速读1篇，共读4篇论文，重点关注两篇9.0分高价值研究。最值得关注的方向：代码大模型的密集分层奖励与课程学习（DHRCL），以及长思维链推理中的反事实敏感度信用重分配。建议优先深入这两篇论文，并留意速读的MemSFT记忆机制作为补充参考。
+- 详情：[/202608/02/README](/202608/02/README)
 
 ### 精读区论文标签
-1. [HARGO: Heterogeneity-Aware Reward-Guided Optimization for RL Post-Training of LLMs on HPC Tasks](/202608/01/2607.28301v1-hargo-heterogeneity-aware-reward-guided-optimization-for-rl-post-training-of-llms-on-hpc-tasks)  
+1. [DHRCL:Training Code LLMs with Dense Hierarchical Rewards and Curriculum Learning](/202608/02/2607.26457v1-dhrcltraining-code-llms-with-dense-hierarchical-rewards-and-curriculum-learning)  
    标签：评分：9.0/10、query:rl
-   evidence：面向HPC任务的RL后训练与异构感知奖励优化
-2. [Harness-G: A Graph-Structured Harness for Search Agents](/202608/01/2607.27652v1-harness-g-a-graph-structured-harness-for-search-agents)  
+   evidence：用于代码LLM强化学习的密集层次奖励与课程学习
+2. [Not All Tokens Deserve Equal Credit: Counterfactual Sensitivity Credit Reallocation for Long-CoT Reasoning](/202608/02/2607.27888v1-not-all-tokens-deserve-equal-credit-counterfactual-sensitivity-credit-reallocation-for-long-cot-reasoning)  
+   标签：评分：9.0/10、query:rl
+   evidence：针对长思维链强化学习的反事实敏感信用再分配，解决token均匀分配问题
+3. [Matryoshka Agent: Unfolding Sub-Agents for Long-Horizon Machine Learning Engineering](/202608/02/2607.25090v1-matryoshka-agent-unfolding-sub-agents-for-long-horizon-machine-learning-engineering)  
    标签：评分：8.0/10、query:rl
-   evidence：面向搜索智能体的强化学习，检索查询生成与最终答案奖励
-3. [AutoPref: Automatic Discovery of Task-Specific Preference Objectives for Neural Combinatorial Optimization](/202608/01/2607.27953v1-autopref-automatic-discovery-of-task-specific-preference-objectives-for-neural-combinatorial-optimization)  
-   标签：评分：8.0/10、query:rl
-   evidence：用LLM自动发现RL偏好/奖励目标，属奖励函数设计
-4. [ClawTrack: Towards Trace-Level Evaluation and Improvement of Real-World Autonomous Agents](/202608/01/2607.28037v1-clawtrack-towards-trace-level-evaluation-and-improvement-of-real-world-autonomous-agents)  
-   标签：评分：8.0/10、query:rl
-   evidence：面向真实世界LLM自主智能体的痕量级评估基准
-5. [$β$-OPSD: Deriving with Policy Optimization, Training with Self-Distillation](/202608/01/2607.28582v1--opsd-deriving-with-policy-optimization-training-with-self-distillation)  
-   标签：评分：8.0/10、query:rl
-   evidence：β-OPSD将自蒸馏纳入策略优化框架，通过β控制KL正则，用于推理语言模型的多步推理训练
-6. [OSReward: Instituting Standardized Evaluation for Cross-Platform Computer-Use Reward Models](/202608/01/2607.28609v1-osreward-instituting-standardized-evaluation-for-cross-platform-computer-use-reward-models)  
-   标签：评分：8.0/10、query:rl
-   evidence：评估视觉语言模型作为计算机使用代理奖励模型的基准
+   evidence：面向长程机器学习工程的分层LLM智能体框架，属于大模型智能体任务自动化。
 
 ### 速读区论文标签
-1. [ARES: Adaptive Reasoning-Effort Steering for PPA- and Cost-Aware RTL Optimization with LLM Agents](/202608/01/2607.27879v1-ares-adaptive-reasoning-effort-steering-for-ppa--and-cost-aware-rtl-optimization-with-llm-agents)  
+1. [MemSFT: Mitigating Alignment Tax with an External Parametric Memory](/202608/02/2607.25614v1-memsft-mitigating-alignment-tax-with-an-external-parametric-memory)  
    标签：评分：7.0/10、query:rl
-   evidence：LLM智能体用于RTL优化并自适应调节推理努力
-2. [Addressable Recall Compaction for Long Context-Window Control in AI Agents](/202608/01/2607.25066v1-addressable-recall-compaction-for-long-context-window-control-in-ai-agents)  
-   标签：评分：6.0/10、query:rl
-   evidence：面向长时程大语言模型智能体的上下文管理框架，支持持续任务自动化
-3. [AgenticCANN: Automated Ascend C Operator Generation via Knowledge-Augmented Agentic Evolution](/202608/01/2607.26661v1-agenticcann-automated-ascend-c-operator-generation-via-knowledge-augmented-agentic-evolution)  
-   标签：评分：6.0/10、query:rl
-   evidence：智能体LLM框架用于自动化算子生成
+   evidence：训练外部参数化记忆模拟检索器来适配领域，缓解对齐税，与检索增强相关
 
 
 <div class="dpr-home-promo-card">
