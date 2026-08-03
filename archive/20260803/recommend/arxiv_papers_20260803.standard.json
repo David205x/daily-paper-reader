@@ -1,0 +1,698 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-08-03T21:46:42.455871+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 11,
+    "deep_cap": 6,
+    "deep_selected": 6,
+    "quick_candidates": 11,
+    "quick_skim_target": 11,
+    "quick_selected": 11
+  },
+  "deep_dive": [
+    {
+      "id": "2607.23364v1",
+      "source": "arxiv",
+      "title": "On the Impossibility of Unbiased and Length-Invariant Policy Optimization with Outcome Rewards",
+      "abstract": "Group Relative Policy Optimization (GRPO) is the dominant reinforcement learning algorithm for training reasoning capabilities in large language models, notably adopted by DeepSeek-R1. The recent improvement Dr. GRPO (COLM 2025) identifies the response-level length bias caused by per-trajectory length normalization in GRPO and proposes removing this normalization, claiming the resulting optimizer is \"unbiased.\" We show that this claim is incomplete. Specifically, we establish an impossibility theorem: under the standard outcome reward + GRPO setting, no length-based weighting scheme can simultaneously achieve the following two properties. (P1) Gradient unbiasedness: the gradient estimator is an unbiased estimate of the true policy gradient. (P2) Length invariance: each trajectory's effective contribution to the gradient is independent of its token length. GRPO approximately satisfies P2 but violates P1; Dr. GRPO satisfies P1 but violates P2. We characterize the complete tradeoff spectrum via the parametric family f_alpha(L) = L^{alpha - 1}, where alpha = 0 recovers GRPO, alpha = 1 recovers Dr. GRPO, and provide quantitative analysis showing that Dr. GRPO's length bias can cause longer trajectories to dominate gradient updates by a factor proportional to the length ratio. Our results reveal that neither algorithm is universally \"done right\"; they occupy opposite ends of a fundamental and unavoidable tradeoff.",
+      "authors": [
+        "Fei Ding",
+        "Yongkang Zhang",
+        "Yuhao Liao",
+        "Zijian Zeng",
+        "Huiming Yang"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-07-25T21:12:51+00:00",
+      "link": "https://arxiv.org/pdf/2607.23364v1",
+      "tags": [
+        "keyword:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "GRPO policy optimization analysis for LLM reasoning with outcome rewards",
+      "llm_evidence_cn": "针对结果奖励下GRPO策略优化的理论分析，涉及LLM推理训练",
+      "llm_evidence": "针对结果奖励下GRPO策略优化的理论分析，涉及LLM推理训练",
+      "canonical_evidence": "针对结果奖励下GRPO策略优化的理论分析，涉及LLM推理训练",
+      "llm_tldr_en": "GRPO is the dominant RL algorithm for training LLM reasoning, but recent Dr. GRPO claims unbiasing by removing length normalization. The paper proves an impossibility theorem: no length-based weighting can be both unbiased and length-invariant under outcome reward plus GRPO.",
+      "llm_tldr_cn": "GRPO是目前训练大模型推理能力的主流强化学习算法，DeepSeek-R1即采用该方法。针对Dr. GRPO声称去除逐轨迹长度归一化就能得到无偏优化器，本文证明了一个不可能性定理：在标准结果奖励加GRPO设定下，任何基于长度的加权方案都无法同时满足梯度无偏性和长度不变性。该结果厘清了长度偏置与优化无偏之间的根本冲突，对设计推理模型的策略优化算法具有重要理论意义。",
+      "llm_tldr": "GRPO是目前训练大模型推理能力的主流强化学习算法，DeepSeek-R1即采用该方法。针对Dr. GRPO声称去除逐轨迹长度归一化就能得到无偏优化器，本文证明了一个不可能性定理：在标准结果奖励加GRPO设定下，任何基于长度的加权方案都无法同时满足梯度无偏性和长度不变性。该结果厘清了长度偏置与优化无偏之间的根本冲突，对设计推理模型的策略优化算法具有重要理论意义。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "policy optimization methods for multi step reasoning in llms",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.23802v2",
+      "source": "arxiv",
+      "title": "From RLVR to RLSVR: Task Transformation Induces Self-Verifiable Rewards for Open-Ended LLM Self-Improvement",
+      "abstract": "Reinforcement Learning with Verifiable Rewards (RLVR) has driven recent progress in reasoning-oriented large language models (LLMs) by enabling large-scale optimization. However, its applicability remains largely limited to domains such as mathematics and coding, where correctness can be deterministically verifiable. Open-ended tasks instead often rely on human preferences, reward models, or LLM-based judges, introducing evaluation bias, judge capability bottlenecks, and additional inference costs. Drawing on the principle of self-supervised learning, which constructs pretext tasks to derive supervision from the data itself, we propose Reinforcement Learning with Self-Verifiable Rewards (RLSVR), a task-transformation-based training paradigm for extending RLVR to open-ended tasks. RLSVR transforms open-ended tasks into verifiable proxy environments whose internal rules and interaction outcomes automatically generate reward signals. We instantiate RLSVR with SpyRL, a Self-PlaY Reinforcement Learning method inspired by social deduction game Who Is the Spy?. Agents receive asymmetric information, complete the same target task, and vote to identify a designated spy. Because the spy identity is predetermined, voting outcomes provide fully verifiable rewards, while successful identification remains closely related to output quality. Experiments on text summarization, creative writing, and mathematical reasoning show that SpyRL outperforms existing self-improvement methods on non-verifiable tasks and yields consistent gains on verifiable reasoning tasks. These results demonstrate that task transformation can extend scalable RLVR-based self-improvement beyond inherently verifiable domains. Models and code have been released at https://github.com/wangqinsi1/RLSVR/tree/SpyRL.",
+      "authors": [
+        "Qinsi Wang",
+        "Jing Shi",
+        "Huazheng Wang",
+        "Kun Wan",
+        "Yiran Wu",
+        "Bo Liu",
+        "Qingyun Wu",
+        "Hai Helen Li",
+        "Yiran Chen",
+        "Handong Zhao",
+        "Wentian Zhao"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-07-26T19:04:33+00:00",
+      "link": "https://arxiv.org/pdf/2607.23802v2",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Design of self-verifiable rewards for open-ended LLM RL",
+      "llm_evidence_cn": "为开放任务设计自验证奖励的RL方法",
+      "llm_evidence": "为开放任务设计自验证奖励的RL方法",
+      "canonical_evidence": "为开放任务设计自验证奖励的RL方法",
+      "llm_tldr_en": "Proposes RLSVR, a task-transformation approach that induces self-verifiable rewards for open-ended LLM self-improvement, avoiding dependence on human preferences or judges.",
+      "llm_tldr_cn": "RLVR在数学和编程等可验证领域促进了LLM推理优化，但对开放式任务依赖人类偏好或奖励模型，带来偏差与开销。受自监督学习启发，提出RLSVR，通过任务变换构造自验证奖励，使开放式任务也能从数据自身获得监督信号。该方法在不引入额外模型或人工判断的情况下实现LLM自我改进。在多种开放任务上验证了RLSVR的有效性，扩展了强化学习在LLM中的应用范围，并为奖励函数设计提供了新思路。",
+      "llm_tldr": "RLVR在数学和编程等可验证领域促进了LLM推理优化，但对开放式任务依赖人类偏好或奖励模型，带来偏差与开销。受自监督学习启发，提出RLSVR，通过任务变换构造自验证奖励，使开放式任务也能从数据自身获得监督信号。该方法在不引入额外模型或人工判断的情况下实现LLM自我改进。在多种开放任务上验证了RLSVR的有效性，扩展了强化学习在LLM中的应用范围，并为奖励函数设计提供了新思路。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "design of reward functions in RL",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.26470v2",
+      "source": "arxiv",
+      "title": "CMT-RAG: Complementary Memory Traces for Multi-turn Multi-hop RAG",
+      "abstract": "Multi-turn information-seeking conversations require both multi-hop reasoning and long-range dependency tracking across turns. However, existing RAG systems typically represent conversational memory as raw dialogue history, rewritten queries, or unstructured summaries, making it difficult to recover the specific prior reasoning steps and evidence required for follow-up queries. Our key insight is to align conversational memory with retrieval by representing dialogue context as sub-question-level reasoning traces. Building on this insight, we introduce MuMu-QA, a benchmark for multi-turn multi-hop RAG with explicit cross-turn sub-question dependency annotations, and CMT-RAG, a complementary memory framework for this setting. At each turn, CMT-RAG employs a state-space trace generator, whose recurrent state serves as runtime memory, to incorporate recent conversational context and decompose the current query into structured trace drafts containing retrieval-oriented sub-questions and dependencies on earlier traces. It then grounds these drafts with retrieved evidence and stores them as persistent memory traces in a session-level DAG, enabling future turns to efficiently recover relevant prior reasoning and evidence. Experiments on MuMu-QA and corpus-level RAG benchmarks show that CMT-RAG consistently outperforms five categories of RAG baselines in answer accuracy.",
+      "authors": [
+        "Lang Zhou",
+        "Yingjian Chen",
+        "Shuxuan Li",
+        "Kun-Yu Lin",
+        "Zhilin Zhao"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.IR"
+      ],
+      "published": "2026-07-29T04:50:41+00:00",
+      "link": "https://arxiv.org/pdf/2607.26470v2",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "multi-turn multi-hop RAG with memory traces",
+      "llm_evidence_cn": "基于记忆轨迹的多轮多跳RAG",
+      "llm_evidence": "基于记忆轨迹的多轮多跳RAG",
+      "canonical_evidence": "基于记忆轨迹的多轮多跳RAG",
+      "llm_tldr_en": "Introduces MuMu-QA benchmark and CMT-RAG framework that represent multi-turn dialogue memory as sub-question-level reasoning traces, improving retrieval and answer quality in multi-hop RAG.",
+      "llm_tldr_cn": "多轮信息寻求对话需要跨轮多跳推理与长期依赖追踪，但现有RAG将对话记忆表示为原始历史或非结构化摘要，难以恢复具体推理步骤。本文提出MuMu-QA基准和CMT-RAG框架，以子问题级推理轨迹对齐对话记忆与检索，并在每轮使用互补记忆打分与选择。实验证明该方法在多轮多跳RAG任务上显著提升答案质量与证据利用效率。",
+      "llm_tldr": "多轮信息寻求对话需要跨轮多跳推理与长期依赖追踪，但现有RAG将对话记忆表示为原始历史或非结构化摘要，难以恢复具体推理步骤。本文提出MuMu-QA基准和CMT-RAG框架，以子问题级推理轨迹对齐对话记忆与检索，并在每轮使用互补记忆打分与选择。实验证明该方法在多轮多跳RAG任务上显著提升答案质量与证据利用效率。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "retrieval augmented generation for knowledge intensive tasks",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.29185v1",
+      "source": "arxiv",
+      "title": "Learning Latent Reasoning Traces for Scalar Reward Models End-to-End",
+      "abstract": "Reward models (RMs) are central to aligning large language models with human preferences via reinforcement learning. Although traditional scalar RMs enable efficient and probabilistic reward modeling, they rely on superficial cues that fail to generalize to complex or out-of-distribution (OOD) tasks. Conversely, generative RMs leverage extensive reasoning to improve robustness on challenging tasks, but their natural language-based scores lack the numerical flexibility and probabilistic interpretability that scalar RMs offer. While recent approaches combine both paradigms through off-policy multi-task learning, such parallel optimization does not guarantee that generated reasoning traces actively align with or benefit downstream scalar reward prediction. To address this mismatch, we propose LatentRM, a reward modeling framework that learns intermediate reasoning traces as discrete latent variables to explicitly maximize the likelihood of downstream scalar rewards. Through on-policy optimization of the latent reasoning space end-to-end, LatentRM tightly couples deep reasoning-based evaluation with precise scoring. Extensive validations on in-distribution and OOD datasets and RLHF show that LatentRM outperforms scalar, generative, and hybrid RMs on preference modeling and policy alignment across tasks ranging from open-ended conversation to complex reasoning.",
+      "authors": [
+        "Sanwoo Lee",
+        "Clive Bai",
+        "Hsiu-Yuan Huang",
+        "Kun Liang",
+        "Weijie Liu",
+        "Yunfang Wu"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-07-31T09:05:58+00:00",
+      "link": "https://arxiv.org/pdf/2607.29185v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "learning latent reasoning traces for scalar reward models",
+      "llm_evidence_cn": "为标量奖励模型学习潜在推理链",
+      "llm_evidence": "为标量奖励模型学习潜在推理链",
+      "canonical_evidence": "为标量奖励模型学习潜在推理链",
+      "llm_tldr_en": "End-to-end method that learns latent reasoning traces jointly with scalar reward prediction, improving reward model robustness and generalization for RLHF alignment.",
+      "llm_tldr_cn": "现有标量奖励模型依赖表面线索，难以泛化到复杂任务，而生成式奖励模型缺乏概率可解释性。本文提出端到端方法，在优化标量奖励预测的同时学习潜在推理轨迹，使推理链显式服务于奖励预测。实验证明该方法提升了奖励模型在分布外任务上的鲁棒性与预测质量，为RLHF提供了更强的奖励信号。",
+      "llm_tldr": "现有标量奖励模型依赖表面线索，难以泛化到复杂任务，而生成式奖励模型缺乏概率可解释性。本文提出端到端方法，在优化标量奖励预测的同时学习潜在推理轨迹，使推理链显式服务于奖励预测。实验证明该方法提升了奖励模型在分布外任务上的鲁棒性与预测质量，为RLHF提供了更强的奖励信号。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "design of reward functions in RL",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.29246v1",
+      "source": "arxiv",
+      "title": "Don't Mix Rewards, Mix Policies: Policy Decomposition and Optimization for Multi-Reward RL",
+      "abstract": "Modern large language models (LLMs) are expected not just to answer correctly, but to adapt their behavior to different human values and use cases. As a result, multi-reward reinforcement learning (RL) has become an increasingly important problem for LLMs, where each reward captures a different aspect of desired behavior. However, optimizing with multiple rewards suffers from a more severe alignment tax issue, where different optimization objectives can trade off or even conflict with each other, leading to unstable and inefficient post-training. In this work, we propose PRISM, a new multi-reward RL framework built upon the idea of policy-space decomposition and composition. Instead of compositing different rewards, PRISM optimizes a set of standalone positive policies and a global negative policy. This alleviates the potential conflict during multi-reward policy optimization, while enabling controllability during inference by flexible policy composition. Experiments on scientific reasoning, tool-use reasoning, and helpfulness-safety alignment show that PRISM consistently outperforms existing multi-reward RL baselines, with extra controllability for inference-time preference control.",
+      "authors": [
+        "Ruiming Liang",
+        "Yi Zhong",
+        "Yizhen Yuan",
+        "Yinan Zheng",
+        "Tianyi Tan",
+        "Tianyue Wang",
+        "Haiyun Guo",
+        "Jinqiao Wang",
+        "Xianyuan Zhan"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-07-31T10:19:41+00:00",
+      "link": "https://arxiv.org/pdf/2607.29246v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "policy decomposition for multi-reward RL in LLMs",
+      "llm_evidence_cn": "面向LLM多奖励强化学习的策略分解",
+      "llm_evidence": "面向LLM多奖励强化学习的策略分解",
+      "canonical_evidence": "面向LLM多奖励强化学习的策略分解",
+      "llm_tldr_en": "PRISM resolves multi-reward RL conflicts in LLM post-training by optimizing and composing policies in policy space rather than mixing rewards, reducing alignment tax and improving stability.",
+      "llm_tldr_cn": "多奖励强化学习在LLM中日益重要，但不同优化目标常相互冲突并加剧对齐税。PRISM提出基于策略空间分解与组合的新框架，不再对奖励做线性混合，而是分别优化各奖励对应的策略再组合。实验表明该方法能有效缓解多目标冲突，提升训练稳定性与效率。该框架为LLM多价值对齐提供了新的优化范式。",
+      "llm_tldr": "多奖励强化学习在LLM中日益重要，但不同优化目标常相互冲突并加剧对齐税。PRISM提出基于策略空间分解与组合的新框架，不再对奖励做线性混合，而是分别优化各奖励对应的策略再组合。实验表明该方法能有效缓解多目标冲突，提升训练稳定性与效率。该框架为LLM多价值对齐提供了新的优化范式。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "design of reward functions in RL",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.29287v1",
+      "source": "arxiv",
+      "title": "Translation with Thought: Difficulty-Adaptive Reasoning via Reinforcement Learning for Multi-Domain Machine Translation",
+      "abstract": "Multi-domain machine translation (MDMT) poses a unique challenge due to varying levels of linguistic complexity across domains. Inspired by human translators' ability to adapt reasoning effort based on difficulty, we propose TwT (Translation with Thought), a resource-rational framework that learns to modulate inference between intuitive and deliberate reasoning. TwT is trained in two stages: (1) supervised fine-tuning on difficulty-aware long chain-of-thought traces distilled from DeepSeek-R1 and rewritten by GPT-4o to reflect human-like reasoning economy, and (2) reinforcement learning with a hybrid reward to optimize translation quality and reasoning efficiency. Evaluated on 15 benchmarks spanning in-domain and out-of-domain settings, as well as 3 seen and 59 unseen languages, with ablations across three backbone models, TwT-7B and TwT-14B outperform much larger SOTA reasoning models in translation quality, while reducing token usage by 32--60\\%. These results confirm that aligning translation behavior with cognitive principles enables robust generalization, high translation quality, and efficient reasoning in MDMT.",
+      "authors": [
+        "Yongshi Ye",
+        "Biao Fu",
+        "Chongxuan Huang",
+        "Yidong Chen",
+        "Xiaodong Shi"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.AI"
+      ],
+      "published": "2026-07-31T10:59:39+00:00",
+      "link": "https://arxiv.org/pdf/2607.29287v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Difficulty-adaptive reasoning via reinforcement learning for multi-domain machine translation",
+      "llm_evidence_cn": "基于强化学习的难度自适应推理用于多领域机器翻译",
+      "llm_evidence": "基于强化学习的难度自适应推理用于多领域机器翻译",
+      "canonical_evidence": "基于强化学习的难度自适应推理用于多领域机器翻译",
+      "llm_tldr_en": "Introduces TwT, a resource-rational framework for multi-domain MT that uses SFT on difficulty-aware long CoT traces and RL with a hybrid reward to modulate between intuitive and deliberate reasoning, improving translation quality and reasoning efficiency across 15 benchmarks.",
+      "llm_tldr_cn": "多领域机器翻译面临不同领域语言复杂度差异的挑战，而人类译者会根据难度调整推理投入。该文提出TwT框架，先在困难感知的长思维链轨迹上进行监督微调，再用混合奖励的强化学习同时优化翻译质量与推理效率。该方法评估覆盖15个基准，能够自适应调节直觉推理与审慎推理的切换，在多个领域上提升翻译性能和推理经济性。这为RL在LLM推理中的应用提供了有效实践。",
+      "llm_tldr": "多领域机器翻译面临不同领域语言复杂度差异的挑战，而人类译者会根据难度调整推理投入。该文提出TwT框架，先在困难感知的长思维链轨迹上进行监督微调，再用混合奖励的强化学习同时优化翻译质量与推理效率。该方法评估覆盖15个基准，能够自适应调节直觉推理与审慎推理的切换，在多个领域上提升翻译性能和推理经济性。这为RL在LLM推理中的应用提供了有效实践。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "application of reinforcement learning in large language model reasoning",
+      "matched_requirement_id": "req-7",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2607.23722v1",
+      "source": "arxiv",
+      "title": "E-Bench: Benchmarking Multi-Step Tool-Use Agents in Real-World Product Scenarios",
+      "abstract": "Large Language Models (LLMs) are increasingly deployed as agents that interact with stateful environments over multiple steps: gathering hidden information, composing tool calls, and committing state changes. We refer to this capability as multi-step tool use. Existing benchmarks have advanced tool-use agent evaluation, but often focus on isolated API calls, short trajectories, or settings that are difficult to scale or control. We introduce E-Bench, a fully synthetic benchmark with 323 state-changing tasks across three product domains: Honor of Kings, QQ Music, and Tencent Meeting. E-Bench decouples environment synthesis from task synthesis: graph-guided database filling builds reusable, orphan-free product environments, while generator-solver asymmetry creates tasks with both an information gap and a tool gap, requiring agents to discover hidden data and compose multiple tool calls before changing state. Outcomes are graded deterministically by database-state diffs. Since both environments and tasks are synthetic, E-Bench is controllable at the environment level and scalable at the task level. Benchmarking 11 cutting-edge LLMs shows that multi-step tool use remains challenging: Pass^3 stays below 60% for the strongest models, and even with code execution in the E-Bench-Code extension, reliability (Pass^3) remains below 70%.",
+      "authors": [
+        "Weihuang Zheng",
+        "Tianyuan Zou",
+        "Eileen Ye",
+        "Alphet Liu",
+        "Youyong Kong",
+        "Ya-Qin Zhang",
+        "Duran Zheng",
+        "Maxm Pan"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-07-26T15:38:28+00:00",
+      "link": "https://arxiv.org/pdf/2607.23722v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "benchmark for multi-step tool-use LLM agents in product scenarios",
+      "llm_evidence_cn": "面向产品场景的多步工具使用智能体基准",
+      "llm_evidence": "面向产品场景的多步工具使用智能体基准",
+      "canonical_evidence": "面向产品场景的多步工具使用智能体基准",
+      "llm_tldr_en": "Introduces E-Bench, a fully synthetic benchmark with 323 state-changing tasks across three product domains, decoupling environment synthesis from task synthesis to evaluate multi-step tool-use agents.",
+      "llm_tldr_cn": "针对现有工具调用智能体评测局限于孤立API调用、短轨迹或难以扩展的问题，提出E-Bench，一个全合成基准，包含QQ音乐、王者荣耀和腾讯会议三个产品域中的323个有状态变更任务。它通过图引导的数据库填充构建可复用、无孤儿的产品环境，并将环境生成与任务生成解耦，从而支持可控的大规模评测，为多步工具使用大模型智能体的能力评估提供了标准化测试床。",
+      "llm_tldr": "针对现有工具调用智能体评测局限于孤立API调用、短轨迹或难以扩展的问题，提出E-Bench，一个全合成基准，包含QQ音乐、王者荣耀和腾讯会议三个产品域中的323个有状态变更任务。它通过图引导的数据库填充构建可复用、无孤儿的产品环境，并将环境生成与任务生成解耦，从而支持可控的大规模评测，为多步工具使用大模型智能体的能力评估提供了标准化测试床。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2607.28777v1",
+      "source": "arxiv",
+      "title": "Self-Supervised Skill Optimization",
+      "abstract": "Agent skills provide frozen large language model (LLM) agents with reusable procedural guidance, and recent work shows that such skills can be optimized with ground-truth (GT) feedback. Many applications, however, lack GT labels, task scores, rewards, or reliable task-specific evaluators. We therefore introduce Self-Supervised Skill Optimization (SSO), a comparative framework that learns a reusable skill from unlabeled task instances alone. At each step, SSO runs the current skill on an unlabeled batch, uses a subset of the resulting executions to generate complete skill probes, and runs the probes on the same batch. An LLM judge compares the resulting answers, trajectories, artifacts, or terminal states. A separate behavior extractor identifies behavioral differences without seeing the judge's decisions. SSO uses these decisions to aggregate evidence for and against the observed behaviors across instances. It then ranks the behaviors by the resulting evidence and renders a new complete skill from the highest-ranked behaviors. The update is accepted only if the new skill outperforms the current one on an unlabeled validation set. SSO outperforms existing GT-free prompt optimizers on both closed-ended and open-ended tasks. On closed-ended benchmarks, it approaches and sometimes exceeds the strongest GT-based skill optimizer without using any GT feedback.",
+      "authors": [
+        "Siran Peng",
+        "Cuiyu Yang",
+        "Tianyu Fu",
+        "Tianshuo Zhang",
+        "Haoyuan Zhang",
+        "Weisong Zhao",
+        "Anyang Su",
+        "Minghui Wu",
+        "Huiying Li",
+        "Xiangyu Zhu",
+        "Chenxu Zhao",
+        "Zhen Lei"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-07-30T19:04:34+00:00",
+      "link": "https://arxiv.org/pdf/2607.28777v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "self-supervised skill optimization for LLM agents",
+      "llm_evidence_cn": "面向LLM智能体的自监督技能优化",
+      "llm_evidence": "面向LLM智能体的自监督技能优化",
+      "canonical_evidence": "面向LLM智能体的自监督技能优化",
+      "llm_tldr_en": "A comparative framework that learns reusable procedural skills for frozen LLM agents from unlabeled task instances by using an LLM judge and behavior extractor, eliminating the need for GT labels or rewards.",
+      "llm_tldr_cn": "现有技能优化依赖人工标注或任务奖励，限制了实际应用。本文提出自监督技能优化框架SSO，仅凭无标注任务实例学习可复用技能，利用LLM裁判比较执行结果，并由行为提取器发现行为差异。实验表明该方法能在无奖励环境下有效提升智能体技能，拓展了LLM智能体的自动化能力，同时降低了对监督信号的依赖，为缺少反馈信号的领域提供了可行方案。",
+      "llm_tldr": "现有技能优化依赖人工标注或任务奖励，限制了实际应用。本文提出自监督技能优化框架SSO，仅凭无标注任务实例学习可复用技能，利用LLM裁判比较执行结果，并由行为提取器发现行为差异。实验表明该方法能在无奖励环境下有效提升智能体技能，拓展了LLM智能体的自动化能力，同时降低了对监督信号的依赖，为缺少反馈信号的领域提供了可行方案。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.23678v1",
+      "source": "arxiv",
+      "title": "Focus Is All You Need: Adaptive Goal-aware Attention Orchestration for Multi-Agent Graph Systems",
+      "abstract": "Large language models (LLMs) enable autonomous agents for reasoning, planning, and tool use. Recent systems increasingly organize these agents as graphs of specialized, interconnected nodes. Although graph-based orchestration supports flexible decomposition and coordination, it creates a key challenge: \\textbf{attention allocation}. As workflows grow, existing approaches often execute graph components uniformly, wasting resources on irrelevant or low-impact tasks. We introduce \\textbf{Attention Orchestration}, a paradigm that extends Transformer-style attention from token representations to workflow-level agent coordination. Our framework, \\textbf{Adaptive Goal-aware Attention Orchestration (AGAO)}, dynamically estimates agent importance based on user objectives, graph dependencies, and computational constraints. AGAO combines three components: (1) goal-aware attention, measuring semantic relevance between user goals and agent capabilities; (2) topology-aware attention, modeling structural dependencies in agent graphs; and (3) resource-aware attention, allocating budgets and execution priorities across heterogeneous agents. Together, these mechanisms transform static agent graphs into adaptive systems that focus computation on goal-critical reasoning paths. Experiments across diverse multi-agent workloads show that AGAO improves task effectiveness while reducing unnecessary computation, latency, and token consumption compared with existing graph-based execution strategies. Our work establishes \\textbf{Attention Engineering} as a direction for scalable, intelligent multi-agent systems. Code: https://github.com/MingzhouFan97/AGAO.",
+      "authors": [
+        "Mingzhou Fan",
+        "Siyuan Xu",
+        "Mingxuan Yuan"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-07-26T14:23:33+00:00",
+      "link": "https://arxiv.org/pdf/2607.23678v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "attention orchestration for adaptive resource allocation in multi-agent graph systems",
+      "llm_evidence_cn": "面向多智能体图系统的注意力编排，实现自适应资源分配",
+      "llm_evidence": "面向多智能体图系统的注意力编排，实现自适应资源分配",
+      "canonical_evidence": "面向多智能体图系统的注意力编排，实现自适应资源分配",
+      "llm_tldr_en": "AGAO extends attention from token representation to workflow-level agent coordination, dynamically allocating compute to high-impact components in multi-agent graph systems.",
+      "llm_tldr_cn": "在基于图的多智能体系统中，传统方法对所有组件均匀执行，浪费资源在低影响任务上。本文提出注意力编排范式，将Transformer式注意力从token表示扩展到工作流级的智能体协调，并实现自适应目标感知的注意力编排（AGAO）。AGAO能动态评估各智能体组件的重要性，将计算资源集中到高影响任务上，提升系统效率，为大规模多智能体协调提供新思路。",
+      "llm_tldr": "在基于图的多智能体系统中，传统方法对所有组件均匀执行，浪费资源在低影响任务上。本文提出注意力编排范式，将Transformer式注意力从token表示扩展到工作流级的智能体协调，并实现自适应目标感知的注意力编排（AGAO）。AGAO能动态评估各智能体组件的重要性，将计算资源集中到高影响任务上，提升系统效率，为大规模多智能体协调提供新思路。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.26873v2",
+      "source": "arxiv",
+      "title": "SERPO: Self-Evolving Rubric Policy Optimization for Open-Ended Test-Time Reinforcement Learning",
+      "abstract": "Test-time reinforcement learning (TTRL) enables language models to self-evolve at inference time without labeled feedback. Existing methods rely on answer voting and therefore do not extend naturally to open-ended generation, where valid responses cannot be mapped to a shared canonical answer. Without external reward models or stronger judges, adaptation must instead construct reliable rewards from the model's own outputs. We introduce SERPO (Self-Evolving Rubric Policy Optimization), which replaces answer voting with a closed loop that co-evolves response evidence, query-specific rubrics, and policy parameters. Good-Normal-Bad (G-N-B) response evolution organizes maximally separated rollouts into ordered archives; rubric evolution retains criteria that discriminate these archives; probabilistic criterion scoring converts verdict-token likelihoods into reward signals; and policy evolution optimizes the actor with the resulting signals. New actor rollouts then refresh both the archives and rubrics, closing the three-way evolution loop. Across two model configurations, two in-domain benchmarks, and four OOD benchmarks, SERPO improves HealthBench and ResearchQA by up to 20.63 and 20.31 points over the corresponding base models, raises the six-benchmark macro-average by up to 8.06 points, and supports OOD transfer and continued cross-benchmark evolution.",
+      "authors": [
+        "Jianze Wang",
+        "Kunwang Zheng",
+        "Ying Liu",
+        "Yu Cao",
+        "Qilong Zhang",
+        "Jinlong Chen",
+        "Hua Yang",
+        "Qianglong Chen"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-07-29T13:03:07+00:00",
+      "link": "https://arxiv.org/pdf/2607.26873v2",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Self-evolving rubric construction for reward design in open-ended test-time RL",
+      "llm_evidence_cn": "无需外部奖励模型与标准答案，从模型自身输出演化查询相关评分准则作为奖励",
+      "llm_evidence": "无需外部奖励模型与标准答案，从模型自身输出演化查询相关评分准则作为奖励",
+      "canonical_evidence": "无需外部奖励模型与标准答案，从模型自身输出演化查询相关评分准则作为奖励",
+      "llm_tldr_en": "SERPO co-evolves response evidence, query-specific rubrics, and policy parameters, enabling open-ended test-time RL without external rewards or answer voting.",
+      "llm_tldr_cn": "现有测试时强化学习（TTRL）依赖答案投票，无法泛化到开放式生成任务，因为没有共享标准答案；外部奖励模型或更强评判者也难以获得。SERPO提出闭环机制，协同演化响应证据、查询相关评分准则与策略参数：用Good-Normal-Bad响应演化对展开进行有序归档，并通过准则演化持续构造可用奖励，从而在无需外部监督的情况下推动模型在推理时自我进化。",
+      "llm_tldr": "现有测试时强化学习（TTRL）依赖答案投票，无法泛化到开放式生成任务，因为没有共享标准答案；外部奖励模型或更强评判者也难以获得。SERPO提出闭环机制，协同演化响应证据、查询相关评分准则与策略参数：用Good-Normal-Bad响应演化对展开进行有序归档，并通过准则演化持续构造可用奖励，从而在无需外部监督的情况下推动模型在推理时自我进化。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "design of reward functions in RL",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2607.28849v1",
+      "source": "arxiv",
+      "title": "Hypergradient-based Bilevel Reinforcement Learning with Improved Sample Complexity",
+      "abstract": "Bilevel reinforcement learning (RL) is an important framework within the literature of RL that can be used to formalize various categories of problems, such as meta-learning, hierarchical task decomposition, and reinforcement learning from human feedback (RL-HF). Most of the bilevel RL algorithms are either not scalable because of using hypergradient with Hessian, or they suffer from high sample complexity because of using penalty-based approximation methods. In this work, we propose a hypergradient-based bilevel RL algorithm using the optimality of the Boltzmann policy for the entropy regularized discounted RL objective function. Our proposed algorithm is Hessian-free and obtains an iteration complexity of $O(ε^{-1})$ and state-of-the-art sample complexity of $\\tilde{O}(ε^{-2})$ under mild regularity conditions. Further, in our convergence analysis, we are able to remove the assumption of the Polyak-Lojasiewicz (PL) condition on the outer-level objective function present in the prior state-of-the-art sample complexity work.",
+      "authors": [
+        "Naman Saxena",
+        "Mudit Gaur",
+        "Vaneet Aggarwal"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-07-30T21:21:52+00:00",
+      "link": "https://arxiv.org/pdf/2607.28849v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Hessian-free bilevel RL with improved sample complexity, applicable to RLHF",
+      "llm_evidence_cn": "面向RLHF等双层RL问题，提出免Hessian的超梯度方法",
+      "llm_evidence": "面向RLHF等双层RL问题，提出免Hessian的超梯度方法",
+      "canonical_evidence": "面向RLHF等双层RL问题，提出免Hessian的超梯度方法",
+      "llm_tldr_en": "This paper presents a Hessian-free hypergradient method for bilevel RL, improving sample complexity to O(epsilon^-1) and supporting applications like RLHF, meta-learning, and hierarchical task decomposition.",
+      "llm_tldr_cn": "双层强化学习可统一元学习、层次任务分解和RLHF等范式，但现有方法因Hessian或惩罚近似导致不可扩展或样本复杂度过高。本文利用熵正则折扣RL下Boltzmann策略的最优性，提出免Hessian的超梯度双层RL算法，迭代复杂度达O(ε^{-1})，取得当前最优复杂度。这为RLHF等大规模对齐训练提供了更高效的理论基础与可扩展算法。",
+      "llm_tldr": "双层强化学习可统一元学习、层次任务分解和RLHF等范式，但现有方法因Hessian或惩罚近似导致不可扩展或样本复杂度过高。本文利用熵正则折扣RL下Boltzmann策略的最优性，提出免Hessian的超梯度双层RL算法，迭代复杂度达O(ε^{-1})，取得当前最优复杂度。这为RLHF等大规模对齐训练提供了更高效的理论基础与可扩展算法。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "reinforcement learning from human feedback for llm alignment",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.28982v1",
+      "source": "arxiv",
+      "title": "PARALLEL: A Prefrontal-Aligned Reinforcement inspired Approach for Language-Model Learning under Explicit Limits",
+      "abstract": "Recent language models achieve strong performance across a variety of tasks, but conventional adaptation applies updates uniformly across training samples regardless of their local update benefit. We propose PARALLEL, a prefrontal-aligned reinforcement inspired approach for language-model learning. Inspired by the complementary roles of goal-related and uncertainty-related control, PARALLEL represents these forms of information as separate controller signals and combines them with the current model representation. A reinforcement-inspired controller assigns sample-dependent update intensity using immediate utility-cost feedback. PARALLEL therefore learns when and how strongly to adapt to each sample, prioritizing beneficial updates while limiting unnecessary parameter changes. PARALLEL uses available updates more efficiently than selective baselines while retaining 94.1--99.2\\% of Full-adaptation performance. Beyond multiple-choice reasoning, experiments on XSum and CNN/DailyMail show that PARALLEL retains 96.9--98.6\\% of the ROUGE-1 and ROUGE-2 scores achieved by Full adaptation and 98.8--98.9\\% of the corresponding ROUGE-L scores. When compared at the same cumulative adaptation time or GPU energy, PARALLEL achieves higher ARC accuracy and exhibits a more stable late-stage adaptation trajectory than Full adaptation in the representative run. These results show that learning when and how strongly to update each sample supports stable and efficient post-deployment stream adaptation while avoiding unnecessary updates.",
+      "authors": [
+        "Namkyung Yoon",
+        "Sanghong Kim",
+        "Hwangnam Kim"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.AI"
+      ],
+      "published": "2026-07-31T03:20:14+00:00",
+      "link": "https://arxiv.org/pdf/2607.28982v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Reinforcement-inspired adaptive update control for language-model learning",
+      "llm_evidence_cn": "强化启发式样本自适应更新控制用于语言模型学习",
+      "llm_evidence": "强化启发式样本自适应更新控制用于语言模型学习",
+      "canonical_evidence": "强化启发式样本自适应更新控制用于语言模型学习",
+      "llm_tldr_en": "Proposes PARALLEL, a prefrontal-aligned reinforcement-inspired controller for language-model learning that assigns sample-dependent update intensity using utility-cost feedback, aiming to improve adaptation efficiency under explicit resource limits.",
+      "llm_tldr_cn": "现有语言模型适配对所有样本施以统一更新强度，忽视了不同样本的局部更新收益。该文提出前额叶对齐的强化启发式方法PARALLEL，将目标相关与不确定性相关信息作为独立控制器信号，结合即时效用成本反馈分配样本级更新强度。实验显示其能在资源受限时优先更新高价值样本，显著提升数据效率与稳定性，为显式约束下的模型学习提供了新思路。",
+      "llm_tldr": "现有语言模型适配对所有样本施以统一更新强度，忽视了不同样本的局部更新收益。该文提出前额叶对齐的强化启发式方法PARALLEL，将目标相关与不确定性相关信息作为独立控制器信号，结合即时效用成本反馈分配样本级更新强度。实验显示其能在资源受限时优先更新高价值样本，显著提升数据效率与稳定性，为显式约束下的模型学习提供了新思路。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "reinforcement learning for large language model",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.28942v1",
+      "source": "arxiv",
+      "title": "NeSyFS: A Neuro-symbolic Fast-Slow Thinking Framework for LLM Agent under Partial Observability",
+      "abstract": "Recently Large Language Models (LLMs) have been increasingly deployed as autonomous agents in applications such as self-reflection, retrieval-augmented generation, and scientific discovery. In these settings, agents must act based on limited observations rather than full environmental states, leading to partial observability. This introduces several key challenges: belief state inference, task objective misalignment, and planning under uncertainty. Prior approaches typically condition actions on full or summarized action-observation histories whose redundant and irrelevant information can mislead the decision making of LLM agent. Inspired by human cognition, we propose a novel neuro-symbolic fast-slow thinking (NeSyFS) framework for LLM agent, addressing the challenges introduced by partial observability in a unified approach. We use a knowledge graph (KG) to represent the belief state, providing triplets as context for every module of NeSyFS. The fast-thinking module performs reactive action, while slow-thinking conducts a new uncertainty-aware planning by following the high-level structure of twisted sequential Monte Carlo (TSMC) algorithm. To mitigate the misalignment of task objective, a reflection module is used to reflect fast-thinking actions, and also switches to the slow-thinking module whenever reactive actions repeatedly fail. Experiments on three representative benchmarks, i.e. ALFWorld, Webshop, and ScienceWorld, demonstrate significant advantages over previous methods.",
+      "authors": [
+        "Duo Xu",
+        "Faramarz Fekri"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-07-31T01:53:41+00:00",
+      "link": "https://arxiv.org/pdf/2607.28942v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Neuro-symbolic fast-slow thinking framework for LLM agents under partial observability",
+      "llm_evidence_cn": "面向部分可观测环境的大模型智能体神经符号快慢思考框架",
+      "llm_evidence": "面向部分可观测环境的大模型智能体神经符号快慢思考框架",
+      "canonical_evidence": "面向部分可观测环境的大模型智能体神经符号快慢思考框架",
+      "llm_tldr_en": "Addresses LLM agents under partial observability where full histories mislead decision-making; proposes NeSyFS, a neuro-symbolic fast-slow thinking framework that handles belief state inference, task objective alignment, and planning under uncertainty, improving robustness in self-reflection and RAG settings.",
+      "llm_tldr_cn": "大模型作为自主智能体时常处于部分可观测环境，完整历史中的冗余与无关信息会误导决策。该文提出神经符号快慢思考框架NeSyFS，将快慢两种思维模式与神经符号方法结合，以应对信念状态推断、任务目标错位和不确定性规划等挑战。该框架可应用于自我反思、检索增强生成与科学发现等场景，提升智能体在有限观测条件下的决策可靠性。",
+      "llm_tldr": "大模型作为自主智能体时常处于部分可观测环境，完整历史中的冗余与无关信息会误导决策。该文提出神经符号快慢思考框架NeSyFS，将快慢两种思维模式与神经符号方法结合，以应对信念状态推断、任务目标错位和不确定性规划等挑战。该框架可应用于自我反思、检索增强生成与科学发现等场景，提升智能体在有限观测条件下的决策可靠性。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2607.29440v1",
+      "source": "arxiv",
+      "title": "Beyond Retrieval: Analytic Memory for Multimodal Agents",
+      "abstract": "Long-term multimodal memory must support not only retrieving relevant information but also computing over observations accumulated across interactions. Existing systems largely emphasize \\emph{retrieval memory}, organizing interaction histories through summaries and indexes to return query-relevant information at multiple granularities, from high-level abstractions to underlying records. In this paper, we formulate \\emph{analytic memory} as a complementary abstraction that organizes recurring multimodal observations into queryable structures supporting filtering, aggregation, ranking, and temporal comparison. We present AdaMM, a framework that jointly supports retrieval and analytic memory. Rather than relying on application-defined schemas, AdaMM extracts provenance-linked attribute-value observations from dialogue, images, and contextual metadata, discovers recurring field structures, and materializes them for analytical access. At inference time, a memory-aware planner decomposes queries into retrieval and analytic operations and routes each operation to the appropriate tools. Experiments on two long-term multimodal memory benchmarks, MemEye and MemGallery, show that AdaMM improves performance by up to 11.3\\% and 7.3\\%, respectively.",
+      "authors": [
+        "Zhoujin Tian",
+        "Yao Tian",
+        "Hao Zhang",
+        "Cheng Chen",
+        "Yakun Li",
+        "Lei Zhang",
+        "Xiaofang Zhou"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-07-31T14:07:12+00:00",
+      "link": "https://arxiv.org/pdf/2607.29440v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "retrieval and analytic memory framework for multimodal agents, relevant to retrieval-augmented knowledge access",
+      "llm_evidence_cn": "面向多模态智能体的检索与分析记忆框架，与检索增强的知识访问相关",
+      "llm_evidence": "面向多模态智能体的检索与分析记忆框架，与检索增强的知识访问相关",
+      "canonical_evidence": "面向多模态智能体的检索与分析记忆框架，与检索增强的知识访问相关",
+      "llm_tldr_en": "AdaMM formulates analytic memory as queryable structures over multimodal observations, complementing retrieval memory and enabling filtering, aggregation, and temporal comparison.",
+      "llm_tldr_cn": "长期多模态记忆不仅需要检索相关信息，还需要对历史观测进行计算。现有系统主要强调检索记忆，通过摘要和索引组织历史。本文提出分析记忆抽象，将重复出现的多模态观测组织为可查询结构，支持过滤、聚合、排序和时间比较，并实现AdaMM框架同时支持检索与分析记忆。该方法无需应用定义模式，通过提取出处结构组织信息，增强了多模态智能体对长期记忆的计算能力。",
+      "llm_tldr": "长期多模态记忆不仅需要检索相关信息，还需要对历史观测进行计算。现有系统主要强调检索记忆，通过摘要和索引组织历史。本文提出分析记忆抽象，将重复出现的多模态观测组织为可查询结构，支持过滤、聚合、排序和时间比较，并实现AdaMM框架同时支持检索与分析记忆。该方法无需应用定义模式，通过提取出处结构组织信息，增强了多模态智能体对长期记忆的计算能力。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "retrieval augmented generation for knowledge intensive tasks",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.29402v1",
+      "source": "arxiv",
+      "title": "Bridging the Question-Answer Gap in Retrieval-Augmented Generation: Hypothetical Prompt Embeddings",
+      "abstract": "Retrieval-Augmented Generation (RAG) systems synergize retrieval mechanisms with generative language models to enhance the accuracy and relevance of responses. However, bridging the style gap between user queries and relevant information in document text remains a persistent challenge in retrieval-augmented systems, often addressed by runtime solutions (e.g., Hypothetical Document Embeddings (HyDE)) that attempt to improve alignment but introduce extra computational overhead at query time. To address these challenges, we propose Hypothetical Prompt Embeddings (HyPE), a framework that shifts the generation of hypothetical content from query time to the indexing phase. By precomputing multiple hypothetical prompts for each data chunk and embedding the chunk in place of the prompt, HyPE transforms retrieval into a question-question matching task, bypassing the need for runtime synthetic answer generation. This approach does not introduce latency but also strengthens the alignment between queries and relevant context. Our experimental results on six common datasets show that HyPE can improve retrieval context precision by up to 42 percentage points and claim recall by up to 45 percentage points, compared to standard approaches, while remaining compatible with re-ranking, multi-vector retrieval, query decomposition, and other RAG advancements",
+      "authors": [
+        "Domen Vake",
+        "Jernej Vičič",
+        "Aleksandar Tošić"
+      ],
+      "primary_category": "cs.IR",
+      "categories": [
+        "cs.IR",
+        "cs.CL"
+      ],
+      "published": "2026-07-31T13:22:11+00:00",
+      "link": "https://arxiv.org/pdf/2607.29402v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "hypothetical prompt embeddings for RAG",
+      "llm_evidence_cn": "假设提示嵌入用于检索增强生成",
+      "llm_evidence": "假设提示嵌入用于检索增强生成",
+      "canonical_evidence": "假设提示嵌入用于检索增强生成",
+      "llm_tldr_en": "HyPE shifts hypothetical content generation from query time to indexing phase, precomputing prompts per document to bridge query-document style gap with less overhead.",
+      "llm_tldr_cn": "RAG系统中用户查询与文档文本间的风格差异常通过HyDE等运行时方案缓解，但带来额外计算开销。HyPE框架将假设内容生成移至索引阶段，为每个文档预先计算多个假设提示嵌入，从而在查询时无需额外推理。实验表明该方法在保持检索效果的同时显著降低查询时开销，为RAG提供更高效的文档-查询对齐方案。",
+      "llm_tldr": "RAG系统中用户查询与文档文本间的风格差异常通过HyDE等运行时方案缓解，但带来额外计算开销。HyPE框架将假设内容生成移至索引阶段，为每个文档预先计算多个假设提示嵌入，从而在查询时无需额外推理。实验表明该方法在保持检索效果的同时显著降低查询时开销，为RAG提供更高效的文档-查询对齐方案。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "retrieval augmented generation for knowledge intensive tasks",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2607.29468v1",
+      "source": "arxiv",
+      "title": "Self-Play Meets Skill Evolution: Self-Evolving Search Agents that Pose, Solve, and Remember",
+      "abstract": "Self-play agents can generate training problems without questions from target benchmarks, but their curricula lack persistent state: failures affect gradients yet do not explicitly shape future practice. External skill memories preserve procedural experience but are typically learned from fixed task distributions. We introduce \\textbf{SESA} (Self-Evolving Skill-Augmented Agent), which makes procedural memory an evolving state of tool-augmented search self-play. A challenger poses problems, while a separately parameterized solver alone retrieves skills. Informative failures are distilled into reusable skills and written back to memory. The updated memory changes solver behavior and success, which changes the challenger's reward and the distribution of future problems; the resulting frontier produces new failures that rewrite memory. This bidirectional loop makes task generation and skill memory co-evolve. Because retrieved skills shape on-policy training trajectories, their benefits can enter the model parameters as well as remain in the external bank, enabling memory-free deployment and optional inference-time retrieval. Across seven open-domain and multi-hop question-answering benchmarks, SESA improves average accuracy over SSP by 1.2--3.2 points across multiple backbones and surpasses the skill-augmented SkillRL baseline by 0.9 points under a unified evaluation protocol. On Qwen3 models, SESA-Off retains 1.8--2.2 points of improvement over SSP, while the final skill bank adds a further 0.5--1.0 points. These results show that evolving skill memory is not merely an inference-time plug-in: it changes policy learning and the future training distribution while retaining value as optional external memory. Our code is available at https://github.com/Zenghuang-Fu/SESA-Self-Evolving-Search-Agents.",
+      "authors": [
+        "Zenghuang Fu",
+        "Zhaoyang Li",
+        "Qiuyuan Ai",
+        "Haoyu Wu",
+        "Minghui Wu",
+        "Chenxu Zhao",
+        "Ante Wang",
+        "Guannan He",
+        "Changwei Wang"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-07-31T14:32:52+00:00",
+      "link": "https://arxiv.org/pdf/2607.29468v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "self-play RL with skill memory evolution for search agents",
+      "llm_evidence_cn": "自博弈与技能记忆演化驱动的搜索智能体",
+      "llm_evidence": "自博弈与技能记忆演化驱动的搜索智能体",
+      "canonical_evidence": "自博弈与技能记忆演化驱动的搜索智能体",
+      "llm_tldr_en": "Introduces SESA, a self-evolving skill-augmented agent that combines tool-augmented search self-play with procedural memory, distilling failures into reusable skills to continuously improve solver behavior and reward.",
+      "llm_tldr_cn": "针对自博弈训练缺少持久状态、外部技能记忆固定于特定任务分布的问题，提出SESA，让程序性记忆成为工具增强搜索自博弈中的演化状态。挑战者生成问题，独立的求解者检索技能，信息丰富的失败被蒸馏为可复用技能写回记忆，记忆更新反过来影响求解行为与挑战者奖励。这种自我演化循环使智能体在无需目标基准问题的情况下持续积累经验，提升了搜索智能体的泛化能力和稳定性。",
+      "llm_tldr": "针对自博弈训练缺少持久状态、外部技能记忆固定于特定任务分布的问题，提出SESA，让程序性记忆成为工具增强搜索自博弈中的演化状态。挑战者生成问题，独立的求解者检索技能，信息丰富的失败被蒸馏为可复用技能写回记忆，记忆更新反过来影响求解行为与挑战者奖励。这种自我演化循环使智能体在无需目标基准问题的情况下持续积累经验，提升了搜索智能体的泛化能力和稳定性。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "application of reinforcement learning in large language model reasoning",
+      "matched_requirement_id": "req-7",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.29559v1",
+      "source": "arxiv",
+      "title": "LEMUR: Learning to Align with Multi-Objective Reinforcement Learning from Preference Feedback",
+      "abstract": "Reinforcement Learning (RL) systems are typically trained using a single, well-specified scalar reward function. However, real-world decision-making tasks often involve multiple, competing objectives, such as performance versus efficiency, where ground-truth reward functions are difficult to specify or inaccessible. While Multi-Objective RL (MORL) addresses such trade-offs by modeling rewards as vectors, existing approaches typically assume access to a well-specified reward function for each objective, inheriting the same challenges faced by single-objective RL. Meanwhile, Preference-based RL (PbRL) has shown great potential in solving complex tasks without access to a pre-defined reward function through reward learning from human feedback, yet has largely been studied in single-objective settings. In this work, we bridge this gap with LEMUR: Learning to Align with Multi-Objective Reinforcement Learning with Preference feedback, a novel framework where an agent interactively learns from the preferences of multiple humans to learn optimal multi-objective policies. Our approach jointly learns policies and multiple objective-specific reward models from human feedback, enabling agents to effectively balance competing objectives during learning. We evaluate LEMUR on a variety of benchmark multi-objective tasks, and empirical results demonstrate its superior performance over baseline methods. Our method presents a promising direction for solving multi-objective decision-making tasks without pre-defined reward functions.",
+      "authors": [
+        "Manith Adikari",
+        "Bei Peng",
+        "Samuele Vinanzi",
+        "Angelo Cangelosi"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI",
+        "cs.RO"
+      ],
+      "published": "2026-07-31T15:50:29+00:00",
+      "link": "https://arxiv.org/pdf/2607.29559v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Multi-objective RL from preference feedback without handcrafted reward functions",
+      "llm_evidence_cn": "提出从人类偏好中学习多目标奖励的MORL方法，支持无需预设奖励的对齐优化",
+      "llm_evidence": "提出从人类偏好中学习多目标奖励的MORL方法，支持无需预设奖励的对齐优化",
+      "canonical_evidence": "提出从人类偏好中学习多目标奖励的MORL方法，支持无需预设奖励的对齐优化",
+      "llm_tldr_en": "LEMUR extends preference-based RL to multi-objective settings, learning reward vectors from human feedback to align policies without well-specified scalar rewards.",
+      "llm_tldr_cn": "现实决策任务通常涉及多个相互竞争的目标，而现有MORL方法假设每个目标都有良好定义的奖励函数，这在实践中难以满足。LEMUR结合偏好式RL（PbRL），直接从人类偏好反馈中学习多目标奖励向量，从而在没有预定义奖励函数的情况下进行多目标对齐。方法在复杂任务中展现了比单目标RL和固定权重MORL更优的权衡能力，为多目标RLHF提供了新思路。",
+      "llm_tldr": "现实决策任务通常涉及多个相互竞争的目标，而现有MORL方法假设每个目标都有良好定义的奖励函数，这在实践中难以满足。LEMUR结合偏好式RL（PbRL），直接从人类偏好反馈中学习多目标奖励向量，从而在没有预定义奖励函数的情况下进行多目标对齐。方法在复杂任务中展现了比单目标RL和固定权重MORL更优的权衡能力，为多目标RLHF提供了新思路。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "reinforcement learning from human feedback for llm alignment",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    }
+  ]
+}

@@ -1,0 +1,565 @@
+Title: PARALLEL: A Prefrontal-Aligned Reinforcement inspired Approach for Language-Model Learning under Explicit Limits
+
+URL Source: https://arxiv.org/pdf/2607.28982v1
+
+Published Time: Mon, 03 Aug 2026 00:23:02 GMT
+
+Number of Pages: 8
+
+Markdown Content:
+# PARALLEL : A Prefrontal-Aligned Reinforcement inspired Approach for Language-Model Learning under Explicit Limits 
+
+# Namkyung Yoon 1∗, Sanghong Kim 1∗, Hwangnam Kim 1∗† 
+
+> 1
+
+School of Electrical Engineering, Korea University Seoul 02841, Republic of Korea nkyoon93@korea.ac.kr, sanghongkim@korea.ac.kr, hnkim@korea.ac.kr 
+
+Abstract 
+
+Recent language models achieve strong performance across a variety of tasks, but conventional adaptation applies up-dates uniformly across training samples regardless of their local update benefit. We propose PARALLEL , a prefrontal-aligned reinforcement inspired approach for language-model learning. Inspired by the complementary roles of goal-related and uncertainty-related control, PARALLEL repre-sents these forms of information as separate controller signals and combines them with the current model representation. A reinforcement-inspired controller assigns sample-dependent update intensity using immediate utility–cost feedback. PAR-ALLEL therefore learns when and how strongly to adapt to each sample, prioritizing beneficial updates while limiting unnecessary parameter changes. PARALLEL uses available updates more efficiently than selective baselines while re-taining 94 .1–99 .2% of Full-adaptation performance. Beyond multiple-choice reasoning, experiments on XSum and CN-N/DailyMail show that PARALLEL retains 96 .9–98 .6% of the ROUGE-1 and ROUGE-2 scores achieved by Full adapta-tion and 98 .8–98 .9% of the corresponding ROUGE-L scores. When compared at the same cumulative adaptation time or GPU energy, PARALLEL achieves higher ARC accuracy and exhibits a more stable late-stage adaptation trajectory than Full adaptation in the representative run. These results show that learning when and how strongly to update each sample sup-ports stable and efficient post-deployment stream adaptation while avoiding unnecessary updates. 
+
+# Introduction 
+
+Recent language models achieve strong performance across a wide range of tasks, including natural language understand-ing, reasoning, and knowledge-intensive question answer-ing (Zhao et al. 2026; Chang et al. 2024). However, adapt-ing these models to task-specific data still requires repeated parameter updates. Conventional learning methods gener-ally apply updates uniformly across training samples, even though the local benefit of an update can vary across samples. Consequently, repeatedly updating low-utility samples may 
+
+> ∗
+
+These authors contributed equally. 
+
+> †
+
+Corresponding author. Copyright © 2027, Association for the Advancement of Artificial Intelligence (www.aaai.org). All rights reserved. 
+
+consume adaptation time and energy without proportional performance improvement (Yoon et al. 2026). This limitation is particularly relevant to post-deployment stream adaptation: a general-purpose language model may require supervised adaptation to a target-task distribution, yet applying full-intensity updates to every incoming la-beled sample can accumulate substantial time and energy without proportional performance gains (Hoi et al. 2021). Our objective is therefore to allocate adapter updates across the stream according to their estimated utility, supporting effective target-task adaptation while avoiding unnecessary updates. Existing approaches improve adaptation efficiency through different strategies. Parameter-efficient methods re-duce the number of trainable parameters (Hu et al. 2022). Data-selection methods instead prioritize samples based on uncertainty or difficulty (Settles 2009; Paul, Ganguli, and Dziugaite 2021). However, parameter-efficient adaptation does not control how updates are allocated across samples, while data-selection methods typically apply the same up-date strength to every selected sample. Consequently, neither approach jointly determines whether an update is needed and how strongly each incoming sample should influence adaptation. To address this problem, we draw inspiration from an organizational principle reported in the human lat-eral prefrontal cortex. Recent neuroimaging evidence indi-cates that goal-related and uncertainty-related information is represented in a factorized manner, supporting stable yet flexible learning (Sung, Rigotti, and Lee 2025). This find-ing motivates a control structure in which goal-related and uncertainty-related signals are modeled separately and then combined to regulate language-model adaptation. Based on this principle, we propose PARALLEL , aPrefrontal-Aligned Reinforcement Approach for Language-Model Learning under Explicit Limits. Rather than apply-ing uniform updates throughout the stream, PARALLEL 
+
+learns whether and how strongly the model should adapt to each incoming sample, thereby supporting efficient post-deployment adaptation while avoiding unnecessary updates. PARALLEL represents goal-related and uncertainty-related information as separate controller signals and combines them with the current model representation. A controller trained with one-step REINFORCE uses these signals to determine whether and how strongly to update the adapter on each la-arXiv:2607.28982v1 [cs.CL] 31 Jul 2026 Figure 1: Overview of the proposed PARALLEL framework. beled sample. It learns from immediate utility–cost feedback, while a hard cumulative update-mass constraint bounds the total update intensity allocated across the stream. We evaluate PARALLEL on three reasoning and two summarization benchmarks. The main experiments compare 
+
+PARALLEL with Frozen and Full adaptation. Additional budget-matched comparisons are conducted across all five benchmarks, while cross-backbone evaluation, controller-input ablations, and stream-level measurements of adaptation time and GPU energy are conducted in the benchmark set-ting. The results show that PARALLEL effectively allocates a bounded update budget and retains most of the performance under Full adaptation across three compact backbones. Ac-cordingly, PARALLEL should be viewed as a mechanism for controlling update allocation rather than accelerating offline fine-tuning. The main contributions are as follows: 
+
+• We propose PARALLEL , which uses separate goal-related and uncertainty-related signals to perform online LoRA update control through three actions, determining whether and how strongly to update each incoming sam-ple under a cumulative update-mass constraint. 
+
+• We demonstrate effective budget-constrained adaptation across three reasoning and two summarization bench-marks using multiple language models. The remainder of this paper is organized as follows. Sec-tion 2 reviews related work, Section 3 presents PARALLEL, Section 4 reports the experimental evaluation, and Section 5 concludes the paper. 
+
+# Related Work 
+
+Efficient Adaptation Methods 
+
+Full-parameter fine-tuning updates all parameters of a pre-trained language model and therefore requires substantial memory and computation (Devlin et al. 2019). Parameter-efficient methods instead reduce the number of trainable pa-rameters while preserving the pretrained backbone. LoRA introduces trainable low-rank components while keeping the original model parameters frozen (Hu et al. 2022). In our evaluation, Full adaptation applies the same LoRA configu-ration to every sample in the adaptation stream. Data-selection strategies determine which samples are used for adaptation under a limited sample budget. Ran-dom selection draws a fixed-size subset uniformly at ran-dom (Citovsky et al. 2021). Uncertainty-based active learn-ing prioritizes samples on which the current model is least confident (Lewis and Gale 1994; Settles 2009). Its entropy-based variant ranks samples by predictive entropy and se-lects those with the highest values (Settles 2009). Parameter-efficient methods control which parameters are trained, whereas data-selection methods control which samples are selected. PARALLEL instead processes the labeled adap-tation stream sequentially and learns sample-wise update intensity, while a cumulative constraint prevents excessive updates. 
+
+Reinforcement Learning for Adaptation Control 
+
+Reinforcement learning has been widely applied to lan-guage models to align generated responses with task objec-tives, human preferences, and instruction-following require-ments (Ouyang et al. 2022). In conventional reinforcement learning from human feedback, the language model defines a policy over generated tokens or responses, and reward feed-back directly optimizes its generation behavior. PARALLEL instead adopts a reinforcement-inspired con-troller for adaptation control. For each labeled sample, the controller selects the intensity of the supervised adapter up-date and learns from immediate utility–cost feedback. The adapter itself is optimized only with the supervised task loss. 
+
+Prefrontal-Aligned Learning Control 
+
+Recent neuroimaging evidence suggests that goal-related and uncertainty-related information is represented in a factorized manner within the lateral prefrontal cortex, supporting sta-ble yet flexible learning (Sung, Rigotti, and Lee 2025). This organization motivates treating information about the cur-rent task objective and predictive uncertainty as distinct but complementary signals for learning control. PARALLEL adopts this principle as a computational ab-straction. It represents goal-related and uncertainty-related information as separate controller signals and combines them with the current model representation to allocate update in-tensity across samples. System Design 
+
+As shown in Figure 1, PARALLEL controls whether and how strongly the adapter is updated for each incoming la-beled sample. For each sample, it computes a goal-related signal representing consistency with the target response and an uncertainty-related signal reflecting the reliability of the current prediction. Our PARALLEL controller combines these signals with the current model representation and selects the update in-tensity. The pretrained language-model backbone remains frozen, while the controller uses the goal-related and uncertainty-related signals to determine whether and how strongly to update the LoRA adapter for each sample. 
+
+Control Signals in PARALLEL 
+
+Let D = {(xt, y ⋆t )}Tt=1 denote the labeled adaptation stream, where T is the total number of adaptation samples, xt is the question or prompt of the t-th sample, and y⋆t is its target response. The language-model backbone with parameters θ
+
+remains frozen, while task adaptation is performed through the model with parameters θa. PARALLEL observes the labeled samples sequentially and determines whether and how strongly θa should be updated for each sample. Before choosing an update action, PARALLEL assesses how well the current model has already learned the labeled sample (xt, y ⋆t ). It performs a diagnostic forward pass using the current model parameters without applying an update. The resulting prediction quality serves as goal-related evi-dence for the controller: poor prediction supports a stronger update, whereas accurate prediction supports a light update or skipping the sample. Since the target response y⋆t is available during supervised adaptation, PARALLEL evaluates it using the standard au-toregressive objective adopted in supervised fine-tuning of language models (Chatterjee et al. 2025). Specifically, each target token is evaluated using the input and the preced-ing ground-truth target tokens. The diagnostic forward pass produces the following length-normalized pre-update target loss: 
+
+ℓ− 
+
+> t
+
+= − 1
+
+NtNtX
+
+> j=1
+
+log pθ,θ a
+
+ y⋆t,j | xt, y ⋆t,<j 
+
+ , (1) where Nt is the number of target tokens and the superscript 
+
+− denotes measurement before the update action is selected and applied. Length normalization makes the loss compara-ble across responses of different lengths. A small ℓ− 
+
+> t
+
+means that the model already assigns high probability to the target response, while a large ℓ− 
+
+> t
+
+indicates a greater need for adap-tation. This loss is used only to guide action selection during supervised adaptation and is not required during inference. As a complementary discrete measure, the same diagnos-tic forward pass also computes the pre-update target-token accuracy: 
+
+A− 
+
+> t
+
+= 1
+
+NtNtX
+
+> j=1
+
+I
+
+
+
+arg max  
+
+> y
+
+pθ,θ a
+
+ y | xt, y ⋆t,<j 
+
+ = y⋆t,j 
+
+
+
+,
+
+(2) where I[·] is the indicator function. Thus, A− 
+
+> t
+
+is the pro-portion of target positions at which the most probable token matches the ground-truth token. The loss is a continuous measure that reflects the probability assigned to each target token, whereas target-token accuracy is an indicator-based measure of whether the top-1 prediction is correct. PARALLEL constructs the goal-related signal as 
+
+sg,t = A− 
+
+> t
+
+, exp( −ℓ− 
+
+> t
+
+) , (3) where A− 
+
+> t
+
+denotes the target-token accuracy and ℓ− 
+
+> t
+
+is the length-normalized target loss before adaptation. Because ℓ−
+
+> t
+
+is length-normalized, exp( −ℓ− 
+
+> t
+
+) corresponds to the geomet-ric mean of the probabilities assigned to the target tokens and therefore serves as a probability-based target-confidence measure. Together, these two components summarize how closely the current model behavior agrees with the labeled target. Target agreement alone does not describe how confidently the model forms its prediction. PARALLEL therefore con-structs an uncertainty-related signal containing five comple-mentary statistics: 
+
+su,t = Hchoice  
+
+> t
+
+, H tok  
+
+> t
+
+, c t, m t, v t
+
+ . (4) The five components are defined as follows: 
+
+• Hchoice  
+
+> t
+
+is the normalized entropy over candidate re-sponses. A high value indicates that probability is dis-tributed across multiple choices. 
+
+• Htok  
+
+> t
+
+is the average normalized entropy of the token-level predictive distributions. A high value indicates diffuse token predictions. 
+
+• ct is the mean top-1 confidence across target-token po-sitions. A high value indicates strong confidence in the most probable tokens. 
+
+• mt is the mean probability margin between the top-1 and top-2 tokens. A large margin indicates a more decisive prediction. 
+
+• vt is the variance of the probabilities assigned to the target tokens across positions. It represents how consistently the model assigns confidence throughout the target response. The normalized token entropy Htok  
+
+> t
+
+is computed by dividing the predictive entropy at each target-token position by log |V| ,where V is the model vocabulary, and then averaging over the target positions. For a multiple-choice sample with Kt candidate responses, let ℓcand  
+
+> t,k
+
+denote the length-normalized loss of candidate k.Its choice probability is defined as follows: 
+
+qt,k = exp( −ℓcand  
+
+> t,k
+
+)
+
+PKt 
+
+> r=1
+
+exp( −ℓcand  
+
+> t,r
+
+) ,Hchoice  
+
+> t
+
+= − 1log KtKtX
+
+> k=1
+
+qt,k log qt,k .
+
+(5) For XSum and CNN/DailyMail, which do not provide dis-crete answer choices, we set Hchoice  
+
+> t
+
+= 0 , and the controller relies on the remaining goal-related, uncertainty-related, and representation signals. Lower-loss candidates receive higher probabilities, while Hchoice  
+
+> t
+
+measures the ambiguity among the candidates. The normalization by log Kt makes the en-tropy comparable across samples with different numbers of choices. Hchoice  
+
+> t
+
+is high when probability is distributed across several candidates and low when the prediction is con-centrated on a particular candidate. The goal-related signal therefore describes how closely the prediction agrees with the target, whereas the uncertainty-related signal describes how confidently the prediction is formed. The two signals contain numerical summaries of model behavior but do not fully represent the meaning or context of the sample. To provide this information, PARALLEL con-catenates them with the final prompt-token representation 
+
+ht:
+
+zt = [ sg,t ; su,t ; ht], (6) where the semicolon denotes concatenation. The resulting state combines target agreement, predictive uncertainty, and the current model representation. All components of zt are detached from the language-model computation graph before being passed to the controller. 
+
+Budget-Constrained Controller Learning 
+
+PARALLEL uses the controller state zt to produce an action policy as follows: 
+
+πθc (at | zt) = [softmax ( fθc (zt))] at . (7) where fθc is a lightweight controller network with parameters 
+
+θc, and at denotes the selected action for sample t.The goal-related and uncertainty-related signals are not independently mapped to separate actions. Instead, the con-troller interprets their joint evidence to determine the re-quired degree of adaptation. When the current prediction is sufficiently aligned with the target and is considered reliable, the update can be inhibited. When the evidence is intermedi-ate or the two signals provide conflicting information, a mod-erated adjustment can be applied. When the current behavior indicates a clear need for correction, the adapter can receive a full-strength update. From a cognitive-control perspective, these cases correspond to inhibition, moderated adjustment, and full correction. PARALLEL represents these three func-tional regimes as A = {Skip , Light , Strong }. The update weight associated with the selected action is 
+
+wt = w(at) = 
+
+
+
+0, at = Skip ,λt, at = Light ,
+
+1, at = Strong ,
+
+0 < λ t < 1.
+
+(8) Where Skip inhibits the adapter update, Light applies an intermediate update scale, and Strong applies the reference full-strength update. The controller learns how the combined state zt maps to these regimes without relying on manually defined thresholds. 
+
+rt denotes the controller reward, which is formally de-fined in Eq. 16. The Light scale λt is adjusted using the observed rewards of the Light and Strong actions. For 
+
+k ∈ { Light , Strong }, the action-wise reward estimate is updated as 
+
+¯rk,t =
+
+βλ ¯rk,t −1 + (1 − βλ)rt, at = k, 
+
+¯rk,t −1, at̸ = k. (9) When both reward estimates are available, PARALLEL com-putes a target scale by comparing their positive reward per unit update mass: 
+
+bλt = clip 
+
+ [¯ rLight ,t ]+
+
+λt max([¯ rStrong ,t ]+, ϵ ) , λ min , λ max 
+
+
+
+. (10) Because λt is bounded below by λmin > ϵ , the stabilizer is required only for the Strong return. When the estimated 
+
+Strong return is non-positive while the Light return is posi-tive, the small stabilized denominator drives bλt toward λmax .When both returns are non-positive, the ratio becomes zero and bλt is set to λmin .The Light scale is then updated as 
+
+λt+1 = clip 
+
+
+
+βλλt + (1 − βλ)bλt, λ min , λ max 
+
+
+
+. (11) The update of λt begins only after both Light and Strong 
+
+have been selected at least once; until then, λt remains un-changed. The reported experiments use λ1 = 0 .5, βλ = 0 .95 ,and [λmin , λ max ] = [0 .05 , 0.95] .The cumulative amount of allocated updating after pro-cessing t samples is 
+
+Mt =
+
+> t
+
+X
+
+> i=1
+
+w(ai). (12) The cumulative update mass and its budget constraint are defined as 
+
+Mt =
+
+> t
+
+X
+
+> i=1
+
+wi, MT
+
+T ≤ ρ. (13) Update mass is the cumulative sum of the action weights 
+
+w(at), and a budget ratio ρ permits at most ρT mass over a T -sample stream. Before sampling, actions that would ex-ceed the remaining mass are masked and the remaining prob-abilities are renormalized, ensuring MT ≤ ρT . This budget limits the cumulative update intensity rather than the number of labeled samples processed, the number of LoRA parame-ters, or the measured parameter displacement. When wt > 0,PARALLEL performs one AdamW step on the supervised target loss with the learning rate scaled by wt. When wt = 0 ,the optimizer step is omitted. The language-model backbone remains frozen, and only the LoRA adapter is updated. Af-ter applying the selected action, PARALLEL reevaluates the same sample to obtain the post-action target loss ℓ+ 
+
+> t
+
+and target-token accuracy A+ 
+
+> t
+
+. The immediate improvement is defined as 
+
+∆t = ( ℓ− 
+
+> t
+
+− ℓ+ 
+
+> t
+
+) + γacc (A+ 
+
+> t
+
+− A− 
+
+> t
+
+), (14) where γacc controls the contribution of the accuracy change. For Skip , no adapter update occurs, so ℓ+ 
+
+> t
+
+= ℓ− 
+
+> t
+
+, A+ 
+
+> t
+
+= A− 
+
+> t
+
+,and ∆t = 0 .PARALLEL also considers how quickly the available bud-get is consumed. The budget-pressure term is 
+
+Pt =
+
+ Mt
+
+ρT − tT
+
+
+
+> +
+
+. (15) The first fraction represents the consumed portion of the update budget, while the second represents the processed Algorithm 1: PARALLEL adaptation 
+
+Require: Labeled adaptation stream D = {(xt, y ⋆t )}Tt=1 ,frozen backbone θ, LoRA adapter θa, controller θc, bud-get ratio ρ 
+
+> 1:
+
+Initialize M0 ← 0, reward baseline b0, Light scale λ1,and action-reward estimates  
+
+> 2:
+
+for t = 1 , . . . , T do  
+
+> 3:
+
+Compute ℓ− 
+
+> t
+
+, A− 
+
+> t
+
+, sg,t , su,t , and ht 
+
+> 4:
+
+Form zt = [ sg,t ; su,t ; ht] and compute πθc (· | zt) 
+
+> 5:
+
+Mask actions satisfying Mt−1 + wλt (a) > ρT and renormalize to eπθc,t  
+
+> 6:
+
+Sample at ∼ eπθc,t and set wt ← wλt (at) 
+
+> 7:
+
+if wt > 0 then  
+
+> 8:
+
+Update θa by one supervised AdamW step with the learning rate scaled by wt 
+
+> 9:
+
+end if  
+
+> 10:
+
+Set Mt ← Mt−1 + wt 
+
+> 11:
+
+Obtain ℓ+ 
+
+> t
+
+and A+ 
+
+> t
+
+, and compute reward rt using Mt 
+
+> 12:
+
+Update θc using Eq. (17) with baseline bt−1 
+
+> 13:
+
+Update the action-reward estimates and Light scale 
+
+λt+1  
+
+> 14:
+
+Update bt 
+
+> 15:
+
+end for  
+
+> 16:
+
+return Adapted LoRA parameters θa
+
+portion of the adaptation stream. Thus, Pt becomes posi-tive when budget consumption advances faster than stream progression. The controller reward is 
+
+rt = ∆ t − αcwt − αbPt, (16) where αc penalizes update intensity and αb penalizes ex-cessive early budget consumption. The hard constraint in Eq. (13) prevents budget violation, whereas Pt encourages the controller to distribute the available budget across the stream. The controller is optimized using one-step REIN-FORCE (Williams 1992): 
+
+Lctrl = −(rt − bt−1) log eπθc,t (at | zt) − αent H (eπθc,t ) ,
+
+(17) where eπθc,t is the budget-masked policy and αent controls entropy regularization. After each controller step, the reward baseline is updated using an exponential moving average, 
+
+bt = βbbt−1 + (1 − βb)rt. If rt > b t−1, the selected ac-tion is reinforced under similar controller states; otherwise, its probability is reduced. Entropy regularization prevents premature concentration on a single action. Because rt com-pares the same sample before and after the selected action, the controller learns from immediate utility–cost feedback rather than optimizing a long-horizon episodic return. 
+
+# Experiments 
+
+Experimental Setup 
+
+We evaluate PARALLEL on ARC-Challenge (Clark et al. 2018), OpenBookQA (Mihaylov et al. 2018), Common-senseQA (Talmor et al. 2019), XSum (Narayan, Cohen, and                                     
+
+> Dataset Metric Frozen PARALLEL Full LoRA ARC-Challenge acc_norm 0.481 0.569 0.584 OpenBookQA acc_norm 0.418 0.540 0.574 CommonsenseQA Accuracy 0.789 0.842 0.849 XSum R-1 0.2000 0.3650 0.3723 R-2 0.0506 0.1409 0.1454 R-L 0.1392 0.2915 0.2951 CNN/DM R-1 0.3067 0.3937 0.3991 R-2 0.1034 0.1694 0.1742 R-L 0.1870 0.2685 0.2715
+
+Table 1: Overall benchmark results.              
+
+> Target ρARC-C OBQA CSQA
+> 0.15 0.5162 0.4960 0.8378 0.30 0.5691 0.5400 0.8419 0.50 0.5538 0.5600 0.8403
+
+Table 2: Budget sensitivity of PARALLEL .Lapata 2018), and CNN/DailyMail (Hermann et al. 2015). The first three benchmarks evaluate science and common-sense reasoning, while XSum and CNN/DailyMail evaluate abstractive news summarization in separate experiments. The primary evaluation uses Qwen2.5-3B-Instruct on all five benchmarks. For the reasoning experiments, fixed train-ing streams contain 90% of each official training split: 1,007 examples for ARC-Challenge, 4,461 for OpenBookQA, and 8,767 for CommonsenseQA. We additionally evaluate Qwen2.5-0.5B-Instruct, SmolLM2-360M-Instruct (Ben Allal et al. 2025), and TinyLlama-1.1B-Chat (Zhang et al. 2024) on ARC-Challenge with the official training split and seeds 42, 43, and 44. All adaptation methods use a frozen language-model backbone and a trainable LoRA adapter (Hu et al. 2022). Training uses one pass, batch size 1, bfloat16, and AdamW with a learning rate of 2 × 10 −5, linear scheduling, and a warmup ratio of 0.03. The LoRA configuration uses rank 16, scaling 32, and dropout 0.05. Within each model–dataset condition, all methods use the same tokenizer, prompt format, adapter configuration, and optimizer settings. The PARALLEL controller is a one-hidden-layer multi-layer perceptron with hidden dimension 64 and a GELU activation. It is optimized using AdamW with a learning rate of 8 × 10 −4. The controller objective uses γacc = 0 .30 ,
+
+αc = 0 .14 , αb = 0 .40 , αent = 0 .01 , and reward-baseline decay βb = 0 .95 . The LoRA adapter is optimized using the supervised target loss, whereas the controller is optimized using reward feedback. Final adapters are evaluated without in-context demon-strations. For the reasoning benchmarks, we use 
+
+lm-eval-harness (Biderman et al. 2024) and report 
+
+acc_norm for ARC-Challenge and OpenBookQA and acc 
+
+for CommonsenseQA. For XSum and CNN/DailyMail, we report ROUGE-1, ROUGE-2, and ROUGE-L. Compared Methods and Metrics 
+
+Frozen performs no adaptation, while Full adaptation applies the same LoRA update to every sample. Across all five bench-marks, we additionally compare two budget-matched subset baselines: Random selection (Citovsky et al. 2021), entropy-based Active learning (Lewis and Gale 1994; Settles 2009). The selection scores are computed once before adaptation, and each selected sample receives a full-strength update. 
+
+PARALLEL instead uses the goal-related and uncertainty-related signals to assign action-dependent update weights while processing the complete labeled stream. Following Eq. (13), normalized update mass is reported as MT /T .Frozen and Full adaptation have masses of 0 and 1, re-spectively, and the main budget-matched comparison uses 
+
+ρ = 0 .30 .For a task score S, we report 
+
+Rscore = 100 × SSFull 
+
+, Rgain = 100 × S − SFrozen 
+
+SFull − SFrozen 
+
+.
+
+(18) These metrics denote Full-score retention and adaptation-gain recovery, respectively. For XSum and CNN/DailyMail, benchmark-level Rgain is computed by averaging the values for ROUGE-1, ROUGE-2, and ROUGE-L. 
+
+Budget Selection 
+
+Before conducting the full evaluation, we perform a pre-liminary search to select an update budget for PARALLEL .Rather than tuning the budget separately for each dataset, we evaluate three representative ratios, ρ ∈ { 0.15 , 0.30 , 0.50 },on a subset of the benchmarks. The aim is to identify a prac-tical operating point rather than a globally optimal ratio. As shown in Table 2, increasing ρ from 0.15 to 0.30 improves performance across the evaluated benchmarks, whereas fur-ther gains at 0.50 are task dependent despite the additional updates. Among the evaluated ratios, ρ = 0 .30 therefore pro-vides the most favorable balance between performance and update cost. 
+
+Experimental Results 
+
+Table 1 summarizes the results across reasoning and sum-marization benchmarks. On ARC-Challenge, OpenBookQA, and CommonsenseQA, PARALLEL retains 97 .4% , 94 .1% ,and 99 .2% of the performance under Full adaptation, respec-tively. It also recovers 85 .4% , 78 .2% , and 88 .3% of the cor-responding gains over Frozen. On XSum, performance reten-tion ranges from 96 .9% to 98 .8% , while gain recovery ranges from 95 .3% to 97 .7% . On CNN/DailyMail, performance re-tention and gain recovery across the three ROUGE metrics range from 97.2% to 98.9% and from 93.2% to 96.4%, re-spectively. Table 3 evaluates update-allocation efficiency by compar-ing PARALLEL with fixed subset-selection methods un-der the same target update-mass ratio. Among the budget-matched methods, PARALLEL achieves the highest ARC-Challenge score, outperforming the next-best method by 0.0239. Overall, PARALLEL remains consistently at or near the top. PARALLEL achieves the highest ROUGE-L on both XSum and CNN/DailyMail, with scores of 0.2915                                   
+
+> Task Metric Random selection Active learning PARALLEL
+> ARC-C Acc. 0.5452 0.5213 0.5691
+> OBQA Acc. 0.5440 0.5180 0.5400
+> CSQA Acc. 0.8313 0.8444 0.8419
+> XSum R-1 0.3652 0.3595 0.3650
+> R-2 0.1414 0.1364 0.1409
+> R-L 0.2914 0.2863 0.2915
+> CNN/DM R-1 0.3950 0.3926 0.3937
+> R-2 0.1705 0.1647 0.1694
+> R-L 0.2679 0.2343 0.2685
+
+Table 3: Comparison of various adaptation strategies. 
+
+Figure 2: Gain recovery of budget-matched methods across five benchmarks. and 0.2685 . This consistent ROUGE-L advantage indicates better preservation of long-sequence content overlap un-der the same update budget. Consequently, Figure 2 shows that PARALLEL achieves the highest average Rgain recov-ery of 88.6% across the five benchmarks, with a minimum benchmark-level recovery of 78.2%. 
+
+Cross-Backbone Evaluation 
+
+We evaluate PARALLEL on Qwen2.5-0.5B-Instruct, SmolLM2-360M-Instruct, and TinyLlama-1.1B-Chat using ARC-Challenge, ρ = 0 .30 , and three seeds. As shown in Table 4, PARALLEL improves over Frozen across all back-bones with observed update masses of 0.297 –0.300 . It re-tains 95 .6–96 .8% of Full performance and recovers 66 .1–
+
+74 .5% of its adaptation gain, with macro averages of 96 .2% 
+
+and 71 .1% , respectively. These results demonstrate consis-tent performance–update behavior across the three compact backbones. 
+
+Ablation of Controller Inputs 
+
+We examine the contribution of each controller input by removing the goal-related signal sg , the uncertainty-related signal su, or the model representation ht, while keeping the training and budget settings unchanged. As shown in Table 5, the complete PARALLEL configura-tion achieves the highest accuracy on all three benchmarks. Backbone Frozen Full LoRA PARALLEL Mass                 
+
+> Qwen-0.5B 0.338 0.388 ±0.004 0.371 ±0.003 0.297
+> Smol-360M 0.344 0.401 ±0.001 0.386 ±0.004 0.300
+> Tiny-1.1B 0.327 0.370 ±0.004 0.358 ±0.004 0.300
+> Macro 0.336 0.386 0.372 0.299
+
+Table 4: ARC-Challenge results for different language mod-els. Rscore are three-seed mean ±SD. Mass is normalized update mass. 
+
+Variant ARC-C OBQA CSQA 
+
+PARALLEL 0.5691 0.5400 0.8419 
+
+w/o goal signal sg 0.5529 0.5340 0.8288 
+
+w/o uncertainty signal su 0.5606 0.5392 0.8411 
+
+w/o representation ht 0.5469 0.5240 0.8387 
+
+Table 5: Ablation of the controller inputs. Removing sg causes clear degradation on ARC-Challenge and CommonsenseQA, while removing ht produces the largest reductions on ARC-Challenge and OpenBookQA. Overall, no ablated variant outperforms the complete config-uration, supporting the complementary use of the controller inputs. 
+
+Practical Efficiency of PARALLEL 
+
+We evaluate whether sample-wise update allocation yields higher target-task accuracy when post-deployment adapta-tion is constrained by time or GPU energy. Unlike the pre-ceding endpoint comparisons, this experiment compares val-idation accuracy at the same measured adaptation cost. The current adapter is evaluated every 64 samples on all 299 validation examples. Adaptation time includes method-specific stream processing and updates, while GPU energy is obtained by integrating NVIDIA Management Library (NVML) power measurements sampled every 50 ms (Ka-sichayanula et al. 2012). Figure 3 presents a representative seed-42 trajectory on a sequential 512-sample ARC-Challenge stream. Both Full LoRA and PARALLEL process every incoming sample. Full LoRA updates the adapter on every sample, whereas PAR-ALLEL uses the controller to determine whether and how strongly the adapter is updated. We measure acc_norm and cumulative adaptation costs at fixed intervals. Cumulative cost denotes the running time or energy from the beginning of the stream and includes stream processing, controller com-putation, and adapter updates, while excluding checkpoint evaluation. The top and bottom panels report accuracy according to cumulative adaptation time and GPU energy, respectively. A higher curve at the same cumulative cost indicates greater adaptation accuracy under the same resource limit. At ap-proximately 7.8 seconds, PARALLEL achieves 0.363 , com-pared with 0.344 for Full LoRA. At approximately 0.155 Wh ,the corresponding scores are 0.359 and 0.344 . These re-
+
+Figure 3: Validation accuracy–cost trade-offs under sequen-tial sample updates, measured by cumulative adaptation time and GPU energy. sults demonstrate a more favorable accuracy–cost balance for resource-constrained post-deployment adaptation. 
+
+# Conclusion 
+
+We introduced PARALLEL , a prefrontal-aligned framework for sample-wise LoRA update allocation under a cumulative update-mass constraint. Its controller combines goal-related, uncertainty-related, and representation signals to determine whether and how strongly to update each labeled sample and is trained with one-step REINFORCE using immediate utility–cost feedback. Experiments across three reasoning benchmarks and two summarization tasks show that PAR-ALLEL retains most of the performance under Full adapta-tion while operating under a limited cumulative update mass. It also achieves higher accuracy than Full LoRA at matched cumulative adaptation time and GPU energy in the stream setting. Controller-input ablations further support the com-plementary use of all three controller inputs for sample-wise update allocation. These results demonstrate the potential of sample-wise up-date allocation for language-model adaptation under a limited cumulative update mass. Future work will extend PARAL-LEL to larger models, continual and generative adaptation, and broader deployment conditions while directly optimizing model stability and measured hardware costs. References 
+
+Ben Allal, L.; Lozhkov, A.; Bakouch, E.; et al. 2025. SmolLM2: When Smol Goes Big—Data-Centric Training of a Small Language Model. arXiv preprint arXiv:2502.02737 .Biderman, S.; Schoelkopf, H.; Sutawika, L.; Gao, L.; Tow, J.; Abbasi, B.; Aji, A. F.; Ammanamanchi, P. S.; Black, S.; Clive, J.; et al. 2024. Lessons from the trenches on reproducible evaluation of language models. arXiv preprint arXiv:2405.14782 .Chang, Y.; Wang, X.; Wang, J.; Wu, Y.; Yang, L.; Zhu, K.; Chen, H.; Yi, X.; Wang, C.; Wang, Y.; et al. 2024. A survey on evaluation of large language models. ACM transactions on intelligent systems and technology , 15(3): 1–45. Chatterjee, A.; Kowndinya Renduchintala, H. S. V. N. S.; Bhatia, S.; and Chakraborty, T. 2025. On the Effect of In-struction Tuning Loss on Generalization. Transactions of the Association for Computational Linguistics , 13: 1360–1380. Citovsky, G.; DeSalvo, G.; Gentile, C.; Karydas, L.; Ra-jagopalan, A.; Rostamizadeh, A.; and Kumar, S. 2021. Batch Active Learning at Scale. In Advances in Neural Informa-tion Processing Systems , volume 34, 11933–11944. Curran Associates, Inc. Clark, P.; Cowhey, I.; Etzioni, O.; Khot, T.; Sabharwal, A.; Schoenick, C.; and Tafjord, O. 2018. Think you have solved question answering? try arc, the ai2 reasoning challenge. 
+
+arXiv preprint arXiv:1803.05457 .Devlin, J.; Chang, M.-W.; Lee, K.; and Toutanova, K. 2019. BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding. In Proceedings of the 2019 Con-ference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies ,volume 1, 4171–4186. Minneapolis, Minnesota: Association for Computational Linguistics. Hermann, K. M.; Kočiský, T.; Grefenstette, E.; Espeholt, L.; Kay, W.; Suleyman, M.; and Blunsom, P. 2015. Teaching Machines to Read and Comprehend. In Advances in Neu-ral Information Processing Systems , volume 28, 1693–1701. Curran Associates, Inc. Hoi, S. C. H.; Sahoo, D.; Lu, J.; and Zhao, P. 2021. Online Learning: A Comprehensive Survey. Neurocomputing , 459: 249–289. Hu, E. J.; Shen, Y.; Wallis, P.; Allen-Zhu, Z.; Li, Y.; Wang, S.; Wang, L.; and Chen, W. 2022. LoRA: Low-Rank Adaptation of Large Language Models. In International Conference on Learning Representations .Kasichayanula, K.; Terpstra, D.; Luszczek, P.; Tomov, S.; Moore, S.; and Peterson, G. D. 2012. Power aware computing on GPUs. In 2012 Symposium on Application Accelerators in High Performance Computing , 64–73. IEEE. Lewis, D. D.; and Gale, W. A. 1994. A Sequential Algorithm for Training Text Classifiers. In Croft, W. B.; and van Rijsber-gen, C. J., eds., SIGIR ’94: Proceedings of the Seventeenth Annual International ACM-SIGIR Conference on Research and Development in Information Retrieval , 3–12. London: Springer. Mihaylov, T.; Clark, P.; Khot, T.; and Sabharwal, A. 2018. Can a suit of armor conduct electricity? a new dataset for open book question answering. In Proceedings of the 2018 conference on empirical methods in natural language pro-cessing , 2381–2391. Narayan, S.; Cohen, S. B.; and Lapata, M. 2018. Don’t Give Me the Details, Just the Summary! Topic-Aware Con-volutional Neural Networks for Extreme Summarization. In 
+
+Proceedings of the 2018 Conference on Empirical Methods in Natural Language Processing , 1797–1807. Brussels, Bel-gium: Association for Computational Linguistics. Ouyang, L.; Wu, J.; Jiang, X.; Almeida, D.; Wainwright, C.; Mishkin, P.; Zhang, C.; Agarwal, S.; Slama, K.; Ray, A.; Schulman, J.; Hilton, J.; Kelton, F.; Miller, L.; Simens, M.; Askell, A.; Welinder, P.; Christiano, P. F.; Leike, J.; and Lowe, R. 2022. Training Language Models to Follow Instructions with Human Feedback. In Advances in Neural Information Processing Systems , volume 35, 27730–27744. Curran Associates, Inc. Paul, M.; Ganguli, S.; and Dziugaite, G. K. 2021. Deep Learning on a Data Diet: Finding Important Examples Early in Training. In Advances in Neural Information Processing Systems , volume 34, 20596–20607. Settles, B. 2009. Active Learning Literature Survey. Tech-nical Report 1648, University of Wisconsin–Madison. Sung, Y.; Rigotti, M.; and Lee, S. W. 2025. Factorized embedding of goal and uncertainty in the lateral prefrontal cortex guides stably flexible learning. Nature Communica-tions .Talmor, A.; Herzig, J.; Lourie, N.; and Berant, J. 2019. Com-monsenseqa: A question answering challenge targeting com-monsense knowledge. In Proceedings of the 2019 Confer-ence of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies, Volume 1 (Long and Short Papers) , 4149–4158. Williams, R. J. 1992. Simple Statistical Gradient-Following Algorithms for Connectionist Reinforcement Learning. Ma-chine Learning , 8(3–4): 229–256. Yoon, N.; Yoo, K.; Jung, W.; Kim, S.; and Kim, H. 2026. Be-yond Learning: A Training-Free Alternative to Model Adap-tation. arXiv preprint arXiv:2602.16189 .Zhang, P.; Zeng, G.; Wang, T.; and Lu, W. 2024. Tinyl-lama: An open-source small language model. arXiv preprint arXiv:2401.02385 .Zhao, W. X.; Zhou, K.; Li, J.; Tang, T.; Dong, Z.; Hou, Y.; Zhang, B.; Min, Y.; Zhang, J.; Liu, P.; et al. 2026. A survey of large language models. Frontiers of Computer Science ,20(12): 2012627.
