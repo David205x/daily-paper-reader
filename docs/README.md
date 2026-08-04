@@ -6,71 +6,104 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-08-03
-- 运行时间：2026-08-03 21:57:35 UTC
+- 最新运行日期：2026-08-04
+- 运行时间：2026-08-04 22:05:21 UTC
 - 运行状态：成功
-- 本次总论文数：17
-- 精读区：6
+- 本次总论文数：27
+- 精读区：16
 - 速读区：11
 
 ### 今日简报（AI）
-今日聚焦LLM强化学习与奖励设计，共精选17篇论文，其中2篇高价值精读。核心结论：无偏且长度不变的策略优化在结果奖励下不可能实现，而任务转换可诱导自验证奖励突破开放任务瓶颈。建议关注E-Bench工具智能体基准测试及SERPO自进化奖励方法，以实践为导向深入研读。
-- 详情：[/202608/03/README](/202608/03/README)
+- 今日共生成 27 篇推荐（精读 16 篇，速读 11 篇）
+- 精读：《Group-Reflective Self-Distillation for Agentic Reinforcement Learning》（9.0/10）, 《Select-And-Extract: A Lightweight Plugin for Retrieval-Augmented Generation》（9.0/10）
+- 速读：《Harness-G: A Graph-Structured Harness for Search Agents》（8.0/10）, 《Personalizing Large Language Model Agents with Small Policy Models》（8.0/10）, 《DocPO: Advancing Document Policy Optimization via Tailored Step-Aware Rewards》（8.0/10）
+- 这些结果覆盖了当下较热的方向，建议先看精读区论文的关键问题与方法。
+- 详情：[/202608/04/README](/202608/04/README)
 
 ### 精读区论文标签
-1. [On the Impossibility of Unbiased and Length-Invariant Policy Optimization with Outcome Rewards](/202608/03/2607.23364v1-on-the-impossibility-of-unbiased-and-length-invariant-policy-optimization-with-outcome-rewards)  
+1. [Group-Reflective Self-Distillation for Agentic Reinforcement Learning](/202608/04/2607.28076v2-group-reflective-self-distillation-for-agentic-reinforcement-learning)  
    标签：评分：9.0/10、query:rl
-   evidence：针对结果奖励下GRPO策略优化的理论分析，涉及LLM推理训练
-2. [From RLVR to RLSVR: Task Transformation Induces Self-Verifiable Rewards for Open-Ended LLM Self-Improvement](/202608/03/2607.23802v2-from-rlvr-to-rlsvr-task-transformation-induces-self-verifiable-rewards-for-open-ended-llm-self-improvement)  
+   evidence：面向LLM智能体的强化学习训练，通过自蒸馏从轨迹生成指导信号
+2. [Select-And-Extract: A Lightweight Plugin for Retrieval-Augmented Generation](/202608/04/2608.00658v1-select-and-extract-a-lightweight-plugin-for-retrieval-augmented-generation)  
    标签：评分：9.0/10、query:rl
-   evidence：为开放任务设计自验证奖励的RL方法
-3. [CMT-RAG: Complementary Memory Traces for Multi-turn Multi-hop RAG](/202608/03/2607.26470v2-cmt-rag-complementary-memory-traces-for-multi-turn-multi-hop-rag)  
+   evidence：针对检索失败与阅读失败的RAG轻量级插件，面向知识密集任务
+3. [Distill Where You Fail: Recovering Learning Signals of Negative RL-Groups from Adaptive Teacher Guidance](/202608/04/2608.00782v1-distill-where-you-fail-recovering-learning-signals-of-negative-rl-groups-from-adaptive-teacher-guidance)  
    标签：评分：9.0/10、query:rl
-   evidence：基于记忆轨迹的多轮多跳RAG
-4. [Learning Latent Reasoning Traces for Scalar Reward Models End-to-End](/202608/03/2607.29185v1-learning-latent-reasoning-traces-for-scalar-reward-models-end-to-end)  
+   evidence：面向大模型RLVR/GRPO后训练的负组自适应教师蒸馏
+4. [PROGRESS: Coverage-guided RL to Train Search-augmented LLM Agent](/202608/04/2608.00969v1-progress-coverage-guided-rl-to-train-search-augmented-llm-agent)  
    标签：评分：9.0/10、query:rl
-   evidence：为标量奖励模型学习潜在推理链
-5. [Don't Mix Rewards, Mix Policies: Policy Decomposition and Optimization for Multi-Reward RL](/202608/03/2607.29246v1-dont-mix-rewards-mix-policies-policy-decomposition-and-optimization-for-multi-reward-rl)  
+   evidence：用覆盖度奖励引导搜索增强大模型智能体的查询分解与搜索行为
+5. [Search-GRT: Guided Retrieval Training of Search Agents to Optimize for Complex Question Answering](/202608/04/2608.00974v1-search-grt-guided-retrieval-training-of-search-agents-to-optimize-for-complex-question-answering)  
    标签：评分：9.0/10、query:rl
-   evidence：面向LLM多奖励强化学习的策略分解
-6. [Translation with Thought: Difficulty-Adaptive Reasoning via Reinforcement Learning for Multi-Domain Machine Translation](/202608/03/2607.29287v1-translation-with-thought-difficulty-adaptive-reasoning-via-reinforcement-learning-for-multi-domain-machine-translation)  
+   evidence：面向多跳问答检索智能体的引导式检索强化训练
+6. [EviSD: Evidence-Conditioned Self-Distillation for Search-Augmented Agents](/202608/04/2608.01359v1-evisd-evidence-conditioned-self-distillation-for-search-augmented-agents)  
    标签：评分：9.0/10、query:rl
-   evidence：基于强化学习的难度自适应推理用于多领域机器翻译
+   evidence：面向多轮搜索增强大模型智能体的证据条件自蒸馏与RL信用分配
+7. [Reusing Rollouts under Policy Lag: Prefix-Normalized Policy Optimization for LLM Reinforcement Learning](/202608/04/2608.01418v1-reusing-rollouts-under-policy-lag-prefix-normalized-policy-optimization-for-llm-reinforcement-learning)  
+   标签：评分：9.0/10、query:rl
+   evidence：用于LLM强化学习离策略修正的前缀归一化策略优化
+8. [HindSearch: Trajectory-Level Hindsight Critique for Search-Augmented Reinforcement Learning](/202608/04/2608.01597v1-hindsearch-trajectory-level-hindsight-critique-for-search-augmented-reinforcement-learning)  
+   标签：评分：9.0/10、query:rl
+   evidence：用于检索增强RL的后见批判与自蒸馏
+9. [RING: Retrieval-Internalized Generation for Continual Large-Scale Knowledge Injection](/202608/04/2608.01630v1-ring-retrieval-internalized-generation-for-continual-large-scale-knowledge-injection)  
+   标签：评分：9.0/10、query:rl
+   evidence：检索内化生成与RL参数化搜索，去除外部RAG检索器
+10. [TCPO: Turn-Level Credit Policy Optimization](/202608/04/2608.01667v1-tcpo-turn-level-credit-policy-optimization)  
+   标签：评分：9.0/10、query:rl
+   evidence：面向验证器引导的多轮LLM推理RL的回合级信用分配
+11. [Progressive Agent Skill Generation via Reinforcement Learning](/202608/04/2608.01678v1-progressive-agent-skill-generation-via-reinforcement-learning)  
+   标签：评分：9.0/10、query:rl
+   evidence：使用强化学习渐进生成智能体技能，直接改进LLM智能体的任务自动化
+12. [Toward Plasticity-Preserving KL Regularization for Capability Retention in LLM Reinforcement Learning](/202608/04/2608.01743v1-toward-plasticity-preserving-kl-regularization-for-capability-retention-in-llm-reinforcement-learning)  
+   标签：评分：9.0/10、query:rl
+   evidence：面向大模型强化学习能力保持的正确性条件化KL正则化
+13. [PCSD: Persistent Consistency for Self-Distillation in Agentic Reinforcement Learning](/202608/04/2608.01837v1-pcsd-persistent-consistency-for-self-distillation-in-agentic-reinforcement-learning)  
+   标签：评分：9.0/10、query:rl
+   evidence：面向LLM智能体强化学习的稀疏奖励问题，用持续性一致性自蒸馏提供密集监督
+14. [Instruction-Conditioned Exploration with Asymmetric Reinforcement Learning and Self-Distillation](/202608/04/2608.02087v1-instruction-conditioned-exploration-with-asymmetric-reinforcement-learning-and-self-distillation)  
+   标签：评分：9.0/10、query:rl
+   evidence：基于指令条件探索的非对称强化学习与自蒸馏
+15. [Self-Improving Large Language Models via Progressive Experience Evolution](/202608/04/2608.02139v1-self-improving-large-language-models-via-progressive-experience-evolution)  
+   标签：评分：9.0/10、query:rl
+   evidence：围绕策略优化与经验蒸馏改进LLM自我改进能力，直接关联大模型强化学习
+16. [Beyond the Mean: Multi-Moment Policy Optimization for LLM Reasoning](/202608/04/2608.02149v1-beyond-the-mean-multi-moment-policy-optimization-for-llm-reasoning)  
+   标签：评分：9.0/10、query:rl
+   evidence：面向大模型推理的多矩策略优化
 
 ### 速读区论文标签
-1. [E-Bench: Benchmarking Multi-Step Tool-Use Agents in Real-World Product Scenarios](/202608/03/2607.23722v1-e-bench-benchmarking-multi-step-tool-use-agents-in-real-world-product-scenarios)  
+1. [Harness-G: A Graph-Structured Harness for Search Agents](/202608/04/2607.27652v2-harness-g-a-graph-structured-harness-for-search-agents)  
    标签：评分：8.0/10、query:rl
-   evidence：面向产品场景的多步工具使用智能体基准
-2. [SERPO: Self-Evolving Rubric Policy Optimization for Open-Ended Test-Time Reinforcement Learning](/202608/03/2607.26873v2-serpo-self-evolving-rubric-policy-optimization-for-open-ended-test-time-reinforcement-learning)  
+   evidence：面向RL多轮搜索智能体的图结构策略-环境接口设计
+2. [Personalizing Large Language Model Agents with Small Policy Models](/202608/04/2608.00215v1-personalizing-large-language-model-agents-with-small-policy-models)  
    标签：评分：8.0/10、query:rl
-   evidence：无需外部奖励模型与标准答案，从模型自身输出演化查询相关评分准则作为奖励
-3. [NeSyFS: A Neuro-symbolic Fast-Slow Thinking Framework for LLM Agent under Partial Observability](/202608/03/2607.28942v1-nesyfs-a-neuro-symbolic-fast-slow-thinking-framework-for-llm-agent-under-partial-observability)  
+   evidence：用小策略模型根据标量反馈在线学习，个性化LLM智能体的执行决策
+3. [DocPO: Advancing Document Policy Optimization via Tailored Step-Aware Rewards](/202608/04/2608.00536v1-docpo-advancing-document-policy-optimization-via-tailored-step-aware-rewards)  
    标签：评分：8.0/10、query:rl
-   evidence：面向部分可观测环境的大模型智能体神经符号快慢思考框架
-4. [Bridging the Question-Answer Gap in Retrieval-Augmented Generation: Hypothetical Prompt Embeddings](/202608/03/2607.29402v1-bridging-the-question-answer-gap-in-retrieval-augmented-generation-hypothetical-prompt-embeddings)  
+   evidence：面向RL奖励设计的步进感知奖励锐化机制
+4. [Remember-R1: Mitigating Long-Context Visual Forgetting through Reinforcement Learning](/202608/04/2608.01314v1-remember-r1-mitigating-long-context-visual-forgetting-through-reinforcement-learning)  
    标签：评分：8.0/10、query:rl
-   evidence：假设提示嵌入用于检索增强生成
-5. [LEMUR: Learning to Align with Multi-Objective Reinforcement Learning from Preference Feedback](/202608/03/2607.29559v1-lemur-learning-to-align-with-multi-objective-reinforcement-learning-from-preference-feedback)  
+   evidence：用过程级奖励强化多模态长思维链中的视觉证据保持
+5. [Beyond On-Policy Exploration: Integrating External Policy Rollouts for Reinforcement Learning in Diffusion Language Models](/202608/04/2608.01717v1-beyond-on-policy-exploration-integrating-external-policy-rollouts-for-reinforcement-learning-in-diffusion-language-models)  
    标签：评分：8.0/10、query:rl
-   evidence：提出从人类偏好中学习多目标奖励的MORL方法，支持无需预设奖励的对齐优化
-6. [Self-Supervised Skill Optimization](/202608/03/2607.28777v1-self-supervised-skill-optimization)  
+   evidence：面向扩散语言模型的强化学习，集成外部策略轨迹以提升训练效果
+6. [CoEvo-Mem: Co-Evolving Retrieval Policy and Memory Bank for LLM Agents](/202608/04/2608.01739v1-coevo-mem-co-evolving-retrieval-policy-and-memory-bank-for-llm-agents)  
+   标签：评分：8.0/10、query:rl
+   evidence：面向长期LLM智能体的检索策略与记忆库闭环协同演化
+7. [CoEvoKG: Co-Evolving Knowledge Graphs with Self-Evolving Search Agents](/202608/04/2608.01904v1-coevokg-co-evolving-knowledge-graphs-with-self-evolving-search-agents)  
+   标签：评分：8.0/10、query:rl
+   evidence：用强化学习训练知识图谱检索智能体，以图证据记忆支持智能体自进化
+8. [Cognitive Demand Steering for Adaptive Meta-Reasoning in Large Language Models](/202608/04/2608.01319v1-cognitive-demand-steering-for-adaptive-meta-reasoning-in-large-language-models)  
    标签：评分：7.0/10、query:rl
-   evidence：面向LLM智能体的自监督技能优化
-7. [Hypergradient-based Bilevel Reinforcement Learning with Improved Sample Complexity](/202608/03/2607.28849v1-hypergradient-based-bilevel-reinforcement-learning-with-improved-sample-complexity)  
-   标签：评分：7.0/10、query:rl
-   evidence：面向RLHF等双层RL问题，提出免Hessian的超梯度方法
-8. [Beyond Retrieval: Analytic Memory for Multimodal Agents](/202608/03/2607.29440v1-beyond-retrieval-analytic-memory-for-multimodal-agents)  
-   标签：评分：7.0/10、query:rl
-   evidence：面向多模态智能体的检索与分析记忆框架，与检索增强的知识访问相关
-9. [Self-Play Meets Skill Evolution: Self-Evolving Search Agents that Pose, Solve, and Remember](/202608/03/2607.29468v1-self-play-meets-skill-evolution-self-evolving-search-agents-that-pose-solve-and-remember)  
-   标签：评分：7.0/10、query:rl
-   evidence：自博弈与技能记忆演化驱动的搜索智能体
-10. [Focus Is All You Need: Adaptive Goal-aware Attention Orchestration for Multi-Agent Graph Systems](/202608/03/2607.23678v1-focus-is-all-you-need-adaptive-goal-aware-attention-orchestration-for-multi-agent-graph-systems)  
+   evidence：面向大模型推理的自适应元推理与剩余需求评估
+9. [The Case Against Generation for Retrieval: Discriminative Language Models as Effective Retrievers](/202608/04/2607.25346v2-the-case-against-generation-for-retrieval-discriminative-language-models-as-effective-retrievers)  
    标签：评分：6.0/10、query:rl
-   evidence：面向多智能体图系统的注意力编排，实现自适应资源分配
-11. [PARALLEL: A Prefrontal-Aligned Reinforcement inspired Approach for Language-Model Learning under Explicit Limits](/202608/03/2607.28982v1-parallel-a-prefrontal-aligned-reinforcement-inspired-approach-for-language-model-learning-under-explicit-limits)  
+   evidence：基于LLM的双塔检索方法可迁移至RAG
+10. [Learning What to Remember and What to Internalize in LLM Self-Evolution via Adaptive Memory-Parameter Coordination](/202608/04/2608.01234v1-learning-what-to-remember-and-what-to-internalize-in-llm-self-evolution-via-adaptive-memory-parameter-coordination)  
    标签：评分：6.0/10、query:rl
-   evidence：强化启发式样本自适应更新控制用于语言模型学习
+   evidence：通过自适应记忆-参数协调提升LLM智能体在动态环境中的自我进化能力
+11. [Cooperative Coevolution for Resource-Constrained Agentic LLM Post-Training](/202608/04/2608.02391v1-cooperative-coevolution-for-resource-constrained-agentic-llm-post-training)  
+   标签：评分：6.0/10、query:rl
+   evidence：面向智能体LLM后训练的进化优化方法，可与强化学习性能匹敌
 
 
 <div class="dpr-home-promo-card">

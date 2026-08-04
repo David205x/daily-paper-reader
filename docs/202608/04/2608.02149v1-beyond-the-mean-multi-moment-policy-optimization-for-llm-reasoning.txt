@@ -1,0 +1,1586 @@
+Title: Beyond the Mean: Multi-Moment Policy Optimization for LLM Reasoning
+
+URL Source: https://arxiv.org/pdf/2608.02149v1
+
+Published Time: Tue, 04 Aug 2026 02:50:40 GMT
+
+Number of Pages: 13
+
+Markdown Content:
+# Beyond the Mean: Multi-Moment Policy Optimization for LLM Reasoning 
+
+# Yijun Zhang* Yule Xie* Jiaxin Ding †
+
+# Xin Ding Fan Xu Haoxiang Zhang Luoyi Fu 
+
+Shanghai Jiao Tong University 
+
+Abstract 
+
+Reinforcement learning has become a central paradigm for im-proving the reasoning capabilities of large language models. Existing methods generally aim to reduce the failure proba-bilities induced across problems. In this paper, we introduce a moment-based perspective on policy optimization for LLM reasoning by treating the failure probability of a randomly sampled problem as a random variable and characterizing optimization objectives through its moments. Under this per-spective, many existing methods optimize only a single mo-ment of the failure-probability distribution, leaving its broader distributional structure largely uncharacterized. We propose 
+
+Multi-Moment Policy Optimization (MMPO), a novel pol-icy optimization framework that jointly minimizes multiple moments of the failure-probability distribution. MMPO ad-mits a direct operational interpretation as minimizing the ex-pected truncated time required to obtain the first success-ful response. Beyond MMPO, we further develop a gen-eral moment-transformation framework that systematically in-duces different moment profiles and provides a unified view of a broader family of policy optimization objectives. Exper-iments across five mathematical reasoning benchmarks and models of different scales demonstrate that MMPO consis-tently outperforms strong baselines. We hope this moment-based perspective offers new insights into the design of policy optimization objectives for LLM reasoning. 
+
+# 1 Introduction 
+
+Reinforcement Learning with Verifiable Rewards (RLVR) has emerged as a powerful paradigm for training large lan-guage models (LLMs) (Lambert et al. 2024). By using rule-based verifiers, RLVR provides reliable outcome supervision for tasks such as search-based question answering (Zhang et al. 2026b) and problem solving (Guo et al. 2025). In this work, we focus on mathematical reasoning, where each re-sponse sampled from the policy receives a binary reward in-dicating success or failure. Consequently, the policy induces a failure-probability distribution over problems. Existing RLVR objectives can be broadly expressed in terms of the failure-probability distribution. REIN-FORCE provides the standard expected-reward formula-tion (Williams 1992), while GRPO (Shao et al. 2024) and DAPO (Yu et al. 2026) introduce practical refinements for stable training. One line of work augments the objective to encourage exploration, including entropy-based regulariza-
+
+Preprint. *Equal contribution. †Corresponding author. Code is avail-able at https://github.com/e3trange/MMPO. 
+
+Figure 1: Illustration of single- and multi-moment opti-mization. Fθ denotes the failure-probability random variable across problems, and F iθ denotes the random variable ob-tained by raising Fθ to the i-th power. Each curve represents the probability density function of F iθ , and the corresponding dashed line marks its mean E[F iθ ], i.e., the i-th moment of 
+
+Fθ . By jointly considering multiple moments, MMPO cap-tures richer structural information. tion (Jiang et al. 2025; Zhang et al. 2026a) and distribution-matching methods (Zhu et al. 2025; Li et al. 2026). Another line of work directly constructs optimization objectives from the failure distribution itself. Pass@ K training (Chen et al. 2025; Peng et al. 2025; Walder and Karkhanis 2026) opti-mizes multi-rollout success toward solving the hard prob-lems, whereas recent work MaxRL (Tajwar et al. 2026) de-rives a likelihood-oriented objective that connects reinforce-ment learning with maximum-likelihood learning. Despite their different motivations, these objectives lack a unified characterization of the distribution they optimize. In this work, we introduce a moment-based perspective on policy optimization for LLM reasoning. To the best of our knowledge, our work is the first work to explicitly formulate policy optimization for LLM reasoning through the moments of the failure-probability distribution . Under this perspec-tive, REINFORCE-style methods optimize the first moment of the distribution, while pass@ K training optimizes a sin-gle higher-order moment. By the Hausdorff moment theo-arXiv:2608.02149v1 [cs.AI] 3 Aug 2026 rem (Mnatsakanov 2008), a distribution supported on [0 , 1] 
+
+is uniquely determined by its complete moment sequence. Optimizing only a single moment therefore captures only one aspect of the distribution, leaving its broader structure uncharacterized. Motivated by this observation, we propose Multi-Moment Policy Optimization (MMPO), which jointly minimizes multiple moments of the failure distribution (see Figure 1). MMPO admits a direct operational interpreta-tion as minimizing the expected truncated number of roll-out attempts required to obtain the first successful response, thereby providing a principled objective that balances aver-age performance with greater attention to harder problems. Building on the moment-based perspective, we further de-velop a generalized moment-transformation framework that unifies a broader family of policy optimization objectives, with different transformations inducing distinct optimization objectives. Under this framework, MaxRL can be interpreted as optimizing the moments of a transformed dristribution rather than those of the original one. We further prove that this family of objectives is strictly Schur-convex, revealing an explicit preference for more balanced success probabilities across problems. Experiments on five mathematical reason-ing benchmarks and models of different scales demonstrate that MMPO consistently outperforms strong baselines. Our main contributions are summarized as follows: 
+
+• We introduce a moment-based formulation of policy opti-mization for LLM reasoning and propose MMPO, which jointly optimizes multiple moments. 
+
+• We unify first-moment methods, pass@ K training, and MaxRL, and develop a moment-transformation frame-work with theoretical properties. 
+
+• We demonstrate across five mathematical reasoning benchmarks and models of different scales that MMPO consistently outperforms strong baselines. 
+
+# 2 Related Work 
+
+Reinforcement Learning for LLM Reasoning. Rein-forcement learning has become a standard approach for im-proving the reasoning capabilities of large language models. Given outcome-level supervision from rule-based verifiers, conventional methods optimize the expected reward through policy-gradient objectives. REINFORCE (Williams 1992) provides the basic formulation, while GRPO (Shao et al. 2024) and DAPO (Yu et al. 2026) further introduce group-based advantage estimation and other strategies to improve training efficiency. A complementary line of work promotes exploration through entropy regularization (Jiang et al. 2025; Zhang et al. 2026a), distribution matching (Zhu et al. 2025; Li et al. 2026), diverse response generation (Hu et al. 2025), or specialized rollout strategies (Li et al. 2025). However, these methods remain primarily centered on first-moment optimization through the expected-reward objective. 
+
+Objectives beyond Expected Reward. Another line of work explores policy objectives beyond standard first-moment optimization. Pass@ K training (Chen et al. 2025; Peng et al. 2025; Walder and Karkhanis 2026) maximizes the probability that at least one of K sampled responses succeeds, while MaxRL (Tajwar et al. 2026) formulates RLVR from a maximum-likelihood perspective by maximiz-ing the expected log success probability. Under our moment-based perspective, pass@ K training corresponds to opti-mizing a single higher-order moment, whereas MaxRL opti-mizes a weighted combination of multiple moments. In con-trast, MMPO jointly minimizes multiple moments with uni-form coefficients, providing a direct characterization of the failure-probability distribution beyond any single moment. Table 1 summarizes representative policy objectives under the moment-based perspective. Here, Uλ ∼ Beta( λ, 1) is independent of Fθ , and MaxRL can be interpreted as opti-mizing multiple moments of a transformed random variable. 
+
+# 3 Methodology 
+
+The methodology is organized as follows. Section 3.1 es-tablishes the basic problem formulation and revisits REIN-FORCE (Williams 1992) from a moment-based perspective, under which its optimization target can be interpreted as the expectation of a random variable. Section 3.2 then intro-duces MMPO, which is grounded in a practically meaningful objective of minimizing the expected time to first success, together with its objective construction and practical sur-rogate. Section 3.3 further provides a theoretical analysis of MMPO, clarifying its connections to pass@ K training methods (Chen et al. 2025; Peng et al. 2025; Walder and Karkhanis 2026) and MaxRL (Tajwar et al. 2026). 
+
+3.1 Preliminaries 
+
+We consider a standard reinforcement learning formulation for LLM reasoning. Let D denote a probability distribution over problems x ∈ X . For each problem x ∼ D , a policy model πθ generates a response y ∼ πθ (· | x). The generated response y is evaluated by a verifier r(x, y ) ∈ { 0, 1}, where 
+
+r(x, y ) = 1 indicates a successful response and otherwise indicates failure. For any problem x, the success probability of a single rollout under the current policy is defined as 
+
+sθ (x) = Pr  
+
+> y∼πθ(·| x)
+
+[r(x, y ) = 1] = Ey∼πθ (·| x)[r(x, y )] . (1) Correspondingly, we define the failure probability as 
+
+fθ (x) = 1 − sθ (x), which induces a random variable over problems. Let X ∼ D denote the random problem instance, and define Fθ = fθ (X). The distribution of Fθ characterizes the heterogeneity of the current policy’s failure probabilities across problems, indicating whether failures are concentrated on a few hard instances or broadly spread over the dataset. REINFORCE optimizes the policy by maximizing the ex-pected success probability of a single rollout over problems. Under the failure-probability view, this is equivalent to min-imizing the expectation of Fθ :
+
+max  
+
+> θ
+
+EX [sθ (X)] ⇐⇒ min  
+
+> θ
+
+EX [fθ (X)] = min  
+
+> θ
+
+E[Fθ ] . (2) The equality follows from the law of the unconscious statisti-cian, R 
+
+> X
+
+fθ (x) d D(x) = R 10 z p Fθ (z) d z, where pFθ (z) is the density function induced by Fθ and describes the proportion of problems whose failure probability is near z. Objective (2) captures only the first moment of the random variable Fθ , i.e., Method Objective Moment View REINFORCE-style min θ E[Fθ ] single moment of Fθ
+
+Pass@ K training min θ E[F Kθ ] single moment of Fθ
+
+MaxRL min θ
+
+PTk=1 E[F kθ ]/k moments of UλFθ
+
+MMPO min θ
+
+PTk=1 E[F kθ ] moments of Fθ
+
+Table 1: Moment characterization and interpretation of rep-resentative policy objectives. Algorithm 1: MMPO Training Workflow 
+
+Require: Initial policy πθ , dataset D, truncation order T ,batch size B, group size G
+
+1: while not converged do 
+
+2: Set πθold ← πθ
+
+3: Sample a batch {xi}Bi=1 from D
+
+4: for each problem xi do 
+
+5: Sample {yi,j }Gj=1 from πθold (· | xi)
+
+6: Compute Advantage bAi,j for each response yi,j 
+
+7: end for 
+
+8: Update θ by optimizing the clipped surrogate objective 
+
+9: end while 
+
+10: return πθ
+
+the average failure probability across problems. Recent meth-ods such as GRPO (Shao et al. 2024) and DAPO (Yu et al. 2026) introduce various refinements, yet their underlying objectives still remain centered on E[Fθ ]. These methods do not explicitly characterize the distributional structure of Fθ ,leaving the behavior beyond the mean unmodeled. MMPO characterizes the failure distribution through the joint op-timization of multiple moments, thereby extending beyond first-moment optimization. 
+
+3.2 Multi-Moment Policy Optimization 
+
+Population Objective. MMPO extends the first-moment objective in (2) by jointly optimizing the first T moments: 
+
+min  
+
+> θ
+
+JT (θ), JT (θ) := 
+
+> T
+
+X
+
+> i=1
+
+E F iθ
+
+ . (3) where T denotes the truncation order. Interestingly, (3) ad-mits a direct interpretation: it is equivalent to minimizing the expected truncated stopping time of the rollout process, namely, the expected number of attempts required to obtain the first successful response under a finite rollout budget. To make such interpretation explicit, for each problem x,we define the first-success stopping time as 
+
+Sθ (x) = inf {t ≥ 1 : r(x, Y t) = 1 },
+
+where (Yt)t≥1i.i.d.
+
+∼ πθ (· | x). (4) Since Sθ (x) follows a geometric distribution with success probability sθ (x), i.e., Pr( Sθ (x) = t) = fθ (x)t−1sθ (x) for 
+
+t ≥ 1, its truncated expectation satisfies 
+
+E[min {Sθ (X), T + 1 } | X = x] = 
+
+> T
+
+X
+
+> i=0
+
+fθ (x)i. (5) Thus, MMPO can be viewed as directly optimizing the time to first success, thereby exhibiting greater sensitivity to the long tail of difficult problems, which naturally require more rollout attempts before a successful response is obtained, than objectives based solely on average success probability. 
+
+Surrogate Objective. We next derive a practical surrogate for the population objective in (3). Differentiating the objec-tive with respect to θ gives 
+
+∇θ JT (θ) = −Ex∼D [wT,θ (x)∇θ sθ (x)] , (6) where 
+
+wT,θ (x) = 
+
+> T
+
+X
+
+> k=1
+
+kf θ (x)k−1 (7) is a problem-level weight induced by the joint optimization of the first T moments. Using the score-function identity, 
+
+∇θ sθ (x) = Ey∼πθ (·| x) [r(x, y )∇θ log πθ (y | x)] , (8) and subtracting the baseline, which leaves the expectation unchanged, the descent direction can be written as 
+
+−∇ θ JT (θ) = E x∼D  
+
+> y∼πθ(·| x)
+
+h
+
+wT,θ (x) ( r(x, y ) − sθ (x)) 
+
+· ∇ θ log πθ (y | x)
+
+i
+
+.
+
+(9) In practice, for each problem xi within a batch, we sample G responses {yi,j }Gj=1 and estimate (9). A sim-ple approach is to estimate both sθ (x) and wT,θ (x) from the sampled group. Specifically, for each xi, we compute 
+
+bsi = 1
+
+> G
+
+PGj=1 r(xi, y i,j ) and bwi = PTk=1 k(1 − bsi)k−1 by Eq. (7). The corresponding advantage is given by 
+
+bAbias  
+
+> i,j
+
+= bwi (r(xi, y i,j ) − bsi) . (10) Although this plug-in estimator is generally biased, we find it empirically effective. Alternatively, when T ≤ G, an un-biased estimator of the policy gradient direction can be con-structed. Let Mi, −j = P 
+
+> ℓ̸=j
+
+(1 − r(xi, y i,ℓ )) denote the number of failures excluding the j-th rollout. An unbiased estimator of the policy gradient direction can be constructed using the following leave-one-out advantage coefficient: 
+
+bAunb  
+
+> i,j
+
+=
+
+" TX
+
+> k=1
+
+k
+
+ Mi, −j
+
+> k−1
+
+ G−1
+
+> k−1
+
+# 
+
+r(xi, y i,j ) − 1 + Mi, −j
+
+G − 1
+
+
+
+.
+
+(11) Eq. (11) further admits a particularly simple form when 
+
+T = G. Let Ni = PGj=1 r(xi, y i,j ) denote the number of successful rollouts. Then we have 
+
+bAunb  
+
+> i,j
+
+=
+
+
+
+G(G + 1)( G − Ni)(G − 1) Ni(Ni + 1) , r(xi, y i,j ) = 1 ,
+
+− G(G + 1) Ni
+
+(G − 1)( Ni + 1)( Ni + 2) , r(xi, y i,j ) = 0 .
+
+(12) Following PPO-style optimization (Schulman et al. 2017), we maximize the corresponding clipped surrogate objective 
+
+LMMPO (θ) = 1
+
+BG 
+
+> B
+
+X
+
+> i=1
+> G
+
+X
+
+> j=1
+
+min 
+
+
+
+ρi,j (θ) bAi,j ,
+
+clip( ρi,j (θ), 1 − ϵ, 1 + ϵ) bAi,j 
+
+
+
+,
+
+(13) where ρi,j (θ) = πθ (yi,j |xi)   
+
+> πθold (yi,j |xi)
+
+is the importance ratio, bAi,j 
+
+is the realized advantage, ϵ is the clipping parameter, and B
+
+is the batch size. The derivation of the unbiased estimater is provided in Appendix A.1, and the overall MMPO training procedure is summarized in Algorithm 1. 
+
+3.3 Theoretical Analysis 
+
+Multi-Moment View. We first place REINFORCE-style methods, pass@K training methods, and MMPO within a unified moment-based framework. Let μk(θ) = E[F kθ ] de-note the k-th raw moment of the failure-probability random variable Fθ . As established in (2), REINFORCE-style meth-ods optimize the first moment μ1(θ). In comparison, maxi-mizing the pass@ K objective, Pass@ K(θ) = 1 − μK (θ),is equivalent to minimizing the K-th raw moment μK (θ).MMPO instead minimizes PTk=1 μk(θ) in (3), thereby jointly optimizing a moment sequence rather than only one of its coordinates. This formulation further provides a distribu-tional perspective on policy optimization. Define the mo-ment profile of Fθ as μ(Fθ ) =  μ1(θ), μ 2(θ), . . . . Since 
+
+Fθ is supported on the compact interval [0 , 1] , the classical Hausdorff moment problem implies that its complete mo-ment sequence uniquely determines its probability distribu-tion (Mnatsakanov 2008; Liu and Pego 2016). The moment profile μ(Fθ ) therefore provides a complete representation of how failure probabilities are distributed across problems. Although a finite set of moments does not in general uniquely determine the distribution, we argue that jointly and equally optimizing multiple moments is advanta-geous , as it captures complementary aspects of the distri-bution that are more difficult to recover from any single moment alone. Notably, existing pass@ K methods improve final performance by annealing K (Chen et al. 2025). Under our moment-based view, such schedules admit a new in-terpretation: varying K sequentially changes the optimized coordinate of the moment sequence. The empirical effective-ness of these schedules is therefore consistent with the view that different moments provide complementary optimization signals. In contrast to annealing among pass@ K objectives, MMPO provides a principled multi-moment formulation, as its combination of moments arises directly from the prac-tically meaningful objective in Eq.(5). Moreover, whereas larger budgets G in REINFORCE-style methods primarily reduce variance, we propose leveraging a larger G to char-acterize Fθ through a broader range of moments .The role of multiple moments can be further understood through tail-probability control. For any integer ℓ ≥ 1 and threshold τ ∈ (0 , 1] , Markov’s inequality gives 
+
+Pr ( Fθ ≥ τ ) = Pr  F ℓθ ≥ τ ℓ ≤ μℓ(θ)
+
+τ ℓ . (14) Thus, each moment provides a distinct upper bound on 
+
+Pr ( Fθ ≥ τ ). Moreover, a reduction in one moment does not necessarily imply a reduction in another, since different moments may induce different orderings over policies. A concrete toy example is provided in Appendix B.1. 
+
+Generalized Moment Transformation. A closely related recent work is MaxRL, which applies a Maclaurin expan-                          
+
+> (a) Fθ1,U∼Beta(1 ,2) (b) Fθ2,U∼Beta(1 ,2)
+> (c) Fθ1,U∼Beta(2 ,2) (d) Fθ1,U∼Beta(1 ,5)
+
+Figure 2: Joint density surfaces induced by different failure distributions Fθ and transformations U . The x- and y-axes represent realizations f of Fθ and u of U , respectively. For 
+
+f, u ∈ [0 , 1] , the surface height is z = pFθ (f )pU (u), where 
+
+pFθ and pU denote their respective densities. sion to the log-likelihood and truncates the resulting series at order T . Under our moment-based view, its objective can be equivalently written as MaxRL T (θ) = PTk=1 1 
+
+> k
+
+E[F kθ ].The key distinction lies in the coefficients assigned to dif-ferent moments: MMPO assigns a uniform coefficient of 1
+
+to each moment, whereas MaxRL adopts the harmonically decaying coefficient 1/k . Consequently, the contribution of 
+
+E[F kθ ] is progressively attenuated as k increases in MaxRL, while MMPO preserves the influence of higher-order mo-ments without such coefficient-level decay. We therefore ar-gue that MMPO directly performs joint optimization over the moments of Fθ , whereas MaxRL optimizes the moments of 
+
+another random variable . The Interpretation is inspired by the classical Hausdorff moment characterization (Berg and Durán 2005), summarized below. 
+
+Theorem 1 (Hausdorff theorem) Let A = {ak}∞ 
+
+> k=0
+
+be a real sequence with a0 = 1 , and define the forward-difference operator by ∆ak = ak+1 − ak. Then A is the moment profile of a random variable supported on [0 , 1] if and only if 
+
+(−1) n∆nak ≥ 0, ∀ n, k ≥ 0. (15) 
+
+Moreover, whenever (15) holds, there exists a unique [0 , 1] -valued random variable U in distribution, such that 
+
+ak = E[U k], ∀ k ≥ 0. (16) 
+
+Furthermore, if A and C = {ck}∞ 
+
+> k=0
+
+are both moment pro-files, then {akck}∞ 
+
+> k=0
+
+is also a moment profile. 
+
+Constructively, we consider a [0 , 1] -valued random vari-able Uλ ∼ Beta( λ, 1) for λ > 0, independent of Fθ . Its k-th moment is given by 
+
+E[U kλ ] = λ
+
+Z 10
+
+uk+λ−1 du = λλ + k . (17) Since {E[U kλ ]}∞ 
+
+> k=0
+
+is a moment profiles (satisfying (15)), it shows that {E[( UλFθ )k]}∞ 
+
+> k=0
+
+is also a moment profile. Thus, MaxRL can be interpreted as optimizing the moments of the random variable UλFθ , rather than those of Fθ itself: 
+
+> T
+
+X
+
+> k=1
+
+E(UλFθ )k = λ
+
+> T
+
+X
+
+> k=1
+
+1
+
+λ + k E[F kθ ]
+
+> up to positive scaling
+
+−−−−−−−−−−−→
+
+> λ→0+
+> T
+
+X
+
+> k=1
+
+1
+
+k E[F kθ ] = MaxRL T (θ).
+
+(18) Here, the outer factor λ only rescales the gradient, while the relative coefficient between the first and the k-th moments approaches k, attenuating higher-order moments. By Theorem 1, we can naturally extend this construction to any [0 , 1] -valued random variable U independent of Fθ . Op-timizing the moments of U F θ induces a systematic reweight-ing of the moments of Fθ . Furthermore, the transformation by U contracts discrepancies between failure distributions, since Wp(U F θ1 , U F θ2 ) ≤ (E[U p]) 1/p Wp(Fθ1 , F θ2 ), where 
+
+Wp denotes the p-th Wasserstein distance between the cor-responding distributions. As shown in Figure 2, different choices of Fθ and U induce markedly different joint density structures. The degenerate choice U ≡ 1 directly character-izes Fθ and recovers MMPO, whereas MaxRL characterizes 
+
+UλFθ with a small λ. More generally, different choices of U
+
+induce distinct optimization problems, which may be better suited to different reasoning settings or datasets. 
+
+Schur-Convexity. We further establish a structural prop-erty shared by this family of generalized moment objectives, i.e., objectives of the form min θ
+
+PTk=1 E (U F θ )k for any 
+
+[0 , 1] -valued random variable U independent of Fθ . We show that all such objectives induce an explicit preference for more balanced failure probabilities across problems: 
+
+Theorem 2 (Schur-Convex Moment Objectives) Let f =(f1, . . . , f n) ∈ [0 , 1] n denote the failure probabilities of n
+
+problems. For any [0 , 1] -valued random variable U satisfying 
+
+Pr( U > 0) > 0 and any truncation order T ≥ 2, define 
+
+JU,T (f ) = 1
+
+n
+
+> n
+
+X
+
+> i=1
+> T
+
+X
+
+> k=1
+
+E[U k]f ki . (19) 
+
+Then JU,T is strictly Schur-convex in f . Specifically, for any 
+
+g = ( g1, . . . , g n) ∈ [0 , 1] n, f ≻ g =⇒ JU,T (f ) > J U,T (g),
+
+where f ≻ g means that f majorizes g (Appendix A.2). 
+
+Here, f ≻ g indicates that f and g have the same mean, while f is more dispersed across problems. Accordingly, The-orem 2 establishes that the generalized moment objective exhibits an explicit preference for more balanced success probabilities across problems. Therefore, our objective en-courages accuracy gains to be distributed more evenly across problems, rather than concentrated on easily solvable ones, thereby mitigating the tendency of GRPO to optimize primar-ily over solvable problems (Qu et al. 2026) and promoting broader improvement across the problem distribution. 
+
+Controlled Reweighting toward Harder Problems. As shown in Eq. (7), implementing our multi-moment objec-tive requires only an additional problem-level reweighting compared with GRPO. This reweighting assigns greater em-phasis to problems with lower success probabilities, thereby directing optimization toward harder problems and encour-aging broader exploration. However, aggressively emphasiz-ing difficult problems, as in Pass@ K training, may come at the cost of reduced average performance. The following property shows that our reweighting alleviates this limitation: 
+
+Proposition 1 (Moderate Reweighting) For any two prob-lems xhard and xeasy satisfying ρ = fθ (xhard )   
+
+> fθ(xeasy )
+
+> 1, let 
+
+cT (ρ) = 2  ρT +1 − (T + 1) ρ + T 
+
+T (T + 1)( ρ − 1) 2 . (20) 
+
+Then cT (ρ) ≥ 1, and the relative weights satisfy 
+
+1 ≤ wT,θ (xhard )
+
+wT,θ (xeasy ) ≤ 1
+
+cT (ρ)
+
+WT,θ (xhard )
+
+WT,θ (xeasy ) , (21) 
+
+where WT,θ (x) = T f θ (x)T −1 denotes the problem-level weight induced by the pass@ T objective. In particular, 
+
+cT (ρ) > 2 if and only if  
+
+> T−1
+
+X
+
+> k=1
+
+(T − k)ρk > T 2, (22) 
+
+which becomes increasingly mild as T grows (Appendix A.3). 
+
+Proposition 1 directly shows that our reweighting remains controlled: as established by (21), the relative weight of a harder problem over an easier one is more moderate than that induced by the pass@ T objective (upper-bounded by the pass@ T ratio divided by cT (ρ)). Such moderation is de-sirable, since excessively emphasizing low-success problems may introduce stronger interference across prompts and po-tentially degrade pass@1 performance (Barakat et al. 2026). 
+
+# 4 Experiments 
+
+Our experiments aim to substantiate the proposed moment-based perspective, rather than merely pursue incremental benchmark gains . Section 4.2 reports the overall perfor-mance, Section 4.3 analyzes the truncation order and trans-formation family, and Section 4.4 further examines the prop-erties of the moment-based objective family. 
+
+4.1 Experiment Setup 
+
+Training Setup. We conduct experiments using Qwen3-1.7B/4B-Base (Yang et al. 2025) as the initial policy mod-els. All models are trained with the verl framework (Sheng et al. 2025) on two NVIDIA H20 GPUs using the MATH7.5K training set (Hendrycks et al. 2021). We use a training batch size of B = 16 problems, sample G = 8 rollouts for each problem, and set the PPO mini-batch size to 16. We use a constant learning rate of 10 −6 without a warm-up phase. The maximum prompt length and response length are set to 1024 and 4096 tokens, respectively. The PPO (Schulman et al. 2017) clipping range is set as ϵ = 0 .2. Math-Verify (Ky-dlíček 2025) is employed as the rule-based verifier to better Method MATH OlymMATH AMC23 AIME24 AIME25 Avg. 
+
+1.7B 4B 1.7B 4B 1.7B 4B 1.7B 4B 1.7B 4B 1.7B 4B 
+
+Base 53.8 58.6 21.7 29.9 29.5 34.8 4.6 7.7 2.1 5.0 22.3 27.2 GRPO 69.6 84.0 34.0 48.4 46.7 58.1 12.1 16.5 7.3 18.1 33.9 45.0 Pass@K 72.4 82.6 35.5 47.1 46.0 60.1 9.2 19.6 7.5 20.0 34.1 45.9 DMPO 71.8 84.8 32.1 47.8 42.4 57.7 10.2 18.3 6.0 18.8 32.5 45.5 MaxRL 71.4 82.4 34.6 45.3 46.8 61.3 9.5 15.4 6.6 12.9 33.8 43.5 
+
+MMPO (ours) 73.0 84.2 35.7 51.6 48.6 60.6 10.6 21.3 5.4 20.4 34.7 47.6 
+
+Table 2: Performance on five mathematical reasoning benchmarks (%). The best results are highlighted in bold , and the runner-up results are underlined. Avg. denotes the average performance across all evaluation benchmarks. determine the correctness of generated responses. During training, we set both the sampling temperature and the top-p
+
+threshold to 1.0. The prompt is provided in Appendix B.2. 
+
+Evaluation Setup. The models are evaluated on five mathematical reasoning benchmarks: AMC23, AIME24, AIME25 (Dekoninck et al. 2026), MATH500 (Hendrycks et al. 2021), and OlymMATH (Sun et al. 2026). These bench-marks cover mathematical problems of varying difficulty, ranging from standard competition problems to challenging Olympiad-level reasoning tasks (Detailed information of the benchmarks are provided in Appendix B.3). Owing to differ-ences in benchmark size, we report avg@1 on MATH500 and OlymMATH, and avg@16 on the remaining benchmarks. The models are evaluated every 20 training steps and we report the best average performance. During evaluation, we use a sampling temperature of 0.6 and a top-p value of 0.95. 
+
+Method Setup. We compare MMPO with several repre-sentative reinforcement learning objectives. GRPO (Shao et al. 2024) and pass@ K training (Walder and Karkhanis 2026) optimize objectives centered on a single moment of the failure-probability distribution, whereas DMPO (Li et al. 2026) promotes exploration through distribution matching. We further include MaxRL (Tajwar et al. 2026), whose ob-jective can be interpreted as optimizing the moments of a transformed random variable rather than those of Fθ . For MMPO, we set the truncation order to T = 4 and use the plug-in advantage estimator in Eq. (10). For pass@ K train-ing, we adopt the estimator proposed in (Chen et al. 2025) and set K = 3 , which we found to perform better than the other configurations considered. For DMPO, we follow the recommended configuration and set λ = 2 and α = 1 /15 .
+
+4.2 Overall Performance 
+
+As shown in Table 2, MMPO consistently achieves the best average performance across both model scales, con-sistently outperforming strong baselines. Compared with GRPO, MMPO improves the average score by 0.8% and 
+
+2.6% on Qwen3-1.7B-Base and Qwen3-4B-Base, respec-tively. On the 1.7B model, most alternative objectives yield only marginal or no gains over GRPO, which may be at-tributed to the relatively limited reasoning capacity of mod-els at this scale and the correspondingly smaller room for improvement through objective design. Compared with 
+
+Figure 3: Ablation study of the truncation order T on Qwen3-4B-Base. The y-axis shows success rate (%).                         
+
+> Transformation UMATH Olymp. AMC23 AIME24 AIME25
+> U∼Beta(1 ,2) 82.2 47.0 61.1 17.1 21.5
+> U≡0.883.6 46.5 58.9 18.3 17.5
+> U≡1.084.2 51.6 60.6 21.3 20.4
+
+Table 3: Performance of different transformation variables U
+
+on Qwen3-4B-Base, with truncation order T = 4 .Pass@ K training, MMPO further improves the average per-formance by 1.7% on the 4B scale. This advantage is con-sistent with our Controlled Reweighting property: MMPO places greater emphasis on difficult problems while avoiding the overly aggressive reweighting induced by Pass@ K train-ing. We also observe that MaxRL, the most closely related baseline, performs less favorably even when its rollout bud-get is increased to G = 16 , which suggests that the effective-ness of a moment objective depends jointly on the choice of transformation variable U and the distribution of the training data. Consequently, the generalized moment-transformation family provide a broader design space for adapting policy objectives to different reasoning settings. 
+
+4.3 Ablation Study 
+
+We first conduct an ablation study on the truncation order T ,which determines the number of moments of Fθ included in the MMPO objective. As shown in Figure 3, T = 4 
+
+achieves the best overall performance, followed by T = 3 ,whereas using higher truncation orders leads to a substan-Figure 4: Distributional comparison between MMPO and GRPO. Left: Gini coefficients across difficulty-controlled subsets, excluding problems according to threshold α. Right: Lorenz curves for the representative setting α = 0 .1.
+
+Figure 5: Comparison of the first success time distribution. The gap is less than 5 for problems solved in the first rollout, and exceeds 30 for problems unsolved after 16 rollouts. tial performance degradation. This result reflects a practical bias–variance trade-off. With a small T , the objective in-corporates only a limited portion of the moment profile and is therefore less capable of characterizing the distributional structure of Fθ . In contrast, under finite batch size and rollout budget, higher-order moments become increasingly difficult to estimate reliably, introducing greater estimation noise and weakening the training signal. The superior performance at an intermediate order is consistent with the discussion in Section 3.3, since a larger rollout budget implies more accu-rate estimation of higher-order moments and thereby enables more reliable optimization over a broader moment range. We further examine the effect of the transformation vari-able U , which shapes the distribution targeted by the opti-mization objective. As shown in Table 3, different choices of U lead to distinct performance. Although U ≡ 0.8 still incorporates higher-order moments, the additional informa-tion they provide appears insufficient to offset the associ-ated estimation noise. In comparison, U ≡ 1.0 achieves the strongest overall performance, suggesting that uniform mo-ment weighting is more effective in our setting. 
+
+4.4 In-Depth Analysis 
+
+Beyond benchmark performance, we further examine how MMPO affects the distribution and dynamics of successful reasoning. Figure 4 presents the Lorenz curves and corre-sponding Gini coefficients, which characterize how evenly per-problem success probabilities are distributed (see Ap-pendix B.4 for details on the Gini coefficient and Lorenz curve). For each threshold α, we exclude validation prob-lems on which both methods achieve success rates below α
+
+or above 1−α, thereby removing instances that are uniformly too difficult or too easy, and compute the Gini coefficient over Method Pass@1 Pass@4 Pass@8 Pass@16 GRPO 45.0 56.2 59.8 62.2 MMPO (ours) 47.6 59.4 63.4 66.2 Table 4: Average Pass@ K performance across five mathe-matical reasoning benchmarks (%). the remaining subset. Across all thresholds, MMPO consis-tently yields lower Gini coefficients than GRPO; under the same α, its Lorenz curve also lies closer to the equality line, indicating a more balanced distribution of success rates across problems. This empirical pattern is consistent with the Schur-convexity property established in Theorem 2, which shows that MMPO prefers improvements distributed across problems rather than gains concentrated on already solvable instances. The first success time distribution in Figure 5 pro-vides a complementary perspective. The two methods solve a similar number of problems on the first rollout, suggest-ing that MMPO’s improvement does not primarily arise from further solving easy problems. Instead, MMPO enables more problems to be solved within subsequent attempts and leaves substantially fewer problems unsolved after 16 rollouts, in-dicating more broadly distributed and earlier discovery of successful solutions under repeated sampling. Table 4 further shows that MMPO consistently outper-forms GRPO across all pass@ K metrics, with its advantage becoming more pronounced as K increases. Since pass@ K
+
+metric measures the ability to discover at least one success-ful solution through repeated sampling, these results provide evidence that MMPO promotes more effective exploration of the solution space. We also observe that MMPO yields longer responses during training, a pattern that is consistent with more extensive reasoning trajectories and has also been reported in prior studies of exploratory behavior (Guo et al. 2025; Yu et al. 2026; Li et al. 2026). Together, these results suggest that MMPO encourages broader exploration rather than merely reinforcing solutions that have already been discovered. More broadly, these find-ings highlight the effectiveness of multi-moment objectives in jointly shaping the performance, distributional balance, and exploratory behavior of reasoning policies. 
+
+# 5 Conclusion 
+
+In this paper, we introduce a moment-based perspective on policy optimization for LLM reasoning and propose Multi-Moment Policy Optimization (MMPO), which jointly opti-mizes multiple moments of the failure-probability distribu-tion. MMPO admits an operational interpretation as mini-mizing the expected truncated time to first success, while its theoretical properties reveal a preference for balanced improvements and controlled emphasis on harder problems. We further developed a generalized moment-transformation framework that unifies a broader family of objectives. Exper-iments across five mathematical reasoning benchmarks and two model scales demonstrate the effectiveness of MMPO, highlighting moments as a principled foundation for design-ing future policy optimization objectives. A Proofs and Derivations 
+
+A.1 Unbiased Gradient Estimator 
+
+We derive an unbiased estimator of the policy-gradient di-rection associated with the multi-moment objective. For a problem x, let sθ (x) = Ey∼πθ (·| x)[r(x, y )] and fθ (x) = 1 − sθ (x). The multi-moment objective is 
+
+JT (θ) = Ex∼D 
+
+" TX
+
+> k=1
+
+fθ (x)k
+
+#
+
+, (23) and its descent direction can be written as 
+
+−∇ θ JT (θ) = Ex∼D 
+
+" TX
+
+> k=1
+
+kf θ (x)k−1∇θ sθ (x)
+
+#
+
+. (24) It therefore suffices to construct, for each k ∈ { 1, . . . , T },an unbiased estimator of kf θ (x)k−1∇θ sθ (x). Fix a prob-lem xi, and let Ri,j := r(xi, y i,j ), where {yi,j }j≤G are drawn i.i.d. from πθ (· | xi). For notational simplicity , we write si := sθ (xi) and fi := fθ (xi). Unless otherwise spec-ified, expectations are taken over the joint randomness of 
+
+{yi,j }j≤G conditional on xi. For the j-th rollout, define 
+
+Mi, −j = X
+
+> ℓ̸=j
+
+(1 − Ri,ℓ ) , (25) which is the number of failures among the remaining G − 1
+
+rollouts excluding the j-th rollout. 
+
+Unbiased estimation of f k−1 
+
+> i
+
+. We first review the subset-averaging construction underlying the unbiased pass@ K es-timator (Walder and Karkhanis 2026). For the (k − 1) -th power of the failure probability, define 
+
+[f k−1 
+
+> i, −j
+
+:= 
+
+ Mi, −j
+
+> k−1
+
+ G−1
+
+> k−1
+
+ , 1 ≤ k ≤ G, (26) where  ab
+
+ denotes the binomial coefficient, with the conven-tion that  ab
+
+ = 0 whenever b > a . Let I−j = {1, . . . , G } \ {j}. [f k−1 
+
+> i, −j
+
+admits the equivalent U -statistic representation 
+
+[f k−1 
+
+> i, −j
+
+= 1
+
+ G−1
+
+> k−1
+
+ X
+
+> S⊆I −j
+> |S| =k−1
+
+Y
+
+> ℓ∈S
+
+(1 − Ri,ℓ ) . (27) Indeed, exactly  Mi, −j
+
+> k−1
+
+ subsets of size k − 1 consist entirely of failed rollouts. For every fixed subset S ⊆ I −j satisfying 
+
+|S| = k − 1, independence of the sampled rollouts gives 
+
+E
+
+"Y
+
+> ℓ∈S
+
+(1 − Ri,ℓ ) xi
+
+#
+
+= Y
+
+> ℓ∈S
+
+E [1 − Ri,ℓ | xi]= ( E[1 − Ri, 1 | xi]) |S| = f k−1 
+
+> i
+
+.
+
+(28) Averaging over all subsets therefore yields 
+
+E
+
+ [f k−1 
+
+> i, −j
+
+xi
+
+
+
+= f k−1 
+
+> i
+
+. (29) Thus, [f k−1 
+
+> i, −j
+
+is an unbiased estimator of f k−1 
+
+> i
+
+.
+
+Leave-one-out baseline. Define the leave-one-out esti-mate of the success probability si as 
+
+bsi, −j = 1
+
+G − 1
+
+X
+
+> ℓ̸=j
+
+Ri,ℓ = 1 − Mi, −j
+
+G − 1 , (30) which is an unbiased estimator of si, i.e., E[bsi, −j | xi] = si.Both [f k−1 
+
+> i, −j
+
+and bsi, −j depend only on the rollouts excluding 
+
+yi,j . Hence, conditional on xi, they are independent of yi,j .Let gi,j := ∇θ log πθ (yi,j | xi). The score-function identi-ties give E[gi,j | xi] = 0 and 
+
+E [Ri,j gi,j | xi] = ∇θ sθ (xi). (31) Conditioning on the leave-one-out rollouts, we obtain 
+
+Eyi,j ∼πθ (·| xi) [( Ri,j − bsi, −j ) gi,j | xi, {yi,ℓ }ℓ̸=j ]= E [Ri,j gi,j | xi] − bsi, −j E [gi,j | xi]= ∇θ sθ (xi).
+
+(32) Therefore, the leave-one-out baseline does not change the expected score-weighted gradient. 
+
+Unbiased estimator for each moment. For the k-th mo-ment, define the leave-one-out advantage coefficient 
+
+bA(k) 
+
+> i,j
+
+= k [f k−1 
+
+> i, −j
+
+(Ri,j − bsi, −j ) . (33) Equivalently, 
+
+bA(k) 
+
+> i,j
+
+= k
+
+ Mi, −j
+
+> k−1
+
+ G−1
+
+> k−1
+
+
+
+Ri,j − 1 + Mi, −j
+
+G − 1
+
+
+
+. (34) Using the tower property of conditional expectation gives 
+
+E
+
+h bA(k) 
+
+> i,j
+
+gi,j xi
+
+i tower property 
+
+========= k Eyi,ℓ ∼πθ (·| xi), ℓ ̸=j
+
+"
+
+[f k−1
+
+> i, −j
+
+Eyi,j ∼πθ (·| xi) [( Ri,j − bsi, −j ) gi,j | xi, {yi,ℓ }ℓ̸=j ] xi
+
+#
+
+> Eq. (32)
+
+====== k Eyi,ℓ ∼πθ (·| xi), ℓ ̸=j
+
+"
+
+[f k−1 
+
+> i, −j
+
+∇θ sθ (xi) xi
+
+#
+
+= k E
+
+"
+
+[f k−1 
+
+> i, −j
+
+∇θ sθ (xi) xi
+
+#
+
+= k E
+
+ [f k−1 
+
+> i, −j
+
+xi
+
+
+
+∇θ sθ (xi)
+
+> Eq. (29)
+
+====== kf k−1 
+
+> i
+
+∇θ sθ (xi).
+
+(35) Hence, bA(k) 
+
+> i,j
+
+∇θ log πθ (yi,j | xi) is an unbiased estimator of the policy-gradient contribution of the k-th moment. 
+
+Unbiased multi-moment estimator. Using Eq. (34), sum-ming over the first T moments gives 
+
+bAunb  
+
+> i,j
+
+=
+
+" TX
+
+> k=1
+
+k
+
+ Mi, −j
+
+> k−1
+
+ G−1
+
+> k−1
+
+# 
+
+Ri,j − 1 + Mi, −j
+
+G − 1
+
+
+
+. (36) Its expected score-weighted value satisfies 
+
+E
+
+h bAunb  
+
+> i,j
+
+∇θ log πθ (yi,j | xi) xi
+
+i
+
+> Eq. (35)
+
+======
+
+> T
+
+X
+
+> k=1
+
+kf k−1 
+
+> θ
+
+∇θ sθ (xi)
+
+> Eq. (7)
+
+===== wT,θ (xi)∇θ sθ (xi).
+
+(37) Consequently, whenever T ≤ G,
+
+1
+
+BG 
+
+> B
+
+X
+
+> i=1
+> G
+
+X
+
+> j=1
+
+bAunb  
+
+> i,j
+
+∇θ log πθ (yi,j | xi) (38) is an unbiased Monte Carlo estimator of the gradient in (6). 
+
+Simplified form when T = G. We next simplify the esti-mator for T = G. For 0 ≤ m ≤ G − 1, define 
+
+SG(m) := 
+
+> G
+
+X
+
+> k=1
+
+k
+
+  mk−1
+
+ G−1
+
+> k−1
+
+ =
+
+> m
+
+X
+
+> t=0
+
+(t + 1) 
+
+ mt
+
+ G−1
+
+> t
+
+ , (39) For 0 ≤ t ≤ G − 1, the beta-integral identity gives 
+
+1
+
+ G−1
+
+> t
+
+ = G
+
+Z 10
+
+ut(1 − u)G−1−t du, (40) we obtain 
+
+SG(m) = G
+
+Z 10
+
+(1 − u)G−1−m
+
+·
+
+" mX
+
+> t=0
+
+(t + 1) 
+
+mt
+
+
+
+ut(1 − u)m−t
+
+#
+
+du. 
+
+(41) The standard binomial identities imply 
+
+> m
+
+X
+
+> t=0
+
+(t + 1) 
+
+mt
+
+
+
+ut(1 − u)m−t = 1 + mu. (42) Therefore, 
+
+SG(m) = G
+
+Z 10
+
+(1 − u)G−1−m(1 + mu ) du. (43) Evaluating the integral yields 
+
+SG(m) = G
+
+ 1
+
+G − m + m
+
+(G − m)( G − m + 1) 
+
+
+
+= G(G + 1) (G − m)( G − m + 1) .
+
+(44) Applying this result with m = Mi, −j allows us to simplify the summation term in Eq. (36). We next consider the two cases corresponding to Ri,j = 1 and Ri,j = 0 , respectively. Let Ni = PGj=1 Ri,j denote the total number of successful rollouts for problem xi. When Ri,j = 1 , we have Mi, −j =
+
+G − Ni and Ri,j − 1 + Mi, −j 
+
+> G−1
+
+= G−Ni 
+
+> G−1
+
+. Thus, 
+
+bAunb  
+
+> i,j
+
+= SG(G − Ni) G − Ni
+
+G − 1= G(G + 1)( G − Ni)(G − 1) Ni(Ni + 1) .
+
+(45) When Ri,j = 0 , we have Mi, −j = G − Ni − 1 and Ri,j −
+
+1 + Mi, −j 
+
+> G−1
+
+= − Ni 
+
+> G−1
+
+. Consequently, 
+
+bAunb  
+
+> i,j
+
+= −SG(G − Ni − 1) Ni
+
+G − 1= − G(G + 1) Ni
+
+(G − 1)( Ni + 1)( Ni + 2) .
+
+(46) Combining the two cases gives the simplified form Eq. (12). 
+
+Bias-variance trade-off. The derivation above establishes an unbiased estimator for the multi-moment gradient. Nev-ertheless, unbiasedness alone does not guarantee low finite-sample estimation error or stable optimization, motivating the deliberate bias-variance trade-offs commonly adopted in policy-gradient methods (Schulman et al. 2015). We there-fore use the generally biased plug-in estimator in Eq. (10) throughout the main experiments. With a limited rollout budget and batch size, this choice accepts finite-sample bias in favor of reduced estimation noise and improved gradi-ent stability. It thus represents a deliberate bias–variance trade-off in the practically relevant limited-sample regime, rather than a modification of the underlying multi-moment objective. The resulting improvements further demonstrate that the proposed multi-moment signal remains effective un-der practical sampling constraints. Meanwhile, the unbiased estimator remains directly applicable and, for fixed T , is ex-pected to become increasingly stable as budgets grow. We further compare the two estimators in Appendix B.5. 
+
+A.2 Schur-Convexity of Moment Objectives 
+
+For clarity, we first specify the majorization notation used in our paper. We write f ⪰ g if f majorizes g, and write f ≻ g
+
+if, in addition, g is not a permutation of f . Define the scalar 
+
+ϕU,T (z) := 
+
+> T
+
+X
+
+> k=1
+
+E[U k]zk, z ∈ [0 , 1] . (47) Then, the objective can be written as 
+
+JU,T (f ) = 1
+
+n
+
+> n
+
+X
+
+> i=1
+
+ϕU,T (fi). (48) We first show that ϕU,T is strictly convex on [0 , 1] . Since 
+
+T ≥ 2, its second derivative is 
+
+ϕ′′  
+
+> U,T
+
+(z) = 
+
+> T
+
+X
+
+> k=2
+
+k(k − 1) E[U k]zk−2
+
+= 2 E[U 2] + 
+
+> T
+
+X
+
+> k=3
+
+k(k − 1) E[U k]zk−2.
+
+(49) Since U ∈ [0 , 1] and Pr( U > 0) > 0, we have E[U 2] > 0.Moreover, all the remaining terms are nonnegative for z ∈
+
+[0 , 1] . Therefore, 
+
+ϕ′′  
+
+> U,T
+
+(z) ≥ 2E[U 2] > 0, z ∈ [0 , 1] . (50) Thus, ϕU,T is strictly convex on [0 , 1] . Now suppose that f ⪰
+
+g. By Karamata’s inequality (Marshall, Olkin, and Arnold 2011), the convexity of ϕU,T gives 
+
+> n
+
+X
+
+> i=1
+
+ϕU,T (fi) ≥
+
+> n
+
+X
+
+> i=1
+
+ϕU,T (gi). (51) Since ϕU,T is strictly convex, equality holds only when g
+
+is a permutation of f (Marshall, Olkin, and Arnold 2011). Therefore, when f ≻ g, we have 
+
+> n
+
+X
+
+> i=1
+
+ϕU,T (fi) >
+
+> n
+
+X
+
+> i=1
+
+ϕU,T (gi). (52) Dividing both sides by n yields 
+
+JU,T (f ) > J U,T (g). (53) Therefore, JU,T is strictly Schur-convex. It is worth noting that this conclusion does not hold when T = 1 . In this case, 
+
+ϕU, 1(z) = E[U ]z is linear rather than strictly convex. Since majorization requires Pni=1 fi = Pni=1 gi, we have 
+
+JU, 1(f ) = E[U ]
+
+n
+
+> n
+
+X
+
+> i=1
+
+fi = E[U ]
+
+n
+
+> n
+
+X
+
+> i=1
+
+gi = JU, 1(g). (54) Thus, a first-moment objective cannot distinguish failure-probability vectors with the same mean but different levels of dispersion. This highlights an inherent limitation of first-moment optimization: it captures average performance but is insensitive to how performance is distributed (Bellemare, Dabney, and Munos 2017). 
+
+A.3 Moderate Reweighting Property 
+
+For brevity, write a = fθ (xeasy ) and t = fθ (xhard ), so that 
+
+t = ρa . Since failure probabilities lie in (0 , 1) , we have a, t ∈
+
+(0 , 1) . Recall that the problem-level weights induced by the multi-moment and pass@ T objectives are, respectively, 
+
+wT,θ (x) = 
+
+> T
+
+X
+
+> k=1
+
+kf θ (x)k−1, W T,θ (x) = T f θ (x)T −1. (55) We first divide the relative weight induced by pass@ T by that induced by the multi-moment objective: 
+
+WT,θ (xhard )/W T,θ (xeasy )
+
+wT,θ (xhard )/w T,θ (xeasy )= ρT −1
+
+PTk=1 ka k−1
+
+PTk=1 k(ρa )k−1
+
+=
+
+PTk=1 kρ T −ktk−1
+
+PTk=1 kt k−1 .
+
+(56) Define 
+
+pk := 2kT (T + 1) , bk := ρT −k, qk := tk−1, (57) where the sequence {bk}Tk=1 and {qk}Tk=1 are decreasing in 
+
+k. Noting that PTk=1 pk = 1 , direct expansion (or, equiva-lently, the weighted Chebyshev sum inequality) gives 
+
+> T
+
+X
+
+> k=1
+
+pkbkqk −
+
+> T
+
+X
+
+> k=1
+
+pkbk
+
+! TX
+
+> k=1
+
+pkqk
+
+!
+
+= 12
+
+> T
+
+X
+
+> i=1
+> T
+
+X
+
+> j=1
+
+pipj (bi − bj )( qi − qj ) ≥ 0.
+
+(58) Dividing by PTk=1 pkqk > 0 and substituting Eq. (57) gives 
+
+PTk=1 kρ T −ktk−1
+
+PTk=1 kt k−1 ≥ 2 PTk=1 kρ T −k
+
+T (T + 1) ≥ 1. (59) The middle term is exactly cT (ρ). Consequently, 
+
+wT,θ (xhard )
+
+wT,θ (xeasy ) ≤ 1
+
+cT (ρ)
+
+WT,θ (xhard )
+
+WT,θ (xeasy ) . (60) To characterize when cT (ρ) > 2, consider 
+
+> T
+
+X
+
+> k=1
+
+kρ T −k = T + 
+
+> T−1
+
+X
+
+> k=1
+
+(T − k)ρk. (61) It follows that 
+
+cT (ρ) > 2 ⇐⇒ T + 
+
+> T−1
+
+X
+
+> k=1
+
+(T − k)ρk > T (T + 1) 
+
+⇐⇒  
+
+> T−1
+
+X
+
+> k=1
+
+(T − k)ρk > T 2.
+
+(62) To show that this condition becomes easier to satisfy as T
+
+increases, in the sense that the minimum required value of ρ
+
+decreases, we define 
+
+gT (ρ) := 1
+
+T 2 
+
+> T−1
+
+X
+
+> k=1
+
+(T − k)ρk. (63) For any fixed ρ > 1,
+
+gT +1 (ρ) − gT (ρ) = 
+
+> T
+
+X
+
+> k=1
+
+ (2 T + 1) k − T (T + 1) ρk
+
+T 2(T + 1) 2 > 0,
+
+(64) where the inequality follows from 
+
+PTk=1 kρ k
+
+PTk=1 ρk > T + 1 2 (by the Chebyshev inequality) 
+
+> T (T + 1) 2T + 1 .
+
+(65) Therefore, gT (ρ) is increasing in T . Since it is also strictly increasing in ρ, the minimum value of ρ satisfying gT (ρ) > 1
+
+decreases as T increases. For example, for T = 3 , 4, 5, the corresponding minimum values are 
+
+ρ⋆ 
+
+> 3
+
+≈ 2.1623 , ρ⋆ 
+
+> 4
+
+≈ 1.7112 , ρ⋆ 
+
+> 5
+
+≈ 1.5109 . (66) Therefore, our objective not only upweights harder problems, but also exhibits a moderate reweighting behavior, in the sense that it avoids the overly aggressive emphasis induced by the corresponding pass@ T objective. 
+
+# B Additional Experimental Details 
+
+B.1 A Toy Example on Moments 
+
+Consider two policies whose per-problem failure probabili-ties follow the continuous distributions 
+
+Fθ1 ∼ Unif(0 .3, 0.5) , Fθ2 ∼ Beta 
+
+ 12 , 1
+
+
+
+. (67) Figure 6: Prompt template. The second distribution places substantially more probability near zero, indicating that θ2 achieves low failure probabilities on a larger fraction of problems. Their first moments are 
+
+E[Fθ1 ] = 25 > 13 = E[Fθ2 ]. (68) Thus, the first moment alone favors θ2. In contrast, their fourth moments satisfy 
+
+EF 4
+
+> θ1
+
+ = 1441 50000 < 19 = EF 4
+
+> θ2
+
+ . (69) Therefore, the fourth moment favors θ1. Intuitively, although 
+
+θ2 performs better on average and assigns more probability to near-zero failure rates, it also has a heavier upper tail corre-sponding to a subset of particularly difficult problems, which is characterized by higher-order moments. In comparison, θ1
+
+distributes its failure probabilities more evenly. When jointly considering the first four moments, the MMPO objective favors θ1, since 
+
+> 4
+
+X
+
+> k=1
+
+EF kθ1
+
+ = 99023 150000 < 248 315 =
+
+> 4
+
+X
+
+> k=1
+
+EF kθ2
+
+ . (70) Thus, MMPO may prefer a policy with a slightly worse average failure probability but substantially smaller higher-order moments, reflecting its greater emphasis on reduc-ing failures on particularly difficult problems. In our experi-ments, MMPO consistently outperforms first-moment meth-ods, suggesting that explicitly accounting for higher-order moments can ultimately reduce the first moment of the fail-ure probability as well. 
+
+B.2 Prompt Template 
+
+Figure 6 presents the prompt template used in our experi-ments. We construct this template using Python-style string formatting, where placeholders enclosed in curly braces are dynamically populated at runtime. 
+
+B.3 Benchmark Details 
+
+We focus on mathematical reasoning, a core capability of LLMs. Below, we provide details of the five mathematical reasoning benchmarks used in our experiments. 
+
+• MATH and MATH500 (Hendrycks et al. 2021). The MATH dataset contains 12 ,500 competition-level math-ematics problems, divided into 7,500 training problems and 5,000 test problems. We use all 7,500 problems in the training split for reinforcement learning and evaluate on MATH500, a representative subset of 500 problems drawn from the original test split. Therefore, the training and evaluation problems of MATH do not overlap. 
+
+• OlymMATH (Sun et al. 2026). OlymMATH contains 
+
+200 manually curated Olympiad-level problems. The problems span four major mathematical domains and are divided into easy and hard subsets. We use its English version for evaluation. 
+
+• AMC23 (Dekoninck et al. 2026). AMC23 consists of 
+
+40 problems selected from the 2023 AMC 12A and AMC 12B competitions. It evaluates high-school-level competi-tion mathematics across topics such as algebra, geometry, number theory, and combinatorics. 
+
+• AIME24 (Dekoninck et al. 2026). AIME24 contains 30 
+
+problems from the 2024 AIME I and AIME II competi-tions, with 15 problems from each examination. These problems require advanced high-school mathematical reasoning and have integer answers between 0 and 999 .
+
+• AIME25 (Dekoninck et al. 2026). AIME25 similarly contains 30 problems from the 2025 AIME I and AIME II competitions. It provides a recent and challenging eval-uation of mathematical reasoning, covering algebra, ge-ometry, number theory, and combinatorics. Except for the MATH7.5K training split, we combine the remaining five benchmarks into a unified validation set. Fol-lowing standard evaluation practice, we evaluate each method at regular training intervals and report the checkpoint achiev-ing the highest accuracy on this unified set. The same evalua-tion frequency and checkpoint-selection criterion are applied to all methods to ensure a fair comparison. 
+
+B.4 Gini Coefficient and Lorenz Curve 
+
+The Gini coefficient measures the dispersion of per-problem success probabilities. Under a common mean, a lower Gini coefficient indicates that performance is distributed more evenly across problems, rather than concentrated on a small subset. The corresponding Lorenz curve plots the cumula-tive fraction of success mass against the cumulative fraction of problems, after sorting problems by their success prob-abilities. A curve closer to the 45 ◦ equality line therefore indicates a more balanced accuracy distribution. To ensure a controlled comparison, we independently sam-ple 16 responses for every problem in the unified validation set. For method m ∈ { MMPO , GRPO }, the empirical suc-cess probability of problem i is bs(m) 
+
+> i
+
+= 116 
+
+P16  
+
+> j=1
+
+r(m) 
+
+> i,j
+
+. For each threshold α, we remove only problems that are com-monly too difficult for both methods or commonly too easy for both methods. Specifically, the retained problem set is 
+
+Iα =
+
+n
+
+i : max  
+
+> m
+
+bs(m) 
+
+> i
+
+≥ α, min  
+
+> m
+
+bs(m) 
+
+> i
+
+≤ 1 − α
+
+o
+
+. (71) This common filtering allows us to compare their accuracy dispersion over the same set of moderately difficult problems. Let nα = |I α| and define the mean accuracy of method m
+
+on this subset as s(m) 
+
+> α
+
+= 1
+
+> nα
+
+P 
+
+> i∈I α
+
+bs(m) 
+
+> i
+
+. To isolate distribu-tional differences from differences in average accuracy, we normalize each success probabilities to a common mean: 
+
+z(m) 
+
+> i
+
+= bs(m)
+
+> i
+
+s(m)
+
+> α
+
+, 1
+
+nα
+
+X
+
+> i∈I α
+
+z(m) 
+
+> i
+
+= 1 . (72) Method MATH Olymp. AMC23 AIME24 AIME25 Avg. GRPO 81.8 51.7 64.0 19.3 18.9 47.1 Unb, T = 4 84.8 49.7 65.3 24.0 17.5 48.3 Unb, T = 3 85.6 51.2 66.3 23.1 19.8 49.2 Bias 85.8 50.1 66.1 24.6 21.1 49.5 
+
+Table 5: Comparison of the biased and unbiased MMPO estimators under a larger computational budget. The best results are highlighted in bold , and the runner-up results are underlined. Avg. denotes the average performance. The last three rows correspond to MMPO using the unbiased estimator with T = 4 , the unbiased estimator with T = 3 ,and the biased estimator with T = 4 , respectively. The Gini coefficient is then computed as Gini (m) 
+
+> α
+
+= 12n2
+
+> α
+
+X
+
+> i∈I α
+
+X
+
+> j∈I α
+
+z(m) 
+
+> i
+
+− z(m) 
+
+> j
+
+. (73) For the Lorenz curve, let z(m)(1) ≤ · · · ≤ z(m)(nα) denote the sorted normalized probabilities of Iα. Its value at q/n α is Lorenz (m)
+
+> α
+
+ qnα
+
+
+
+=
+
+Pqi=1 z(m)(i)
+
+Pnα 
+
+> i=1
+
+z(m)(i)
+
+, q = 0 , . . . , n α.
+
+(74) As shown in Figure 4, MMPO achieves a lower Gini co-efficient for every evaluated values of α. Its Lorenz curve is also consistently closer to the equality line than that of GRPO (Shao et al. 2024), indicating that MMPO distributes its improvements more evenly across problems. 
+
+B.5 Biased and Unbiased Estimators 
+
+To complement the main experiments, we further compare the two MMPO estimators under a larger computational bud-get. MMPO(Unb) uses the unbiased estimator in Eq. (11), whereas MMPO(Bias) uses the plug-in estimator in Eq. (10). We double both the batch size B and the PPO mini-batch size to 32 , and increase the maximum response length to 8192 . As shown in Table 5, MMPO(Bias) still achieves the best over-all performance, while MMPO(Unb, T = 4 ) also obtains competitive results. In particular, compared with the main setting where MMPO(Unb, T = 4 ) underperformed GRPO by 1.5% on average, it now surpasses GRPO by 1.2% points. This narrowed gap suggests that increasing the sampling and optimization budgets improves the stability of higher-order moment estimation, consistent with the discussion in Sec-tion 3.3. We also observe that reducing T from 4 to 3 im-proves the performance of the unbiased estimator, whereas the opposite trend is observed for the biased estimator in our ablation study. This contrast further highlights the impor-tance of jointly considering the truncation order T and the estimator’s bias-variance trade-off. 
+
+# References 
+
+Barakat, A.; Chakraborty, S.; Pahwa, K.; and Bedi, A. S. 2026. Why pass@ k optimization can degrade pass@ 1: Prompt interference in llm post-training. arXiv preprint arXiv:2602.21189 .Bellemare, M. G.; Dabney, W.; and Munos, R. 2017. Adistributional perspective on reinforcement learning. In In-ternational conference on machine learning , 449–458. Pmlr. Berg, C.; and Durán, A. J. 2005. Some transformations of Hausdorff moment sequences and harmonic numbers. Cana-dian Journal of Mathematics , 57(5): 941–960. Chen, Z.; Qin, X.; Wu, Y.; Ling, Y.; Ye, Q.; Zhao, W. X.; and Shi, G. 2025. Pass@ k training for adaptively balancing exploration and exploitation of large reasoning models. arXiv preprint arXiv:2508.10751 .Dekoninck, J.; Jovanović, N.; Gehrunger, T.; Rögnvaldsson, K.; Petrov, I.; Sun, C.; and Vechev, M. 2026. Beyond bench-marks: Matharena as an evaluation platform for mathematics with llms. arXiv preprint arXiv:2605.00674 .Guo, D.; Yang, D.; Zhang, H.; Song, J.; Wang, P.; Zhu, Q.; Xu, R.; Zhang, R.; Ma, S.; Bi, X.; et al. 2025. Deepseek-r1: Incentivizing reasoning capability in llms via reinforcement learning. arXiv preprint arXiv:2501.12948 .Hendrycks, D.; Burns, C.; Kadavath, S.; Arora, A.; Basart, S.; Tang, E.; Song, D.; and Steinhardt, J. 2021. Measuring mathematical problem solving with the math dataset. arXiv preprint arXiv:2103.03874 .Hu, Z.; Zhang, S.; Li, Y.; Yan, J.; Hu, X.; Cui, L.; Qu, X.; Chen, C.; Cheng, Y.; and Wang, Z. 2025. Diversity-incentivized exploration for versatile reasoning. arXiv preprint arXiv:2509.26209 .Jiang, Y.; Li, Y.; Chen, G.; Liu, D.; Cheng, Y.; and Shao, J. 2025. Rethinking entropy regularization in large reasoning models. arXiv preprint arXiv:2509.25133 .Kydlíček, H. 2025. Math-Verify: Math Verification Li-brary. https://github.com/huggingface/math-verify. Com-puter software, version 0.6.1. Lambert, N.; Morrison, J.; Pyatkin, V.; Huang, S.; Ivison, H.; Brahman, F.; Miranda, L. J. V.; Liu, A.; Dziri, N.; Lyu, S.; et al. 2024. Tulu 3: Pushing frontiers in open language model post-training. arXiv preprint arXiv:2411.15124 .Li, X.; Li, Y.; Fang, X.; Ding, S.; Li, P.; Chen, Y.; Ma, Y.; Lyu, T.; Li, L.; Lin, D.; et al. 2026. Beyond Mode Collapse: Distribution Matching for Diverse Reasoning. arXiv preprint arXiv:2605.19461 .Li, Y.; Gu, Q.; Wen, Z.; Li, Z.; Xing, T.; Guo, S.; Zheng, T.; Zhou, X.; Qu, X.; Zhou, W.; et al. 2025. Treepo: Bridging the gap of policy optimization and efficacy and inference efficiency with heuristic tree-based modeling. arXiv preprint arXiv:2508.17445 .Liu, J.-G.; and Pego, R. 2016. On generating functions of Hausdorff moment sequences. Transactions of the American Mathematical Society , 368(12): 8499–8518. Marshall, A. W.; Olkin, I.; and Arnold, B. C. 2011. Inequal-ities: Theory of Majorization and Its Applications. Springer Series in Statistics ( .Mnatsakanov, R. M. 2008. Hausdorff moment problem: Re-construction of probability density functions. Statistics & probability letters , 78(13): 1869–1877. Peng, R.; Ren, Y.; Yu, Z.; Liu, W.; and Wen, Y. 2025. Simko: Simple pass@ k policy optimization. arXiv preprint arXiv:2510.14807 .Qu, Y.; Setlur, A.; Smith, V.; Salakhutdinov, R.; and Ku-mar, A. 2026. POPE: Learning to Reason on Hard Prob-lems via Privileged On-Policy Exploration. arXiv preprint arXiv:2601.18779 .Schulman, J.; Moritz, P.; Levine, S.; Jordan, M.; and Abbeel, P. 2015. High-dimensional continuous control using general-ized advantage estimation. arXiv preprint arXiv:1506.02438 .Schulman, J.; Wolski, F.; Dhariwal, P.; Radford, A.; and Klimov, O. 2017. Proximal policy optimization algorithms. 
+
+arXiv preprint arXiv:1707.06347 .Shao, Z.; Wang, P.; Zhu, Q.; Xu, R.; Song, J.; Bi, X.; Zhang, H.; Zhang, M.; Li, Y.; Wu, Y.; et al. 2024. Deepseekmath: Pushing the limits of mathematical reasoning in open lan-guage models. arXiv preprint arXiv:2402.03300 .Sheng, G.; Zhang, C.; Ye, Z.; Wu, X.; Zhang, W.; Zhang, R.; Peng, Y.; Lin, H.; and Wu, C. 2025. Hybridflow: A flexible and efficient rlhf framework. In Proceedings of the Twentieth European Conference on Computer Systems , 1279–1297. Sun, H.; Min, Y.; Chen, Z.; Zhao, W. X.; and Wen, J.-R. 2026. Challenging the boundaries of reasoning: An olympiad-level math benchmark for large language models. In Proceedings of the 64th Annual Meeting of the Association for Computa-tional Linguistics (Volume 1: Long Papers) , 17438–17457. Tajwar, F.; Zeng, G.; Zhou, Y.; Song, Y.; Arora, D.; Jiang, Y.; Schneider, J.; Salakhutdinov, R.; Feng, H.; and Zanette, A. 2026. Maximum Likelihood Reinforcement Learning. arXiv preprint arXiv:2602.02710 .Walder, C.; and Karkhanis, D. T. 2026. Pass@ k policy optimization: Solving harder reinforcement learning prob-lems. Advances in Neural Information Processing Systems ,38: 152416–152445. Williams, R. J. 1992. Simple statistical gradient-following al-gorithms for connectionist reinforcement learning. Machine learning , 8(3): 229–256. Yang, A.; Li, A.; Yang, B.; Zhang, B.; Hui, B.; Zheng, B.; Yu, B.; Gao, C.; Huang, C.; Lv, C.; et al. 2025. Qwen3 technical report. arXiv preprint arXiv:2505.09388 .Yu, Q.; Zhang, Z.; Zhu, R.; Yuan, Y.; Zuo, X.; Yue, Y.; Dai, W.; Fan, T.; Liu, G.; Liu, L.; et al. 2026. Dapo: An open-source llm reinforcement learning system at scale. Advances in Neural Information Processing Systems , 38: 113222– 113244. Zhang, X.; Yuan, X.; Huang, D.; You, W.; Hu, C.; Ruan, J.; Chen, K.; and Hu, X. 2026a. Revisiting Entropy Regular-ization: Adaptive Coefficient Unlocks Its Potential for LLM Reinforcement Learning. In Findings of the Association for Computational Linguistics: ACL 2026 , 18005–18020. Zhang, Y.; Xu, F.; Ding, J.; Xie, Y.; Gao, S.; Ding, X.; Zhang, H.; Fu, L.; and Wang, X. 2026b. Information Gain-based Rollout Policy Optimization: An Adaptive Tree-Structured Rollout Approach for Multi-Turn LLM Agents. 
+
+arXiv preprint arXiv:2607.06223 .Zhu, X.; Cheng, D.; Zhang, D.; Li, H.; Zhang, K.; Jiang, C.; Sun, Y.; Hua, E.; Zuo, Y.; Lv, X.; et al. 2025. Flowrl: Match-ing reward distributions for llm reasoning. arXiv preprint arXiv:2509.15207 .

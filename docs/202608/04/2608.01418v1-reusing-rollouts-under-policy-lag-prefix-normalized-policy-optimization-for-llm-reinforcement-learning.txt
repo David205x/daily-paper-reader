@@ -1,0 +1,1302 @@
+Title: Reusing Rollouts under Policy Lag: Prefix-Normalized Policy Optimization for LLM Reinforcement Learning
+
+URL Source: https://arxiv.org/pdf/2608.01418v1
+
+Published Time: Tue, 04 Aug 2026 01:31:24 GMT
+
+Number of Pages: 17
+
+Markdown Content:
+# REUSING ROLLOUTS UNDER POLICY LAG : PREFIX -NORMALIZED POLICY OPTIMIZATION FOR LLM R EIN -
+
+# FORCEMENT LEARNING 
+
+Wenhao Zhang 1,2 Yibo Xie 1 Rui Wang 1 Jiahua Yang 1,3 Lei Jiang 1,4 Zibo Yang 1
+
+Yawei Wang 1 Jiali Xu 1 jasperawang 1 Haoyang Long 1 Huan Xiong 1,† alantzhao 1,†
+
+> 1
+
+Tencent 2Harbin Institute of Technology 3Jinan University 
+
+> 4
+
+University of Science and Technology of China 
+
+> †
+
+Corresponding authors 
+
+## ABSTRACT 
+
+Autoregressive rollout generation is a major computational cost in reinforcement learning for large language models. Reusing each rollout batch for additional learner updates amortizes this cost, but later updates become increasingly off-policy as the learner departs from the behavior policy. At a token position, exact off-policy correction must account for both the current action and the probability of reaching its prefix. The cumulative importance ratio provides this correction, but its product form can produce an unwieldy dynamic range. We study Prefix-Normalized Policy Optimization (PNPO), which replaces the cumulative ratio with the geometric mean of likelihood ratios along each causal prefix, preserving causal-prefix dependence at each position while compressing the log-weight scale. In controlled long-context mathematical reasoning experiments, we induce two off-policy regimes by using one or four policy-update epochs per rollout batch. PNPO does not consistently outperform GSPO with one epoch. With four epochs, it attains the highest observed Avg@32 on each benchmark; the unweighted mean of the three independently selected benchmark peaks is 50 .24 , 3.00 percentage points above GSPO. Under a matched 2,400 -update budget, four-epoch PNPO reaches a final macro Avg@32 of 49 .66 after 150 rollout batches, comparable to the 
+
+49 .56 reached after 600 batches with one epoch. These results provide preliminary evidence that PNPO can be advantageous as training moves further off-policy. 
+
+## 1 INTRODUCTION 
+
+Policy-gradient methods are a standard approach to language-model post-training (Schulman et al., 2017; Ouyang et al., 2022; Guo et al., 2025). In this setting, collecting a rollout batch requires autoregressive generation, which can consume a substantial fraction of training time (Hu et al., 2026). One way to amortize this cost is to reuse collected rollouts for multiple learner updates, as in PPO’s multi-epoch minibatch optimization. Because the behavior data remain fixed while the learner changes, later updates become increasingly off-policy. This mismatch already appears within a single pass through a collected batch, since later minibatches are processed after earlier learner updates, and it grows when the same trajectories are revisited for additional epochs. Such update-induced drift has been noted in recent large-scale reasoning-model training (DeepSeek-AI et al., 2025) and is a form of forward policy lag (Honari et al., 2026). Proximal policy methods address this mismatch through a local approximation. The exact performance-difference identity depends on the learner’s state distribution; TRPO freezes this distribution at the behavior policy in its surrogate and uses a trust region to control the resulting approximation error (Schulman et al., 2015). PPO replaces the constrained update with a clipped local-ratio objective (Schulman et al., 2017), and GRPO retains this token-local construction while replacing critic-based advantages with group-relative estimates (Shao et al., 2024). The resulting local-ratio objective is therefore a proximity-based surrogate rather than a complete state–action correction, and repeated reuse progressively weakens the premise that the learner remains close to the behavior policy. 1arXiv:2608.01418v1 [cs.AI] 2 Aug 2026 coefficient        
+
+> (a) Local ratio
+> current action
+> (b) Exact prefix ratio
+> causal prefix sum
+> (d) PNPO
+> causal prefix mean
+> (c) GSPO
+> response mean, shared
+> 0000
+> broadcast from L
+
+Figure 1: Weighting support and log-weight scale. Top: the local log-ratio contains only the current-token term; the exact cumulative log-ratio sums terms over the causal prefix; GSPO broadcasts the full-response mean log-ratio to every position; and PNPO uses the corresponding prefix mean at each position. Bottom: schematic transformations of the same centered log-ratio vectors under the covariance model shown in the figure. Shading shows the corresponding ±√Var scale, and dashed lines mark the common ±σ reference. Among these, the cumulative prefix ratio is the exact joint state–action change-of-measure weight at position t; the local ratio is exact only for the conditional action distribution at a fixed prefix. PNPO is a scale-controlled, generally biased transform of the cumulative ratio. The traces are schematic, not training curves. Autoregressive generation, however, makes the state correction omitted by this local surrogate directly computable. At position t, the state is the full prefix st = ( x, y <t ), and the deterministic token-appending transition makes the probability of reaching st factorize over preceding token decisions. The local ratio ρt = πθ (yt | x, y <t )/π β (yt | x, y <t ) corrects the action distribution at the observed prefix, whereas the exact state–action density ratio is Ct = Qtk=1 ρk: the preceding factors correct prefix visitation and ρt corrects the current action (Precup et al., 2000; Liu et al., 2020). This restores causal-prefix dependence, but log Ct accumulates token-level log-ratios, so its dynamic range can grow with prefix length and policy drift. GSPO instead controls scale with a length-normalized full-response statistic shared across all positions (Zheng et al., 2025), at the cost of making early-position weights depend on the sampled suffix. This leaves a tension between causal prefix correction and manageable weight scale. 
+
+Prefix-Normalized Policy Optimization (PNPO) uses the geometric mean of the likelihood ratios along the prefix through position t:
+
+wPN  
+
+> t
+
+= C1/t t = exp 1
+
+t
+
+> t
+
+X
+
+> k=1
+
+log ρk
+
+!
+
+. (1) The 1/t power tempers the current-token ratio together with all preceding ratios, trading the exact state– action density ratio for scale control. Unlike a sequence-shared statistic, wPN  
+
+> t
+
+varies with position and excludes likelihood-ratio changes in the future suffix; at the terminal position, it coincides numerically with the full-response geometric mean. Figure 1 summarizes the four weighting granularities and their position-dependent log-weight scales. The PNPO objective evaluated in this paper combines this weight with a position-dependent acceptance gate and response-level averaging; Section 3 gives the full specification. 2Our central empirical question is whether PNPO performs more favorably than GSPO as training moves further off-policy. We create two controlled off-policy regimes by applying one or four policy-update epochs to each rollout batch in long-context mathematical reasoning training. Within each regime, we match the training prompts, number of generated responses, update schedule, and evaluation horizon. With one epoch, PNPO does not consistently outperform GSPO. With four epochs, PNPO attains the highest observed Avg@32 on each benchmark; the unweighted mean of the three independently selected benchmark peaks is 50 .24 , 3.00 percentage points above GSPO. Under the matched 2,400 -update budget, four-epoch PNPO reaches a final macro Avg@32 of 49 .66 after 
+
+150 rollout batches, comparable to the 49 .56 reached after 600 batches with one epoch. Together, these results suggest that PNPO can be particularly useful as training moves further off-policy. Our main contributions are summarized as follows: 
+
+• We formulate PNPO, a token-level policy objective for off-policy language-model RL that uses a prefix-normalized policy weight. Starting from the exact autoregressive state–action ratio, we characterize this biased, position-specific transformation and compare it with per-token ratios and sequence-shared weights. • We evaluate PNPO in two controlled off-policy regimes induced by one and four PPO epochs, and find that its advantage over GSPO is more pronounced in the four-epoch regime under a matched minibatch-update budget. 
+
+## 2 PROBLEM SETUP AND BACKGROUND 
+
+2.1 LOCAL PROXIMAL SURROGATE 
+
+Fix a prompt x and let the behavior policy πβ generate a response y1: L. At position t, the state is the complete prefix st = ( x, y <t ), the action is at = yt, and dβt and dθt denote the state distributions induced by the behavior and learner policies, respectively. Let Aβt be the finite-horizon advantage under πβ , and define the local action ratio ρt = πθ (at | st)/π β (at | st).The advantage Aβt enters through the performance-difference identity, which expresses the change from πβ to πθ using behavior-policy advantages but learner-policy state–action visitation. TRPO obtains a tractable local objective by freezing the learner state distribution at dβt and using ρt to change only the conditional action distribution. The corresponding unclipped surrogate gradient is 
+
+∇θ Sβ,x (θ) = 
+
+> L
+
+X
+
+> t=1
+
+E st∼dβt (·| x) 
+
+> at∼πβ(·| st)
+
+h
+
+ρtAβt (st, a t)∇θ log πθ (at | st)
+
+i
+
+. (2) Here, Aβt and dβt are fixed, and differentiating the local ratio yields the current-token score. The ratio ρt therefore changes the action distribution exactly at a fixed state, but it does not change state weighting from dβt to dθt . This omission defines a proximal approximation rather than an exact state–action correction. The displayed gradient agrees with the true policy gradient at πθ = πβ ; away from the behavior policy, the accuracy of the surrogate depends on controlling policy movement. TRPO controls this frozen-occupancy approximation with a trust region (Schulman et al., 2015). PPO replaces the explicit constrained update with a clipped local-ratio surrogate (Schulman et al., 2017), and GRPO retains the same token-level ratio and clipping while replacing critic-based advantages with a group-relative outcome signal (Shao et al., 2024). These methods rely on policy proximity to limit the error induced by state-distribution shift rather than explicitly applying the missing state ratio. Reusing a rollout batch for additional learner updates can progressively weaken this proximity condition. The performance-difference construction and the resulting local surrogate are derived in Section A. 2.2 EXACT PREFIX CHANGE OF MEASURE 
+
+In a general MDP, the state-distribution ratio omitted by the local surrogate is difficult to compute. In the autoregressive process considered here, however, the full prefix is observed and the transition deterministically appends the sampled token. The probability of reaching st therefore factorizes 3along its unique prefix path. Under the standard support condition, 
+
+dθt (st | x)
+
+dβt (st | x) =
+
+> t−1
+
+Y
+
+> k=1
+
+ρk,dθt (st | x)πθ (at | st)
+
+dβt (st | x)πβ (at | st) =
+
+> t−1
+
+Y
+
+> k=1
+
+ρk
+
+| {z } 
+
+> state ratio
+
+ρt
+
+|{z} 
+
+> action ratio
+
+=
+
+> t
+
+Y
+
+> k=1
+
+ρk =: Ct. (3) The factors before t correct the probability of reaching the current prefix, while ρt corrects the action selected there. Thus, Ct is the exact joint state–action change-of-measure ratio at position t. Under the same support condition, for any integrable function ft(st, a t),
+
+E st∼dβt (·| x) 
+
+> at∼πβ(·| st)
+
+[Ctft(st, a t)] = E st∼dθt (·| x) 
+
+> at∼πθ(·| st)
+
+[ft(st, a t)] . (4) This is the autoregressive form of per-decision importance sampling (Precup et al., 2000; Zhang et al., 2026); its state-ratio factor is the state-distribution correction required for exact off-policy gradient estimation (Liu et al., 2020). The factorization and generic change-of-measure identity are derived in Section A. To recover the target-policy gradient rather than the frozen-occupancy surrogate, let Jx(π) denote the expected return for prompt x, let Aθt be the finite-horizon advantage under πθ , and define 
+
+zt = ∇θ log πθ (at | st). Applying Equation (4) to the policy-gradient theorem (Sutton et al., 1999) gives 
+
+∇θ Jx(πθ ) = 
+
+> L
+
+X
+
+> t=1
+
+E st∼dθt (·| x) 
+
+> at∼πθ(·| st)
+
+Aθt (st, a t)zt
+
+
+
+=
+
+> L
+
+X
+
+> t=1
+
+E st∼dβt (·| x) 
+
+> at∼πβ(·| st)
+
+CtAθt (st, a t)zt
+
+ . (5) The exact cumulative ratio can also create a scale problem. Because log Ct = Ptk=1 log ρk, its dynamic range can grow with prefix length and policy drift. Token-level PPO and GRPO avoid this accumulation by using only ρt, but thereby omit the prefix-state factor. GSPO instead uses a length-normalized full-response statistic shared across positions, controlling response-level scale while making early-token weights depend on the sampled suffix (Zheng et al., 2025). PNPO uses the position-dependent transform C1/t t , retaining causal-prefix dependence while compressing cumulative log scale. For t > 1, this transform is not the target-to-behavior density ratio and therefore does not preserve the exact change of measure in Equation (4); it trades exactness for scale control. Exact change of measure alone, however, does not determine a compatible advantage–score pairing. 2.3 EXACT ADVANTAGE –S CORE PAIRINGS 
+
+Let Eπβ [·] denote expectation over complete responses sampled from πβ (· | x). Equation (5) is an exact target-policy gradient representation and pairs the current-token score zt with Aθt . An unbiased representation that retains Aβt must instead be derived from an exact identity, rather than obtained by substituting Aβt for Aθt in that equation. The familiar behavior-advantage/current-token-score pairing in PPO is the gradient structure of the frozen-occupancy surrogate in Equation (2). If Ct
+
+is substituted only as a detached coefficient while retaining this current-token-score structure, the resulting expression is 
+
+> L
+
+X
+
+> t=1
+
+Eπβ
+
+h
+
+CtAβt (st, a t)zt
+
+i
+
+,
+
+4which is generally not equal to ∇θ Jx(πθ ). This retains the gradient structure of the PPO surrogate rather than differentiating an exact identity. To retain Aβt without bias, we instead differentiate the exact behavior-rollout performance-difference identity, obtaining 
+
+∇θ Jx(πθ ) = Eπβ
+
+" LX
+
+> t=1
+
+CtAβt (st, a t)
+
+> t
+
+X
+
+> k=1
+
+zk
+
+#
+
+. (6) Thus, retaining Aβt requires the cumulative prefix score Ptk=1 zk, whereas the current-token score in Equation (5) pairs with Aθt . Under the support condition and with exact advantages, these representations are unbiased and equal in expectation, but their components are not interchangeable. Section B proves this equivalence. The practical PNPO objective retains the current-token-score structure of PPO and GRPO, using the rollout-derived group-relative advantage as a behavior-side proxy rather than the exact Aθt . It also replaces the exact cumulative ratio with C1/t t and combines this weight with position-dependent gating and response-level aggregation. The complete PNPO objective is therefore a biased proximal surrogate, while Ct remains its exact change-of-measure reference. Section 3 gives the full objective; the derivation and the boundary between the exact and approximate forms are detailed in Section B. 
+
+## 3 PREFIX -N ORMALIZED POLICY OPTIMIZATION 
+
+3.1 PREFIX -N ORMALIZED POLICY WEIGHT 
+
+Starting from the exact state–action ratio in Equation (3), PNPO length-normalizes the cumulative log-ratio by the number of decisions in the corresponding prefix. For a response yi = yi, 1: Li with valid length Li, at position t we define 
+
+wPN  
+
+> i,t
+
+= C1/t i,t = exp 1
+
+t
+
+> t
+
+X
+
+> k=1
+
+log ρi,k 
+
+!
+
+. (7) The 1/t power applies to the current-token ratio together with every preceding ratio. For t > 1, wPN 
+
+> i,t
+
+is not a target-to-behavior density ratio and therefore does not preserve the exact change of measure associated with Equation (3). At each fixed t, it is a monotone transform of Ci,t : it preserves the sign of log Ci,t and the ordering across responses while compressing the cumulative log scale. Given the prompt xi, the weight depends only on yi, ≤t.The weight recovers the local ratio at t = 1 and the full-response geometric mean at t = Li, while intermediate positions exclude likelihood shifts from the future suffix. We refer to wPN  
+
+> i,t
+
+as the 
+
+prefix-normalized policy weight .3.2 COMPLETE PNPO O BJECTIVE 
+
+Acceptance gate. The reported PNPO configuration uses the position-dependent scale 
+
+h(t, L i) = 
+
+r Li
+
+t , (8) and retains the score term at position t only when 
+
+Mi,t = 1 1 − ϵ− h(t, L i) ≤ wPN  
+
+> i,t
+
+≤ 1 + ϵ+ h(t, L i) . (9) This heuristic widens the acceptance interval at earlier positions and reduces to the base interval at t = Li; the lower and upper base tolerances may be asymmetric. The bounds are evaluated independently at each position. If Mi,t = 0 , only the score-function term at position t is removed, and later positions remain eligible under their own bounds. The gate performs hard rejection rather than truncating the weight to a boundary. 
+
+Group-relative advantage and detached surrogate. Let x ∼ D be a prompt, and sample G
+
+conditionally independent responses yi ∼ πβ (· | x). Writing Ri = R(x, y i), the reported experiments 5use GRPO’s group-relative outcome advantage (Shao et al., 2024), assigning every valid token in response i the advantage 
+
+bAi,t = Ri − mean  {Rj }Gj=1 
+
+
+
+std  {Rj }Gj=1 
+
+ . (10) We maximize the detached score-function surrogate 
+
+JPNPO (θ) = E x∼D   
+
+> y1,...,y G
+> i.i.d.
+> ∼πβ(·| x)
+
+"
+
+1
+
+G
+
+> G
+
+X
+
+> i=1
+
+1
+
+LiLiX
+
+> t=1
+
+sg 
+
+h
+
+Mi,t wPN  
+
+> i,t
+
+bAi,t 
+
+i
+
+log πθ (yi,t | x, y i,<t )
+
+#
+
+. (11) The stop-gradient operator treats the gate, policy weight, and advantage as numerical coefficients, so gradients flow only through the current-token log probability. We first average the token-level score terms over valid tokens within each response and then average the resulting per-response means across responses, matching the aggregation induced by the GSPO objective (Zheng et al., 2025). The normalization remains 1/L i after gating: rejected tokens contribute zero, and the retained tokens are not renormalized by their accepted count. Only wPN  
+
+> i,t
+
+depends exclusively on the observed prefix; 
+
+Mi,t depends on Li, and bAi,t is derived from response-level outcomes. 
+
+Updates over a fixed rollout batch. The sampled responses, behavior-policy log probabilities in the denominator, and group-derived advantages remain fixed while a rollout batch is reused. At each minibatch update, including those in later epochs, we evaluate the numerator log probabilities under the current learner, reconstruct wPN  
+
+> i,t
+
+from the cumulative log-ratios, recompute Mi,t , and apply Equation (11). In each additional epoch, the learner is updated further on the same sampled responses without generating new trajectories. 
+
+## 4 EXPERIMENTS 
+
+We evaluate PNPO on long-context mathematical reasoning using one or four PPO epochs per rollout batch. We compare primarily against GSPO and include GRPO as a token-level baseline. 4.1 EXPERIMENTAL SETUP 
+
+Datasets and model. We initialize all methods from DeepSeek-R1-Distill-Qwen-1.5B (Guo et al., 2025) and perform RL post-training on DAPO-Math-17k (Yu et al., 2025). We evaluate mathematical reasoning on AMC 2023, AIME 2024, and AIME 2025. 
+
+Training setup. At each training step, we collect one rollout batch by sampling 256 prompts and 
+
+8 responses per prompt, yielding 2,048 responses. The maximum prompt and response lengths are 
+
+1,024 and 15 ,360 tokens, respectively. We use a learning rate of 10 −6 and minibatches of 64 prompt groups ( 512 responses), yielding four optimizer updates per PPO epoch. We run 600 steps with one epoch and 150 steps with four epochs, so both settings perform 2,400 optimizer updates. All training runs use 32 NVIDIA H20 GPUs. Further implementation details are provided in Section C. 
+
+Baselines. GRPO uses local token ratios with token-mean aggregation (Shao et al., 2024), lower/upper clipping tolerances (0 .2, 0.28) , and a dual-clip coefficient of 10 . GSPO uses a length-normalized response ratio with response-mean aggregation (Zheng et al., 2025) and lower/upper clipping tolerances (3 × 10 −4, 4 × 10 −4). PNPO uses the complete objective in Section 3.2, with base acceptance-gate tolerances (7 × 10 −4, 9.5 × 10 −4).
+
+Evaluation. For each benchmark, Avg@32 is the mean binary correctness over 32 sampled re-sponses per problem; macro Avg@32 is the unweighted mean of the three benchmark scores. We evaluate every 50 steps in the one-epoch runs and every 10 steps in the four-epoch runs. For each benchmark, Table 1 reports the best observed Avg@32 within the corresponding training horizon. 6Table 1: Best observed Avg@32 (%) within each training horizon. For each run, the best value on each benchmark is selected independently; Avg. is the unweighted mean of the three resulting scores. Boldface marks the best value in each column within an epoch setting. 
+
+PPO Epochs Method AMC23 AIME24 AIME25 Avg. 
+
+1GRPO 80.16 35.83 28.75 48.25 GSPO 79.92 37.81 30.52 49.42 PNPO (Ours) 79.84 40.52 29.79 50.05 
+
+4GRPO 77.81 36.15 27.19 47.05 GSPO 78.91 34.90 27.92 47.24 PNPO (Ours) 80.94 38.85 30.94 50.24 GRPO GSPO PNPO                       
+
+> (a) Evaluation, 1 epoch
+> 0100 200 300 400 500 600 38 41 44 47 50
+> (b) Evaluation, 4 epochs
+> 030 60 90 120 150
+> (c) Training reward, 1 epoch
+> 0100 200 300 400 500 600 -0.5 -0.25 00.25
+> (d) Training reward, 4 epochs
+> 030 60 90 120 150
+> Training step Macro Avg@32 accuracy (%) Mean rollout reward
+
+Figure 2: Evaluation and training dynamics under one and four PPO epochs. (a,b) Macro Avg@32 (%), computed as the unweighted mean across AMC 2023, AIME 2024, and AIME 2025, without smoothing. (c,d) Per-step mean rollout reward under the corresponding settings; faint curves show raw rewards and darker curves show centered 11-step moving averages. All runs begin from the same checkpoint, whose GRPO evaluation is used as the common step-0 value. 4.2 MAIN RESULTS 
+
+Under four PPO epochs, PNPO attains the best observed Avg@32 on all three benchmarks (Table 1). The unweighted average of these three scores is 50 .24 , 3.00 percentage points above GSPO. We next examine whether this separation persists over the reported evaluation trajectories. 4.3 LEARNING DYNAMICS AND ROLLOUT REUSE 
+
+Figure 2 shows that the separation in Table 1 is regime-dependent. With one epoch, PNPO and GSPO remain close and exchange the lead. With four epochs, PNPO is higher at 14 of 15 evaluations and finishes 2.66 percentage points ahead of GSPO. The four-epoch advantage is therefore visible across the reported evaluation trajectory, rather than only in the per-benchmark peaks. At the common budget of 2,400 optimizer updates, four-epoch PNPO reaches a final macro Avg@32 of 49 .66 after 150 rollout batches, comparable to the 49 .56 reached after 600 one-epoch batches. 7010 20 30 40 0 0.05 0.10 0.15 0.20 0.25      
+
+> GSPO PNPO 1 epoch 4 epochs
+> t= 15.4 h
+> t= 6.4 h
+> 1 epoch: 37.7–38.0 h (1.00×) GSPO-4: 22.4 h (1.69×) PNPO-4: 16.0 h (2.36×)
+> Mean rollout reward
+> Estimated training time (hours)
+
+Figure 3: Estimated time to reach a mean rollout reward of 0.25 . First-passage times are computed from the centered 11-step reward trajectories using 283 and 510 seconds per step in the one- and four-epoch settings, respectively. Because the rollout batch size is fixed, the four-epoch run reaches comparable final performance using one quarter as many newly generated responses, indicating more effective rollout reuse in this setting. Under the regime-level timing estimates used in Figure 3, the centered reward trajectories first reach 
+
+0.25 after 37 .7–38 .0 hours in the one-epoch runs, 22 .4 hours for four-epoch GSPO, and 16 .0 hours for four-epoch PNPO. Both four-epoch configurations therefore reach the threshold earlier than their one-epoch counterparts, while PNPO reaches it 6.4 hours earlier than GSPO with four epochs. GRPO does not sustain its early reward gains over either training horizon, and its four-epoch evaluation curve declines after reaching its maximum. GSPO provides a useful counterpoint: its four-epoch reward trajectory remains stable, but this stability does not eliminate the evaluation gap. This pattern is consistent with the weighting-granularity interpretation: at each update, GSPO shares one response-level statistic across token positions, whereas PNPO retains a position-dependent prefix statistic. Because the experiments compare the complete objectives without an ablation of weighting granularity, however, they do not isolate this mechanism. 
+
+## 5 RELATED WORK 
+
+Off-policy language-model reinforcement learning. Learner–behavior mismatch arises whenever a policy is updated using trajectories generated by an earlier policy. PPO-style minibatch updates can make even freshly collected rollouts off-policy, while training–inference inconsistencies introduce a related mismatch (Schulman et al., 2017; DeepSeek-AI et al., 2025). Replay buffers resample older trajectories across learner updates (Arnal et al., 2026), while OAPL introduces an explicitly off-policy objective for data from a lagged inference policy (Ritter et al., 2026). Concurrent generation and optimization introduce additional policy-version staleness in asynchronous actor–learner systems (Espeholt et al., 2018; Fu et al., 2025; Hu et al., 2026); VACO and SAO address policy lag through algorithmic modifications (Honari et al., 2026; Hou et al., 2026). These settings share an importance-weighting problem, although the mismatch arises in different ways. Our experiments isolate one controlled source of mismatch by varying the number of learner updates applied to each fixed rollout batch; replay and asynchronous staleness remain outside the scope of this study. 
+
+Likelihood-ratio granularity in reasoning RL. Recent critic-free reasoning objectives differ in advantage estimation, clipping, and likelihood-ratio granularity. GRPO and DAPO use per-token ratios with group-relative outcome advantages (Shao et al., 2024; Yu et al., 2025), whereas GSPO 8uses a length-normalized response ratio in a sequence-level objective (Zheng et al., 2025). PNPO occupies the prefix-dependent middle ground between these token- and response-level constructions. 
+
+Prefix-aware importance weighting. Classical per-decision importance sampling provides the foundation for prefix-conditioned correction (Precup et al., 2000). Recent LLM methods construct prefix-aware importance weights in different ways. MinPRO replaces the cumulative product over preceding tokens with the minimum of their likelihood ratios while retaining the current-token ratio (Lei et al., 2026). CTPO uses the exact cumulative prefix ratio with position-adaptive clipping (Zhang et al., 2026), whereas TEPO evaluates a length-normalized prefix likelihood-ratio variant as its “Sentence Prefix IS” ablation (Lin et al., 2026). In PNPO, the prefix geometric mean is the primary policy weight, normalizing the cumulative log-ratio by prefix length rather than preserving exact change of measure. 
+
+## 6 CONCLUSION AND LIMITATIONS 
+
+We introduced PNPO, a token-level objective that replaces the exact cumulative state–action ratio with the geometric mean of token likelihood ratios over the causal prefix. This biased normalization preserves causal prefix dependence at each position while compressing the cumulative log-ratio scale. In our controlled comparison of one and four PPO epochs, PNPO and GSPO perform similarly in the lower-mismatch setting, whereas PNPO shows a sustained advantage when repeated updates induce greater learner–behavior mismatch. At a matched budget of 2,400 optimizer updates, four-epoch PNPO reaches final performance comparable to its one-epoch counterpart while using one quarter as many newly generated responses, providing preliminary evidence of more effective rollout reuse under greater mismatch. These findings are limited to a single 1.5B-parameter model, three mathematical reasoning bench-marks, and one run per configuration. Because the acceptance gate and response-level aggregation are not ablated, the evidence applies to the complete PNPO configuration and does not isolate the effect of prefix normalization. Moreover, our experiments induce mismatch only through repeated updates on fresh batches. Asynchronous collection, replay, offline data, and training–inference mismatch introduce distinct learner–behavior gaps. These broader sources of mismatch provide natural settings for future work. In classical distributed RL, asynchronous actor–learner systems gain parallel exploration and higher throughput at the cost of policy-lagged experience (Espeholt et al., 2018). Evaluating PNPO in such settings would test whether prefix-normalized weighting remains useful beyond repeated update epochs and, in online systems, how more effective reuse of lagged trajectories interacts with the exploration–exploitation trade-off. 
+
+## REFERENCES 
+
+Charles Arnal, Vivien Cabannes, Taco Cohen, Julia Kempe, and Remi Munos. Efficient RL training for LLMs with experience replay. arXiv preprint arXiv:2604.08706 , 2026. DeepSeek-AI et al. DeepSeek-V3.2: Pushing the frontier of open large language models. arXiv preprint arXiv:2512.02556 , 2025. Lasse Espeholt, Hubert Soyer, Remi Munos, Karen Simonyan, Vlad Mnih, Tom Ward, Yotam Doron, Vlad Firoiu, Tim Harley, Iain Dunning, Shane Legg, and Koray Kavukcuoglu. IMPALA: Scalable distributed deep-RL with importance weighted actor-learner architectures. In Proceedings of the 35th International Conference on Machine Learning , volume 80 of Proceedings of Machine Learning Research , pp. 1407–1416, 2018. Wei Fu, Jiaxuan Gao, Xujie Shen, Chen Zhu, Zhiyu Mei, Chuyi He, Shusheng Xu, Guo Wei, Jun Mei, Jiashu Wang, Tongkai Yang, Binhang Yuan, and Yi Wu. AReaL: A large-scale asynchronous rein-forcement learning system for language reasoning. In Advances in Neural Information Processing Systems , volume 38, 2025. Daya Guo et al. DeepSeek-R1 incentivizes reasoning in LLMs through reinforcement learning. 
+
+Nature , 645:633–638, 2025. doi: 10.1038/s41586-025-09422-z. 9Homayoun Honari, Roger Creus Castanyer, Michael Przystupa, Michael Noukhovitch, Pablo Samuel Castro, and Glen Berseth. Align and filter: Improving performance in asynchronous on-policy RL. 
+
+arXiv preprint arXiv:2603.01365 , 2026. Zhenyu Hou, Yujiang Li, Jie Tang, and Yuxiao Dong. Single-rollout asynchronous optimization for agentic reinforcement learning. arXiv preprint arXiv:2607.07508 , 2026. Tianhao Hu, Xiangcheng Liu, Yuchun Miao, Youshao Xiao, Hongyu Zang, Yang Zheng, Xuan Huang, Jinrui Ding, Yufei Zhang, et al. DORA: A scalable asynchronous reinforcement learning system for language model training. arXiv preprint arXiv:2604.26256 , 2026. Shiye Lei, Zhihao Cheng, and Dacheng Tao. A step back: Prefix importance ratio stabilizes policy optimization. arXiv preprint arXiv:2601.22718 , 2026. Xingyu Lin, Yilin Wen, Du Su, Jinchang Hou, En Wang, Wenbin Liu, Chenfu Bao, and Zhonghou Lv. Token-level policy optimization: Linking group-level rewards to token-level aggregation via sequence-level likelihood. arXiv preprint arXiv:2604.12736 , 2026. Yao Liu, Adith Swaminathan, Alekh Agarwal, and Emma Brunskill. Off-policy policy gradient with stationary distribution correction. In Proceedings of the 35th Conference on Uncertainty in Artificial Intelligence , volume 115 of Proceedings of Machine Learning Research , pp. 1180–1190, 2020. Long Ouyang et al. Training language models to follow instructions with human feedback. In 
+
+Advances in Neural Information Processing Systems , volume 35, pp. 27730–27744, 2022. Doina Precup, Richard S. Sutton, and Satinder P. Singh. Eligibility traces for off-policy policy evaluation. In Proceedings of the 17th International Conference on Machine Learning , pp. 759– 766, 2000. Daniel Ritter, Owen Oertell, Bradley Guo, Jonathan Chang, Kianté Brantley, and Wen Sun. LLMs can learn to reason via off-policy RL. arXiv preprint arXiv:2602.19362 , 2026. John Schulman, Sergey Levine, Philipp Moritz, Michael I. Jordan, and Pieter Abbeel. Trust region policy optimization. In Proceedings of the 32nd International Conference on Machine Learning ,volume 37 of Proceedings of Machine Learning Research , pp. 1889–1897, 2015. John Schulman, Filip Wolski, Prafulla Dhariwal, Alec Radford, and Oleg Klimov. Proximal policy optimization algorithms. arXiv preprint arXiv:1707.06347 , 2017. Zhihong Shao, Peiyi Wang, Qihao Zhu, Runxin Xu, Junxiao Song, Xiao Bi, Haowei Zhang, Mingchuan Zhang, Y. K. Li, Y. Wu, and Daya Guo. DeepSeekMath: Pushing the limits of mathematical reasoning in open language models. arXiv preprint arXiv:2402.03300 , 2024. Richard S. Sutton, David A. McAllester, Satinder P. Singh, and Yishay Mansour. Policy gradi-ent methods for reinforcement learning with function approximation. In Advances in Neural Information Processing Systems , volume 12, 1999. Qiying Yu et al. DAPO: An open-source LLM reinforcement learning system at scale. In Advances in Neural Information Processing Systems , volume 38, 2025. Yuheng Zhang, Chenlu Ye, Shuowei Jin, Changlong Yu, Wei Xiong, Saurabh Sahu, and Nan Jiang. Rethinking importance sampling in LLM policy optimization: A cumulative token perspective. 
+
+arXiv preprint arXiv:2605.07331 , 2026. Chujie Zheng, Shixuan Liu, Mingze Li, Xiong-Hui Chen, Bowen Yu, Chang Gao, Kai Dang, Yuqiong Liu, Rui Men, An Yang, Jingren Zhou, and Junyang Lin. Group sequence policy optimization. 
+
+arXiv preprint arXiv:2507.18071 , 2025. 10 A FINITE -H ORIZON LOCAL SURROGATES AND EXACT PREFIX CHANGE OF 
+
+## MEASURE 
+
+Fix a prompt x and consider an undiscounted autoregressive process with maximum horizon L. At position t, let st = ( x, y <t ) and at = yt. For a policy π, define 
+
+dπt (s | x) = Pr( st = s | x, π ), (12) and let Jx(π) and Aπt denote its expected return and finite-horizon advantage, respectively. For responses that terminate before L, the same derivation applies through the realized terminal position. We assume throughout that the learner state–action distribution is absolutely continuous with respect to the behavior distribution. A.1 LOCAL -R ATIO SURROGATE 
+
+Writing the finite-horizon occupancy position by position, the performance-difference identity is 
+
+Jx(πθ ) − Jx(πβ ) = 
+
+> L
+
+X
+
+> t=1
+
+E st∼dθt (·| x) 
+
+> at∼πθ(·| st)
+
+h
+
+Aβt (st, a t)
+
+i
+
+. (13) Define the local action ratio 
+
+ρt = πθ (at | st)
+
+πβ (at | st) . (14) For a fixed state st, the action distribution admits the exact change of measure 
+
+Eat∼πθ (·| st)
+
+h
+
+Aβt (st, a t)
+
+i
+
+= X
+
+> a
+
+πθ (a | st)Aβt (st, a )= X
+
+> a
+
+πβ (a | st) πθ (a | st)
+
+πβ (a | st) Aβt (st, a )= Eat∼πβ (·| st)
+
+h
+
+ρtAβt (st, a t)
+
+i
+
+. (15) Proximal policy methods use a local surrogate that freezes each position-wise state distribution in Equation (13) at its behavior-policy counterpart: 
+
+Sβ,x (θ) = Jx(πβ ) + 
+
+> L
+
+X
+
+> t=1
+
+E st∼dβt (·| x) 
+
+> at∼πβ(·| st)
+
+h
+
+ρtAβt (st, a t)
+
+i
+
+. (16) Combining Equations (13) and (15) gives the exact discrepancy 
+
+Jx(πθ ) − S β,x (θ) = 
+
+> L
+
+X
+
+> t=1
+
+X
+
+> s
+
+h
+
+dθt (s | x) − dβt (s | x)
+
+i
+
+· X
+
+> a
+
+πθ (a | s)Aβt (s, a ). (17) Thus, ρt exactly changes the conditional action distribution at a given state, while the surrogate continues to weight states according to dβt , rather than dθt .A.2 TRPO T RUST REGIONS AND PPO C LIPPING 
+
+The occupancy discrepancy in Equation (17) motivates restricting each policy update. TRPO opti-mizes the frozen-occupancy surrogate subject to a policy-distance constraint; its practical update uses the average KL constraint 
+
+max  
+
+> θ
+
+Sβ,x (θ)
+
+s.t. Dβ
+
+> KL
+
+(θ) ≤ δ, (18) 11 where 
+
+Dβ
+
+> KL
+
+(θ) = 1
+
+L
+
+> L
+
+X
+
+> t=1
+
+Est∼dβt (·| x)
+
+DKL 
+
+ πβ (· | st)∥πθ (· | st) . (19) and δ is the trust-region radius. PPO replaces the explicit constrained optimization with a clipped local-ratio surrogate (Schulman et al., 2017): 
+
+Jclip (θ) = 
+
+> L
+
+X
+
+> t=1
+
+E st∼dβt (·| x) 
+
+> at∼πβ(·| st)
+
+h
+
+min  ρtAβt (st, a t),
+
+clip( ρt, 1 − ϵ, 1 + ϵ)Aβt (st, a t)i
+
+. (20) Here, ϵ is the clipping tolerance. Clipping suppresses advantage-improving updates once a sampled ratio moves beyond the prescribed interval; it does not impose a hard constraint on the full-policy KL. GRPO retains the PPO-style token-level action ratio and clipping while replacing the critic-based advantage with a group-relative outcome signal. A.3 EXACT AUTOREGRESSIVE STATE –A CTION CHANGE OF MEASURE 
+
+The local surrogate in Equation (16) does not explicitly correct the state-distribution mismatch. In the autoregressive process considered here, st contains the complete generated prefix and the transition deterministically appends the sampled token. The probability of reaching st therefore factorizes as 
+
+dπt (st | x) = Pr  
+
+> π
+
+(y<t | x) = 
+
+> t−1
+
+Y
+
+> k=1
+
+π(ak | sk). (21) Along a sampled response, 
+
+dθt (st | x)
+
+dβt (st | x) =
+
+Qt−1 
+
+> k=1
+
+πθ (ak | sk)
+
+Qt−1 
+
+> k=1
+
+πβ (ak | sk)=
+
+> t−1
+
+Y
+
+> k=1
+
+ρk. (22) Multiplying by the action ratio at position t gives the complete state–action density ratio: 
+
+dθt (st | x)πθ (at | st)
+
+dβt (st | x)πβ (at | st)=
+
+> t−1
+
+Y
+
+> k=1
+
+ρk
+
+| {z } 
+
+> state ratio
+
+ρt
+
+|{z} 
+
+> action ratio
+
+=
+
+> t
+
+Y
+
+> k=1
+
+ρk =: Ct. (23) Consequently, for any integrable function ft(st, a t),
+
+E st∼dθt (·| x) 
+
+> at∼πθ(·| st)
+
+[ft(st, a t)] = X
+
+> st
+
+dθt (st | x) X
+
+> at
+
+πθ (at | st)ft(st, a t)= X
+
+> st
+
+dβt (st | x) X
+
+> at
+
+πβ (at | st) dθt (st | x)πθ (at | st)
+
+dβt (st | x)πβ (at | st) ft(st, a t)= E st∼dβt (·| x) 
+
+> at∼πβ(·| st)
+
+[Ctft(st, a t)] . (24) Thus, Ct is the exact state–action density ratio at position t. Section B uses this identity to compare two exact behavior-rollout representations of the target-policy gradient with the practical PNPO surrogate. 12 B EXACT GRADIENT REPRESENTATIONS AND THE PRACTICAL PNPO SURROGATE 
+
+We retain the setting of Section A. The behavior policy πβ is fixed, rewards and autoregressive transitions have no explicit dependence on θ, and the support condition above holds. Define the score at position t as 
+
+zt = ∇θ log πθ (at | st). (25) For compactness, let Eπβ [·] := Eτ ∼πβ (·| x)[·], with analogous notation for πθ . We write Ct(θ) when its parameter dependence is relevant. Section A establishes that Ct is the exact state–action change-of-measure ratio at position t. Exactness of the ratio alone, however, does not specify an unbiased gradient estimator: the advantage and score-function form must also be compatible. We derive two exact behavior-rollout representations and then relate them to the proximal approximations used by the practical PNPO objective. B.1 GRADIENT OF THE PERFORMANCE -D IFFERENCE IDENTITY 
+
+Applying Equation (24) to each state–action expectation in Equation (13) gives 
+
+Jx(πθ ) − Jx(πβ ) = Eτ ∼πβ (·| x)
+
+" LX
+
+> t=1
+
+Ct(θ)Aβt (st, a t)
+
+#
+
+. (26) Because 
+
+∇θ Ct(θ) = Ct(θ)∇θ log Ct(θ)= Ct(θ)
+
+> t
+
+X
+
+> k=1
+
+∇θ log πθ (ak | sk)= Ct(θ)
+
+> t
+
+X
+
+> k=1
+
+zk, (27) and both πβ and Aβt are independent of θ, differentiating Equation (26) yields 
+
+∇θ Jx(πθ ) = Eτ ∼πβ (·| x)
+
+" LX
+
+> t=1
+
+CtAβt (st, a t)
+
+> t
+
+X
+
+> k=1
+
+zk
+
+#
+
+. (28) B.2 DIRECT CHANGE OF MEASURE OF THE POLICY GRADIENT 
+
+The policy-gradient theorem gives 
+
+∇θ Jx(πθ ) = 
+
+> L
+
+X
+
+> t=1
+
+E st∼dθt (·| x) 
+
+> at∼πθ(·| st)
+
+Aθt (st, a t)zt
+
+
+
+=
+
+> L
+
+X
+
+> t=1
+
+E st∼dβt (·| x) 
+
+> at∼πβ(·| st)
+
+CtAθt (st, a t)zt
+
+ , (29) The second equality applies Equation (24): the cumulative ratio changes the sampled state–action distribution from πβ to πθ , while Aθt zt remains the learner-policy score-function integrand. We next verify that this current-token-score form and the cumulative-score form in Equation (28) agree in expectation. Reversing the order of summation in Equation (28) gives 
+
+Eπβ
+
+" LX
+
+> t=1
+
+CtAβttX
+
+> k=1
+
+zk
+
+#
+
+=
+
+> L
+
+X
+
+> k=1
+
+Eπβ
+
+"
+
+zkLX
+
+> t=k
+
+CtAβt
+
+#
+
+. (30) 13 Let Fk = σ(x, a 1: k) denote the prefix information through and including ak. Because sk = ( x, a <k ),conditioning on Fk is equivalent to conditioning on (sk, a k). For t > k ,
+
+Ct = CktY
+
+> j=k+1
+
+ρj . (31) It follows that 
+
+Eπβ
+
+h
+
+CtAβt (st, a t) Fk
+
+i
+
+= CkEπβ
+
+
+
+> t
+
+Y
+
+> j=k+1
+
+ρj
+
+ Aβt (st, a t) Fk
+
+ , (32) where Ck is Fk-measurable. The remaining conditional expectation is 
+
+Eπβ
+
+
+
+> t
+
+Y
+
+> j=k+1
+
+ρj
+
+ Aβt (st, a t) Fk
+
+
+
+= X
+
+> ak+1: t
+
+
+
+> t
+
+Y
+
+> j=k+1
+
+πβ (aj | sj ) πθ (aj | sj )
+
+πβ (aj | sj )
+
+ Aβt (st, a t)= X
+
+> ak+1: t
+
+
+
+> t
+
+Y
+
+> j=k+1
+
+πθ (aj | sj )
+
+ Aβt (st, a t)= Eπθ
+
+h
+
+Aβt (st, a t) Fk
+
+i
+
+. (33) Substituting Equation (33) into Equation (32), for every t > k ,
+
+Eπβ
+
+h
+
+CtAβt (st, a t) Fk
+
+i
+
+= CkEπθ
+
+h
+
+Aβt (st, a t) Fk
+
+i
+
+. (34) The current term CkAβk (sk, a k) is already determined by Fk. Separating it from the future terms and applying Equation (34) gives 
+
+Eπβ
+
+" LX
+
+> t=k
+
+CtAβt (st, a t) Fk
+
+#
+
+= CkAβk (sk, a k) + 
+
+> L
+
+X
+
+> t=k+1
+
+Eπβ
+
+h
+
+CtAβt (st, a t) Fk
+
+i
+
+= CkAβk (sk, a k) + CkLX
+
+> t=k+1
+
+Eπθ
+
+h
+
+Aβt (st, a t) Fk
+
+i
+
+= CkEπθ
+
+"
+
+Aβk (sk, a k) + 
+
+> L
+
+X
+
+> t=k+1
+
+Aβt (st, a t) Fk
+
+#
+
+= CkEπθ
+
+" LX
+
+> t=k
+
+Aβt (st, a t) sk, a k
+
+#
+
+. (35) Let rt(st, a t) denote the conditional mean immediate reward and set V βL+1 = 0 . Under the determin-istic token-append transition, 
+
+Aβt (st, a t) = rt(st, a t) + V βt+1 (st+1 ) − V βt (st). (36) 14 Substitution into the last expectation in Equation (35) gives 
+
+Eπθ
+
+" LX
+
+> t=k
+
+Aβt (st, a t) sk, a k
+
+#
+
+= Eπθ
+
+" LX
+
+> t=k
+
+ rt + V βt+1 − V βt
+
+ sk, a k
+
+#
+
+= Eπθ
+
+" LX
+
+> t=k
+
+rt sk, a k
+
+#
+
+− V βk (sk)= Qθk(sk, a k) − V βk (sk), (37) where 
+
+Qθk(sk, a k) = Eπθ
+
+" LX
+
+> t=k
+
+rt sk, a k
+
+#
+
+.
+
+Combining Equations (35) and (37) yields 
+
+Eπβ
+
+" LX
+
+> t=k
+
+CtAβt Fk
+
+#
+
+= Ck
+
+h
+
+Qθk(sk, a k) − V βk (sk)
+
+i
+
+. (38) Because zk is Fk-measurable, the tower property applied to Equations (30) and (38) gives 
+
+> L
+
+X
+
+> k=1
+
+Eπβ
+
+"
+
+zkLX
+
+> t=k
+
+CtAβt
+
+#
+
+=
+
+> L
+
+X
+
+> k=1
+
+Eπβ
+
+"
+
+zkEπβ
+
+" LX
+
+> t=k
+
+CtAβt Fk
+
+## 
+
+=
+
+> L
+
+X
+
+> k=1
+
+Eπβ
+
+h
+
+Ck
+
+ Qθk(sk, a k) − V βk (sk)zk
+
+i
+
+. (39) Now decompose 
+
+Qθk(sk, a k) − V βk (sk) = Aθk(sk, a k) + V θk (sk) − V βk (sk). (40) The second term depends only on sk. Using the state–action factorization in Equation (23), its score contribution vanishes: 
+
+Eπβ
+
+h
+
+Ck
+
+ V θk (sk) − V βk (sk)zk
+
+i
+
+= Esk ∼dβk (·| x)
+
+"
+
+dθk(sk | x)
+
+dβk (sk | x)
+
+ V θk (sk) − V βk (sk)
+
+· X
+
+> a
+
+πβ (a | sk) πθ (a | sk)
+
+πβ (a | sk) ∇θ log πθ (a | sk)
+
+#
+
+= Esk ∼dβk (·| x)
+
+"
+
+dθk(sk | x)
+
+dβk (sk | x)
+
+ V θk (sk) − V βk (sk)∇θ
+
+X
+
+> a
+
+πθ (a | sk)
+
+#
+
+= 0 . (41) Substituting Equations (40) and (41) into Equation (39) gives 
+
+Eπβ
+
+" LX
+
+> t=1
+
+CtAβttX
+
+> k=1
+
+zk
+
+#
+
+=
+
+> L
+
+X
+
+> k=1
+
+Eπβ
+
+CkAθk(sk, a k)zk
+
+
+
+= ∇θ Jx(πθ ). (42) 15 Hence, Equations (28) and (29) are two exact representations of the same target-policy gradient. The first pairs Aβt with the cumulative prefix score, whereas the second pairs Aθt with the current-token score. Their expectations agree by Equation (42), but these components are not interchangeable: in general, CtAβt zt is not an exact target-policy gradient term. Under the assumptions above and with exact advantages, Monte Carlo estimates of either representation are unbiased for ∇θ Jx(πθ ).The corresponding stop-gradient surrogate forms are 
+
+Eπβ
+
+" LX
+
+> t=1
+
+sg 
+
+h
+
+CtAβt
+
+i tX
+
+> k=1
+
+log πθ (ak | sk)
+
+#
+
+,
+
+Eπβ
+
+" LX
+
+> t=1
+
+sg CtAθt
+
+ log πθ (at | st)
+
+#
+
+. (43) At the current parameter value, their gradients recover Equations (28) and (29), respectively. B.3 PRACTICAL PNPO S URROGATE 
+
+The distinction above also clarifies the approximation inherited from the TRPO/PPO lineage. In the local surrogate of Equation (16), the behavior-policy occupancy and Aβt are held fixed, and differentiating the local ratio yields a current-token score. Because this surrogate contains ρt rather than Ct, it does not differentiate the full prefix ratio. TRPO constrains this local update with a trust region, whereas PPO and GRPO use clipped local ratios. PNPO changes the weighting statistic but retains the corresponding proximal advantage approximation in its current-token-score form: 
+
+Aθt (st, a t) ≈ Aβt (st, a t). (44) In the reported objective, the rollout-derived group-relative signal bAi,t serves as this behavior-side proxy. As established above, pairing this proxy with the current-token score is a proximal approximation rather than the exact Aβt cumulative-score representation. PNPO further replaces the exact cumulative ratio with the prefix-normalized policy weight 
+
+wPN  
+
+> i,t
+
+= C1/t i,t . (45) For t > 1, replacing Ci,t with C1/t i,t does not preserve either exact gradient identity; the normalization deliberately trades exact change of measure for control of the cumulative log-weight scale. Using the response-level notation and gate Mi,t defined in Section 3.2, the reported surrogate is 
+
+JPNPO (θ) = E x∼D   
+
+> y1,...,y G
+> i.i.d.
+> ∼πβ(·| x)
+
+"
+
+1
+
+G
+
+> G
+
+X
+
+> i=1
+
+1
+
+LiLiX
+
+> t=1
+
+sg 
+
+h
+
+Mi,t wPN  
+
+> i,t
+
+bAi,t 
+
+i
+
+log πθ (yi,t | x, y i,<t )
+
+#
+
+. (46) Thus, the practical PNPO update combines the current-token score with a behavior-side advantage proxy, the prefix-normalized weight, position-dependent gating, and response-level aggregation. Together, these choices make the complete objective a deliberately biased proximal surrogate of the target-policy gradient, while Ct remains its exact change-of-measure reference. 16 C FULL EXPERIMENTAL CONFIGURATION 
+
+Table 2: Configuration used for the reported experiments. 
+
+Item Configuration Base model DeepSeek-R1-Distill-Qwen-1.5B Training data DAPO-Math-17k Rollout batch 256 prompts × 8 responses per prompt PPO minibatch 64 prompt groups ( 512 response sequences) Policy-update epochs 1 or 4
+
+Maximum lengths 1,024 prompt tokens; 15 ,360 response tokens Advantage estimator Group-relative outcome advantage (as in GRPO) Actor optimization Learning rate 10 −6; 10-step warmup; weight decay 0.1
+
+Rollout sampling Temperature 1.0
+
+Evaluation sets AMC 2023, AIME 2024, AIME 2025 Evaluation sampling 32 responses per problem; temperature 0.7; top-p sampling with p =0.9
+
+Evaluation schedule Every 50 steps (one-epoch setting); every 10 steps (four-epoch setting) Reported metrics Avg@32 for each benchmark; macro Avg@32 as the unweighted mean across benchmarks Runs One run for each combination of method and epoch setting (seed 42 )GRPO Token-mean aggregation; local-ratio clip tolerances (0 .2, 0.28) ; dual-clip coefficient 10 .0
+
+GSPO Mean of token-level score terms within each response, then mean across responses; sequence-ratio clip tolerances (3 × 10 −4, 4 × 10 −4)
+
+PNPO Mean of token-level score terms within each response, then mean across responses; position-dependent gate with base tolerances (7 ×
+
+10 −4, 9.5 × 10 −4)
+
+17
