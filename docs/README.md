@@ -6,104 +6,80 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-08-04
-- 运行时间：2026-08-04 22:05:21 UTC
+- 最新运行日期：2026-08-05
+- 运行时间：2026-08-05 21:57:58 UTC
 - 运行状态：成功
-- 本次总论文数：27
-- 精读区：16
+- 本次总论文数：19
+- 精读区：8
 - 速读区：11
 
 ### 今日简报（AI）
-- 今日共生成 27 篇推荐（精读 16 篇，速读 11 篇）
-- 精读：《Group-Reflective Self-Distillation for Agentic Reinforcement Learning》（9.0/10）, 《Select-And-Extract: A Lightweight Plugin for Retrieval-Augmented Generation》（9.0/10）
-- 速读：《Harness-G: A Graph-Structured Harness for Search Agents》（8.0/10）, 《Personalizing Large Language Model Agents with Small Policy Models》（8.0/10）, 《DocPO: Advancing Document Policy Optimization via Tailored Step-Aware Rewards》（8.0/10）
+- 今日共生成 19 篇推荐（精读 8 篇，速读 11 篇）
+- 精读：《Start Classifying: Categorical Critics for LLM Reinforcement Learning》（9.0/10）, 《CVPO: Enhancing LLM Reinforcement Learning Reasoning via Value-Variance Adaptation and Dynamic Curriculum Learning》（9.0/10）
+- 速读：《Cross-Domain Hybrid OPD for Generalizable Search Agents》（8.0/10）, 《RoMeRL: Balancing Feedback Coverage and the Memory-Reward Trap in Self-Evolving Agent Memory via Reduced-Order Utility States》（8.0/10）, 《BODHI: Do LLMs Branch Out and Discover Heterogeneous Inferences?》（8.0/10）
 - 这些结果覆盖了当下较热的方向，建议先看精读区论文的关键问题与方法。
-- 详情：[/202608/04/README](/202608/04/README)
+- 详情：[/202608/05/README](/202608/05/README)
 
 ### 精读区论文标签
-1. [Group-Reflective Self-Distillation for Agentic Reinforcement Learning](/202608/04/2607.28076v2-group-reflective-self-distillation-for-agentic-reinforcement-learning)  
+1. [Start Classifying: Categorical Critics for LLM Reinforcement Learning](/202608/05/2608.02181v1-start-classifying-categorical-critics-for-llm-reinforcement-learning)  
    标签：评分：9.0/10、query:rl
-   evidence：面向LLM智能体的强化学习训练，通过自蒸馏从轨迹生成指导信号
-2. [Select-And-Extract: A Lightweight Plugin for Retrieval-Augmented Generation](/202608/04/2608.00658v1-select-and-extract-a-lightweight-plugin-for-retrieval-augmented-generation)  
+   evidence：面向LLM强化学习PPO的分类式critic训练方法
+2. [CVPO: Enhancing LLM Reinforcement Learning Reasoning via Value-Variance Adaptation and Dynamic Curriculum Learning](/202608/05/2608.03068v1-cvpo-enhancing-llm-reinforcement-learning-reasoning-via-value-variance-adaptation-and-dynamic-curriculum-learning)  
    标签：评分：9.0/10、query:rl
-   evidence：针对检索失败与阅读失败的RAG轻量级插件，面向知识密集任务
-3. [Distill Where You Fail: Recovering Learning Signals of Negative RL-Groups from Adaptive Teacher Guidance](/202608/04/2608.00782v1-distill-where-you-fail-recovering-learning-signals-of-negative-rl-groups-from-adaptive-teacher-guidance)  
+   evidence：面向大模型推理的方差感知策略优化与课程学习
+3. [Don't Peek at the Answer: Outcome-Masked Group Relative Policy Optimization for Label-Free RLVR](/202608/05/2608.03119v1-dont-peek-at-the-answer-outcome-masked-group-relative-policy-optimization-for-label-free-rlvr)  
    标签：评分：9.0/10、query:rl
-   evidence：面向大模型RLVR/GRPO后训练的负组自适应教师蒸馏
-4. [PROGRESS: Coverage-guided RL to Train Search-augmented LLM Agent](/202608/04/2608.00969v1-progress-coverage-guided-rl-to-train-search-augmented-llm-agent)  
+   evidence：面向LLM推理的策略优化，提出掩码GRPO用于无标签可验证奖励强化学习
+4. [Agentic Reinforcement Learning with Self-Distilled Reward Shaping](/202608/05/2608.03223v1-agentic-reinforcement-learning-with-self-distilled-reward-shaping)  
    标签：评分：9.0/10、query:rl
-   evidence：用覆盖度奖励引导搜索增强大模型智能体的查询分解与搜索行为
-5. [Search-GRT: Guided Retrieval Training of Search Agents to Optimize for Complex Question Answering](/202608/04/2608.00974v1-search-grt-guided-retrieval-training-of-search-agents-to-optimize-for-complex-question-answering)  
+   evidence：提出ADRS智能体强化学习奖励塑形框架，解决稀疏轨迹级奖励问题
+5. [Hybrid LLM-Augmented Reinforcement Learning Agents for Complex Sequential Decision Tasks](/202608/05/2608.03502v1-hybrid-llm-augmented-reinforcement-learning-agents-for-complex-sequential-decision-tasks)  
    标签：评分：9.0/10、query:rl
-   evidence：面向多跳问答检索智能体的引导式检索强化训练
-6. [EviSD: Evidence-Conditioned Self-Distillation for Search-Augmented Agents](/202608/04/2608.01359v1-evisd-evidence-conditioned-self-distillation-for-search-augmented-agents)  
+   evidence：将LLM规划与RL动作优化结合，用于长时域序贯决策的智能体
+6. [Taming the Implicit: Dual-Channel Risk-Aware Reinforcement Fine-Tuning for Continual Multimodal Post-Training](/202608/05/2608.03660v1-taming-the-implicit-dual-channel-risk-aware-reinforcement-fine-tuning-for-continual-multimodal-post-training)  
    标签：评分：9.0/10、query:rl
-   evidence：面向多轮搜索增强大模型智能体的证据条件自蒸馏与RL信用分配
-7. [Reusing Rollouts under Policy Lag: Prefix-Normalized Policy Optimization for LLM Reinforcement Learning](/202608/04/2608.01418v1-reusing-rollouts-under-policy-lag-prefix-normalized-policy-optimization-for-llm-reinforcement-learning)  
+   evidence：面向多模态LLM持续RL微调的风险感知策略优化
+7. [Enhancing VLM Reward Models Through Structure-Aware Fine-Tuning](/202608/05/2608.03875v1-enhancing-vlm-reward-models-through-structure-aware-fine-tuning)  
    标签：评分：9.0/10、query:rl
-   evidence：用于LLM强化学习离策略修正的前缀归一化策略优化
-8. [HindSearch: Trajectory-Level Hindsight Critique for Search-Augmented Reinforcement Learning](/202608/04/2608.01597v1-hindsearch-trajectory-level-hindsight-critique-for-search-augmented-reinforcement-learning)  
+   evidence：面向 RL 的结构感知微调，提升 VLM 奖励模型质量
+8. [TurnSight: Turn-Level Hindsight Self-Distillation for Tool-Integrated Reasoning](/202608/05/2608.04007v1-turnsight-turn-level-hindsight-self-distillation-for-tool-integrated-reasoning)  
    标签：评分：9.0/10、query:rl
-   evidence：用于检索增强RL的后见批判与自蒸馏
-9. [RING: Retrieval-Internalized Generation for Continual Large-Scale Knowledge Injection](/202608/04/2608.01630v1-ring-retrieval-internalized-generation-for-continual-large-scale-knowledge-injection)  
-   标签：评分：9.0/10、query:rl
-   evidence：检索内化生成与RL参数化搜索，去除外部RAG检索器
-10. [TCPO: Turn-Level Credit Policy Optimization](/202608/04/2608.01667v1-tcpo-turn-level-credit-policy-optimization)  
-   标签：评分：9.0/10、query:rl
-   evidence：面向验证器引导的多轮LLM推理RL的回合级信用分配
-11. [Progressive Agent Skill Generation via Reinforcement Learning](/202608/04/2608.01678v1-progressive-agent-skill-generation-via-reinforcement-learning)  
-   标签：评分：9.0/10、query:rl
-   evidence：使用强化学习渐进生成智能体技能，直接改进LLM智能体的任务自动化
-12. [Toward Plasticity-Preserving KL Regularization for Capability Retention in LLM Reinforcement Learning](/202608/04/2608.01743v1-toward-plasticity-preserving-kl-regularization-for-capability-retention-in-llm-reinforcement-learning)  
-   标签：评分：9.0/10、query:rl
-   evidence：面向大模型强化学习能力保持的正确性条件化KL正则化
-13. [PCSD: Persistent Consistency for Self-Distillation in Agentic Reinforcement Learning](/202608/04/2608.01837v1-pcsd-persistent-consistency-for-self-distillation-in-agentic-reinforcement-learning)  
-   标签：评分：9.0/10、query:rl
-   evidence：面向LLM智能体强化学习的稀疏奖励问题，用持续性一致性自蒸馏提供密集监督
-14. [Instruction-Conditioned Exploration with Asymmetric Reinforcement Learning and Self-Distillation](/202608/04/2608.02087v1-instruction-conditioned-exploration-with-asymmetric-reinforcement-learning-and-self-distillation)  
-   标签：评分：9.0/10、query:rl
-   evidence：基于指令条件探索的非对称强化学习与自蒸馏
-15. [Self-Improving Large Language Models via Progressive Experience Evolution](/202608/04/2608.02139v1-self-improving-large-language-models-via-progressive-experience-evolution)  
-   标签：评分：9.0/10、query:rl
-   evidence：围绕策略优化与经验蒸馏改进LLM自我改进能力，直接关联大模型强化学习
-16. [Beyond the Mean: Multi-Moment Policy Optimization for LLM Reasoning](/202608/04/2608.02149v1-beyond-the-mean-multi-moment-policy-optimization-for-llm-reasoning)  
-   标签：评分：9.0/10、query:rl
-   evidence：面向大模型推理的多矩策略优化
+   evidence：面向工具集成多步推理的轮级事后自蒸馏强化学习方法
 
 ### 速读区论文标签
-1. [Harness-G: A Graph-Structured Harness for Search Agents](/202608/04/2607.27652v2-harness-g-a-graph-structured-harness-for-search-agents)  
+1. [Cross-Domain Hybrid OPD for Generalizable Search Agents](/202608/05/2608.02101v1-cross-domain-hybrid-opd-for-generalizable-search-agents)  
    标签：评分：8.0/10、query:rl
-   evidence：面向RL多轮搜索智能体的图结构策略-环境接口设计
-2. [Personalizing Large Language Model Agents with Small Policy Models](/202608/04/2608.00215v1-personalizing-large-language-model-agents-with-small-policy-models)  
+   evidence：面向可泛化自主搜索智能体的智能体强化学习训练框架
+2. [RoMeRL: Balancing Feedback Coverage and the Memory-Reward Trap in Self-Evolving Agent Memory via Reduced-Order Utility States](/202608/05/2608.02508v1-romerl-balancing-feedback-coverage-and-the-memory-reward-trap-in-self-evolving-agent-memory-via-reduced-order-utility-states)  
    标签：评分：8.0/10、query:rl
-   evidence：用小策略模型根据标量反馈在线学习，个性化LLM智能体的执行决策
-3. [DocPO: Advancing Document Policy Optimization via Tailored Step-Aware Rewards](/202608/04/2608.00536v1-docpo-advancing-document-policy-optimization-via-tailored-step-aware-rewards)  
+   evidence：面向自进化大模型智能体记忆的强化学习方法，解决记忆奖励陷阱
+3. [BODHI: Do LLMs Branch Out and Discover Heterogeneous Inferences?](/202608/05/2608.02867v1-bodhi-do-llms-branch-out-and-discover-heterogeneous-inferences)  
    标签：评分：8.0/10、query:rl
-   evidence：面向RL奖励设计的步进感知奖励锐化机制
-4. [Remember-R1: Mitigating Long-Context Visual Forgetting through Reinforcement Learning](/202608/04/2608.01314v1-remember-r1-mitigating-long-context-visual-forgetting-through-reinforcement-learning)  
+   evidence：分析RLVR训练的大模型推理探索行为与策略熵坍缩
+4. [Verifiable Memory: Learning Unified Memory Management with Local and Global Verifiers for Large Language Model Agents](/202608/05/2608.03137v1-verifiable-memory-learning-unified-memory-management-with-local-and-global-verifiers-for-large-language-model-agents)  
    标签：评分：8.0/10、query:rl
-   evidence：用过程级奖励强化多模态长思维链中的视觉证据保持
-5. [Beyond On-Policy Exploration: Integrating External Policy Rollouts for Reinforcement Learning in Diffusion Language Models](/202608/04/2608.01717v1-beyond-on-policy-exploration-integrating-external-policy-rollouts-for-reinforcement-learning-in-diffusion-language-models)  
+   evidence：用局部与全局验证器学习LLM智能体的统一记忆管理策略
+5. [Aligning Large Vision-Language Models at Test Time: A Trajectory-Guided Structured Sampling Approach](/202608/05/2608.03204v1-aligning-large-vision-language-models-at-test-time-a-trajectory-guided-structured-sampling-approach)  
    标签：评分：8.0/10、query:rl
-   evidence：面向扩散语言模型的强化学习，集成外部策略轨迹以提升训练效果
-6. [CoEvo-Mem: Co-Evolving Retrieval Policy and Memory Bank for LLM Agents](/202608/04/2608.01739v1-coevo-mem-co-evolving-retrieval-policy-and-memory-bank-for-llm-agents)  
+   evidence：面向LVLM与人类意图对齐的后训练RL，提出测试时轨迹引导结构化采样
+6. [Towards Improving Sequential Decision-Making in LLM Agents via Experience Memory](/202608/05/2608.03420v1-towards-improving-sequential-decision-making-in-llm-agents-via-experience-memory)  
    标签：评分：8.0/10、query:rl
-   evidence：面向长期LLM智能体的检索策略与记忆库闭环协同演化
-7. [CoEvoKG: Co-Evolving Knowledge Graphs with Self-Evolving Search Agents](/202608/04/2608.01904v1-coevokg-co-evolving-knowledge-graphs-with-self-evolving-search-agents)  
-   标签：评分：8.0/10、query:rl
-   evidence：用强化学习训练知识图谱检索智能体，以图证据记忆支持智能体自进化
-8. [Cognitive Demand Steering for Adaptive Meta-Reasoning in Large Language Models](/202608/04/2608.01319v1-cognitive-demand-steering-for-adaptive-meta-reasoning-in-large-language-models)  
+   evidence：基于经验记忆提升大模型智能体的序贯决策能力
+7. [TransMem: Transforming Hidden States into Memory for Large Language Models](/202608/05/2607.29032v1-transmem-transforming-hidden-states-into-memory-for-large-language-models)  
    标签：评分：7.0/10、query:rl
-   evidence：面向大模型推理的自适应元推理与剩余需求评估
-9. [The Case Against Generation for Retrieval: Discriminative Language Models as Effective Retrievers](/202608/04/2607.25346v2-the-case-against-generation-for-retrieval-discriminative-language-models-as-effective-retrievers)  
+   evidence：为长交互历史中的LLM智能体提供可复用记忆模块
+8. [HarnessCompass: Guiding Automatic Harness Evolution toward Generalizable and Effective Agent Harnesses](/202608/05/2608.01918v1-harnesscompass-guiding-automatic-harness-evolution-toward-generalizable-and-effective-agent-harnesses)  
+   标签：评分：7.0/10、query:rl
+   evidence：面向LLM智能体的自动harness演化框架，解决过拟合与组件相互干扰的问题
+9. [Self-Improving Large Language Models via Progressive Experience Evolution](/202608/05/2608.02139v2-self-improving-large-language-models-via-progressive-experience-evolution)  
+   标签：评分：7.0/10、query:rl
+   evidence：面向大模型自改进的经验蒸馏与策略优化
+10. [SkillTrace: Traversing a Query-Skill Graph for Composable LLM Agents](/202608/05/2608.02356v2-skilltrace-traversing-a-query-skill-graph-for-composable-llm-agents)  
+   标签：评分：7.0/10、query:rl
+   evidence：基于图的技能组合方法，用于LLM智能体
+11. [SkillTrace: Traversing a Query-Skill Graph for Composable LLM Agents](/202608/05/2608.02356v1-skilltrace-traversing-a-query-skill-graph-for-composable-llm-agents)  
    标签：评分：6.0/10、query:rl
-   evidence：基于LLM的双塔检索方法可迁移至RAG
-10. [Learning What to Remember and What to Internalize in LLM Self-Evolution via Adaptive Memory-Parameter Coordination](/202608/04/2608.01234v1-learning-what-to-remember-and-what-to-internalize-in-llm-self-evolution-via-adaptive-memory-parameter-coordination)  
-   标签：评分：6.0/10、query:rl
-   evidence：通过自适应记忆-参数协调提升LLM智能体在动态环境中的自我进化能力
-11. [Cooperative Coevolution for Resource-Constrained Agentic LLM Post-Training](/202608/04/2608.02391v1-cooperative-coevolution-for-resource-constrained-agentic-llm-post-training)  
-   标签：评分：6.0/10、query:rl
-   evidence：面向智能体LLM后训练的进化优化方法，可与强化学习性能匹敌
+   evidence：面向可组合 LLM 智能体的技能图遍历方法
 
 
 <div class="dpr-home-promo-card">

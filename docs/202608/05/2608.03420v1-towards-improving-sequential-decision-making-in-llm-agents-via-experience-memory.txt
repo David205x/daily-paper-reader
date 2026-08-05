@@ -1,0 +1,1618 @@
+Title: Towards Improving Sequential Decision-Making in LLM Agents via Experience Memory
+
+URL Source: https://arxiv.org/pdf/2608.03420v1
+
+Published Time: Wed, 05 Aug 2026 00:51:39 GMT
+
+Number of Pages: 15
+
+Markdown Content:
+# Towards Improving Sequential Decision-Making in LLM Agents via Experience Memory 
+
+## Jakub Rada , Viliam Lis´ y
+
+## AI Center, Department of Computer Science, FEE, Czech Technical University in Prague radajak5@fel.cvut.cz, lisyvili@fel.cvut.cz 
+
+## Abstract 
+
+Large language models have improved substan-tially on single-shot reasoning tasks, but their per-formance in sequential decision-making is less well understood. We study this on fully-observable two-player zero-sum games, which provide ground-truth evaluation: outcomes are determined by the rules, and optimality of individual moves can be computed or approximated, without relying on a judge model. Across model tiers, LLMs play sub-optimally in simple games such as tic-tac-toe or Connect Four, and lose to MCTS opponents. Ob-fuscations that preserve the game tree but rewrite its surface form leave performance largely unchanged, indicating the gap is not fully explained by recall of memorized strategies. Motivated by this per-formance gap, we introduce an agentic framework enhanced with an experience memory designed for the sequential setting and addressing common chal-lenges of sequential decision-making such as credit assignment. We show that post-game reflection and rule extraction yield measurable improvements on tic-tac-toe without modifying the model weights. 
+
+## 1 Introduction 
+
+Large language models (LLMs) now solve impressive rea-soning problems, from competition mathematics to multi-file coding tasks. Yet a growing body of evidence, most visibly the recent study on the limits of ”thinking” models [Shojaee 
+
+et al. , 2025], shows that this competence does not transfer cleanly to simple sequential decision-making puzzles. Even on tasks humans master with little practice, frontier models falter once the environment is no longer stationary or passive: it evolves between steps, an adversary pushes back, and re-wards are delayed. Closing this gap matters for deploying LLMs as reliable autonomous agents, yet progress is hard to measure, as benchmarks often lean on LLM judges or proxy metrics that conflate reasoning quality with surface plausibil-ity [Ye et al. , 2024]. We study this gap in a setting that admits ground-truth eval-uation: deterministic perfect-information two-player zero-sum games. Outcomes are determined by the rules, the op-timality of each individual move can be computed exactly by classical solvers for games of modest size, and the games we consider, tic-tac-toe, Nim, and Connect Four, are simple enough that a casual human player can master them. Build-ing on GTBench [Duan et al. , 2024], we evaluate state-of-the-art models from OpenAI, Google, and the open-source community across three capability tiers. The picture is con-sistent and discouraging. Efficient and Intermediate models miss four to twelve optimal moves per hundred on tic-tac-toe and up to five on Nim, and the Frontier tier, GPT-5.4, Gemini 3.1 Pro, and GLM-5.2, lose to a moderate MCTS opponent on Connect Four in essentially every game, typi-cally collapsing within ten moves of a forty-move game. To probe how robust this behavior is, we evaluate the same mod-els under a suite of game-rule obfuscations that preserve the underlying game tree but rewrite its surface form. Perfor-mance is largely invariant across formulations, and reason-ing traces frequently identify the underlying game by name even with disguised rules. The obfuscations therefore do not cleanly separate reasoning from recall, models can still draw on memorized strategies once they recognize the game, but they do show that the failures are stable properties of how each model engages with these positions, not artifacts of a particular representation. A natural response would be to fine-tune the models on game play, but updating frontier-model weights is costly, often inaccessible, and risks regressing the capabilities the agent depends on for parsing rules and planning over them. We therefore ask whether the gap can be closed at the agent level, by supplying the missing decision-time signal exter-nally and leaving the model untouched. Prior work on case-based reasoning and self-reflection, Memento [Zhou et al. ,2025], ExpeL [Zhao et al. , 2024], and Reflexion [Shinn et al. , 2023], has shown that experience memory and generat-ing reflective feedback can yield consistent gains on question-answering and tool-use tasks without weight updates. These methods, however, were designed for planning rather than ad-versarial environments; they do not address the challenge of assigning a delayed reward across a sequence of turn-based, adversarial state evolutions. A direct port to game play is es-sentially non-functional in our experiments. We introduce REAPER ( Reflective Experiential Agent with Periodic Extraction of Rules), 1 a reflective case-based      
+
+> 1It learns only from its own experience, i.e. it reaps what it sows .arXiv:2608.03420v1 [cs.AI] 4 Aug 2026 Games
+> Players
+> Turn Based Engine
+> Tic Tac Toe Family
+> Tic Tac Toe Magic Square
+> Modified Tic Tac Toe Story Magic Square
+> Nim Family
+> Nim Inverse Nim
+> Modified Nim Story Nim
+> Connect Four Family
+> Connect Four
+> LLM Players
+> LLM Player
+> REAPER Player
+> Algorithmic Players
+> MCTS Player
+> Optimal Player
+> Random Player
+> LLM Adapter
+> Prompt Adapter
+> Output Strategy
+> Interface Adapter
+> Observation Adapter
+> Action Adapter
+> OpenSpiel
+> system prompt
+> observation prompt
+> raw response
+> observation
+> legal actions
+> selected action
+> interface observation
+> legal interface actions
+> selected interface action
+> interface observation
+> legal interface actions
+> selected interface action
+
+Figure 1: A simplified schema of PlyBench highlighting the modularity and extensibility of the framework to add new games and players. 
+
+reasoning framework that adapts experience memory to se-quential play. REAPER keeps the LLM as the primary rea-soner and targets the structural challenges of the setting with a self-reflecting mechanism that performs per-move credit assignment after each completed trajectory. It emits fine-grained annotations augmenting the terminal reward and pe-riodically distills them into a small set of natural-language strategic rules. REAPER requires no weight updates and learns purely from played episodes, substantially improving over both the base LLM and a case-based-reasoning baseline on tic-tac-toe with GPT-5 nano against the Optimal opponent. Our contributions are: • An empirical characterization of the gap in sequen-tial reasoning in current LLMs on simple deterministic perfect-information two-player zero-sum games, show-ing it persists across models and providers, and is largely invariant to surface representation. • REAPER, an agentic framework that adapts case-based reasoning to sequential decision-making through per-move reflection and rule extraction, improving over a strong baseline without modifying the model weights. 
+
+## 2 Related Work 
+
+A growing body of work has examined how LLMs per-form on reasoning tasks that require more than a single out-put step. Chain-of-Thought prompting [Wei et al. , 2022] elicits intermediate reasoning steps and has become stan-dard practice on multi-step problems, with extensions such as self-consistency [Wang et al. , 2023] improving robustness through majority voting over independent reasoning chains. Tree of Thoughts [Yao et al. , 2023a] reframes reasoning as a search problem, structuring intermediate thoughts into a tree, self-evaluating them and backtracking on dead ends. Although closer to the explicit search used in sequential decision-making, it searches over the model’s internal states rather than a shared external state. A separate line of research targets environments with ex-ternal state directly. ReAct [Yao et al. , 2023b] interleaves reasoning and action steps in interactive environments, lay-ing the foundations for agentic systems. RAP [Hao et al. ,2023] prompts the LLM to act as both a world model and a value function, and plans over its own predictions using Monte Carlo Tree Search. Code World Models [Lehrach et al. , 2025] have the LLM synthesize executable code that rep-resents the environment, then use a dedicated planning algo-rithm on the resulting world model. These methods use the LLM for environment representation or prediction, but unlike our method, the planning is performed by an external algo-rithm. A complementary approach is to keep the LLM as the pri-mary reasoner and provide it with structured context drawn from past experience. Memento [Zhou et al. , 2025] intro-duces a case-based reasoning architecture in which an agent consults a growing case bank of past task-solving trajectories, retrieving relevant cases at decision time. ExpeL [Zhao et al. ,2024] extracts natural-language insights from successful and failed trajectories and supplies them as additional context for new tasks. Reflexion [Shinn et al. , 2023] prompts the agent to reflect on its own failures and uses the resulting reflections as guidance on subsequent attempts at the same task. These methods establish that experience memory and self-reflection can yield consistent gains without modifying model weights, but they were developed primarily for stationary question-answering and tool-use tasks, where the environment does not respond adversarially and trajectories are short enough that storing them as a single unit, labeled by the final outcome, gives a useful retrieval signal. REAPER adapts this family of methods to sequential play, where trajectories are longer, the binary win/loss reward arrives only at the end, a signal too coarse to tell strong moves from mistakes within a trajectory and drive learning. A third line of work focuses on the infrastructure for evalu-ating LLMs on games. OpenSpiel [Lanctot et al. , 2019] pro-vides a comprehensive library of game implementations and reference algorithms, and is widely used as the standard en-gine for game-theoretic experiments. GTBench [Duan et al. ,2024], building on OpenSpiel, introduces a benchmark suite for evaluating LLMs on a range of (im)perfect-information, deterministic and stochastic games, and reports substantial gaps to optimal play, including on tic-tac-toe, Nim, and Con-nect Four. PlyBench extends GTBench into a modular eval-uation framework that supports arbitrary players, games, and obfuscations through a small set of adapter interfaces, and serves as the platform for evaluating REAPER; for differ-ences from the concurrent OpenSpiel 2.0 [Lanctot, 2026], see Appendix E. 
+
+## 3 The Sequential Reasoning Gap 
+
+In this section we diagnose the sequential reasoning gap by evaluating LLMs on deterministic perfect-information two-player zero-sum games. As argued in Section 1, such games provide a controlled setting for this purpose: the rules are well-defined, actions and final outcomes allow for unambigu-ous ground-truth evaluation, and the optimal policy is com-putable exactly for games of modest size. We show that cur-rent state-of-the-art LLMs remain unreliable even in simple domains, then probe whether this unreliability is better ex-plained by recall of memorized strategies or by flawed rea-soning about the current state. The gap to optimal play per-sists across models and opponents and is largely invariant to representation, motivating the method introduced in Sec-tion 4. 
+
+3.1 PlyBench 
+
+To evaluate a broad spectrum of players, ranging from ran-dom and algorithmic baselines to LLM-based players, on ar-bitrary games, we developed PlyBench 2, shown in Figure 1. Following GTBench [Duan et al. , 2024], PlyBench uses OpenSpiel [Lanctot et al. , 2019] as the underlying game en-gine and introduces two components: the Interface Adapter ,which translates OpenSpiel’s observations and actions into a unified representation for all types of players; and the LLM Adapter , which transforms this representation into a text-based format suitable for LLMs. New games and players are integrated by implementing the interfaces defined by these adapters, regardless of their internal complexity. PlyBench then handles game execution, player orchestration, paral-lelization, and result aggregation and analysis. 
+
+3.2 Evaluation Setting 
+
+We consider three perfect-information two-player zero-sum games, each posing different challenges. Tic-tac-toe fea-tures a small game tree and short-horizon planning, with draw as the optimal outcome, and thus tests the player’s ability 
+
+> 2GitHub repository: https://github.com/radajakub/plybench
+
+to avoid losing rather than to win. Nim also has a small game tree, but requires a less obvious strategy based on the Nim-sum of the piles, and tests the player’s ability to force a win when starting in a winning position. Connect Four 
+
+has a much larger game tree, requiring long-horizon planning and the ability to anticipate and create multiple simultaneous threats. To measure the game-playing ability of the players, we use three opponents of increasing strength. The Random oppo-nent chooses actions uniformly at random. The Monte Carlo Tree Search (MCTS) opponent is strong but exploitable. Since MCTS estimates state values from random rollouts, a bounded simulation budget n leaves a non-trivial probability of suboptimal play. We use n = 1000 for tic-tac-toe and Nim, and n = 5000 for Connect Four, large enough for strong play but allowing for occasional mistakes. Other hyperparameters are set to the OpenSpiel defaults. The Optimal opponent runs the Minimax algorithm, breaking ties uniformly. We evaluate state-of-the-art LLMs from OpenAI [Singh et al. , 2026] and Google [Google, 2025], together with selected open-source models [Yang et al. , 2025; GLM-5-Team et al. ,2026], grouped into three tiers (see Table 1) by expected ca-pability, as reflected in public benchmarks [Analysis, 2026] rather than parameter count. Unless stated otherwise, the models are queried with reasoning effort set to high , if such a setting is exposed by the provider; all other hyperparameters use their default values.     
+
+> Group Models Efficient GPT-5 nano, Gemini 3.1 Flash Lite, GPT-OSS 120B Intermediate GPT-5 mini, Gemini 3 Flash, Qwen 3.5 122B Frontier GPT-5.4, Gemini 3.1 Pro, GLM-5.2 Table 1: LLMs grouped by expected capabilities into tiers.
+
+Under optimal play, tic-tac-toe is a draw for both players, whereas Connect Four is a first-player win and Nim (from the selected initial position {1, 3, 5, 7}) is a first-player loss. For each player-opponent pair, we run 100 games, switching sides after half of the games to control for the first or second player advantage. For tic-tac-toe and Nim, we report per-move optimality rates, where a move is considered optimal if it could have been chosen by Minimax. States in which all legal moves are optimal are excluded because they provide no discriminative signal. For Connect Four, where the game tree is too large to compute exact optimality easily, we instead report win rate and average number of player moves in the game. 
+
+3.3 Failures in Simple Domains 
+
+We first evaluate the LLMs under the standard game rules. We found the Frontier tier to play Nim optimally and tic-tac-toe near-optimally in this setting, so we restrict the analysis of these two games to the Efficient and Intermediate tiers. The Frontier tier is evaluated below on Connect Four, where optimal play is substantially more challenging. Table 2 shows that no model from the Efficient or Interme-diate tier reaches optimal play on tic-tac-toe, even with high Model tic-tac-toe Nim GPT-5 nano .880 †
+
+> [.828, .918]
+
+.955 
+
+> [.904, .979]
+
+Gemini 3.1 FL .956 
+
+> [.918, .977]
+
+1.00 
+
+> [.976, 1.00]
+
+GPT-OSS .901 †
+
+> [.853, .935]
+
+.980 
+
+> [.943, .993]
+
+GPT-5 mini .922 
+
+> [.878, .952]
+
+.993 
+
+> [.959, .999]
+
+Gemini 3 F .995 
+
+> [.974, .999]
+
+1.00 
+
+> [.974, 1.00]
+
+Qwen 3.5 .949 
+
+> [.909, .972]
+
+1.00 
+
+> [.974, 1.00]
+
+Table 2: Per-move optimality rates with 95% Wilson score confi-dence intervals for Efficient- and Intermediate-tier LLMs on tic-tac-toe and Nim against the Optimal opponent. Each model plays 100 
+
+games, switching sides halfway through. †GPT-5 nano and GPT-OSS failed to return a legal action in 2 and 8 moves, respectively. 
+
+reasoning effort, and several models occasionally fail to pro-duce a legal action. Apart from Gemini 3 Flash, which makes roughly one mistake per 200 moves, the remaining models make four to twelve mistakes per 100 moves, a substantial error rate given the small game tree. On Nim, the picture is mixed: several models reach optimal play, but the smaller models still miss a non-trivial fraction of moves. The situation is significantly worse for the Frontier tier on Connect Four. Table 3 reports win rates and the average num-ber of moves made by the LLM player against the Random and MCTS opponents. All three models defeat the Random opponent in every game, indicating that they can follow the rules and exploit unstructured play. However, given the low probability of strong moves under random play, this is only a weak indicator of strategic competence. 
+
+Model Random MCTS Win rate Moves Win rate Moves GPT-5.4 1.00 
+
+> [0.72, 1.00]
+
+4.90 
+
+> [4.04, 5.76]
+
+0.00 
+
+> [0.00, 0.28]
+
+10.90 
+
+> [6.93, 14.87]
+
+Gemini 3.1 Pro 1.00 
+
+> [0.72, 1.00]
+
+5.40 
+
+> [4.43, 6.37]
+
+0.00 
+
+> [0.00, 0.28]
+
+13.90 
+
+> [10.97, 16.83]
+
+GLM-5.2 1.00 
+
+> [0.72, 1.00]
+
+5.90 
+
+> [4.23, 7.57]
+
+0.00 
+
+> [0.00, 0.28]
+
+6.20 
+
+> [3.70, 8.70]
+
+Table 3: Win rate and average number of moves made by the LLM player before the game ended on Connect Four against the Random and MCTS opponents. Win rates are reported with 95% Wilson score confidence intervals, while the number of LLM moves is re-ported with 95% Student’s t confidence intervals. Each model plays 
+
+10 games against each opponent, switching sides halfway through. 
+
+Against the stronger but imperfect MCTS opponent, no Frontier model won a single game, and all were defeated rapidly. Whereas bilateral perfect play in Connect Four ex-tends to move 41 , a first-player win, requiring at least 20 
+
+moves per player, the Frontier models made only 10 .3 moves on average before losing. This indicates that failure arises al-ready in the opening phase rather than in tactically complex middlegames. 
+
+3.4 Obfuscations 
+
+We have seen models fail even on simple games such as tic-tac-toe and Nim. Both games are well known and likely appear frequently in pretraining data, including examples of good and bad play from many positions. A natural alterna-tive explanation is therefore that the observed errors reflect imperfect recall of familiar positions or strategies, rather than flawed reasoning about the current state.              
+
+> XXX
+> OX
+> OO
+> 276
+> 951
+> 438
+> 15
+> 15
+> 15
+> 15 15 15 15 15
+
+Figure 2: A Magic Square obfuscation of tic-tac-toe. The original game board is mapped to a Magic Square grid, where each cell is assigned a number from 1 to 9 such that the sum of each row, column and diagonal is 15 . Players alternately take numbers from this set; the first one to collect three that sum to 15 wins. 
+
+To probe the role of memorized strategies, we introduce al-ternative rule formulations that preserve the underlying game tree while changing its surface representation. Each such ob-fuscation is structurally identical to the original game, but the state observations and available actions, both expressed in natural language, are different. We focus here on the tic-tac-toe obfuscations, which pro-vide a compact representative case; Nim is evaluated with analogous surface transformations and presented in Ap-pendix B. Since these formulations are unlikely to appear in pretraining data, a model relying on memorized positions or strategies tied to the original representation should play no-ticeably worse on them, whereas a model that reasons about the current state should be largely unaffected. 
+
+Hidden tic-tac-toe (Hid) uses the same rules as tic-tac-toe except that the markers X and O are replaced with B and W,and the game name is not mentioned. Magic Square (M.Sq) is played on a set of numbers {1, . . . , 9}. Players alternately claim a number that has not yet been taken, and the first to hold three numbers summing to 15 wins. This is isomorphic to tic-tac-toe: the nine numbers can be arranged in a 3 × 3
+
+grid where every row, column, and diagonal sums to 15 . An example configuration is shown in Figure 2. Magic Square Add 5 (M.Sq + 5) is identical to Magic Square, but every cell value is incremented by 5 to obscure the standard pattern so that the winning triples now sum to 30 . Story Magic Square 
+
+(Story) encodes the M.Sq obfuscation as a story. The players try to cross a river of width 15 , each aiming to do so in three jumps. On their turn, a player claims a jump length from 
+
+{1, . . . , 9}; each jump length may be claimed only once. A player wins if three of their claimed lengths sum to 15 , which is a crossing that neither overshoots nor undershoots. The evaluation setting mirrors that of Section 3.3. As shown in Table 4, the hardest obfuscations do induce declines Model TTT Hid M.Sq M.Sq + 5 Story GPT-5 nano .880 
+
+> [.828, .918]
+
+.871 
+
+> [.817, .911]
+
+.888 
+
+> [.837, .925]
+
+.785 
+
+> [.718, .840]
+
+.844 
+
+> [.786, .888]
+
+Gemini 3.1 FL .956 
+
+> [.918, .977]
+
+.950 
+
+> [.910, .972]
+
+.991 
+
+> [.966, .997]
+
+.991 
+
+> [.966, .997]
+
+.703 
+
+> [.635, .763]
+
+GPT-OSS .901 
+
+> [.853, .935]
+
+.887 
+
+> [.837, .924]
+
+.901 
+
+> [.853, .935]
+
+.779 
+
+> [.716, .832]
+
+.835 
+
+> [.777, .880]
+
+GPT-5 mini .922 
+
+> [.878, .952]
+
+.923 
+
+> [.878, .952]
+
+.967 
+
+> [.934, .984]
+
+.971 
+
+> [.939, .987]
+
+.953 
+
+> [.916, .974]
+
+Gemini 3 F .995 
+
+> [.974, .999]
+
+1.00 
+
+> [.983, 1.00]
+
+1.00 
+
+> [.983, 1.00]
+
+.995 
+
+> [.974, .999]
+
+1.00 
+
+> [.983, 1.00]
+
+Qwen 3.5 .949 
+
+> [.909, .972]
+
+.956 
+
+> [.918, .977]
+
+1.00 
+
+> [.982, 1.00]
+
+.986 
+
+> [.960, .995]
+
+.721 
+
+> [.656, .779]
+
+Table 4: Per-move optimality rates with 95% Wilson score confi-dence intervals for Efficient- and Intermediate-tier LLMs on tic-tac-toe and its obfuscations against the Optimal opponent. Each model plays 100 games per rule formulation, switching sides halfway through. 
+
+for some models, specifically GPT-5 nano and GPT-OSS on M.Sq + 5, and Gemini 3.1 FL and Qwen 3.5 on Story. These declines are idiosyncratic, however, with no failure mode generalizing across both models and obfuscations. This sug-gests that the models are not relying solely on memorized tic-tac-toe positions, but can often adapt their play to seman-tically equivalent rule formulations. To further inspect the reasoning process, we examine reasoning-trace summaries and compute the proportion that explicitly names the underlying game (Table 5); since a model may recognize the hidden structure without verbaliz-ing it, this is a lower bound. Models identify the original game in a substantial fraction of traces for the milder obfus-cations, Hid and M.Sq, but recognition drops sharply on M.Sq +5 and Story. This suggests they often infer the hidden struc-ture from the rules rather than merely match the original sur-face form. Once the game is recognized, we cannot rule out the use of memorized positions or strategies. If this flawed recall were the source of the residual sub-optimality, how-ever, the gap to optimal play should widen when the model no longer recognizes the game. Yet Gemini 3.1 FL recog-nizes tic-tac-toe in only a quarter of its M.Sq + 5 traces while its optimality stays near-perfect, so the gap there cannot be at-tributed to flawed recall only; on Story, recognition collapses even further while optimality falls far less steeply. This points to decision-time reasoning rather than flawed memoization. Although optimality rates vary little across obfuscations, the number of output tokens per move increases steadily with obfuscation complexity, with token statistics reported in Ap-pendix C.1. This suggests that models expend additional rea-soning effort to interpret the harder formulations and map them to playable states. Overall, this section shows that current state-of-the-art LLMs remain unreliable in simple sequential decision-making domains. Models in the Efficient and Intermedi-ate tiers fall short on tic-tac-toe and Nim, while the Fron-tier tier fails early on Connect Four. Performance remains largely invariant across surface-level obfuscations, and rea-soning traces show that models frequently identify the ob-scured game from the rules alone. Together, these findings 
+
+Model Hid M.Sq M.Sq +5 Story GPT-5 nano .830 
+
+> [.791, .863]
+
+.931 
+
+> [.902, .951]
+
+.424 
+
+> [.377, .472]
+
+.482 
+
+> [.435, .530]
+
+Gemini 3.1 FL .998 
+
+> [.987, 1.00]
+
+.922 
+
+> [.893, .943]
+
+.256 
+
+> [.218, .298]
+
+.189 
+
+> [.154, .231]
+
+GPT-OSS .944 
+
+> [.918, .963]
+
+.951 
+
+> [.926, .968]
+
+.539 
+
+> [.486, .591]
+
+.736 
+
+> [.691, .776]
+
+GPT-5 mini .364 
+
+> [.317, .414]
+
+.588 
+
+> [.538, .635]
+
+.581 
+
+> [.534, .628]
+
+.859 
+
+> [.822, .889]
+
+Gemini 3 F .991 
+
+> [.977, .997]
+
+.831 
+
+> [.794, .863]
+
+.414 
+
+> [.369, .460]
+
+.756 
+
+> [.714, .793]
+
+Qwen 3.5 1.00 
+
+> [.991, 1.00]
+
+.996 
+
+> [.984, .999]
+
+.633 
+
+> [.587, .676]
+
+.435 
+
+> [.387, .485]
+
+Table 5: Proportion of reasoning traces that explicitly identify the underlying game as tic-tac-toe under each obfuscation. Results are aggregated over 100 games per model-obfuscation pair ( ∼ 400 
+
+traces per cell), and reported with 95% Wilson score confidence in-tervals. 
+
+argue against a pure surface-memorization explanation and point to a decision-time reasoning bottleneck. Additional re-sults are reported in Supplementaries A, B, and C. 
+
+## 4 Reflective Case-Based Reasoning 
+
+Section 3 showed that LLMs remain unreliable in simple perfect-information games. This unreliability is largely in-variant to surface-level changes in the game rules, suggesting a decision-time reasoning bottleneck rather than faulty recall of memorized strategies. A natural way to address this bot-tleneck without modifying model weights is to provide the model with structured context from past experience, as Me-mento [Zhou et al. , 2025] and ExpeL [Zhao et al. , 2024] do for question-answering and tool-use tasks. Although these tasks may involve sequences of reasoning steps, they dif-fer from the sequential decision-making setting studied here. The environment does not evolve in response to the agent, and there is no adversary whose actions shape the outcome. Adapting case-based reasoning to this setting raises chal-lenges that the mentioned methods do not address. The unit of experience is an individual move, rather than a completed task, yet reward is revealed only at the episode’s end, so the terminal outcome must be distributed across the full tra-jectory. We address these challenges in REAPER, a reflec-tive case-based reasoning framework that keeps the LLM as the primary reasoner while augmenting it with an experience memory designed for sequential play. We first describe the progression from a direct Memento port to a working baseline and then introduce the additional components for REAPER. 
+
+4.1 From Static Case Memory to Sequential Play 
+
+We begin with a minimal adaptation of Memento [Zhou et al. ,2025] to sequential game play, which we call Original . To solve a task, Memento uses an LLM planner-executor loop. The planner generates either a plan, which is executed step-by-step, or a final answer that is returned to the environment. Completed tasks are stored in case memory together with the latest plan and an outcome score produced by an LLM judge. At decision time, similar cases are retrieved to condition the solution of future tasks. REAPER    
+
+> PlyBench
+> PlyBench
+> State Descriptor
+> Case Memory
+> Prompt Formatter
+> Rule Memory Rule Extractor
+> Planner
+> Executor
+> Game Buffer Self-Reflector
+> observation
+> legal actions
+> legal actions
+> state state description
+> rules
+> ksimilar cases
+> system prompt
+> prompt final answer
+> plan
+> result
+> game situations:
+> state, state description, plan, final answer
+> end of the game
+> game result
+> flush
+> situations
+> game situations with reflections
+> ngames finished
+> reflected game situations
+> new
+> rules
+
+Figure 3: Schema of the REAPER architecture and its interaction with PlyBench. 
+
+To adapt this structure to sequential play, we add a Game Buffer that stores generated moves until the episode termi-nates. Once the outcome is observed, the same reward is as-signed to all buffered moves, and the resulting cases are writ-ten to memory. Each move is a complete planner-executor task, so the natural unit of experience is a single move rather than a whole trajectory, which would bundle many tasks into one case. Under full observability this is also sound for re-trieval: a decision’s quality depends on the current state, not the path to it. Since game outcomes are determined exactly by the environment, no LLM judge is needed. This minimal port suffices for environment interaction, but not for dependable play. Its prompt-level formatting instructions and response parsing are brittle in settings that require precise action for-mats, leading to frequent failures. Also, storing the same de-cision repeatedly lets the majority outcome for a given state dominate rarer but valid ones at retrieval time. We therefore introduce a stronger engineered variant, de-noted Baseline . It preserves the planner-executor architecture and case memory, but makes inter-component communica-tion robust through structured outputs, reducing parsing er-rors. The final answer is generated as a free-form string to keep the method independent of game-specific action encod-ing. Memory entries are deduplicated by state-action-reward triples, preventing domination by repeated identical cases. Diversity of retrieved cases is improved by stratified sampling that balances positive and negative examples. Although these changes make Baseline a usable game-playing agent, they do not address structural limitations of case-based reasoning in games. The credit assignment is coarse: every move in a lost game receives negative credit, even if some were locally optimal, and every move in a won game receives positive credit, even if some were locally sub-optimal. A second limitation concerns decision-time retrieval of similar cases, which is limited to already observed states and actions with no mechanism to generalize to unseen states, leading to slow learning in large domains. 
+
+4.2 REAPER 
+
+REAPER, shown in Figure 3, retains the planner-executor architecture and a case memory, and adds two components: the self-reflector and the rule extractor , which address the two limitations identified above. A third auxiliary compo-nent, the state descriptor , transforms observations into nat-ural language before retrieval and is evaluated separately in Appendix D.4. The self-reflector targets the coarse credit assignment of 
+
+Baseline . Once an episode terminates, it analyzes the full trajectory and produces structured per-move reflections, in-stead of assigning a single terminal reward uniformly over every move. The generated reflection scores a move along two independent axes: its local quality, whether the move was sound at the point it was played, and its outcome contribution, whether it helped, hurt, or was neutral to the final result. This decomposition is the core of the finer-grained signal, record-ing a locally sound move in a lost game as good rather than uniformly penalizing it. Reflections are stored alongside the terminal reward and are presented in the planner’s prompt as concrete plays to emulate or mistakes to avoid. Reflections only provide signal for the states actually en-countered. For large domains with many possible states, this can be a learning bottleneck, as it requires many interactions to explore the space sufficiently. The rule extractor general-izes the reflections to guide the planner even in unseen states. Periodically, after a fixed number of games, it consolidates the reflected cases accumulated since the last update, together with the current rule set, into a compact set of general strate-gic rules that are inserted into the planner’s prompt. Because a new set is generated each period, the rule memory is self-correcting, merging overlapping rules into stronger ones and removing rules contradicted by new evidence. Together, the two components complement each other, with reflections at-taching fine-grained credit to individual cases and rules dis-tilling those into transferable principles. REAPER runs an online decision loop during play. On each move, the current observation and legal actions retrieve the most semantically similar cases from case memory and the current rules from rule memory; these are combined into the planner’s prompt, and the planner-executor loop runs until it returns an action, which is played and appended to the game buffer. Then, the two post-game updates are performed: the self-reflector after each game and the rule extractor after a fixed number of games. Full details of retrieval, the decision loop, and the update schedule are given in Appendix D. 5 Experiments 
+
+We ask whether reflective case-based memory improves se-quential decision-making. We test this on tic-tac-toe against the Optimal opponent: it admits exact move-level evaluation, yet Section 3 showed that Efficient models still make frequent mistakes on it. Section 3 queried each model with high reasoning effort to elicit its best single-call play; here we instead query GPT-5 nano at medium effort. This leaves the model more headroom to improve in. At high effort it already plays close to opti-mally, so gains from memory are small and hard to separate from noise; at medium effort the wider gap to optimal play lets REAPER’s gains stand out and each component’s contri-bution be distinguished more clearly.      
+
+> Figure 4: Ablation of individual REAPER components using GPT-5 nano with medium reasoning effort against the Optimal opponent on tic-tac-toe. Results are averaged over 10 runs, error bars show 95%
+> Student’s tconfidence intervals.
+
+5.1 Evaluation Setting 
+
+Each run begins with 50 evaluation games on an empty mem-ory, comparing the planner-executor architecture with the single-call reference. Then it proceeds through 5 epochs of 20 learning games followed by 50 evaluation games. Dur-ing learning, the agent works as described in Section 4.2: it buffers its decisions, generates reflections after each game, and writes the reflected cases to memory. The rule extrac-tor runs once at the end of each learning phase, consolidating the recent cases with the existing rules. During evaluation, memory is frozen and no reflection or rule extraction occurs, so each evaluation phase measures the policy induced by the current memory snapshot. We repeat every configuration over 10 independent runs. We report draw rate as our primary metric, since it is the best achievable result in tic-tac-toe against the Optimal oppo-nent. We also report output tokens per move as a measure of inference cost and reasoning efficiency. 
+
+5.2 Ablation of REAPER Components 
+
+We ablate the two components of REAPER. Reflection is in-cluded in both variants, since per-move credit assignment is the core mechanism of REAPER and the source from which rules are distilled; this gives two configurations, reflection          
+
+> (a) Draw rate
+> (b) Output tokens, including reasoning tokens, per move. Figure 5: Comparison of the Original port, the engineered Base-line , and the best REAPER variant on tic-tac-toe with GPT-5 nano (medium) against the Optimal opponent. Single-call reference from Section 3 is shown as a dashed line. Lines show means over 10 inde-pendent runs, with error bars denoting 95% Student’s tconfidence intervals.
+
+alone and reflection with rules. The state descriptor is an aux-iliary component, evaluated separately in Appendix D.4. Figure 4 shows that adding rule extraction improves over reflection alone. The reflection-only variant reaches a mean draw rate of 0.826 , adding rules increases it to 0.868 . Al-though the confidence intervals overlap, the improvement is significant under a one-sided Welch t-test ( p = 0 .039 ). An analogous, significant improvement occurs in per-move opti-mality rate, improving from 0.959 to 0.970 (p = 0 .027 ). 
+
+5.3 Improvement over Original and Baseline 
+
+We next compare REAPER, in its configuration with reflec-tion and rules, against the direct Memento port ( Original ) and the engineered Baseline . We also include the single-call GPT-5 nano player from Section 3 as a fixed reference. Figure 5 shows that Original fails to produce a usable game-playing agent. Its draw rate remains at zero across all evaluation checkpoints, with most games ending in failure due to invalid moves or failed parsing. In contrast, Baseline 
+
+reaches a final mean draw rate of 0.818 , showing that strict planner-executor communication and memory deduplication can lead to viable play. REAPER improves further, reaching a final mean draw rate of 0.868 , a gain of 5 percentage points over Baseline that is significant under a one-sided Welch t-test ( p = 0 .018 ). Since REAPER and Baseline share the same underlying architec-ture, this gain isolates the contribution of post-game reflection and rule extraction. Figure 5 also reports output tokens per move. REAPER reduces token usage over training and ends below both Base-line and even the single-call reference. The performance gain therefore does not come from longer reasoning traces, but from more useful decision-time context. 
+
+## 6 Conclusion 
+
+We studied sequential decision-making in LLMs through perfect-information two-player zero-sum games, where both outcomes and individual moves can be evaluated against ground truth. Across models, we found that even simple games expose a persistent decision-time reasoning gap, and that this gap is largely invariant to surface-level rule obfusca-tions. We introduced REAPER, a reflective case-based rea-soning framework that adapts experience memory to sequen-tial play. Its central mechanism is per-move reflection that assigns credit under delayed rewards, complemented by rule extraction that generalizes this signal, and structured planner-executor communication that makes play reliable. On tic-tac-toe with GPT-5 nano, REAPER improves over both a direct Memento port and a strong engineered baseline, while reduc-ing output-token usage. These results suggest that external experience memory can improve LLM agents without modi-fying model weights, but they also leave open how well the approach scales to larger games, longer horizons, and partial observability. 
+
+## Acknowledgments 
+
+This research is supported by the Czech Science Foun-dation GA25-18353S and the CTU in Prague grant SGS23/184/OHK3/3T/13. The access to the compu-tational infrastructure of the OP VVV funded project CZ.02.1.01/0.0/0.0/16 019/0000765 is also acknowledged. 
+
+## References 
+
+[Analysis, 2026] Artificial Analysis. Comparison of ai mod-els across intelligence, performance, and price, 2026. [Duan et al. , 2024] Jinhao Duan, Renming Zhang, James Diffenderfer et al. Gtbench: Uncovering the strategic rea-soning limitations of llms via game-theoretic evaluations. 
+
+arXiv preprint arXiv:2402.12348 , 2024. [Gao et al. , 2021] Tianyu Gao, Xingcheng Yao, and Danqi Chen. SimCSE: Simple contrastive learning of sentence embeddings. In Empirical Methods in Natural Language Processing (EMNLP) , 2021. [GLM-5-Team et al. , 2026] GLM-5-Team, Aohan Zeng, Xin Lv et al. Glm-5: from vibe coding to agentic engineering, 2026. [Google, 2025] Google. A new era of intelligence with gem-ini 3, November 2025. Accessed: 2026-05-07. [Hao et al. , 2023] Shibo Hao, Yi Gu, Haodi Ma et al. Rea-soning with language model is planning with world model. In The 2023 Conference on Empirical Methods in Natural Language Processing , 2023. [Lanctot et al. , 2019] Marc Lanctot, Edward Lockhart, Jean-Baptiste Lespiau et al. OpenSpiel: A framework for re-inforcement learning in games. CoRR , abs/1908.09453, 2019. [Lanctot, 2026] Marc Lanctot. Introducing OpenSpiel 2.0. https://mlanctot.info/introducing open spiel 2.0/, 2026. Accessed: 2026-08-01. [Lehrach et al. , 2025] Wolfgang Lehrach, Daniel Hennes, Miguel Lazaro-Gredilla et al. Code world models for gen-eral game playing, 2025. [Shinn et al. , 2023] Noah Shinn, Federico Cassano, Edward Berman et al. Reflexion: Language agents with verbal reinforcement learning, 2023. [Shojaee et al. , 2025] Parshin Shojaee, Iman Mirzadeh, Keivan Alizadeh et al. The illusion of thinking: Under-standing the strengths and limitations of reasoning mod-els via the lens of problem complexity. arXiv preprint arXiv:2506.06941 , 2025. [Singh et al. , 2026] Aaditya Singh, Adam Fry, Adam Perel-man et al. Openai gpt-5 system card, 2026. [Wang et al. , 2023] Xuezhi Wang, Jason Wei, Dale Schuur-mans et al. Self-consistency improves chain of thought reasoning in language models. In The Eleventh Interna-tional Conference on Learning Representations , 2023. [Wei et al. , 2022] Jason Wei, Xuezhi Wang, Dale Schuur-mans et al. Chain of thought prompting elicits reasoning in large language models. In Alice H. Oh, Alekh Agar-wal, Danielle Belgrave et al., editors, Advances in Neural Information Processing Systems , 2022. [Yang et al. , 2025] An Yang, Anfeng Li, Baosong Yang et al. Qwen3 technical report, 2025. [Yao et al. , 2023a] Shunyu Yao, Dian Yu, Jeffrey Zhao et al. Tree of thoughts: Deliberate problem solving with large language models. In Thirty-seventh Conference on Neural Information Processing Systems , 2023. [Yao et al. , 2023b] Shunyu Yao, Jeffrey Zhao, Dian Yu et al. ReAct: Synergizing reasoning and acting in language models. In International Conference on Learning Repre-sentations (ICLR) , 2023. [Ye et al. , 2024] Jiayi Ye, Yanbo Wang, Yue Huang et al. Justice or prejudice? quantifying biases in llm-as-a-judge. 
+
+arXiv preprint arXiv:2410.02736 , 2024. [Zhao et al. , 2024] Andrew Zhao, Daniel Huang, Quentin Xu et al. Expel: Llm agents are experiential learners. In 
+
+Proceedings of the AAAI Conference on Artificial Intelli-gence , volume 38, pages 19632–19642, 2024. [Zhou et al. , 2025] Huichi Zhou, Yihang Chen, Siyuan Guo et al. Memento: Fine-tuning llm agents without fine-tuning llms. arXiv preprint arXiv: 2508.16153 , 2025. A Additional Standard Evaluation Results 
+
+This supplementary section complements Section 3 by report-ing full game-level outcomes on the standard versions of tic-tac-toe and Nim. The main text reports per-move optimality against the Optimal opponent for the Efficient and Intermedi-ate tiers, since the Frontier tier plays these two games near-optimally. Here, we instead report wins, draws, losses, and failures against the Random, MCTS, and Optimal opponents, and we extend the analysis to the Frontier tier. The evaluation setting matches Section 3.2: each model-opponent pair plays 100 games with sides switched halfway to control for the first or second player advantage, and the MCTS opponent uses the same simulation budget n = 1000 .The two games differ in their optimal outcome. Under op-timal play tic-tac-toe is a draw, whereas Nim from the ini-tial position {1, 3, 5, 7} is a second-player win. A failure denotes an illegal or ill-formed action that PlyBench could not parse. We report raw counts of wins, draws, losses, and failures rather than confidence intervals to keep the four-way decomposition legible.                                                                                                                             
+
+> Model Random MCTS Optimal WDLFWDLFWDLFGPT-5 nano 89 803075 23 2076 22 2Gemini 3.1 FL 92 800090 10 0091 90GPT-OSS 83 917068 923 080 12 8GPT-5 mini 91 810093 70084 16 0Gemini 3 F 96 400198 10099 10Qwen 3.5 93 700093 70090 10 0GPT-5.4 95 410196 30096 40Gemini 3.1 Pro 93 7000100 000100 00GLM-5.2 92 800098 20091 90Table 6: Wins, draws, losses, and failures out of 100 games for all models on standard tic-tac-toe.
+
+For most models, the MCTS and Optimal columns are sim-ilar: the near-optimal Frontier tier draws almost every game against both opponents (Gemini 3.1 Pro draws all 100 ), and the remaining models show no systematic advantage for ei-ther opponent. This suggests that outcomes on tic-tac-toe are not determined solely by opponent strength. The clear exception is GPT-OSS 120B, which does worse against the weaker MCTS opponent ( 68 draws, 23 failures) than against Optimal ( 80 draws, 8 failures). Since MCTS is the weaker opponent, this inversion cannot be explained by opponent strength alone. A plausible explanation is that Optimal pro-duces canonical optimal-play trajectories, whereas MCTS oc-casionally plays suboptimally and steers the game into less common states; if such states are underrepresented in train-ing data, they are harder for models that partly rely on learned positional priors. Notably, most of GPT-OSS 120B’s degra-dation shows up as failures ( 23 versus 8), indicating that these off-distribution states hurt not only strategic quality but also its ability to produce well-formed actions. Unlike tic-tac-toe, Nim admits a compact symbolic strat-egy: optimal play follows from the Nim-sum of the piles                                                                                                                             
+
+> Model Random MCTS Optimal WDLFWDLFWDLFGPT-5 nano 96 04072 028 044 056 0Gemini 3.1 FL 100 00095 05050 050 0GPT-OSS 95 05084 016 047 053 0GPT-5 mini 88 012 068 032 049 051 0Gemini 3 F 100 00098 02050 050 0Qwen 3.5 98 02081 018 150 050 0GPT-5.4 100 00086 014 050 050 0Gemini 3.1 Pro 100 000100 00050 050 0GLM-5.2 99 01094 06050 050 0Table 7: Wins, draws, losses, and failures out of 100 games for all models on standard Nim.
+
+rather than from reasoning over spatial threats, blocks, and forks. This suggests that, for current models, applying a known symbolic evaluation might be easier than robust po-sitional reasoning. This likely explains why models handle Nim more reliably than tic-tac-toe. It also shows that the cho-sen simulation budget is low enough that MCTS makes fre-quent mistakes in Nim, where the action space is larger than in tic-tac-toe, to allow stronger models to win nearly every game. On Nim, Random is almost saturated for every model, whereas MCTS is the discriminating opponent, with win rates ranging from 68 to a perfect 100 . That the stronger models beat MCTS in nearly every game, including the half in which MCTS moves second and could force a win, indicates that at the chosen simulation budget ( n = 1000 ) MCTS frequently plays suboptimally in Nim. The stronger models are able to exploit these mistakes more effectively than the weaker mod-els. We don’t really observe this on tic-tac-toe, which might be attributed to the smaller action space of tic-tac-toe and hence more precise value estimates from the simulations. The Optimal opponent is only challenging for the Efficient tier; the two stronger tiers solve it near-optimally. Failures are almost absent on Nim, in contrast to tic-tac-toe, suggest-ing that production of invalid actions and formatting errors depend strongly on the game representation and action inter-face rather than only on model capability. B Additional Obfuscation Results 
+
+This section complements Section 3.4 in two ways. First, we extend the tic-tac-toe obfuscation analysis to the Frontier tier in Appendix B.1, which the main text omitted because it already plays the standard games near-optimally. Second, we introduce analogous obfuscations for Nim in Appendix B.2 and report their results in Section B.3, testing whether the invariance observed on tic-tac-toe also holds in a game whose optimal strategy rests on a compact symbolic state value. As in Section 3.4, all results are measured against the Op-timal opponent using per-move optimality, excluding states where all legal moves are optimal, and we additionally re-port the proportion of reasoning traces that explicitly identify the underlying game, mirroring the recognition analysis in Section 3.4. It should be noted again that a model may rec-ognize the game structure without explicitly verbalizing it, hence these recognition rates are lower bounds. 
+
+B.1 tic-tac-toe Obfuscation Results 
+
+The Frontier tier confirms the representation invariance ob-served for Efficient and Intermediate tier models on tic-tac-toe in the main text. Per-move optimality remains high and nearly flat across all obfuscations, as shown in Table 8. Gem-ini 3.1 Pro plays optimally throughout, while GPT-5.4 and GLM-5.2 stay close to optimal with no systematic decline on the harder formulations. 
+
+Model TTT Hid M.Sq M.Sq + 5 Story GPT-5 nano .880 
+
+> [.828, .918]
+
+.871 
+
+> [.817, .911]
+
+.888 
+
+> [.837, .925]
+
+.785 
+
+> [.718, .840]
+
+.844 
+
+> [.786, .888]
+
+Gemini 3.1 FL .956 
+
+> [.918, .977]
+
+.950 
+
+> [.910, .972]
+
+.991 
+
+> [.966, .997]
+
+.991 
+
+> [.966, .997]
+
+.703 
+
+> [.635, .763]
+
+GPT-OSS .901 
+
+> [.853, .935]
+
+.887 
+
+> [.837, .924]
+
+.901 
+
+> [.853, .935]
+
+.779 
+
+> [.716, .832]
+
+.835 
+
+> [.777, .880]
+
+GPT-5 mini .922 
+
+> [.878, .952]
+
+.923 
+
+> [.878, .952]
+
+.967 
+
+> [.934, .984]
+
+.971 
+
+> [.939, .987]
+
+.953 
+
+> [.916, .974]
+
+Gemini 3 F .995 
+
+> [.974, .999]
+
+1.00 
+
+> [.983, 1.00]
+
+1.00 
+
+> [.983, 1.00]
+
+.995 
+
+> [.974, .999]
+
+1.00 
+
+> [.983, 1.00]
+
+Qwen 3.5 .949 
+
+> [.909, .972]
+
+.956 
+
+> [.918, .977]
+
+1.00 
+
+> [.982, 1.00]
+
+.986 
+
+> [.960, .995]
+
+.721 
+
+> [.656, .779]
+
+GPT-5.4 .981 
+
+> [.952, .993]
+
+.971 
+
+> [.939, .987]
+
+1.00 
+
+> [.983, 1.00]
+
+.995 
+
+> [.975, .999]
+
+.991 
+
+> [.967, .997]
+
+Gemini 3.1 Pro 1.00 
+
+> [.983, 1.00]
+
+1.00 
+
+> [.983, 1.00]
+
+1.00 
+
+> [.983, 1.00]
+
+1.00 
+
+> [.983, 1.00]
+
+1.00 
+
+> [.983, 1.00]
+
+GLM-5.2 .957 
+
+> [.920, .977]
+
+.982 
+
+> [.954, .993]
+
+1.00 
+
+> [.983, 1.00]
+
+.937 
+
+> [.892, .963]
+
+.959 
+
+> [.924, .978]
+
+Table 8: Per-move optimality rates with 95% Wilson score confi-dence intervals for all model tiers on tic-tac-toe and its obfuscations against the Optimal opponent. Each model plays 100 games per rule formulation, switching sides halfway through. 
+
+The M.Sq obfuscation is the least challenging across all model tiers, showing even better performance than the un-obfuscated tic-tac-toe formulation. This can be attributed to the Magic Square being a well-known mathematical puzzle that the models have likely encountered before. Applying a fixed offset in M.Sq + 5 pushes the puzzle further out of dis-tribution: recognition falls sharply for nearly every model, yet optimality drops only for GPT-5 nano, GPT-OSS 120B, and GLM-5.2 and stays essentially flat for the rest. Compe-tent play therefore does not require recognizing the original game, reinforcing the decision-time-reasoning conclusion of the main text. 
+
+Model Hid M.Sq M.Sq +5 Story GPT-5 nano .830 
+
+> [.791, .863]
+
+.931 
+
+> [.902, .951]
+
+.424 
+
+> [.377, .472]
+
+.482 
+
+> [.435, .530]
+
+Gemini 3.1 FL .998 
+
+> [.987, 1.00]
+
+.922 
+
+> [.893, .943]
+
+.256 
+
+> [.218, .298]
+
+.189 
+
+> [.154, .231]
+
+GPT-OSS .944 
+
+> [.918, .963]
+
+.951 
+
+> [.926, .968]
+
+.539 
+
+> [.486, .591]
+
+.736 
+
+> [.691, .776]
+
+GPT-5 mini .364 
+
+> [.317, .414]
+
+.588 
+
+> [.538, .635]
+
+.581 
+
+> [.534, .628]
+
+.859 
+
+> [.822, .889]
+
+Gemini 3 F .991 
+
+> [.977, .997]
+
+.831 
+
+> [.794, .863]
+
+.414 
+
+> [.369, .460]
+
+.756 
+
+> [.714, .793]
+
+Qwen 3.5 1.00 
+
+> [.991, 1.00]
+
+.996 
+
+> [.984, .999]
+
+.633 
+
+> [.587, .676]
+
+.435 
+
+> [.387, .485]
+
+GPT-5.4 .494 
+
+> [.443, .546]
+
+.580 
+
+> [.530, .629]
+
+.435 
+
+> [.386, .486]
+
+.711 
+
+> [.666, .753]
+
+Gemini 3.1 Pro .976 
+
+> [.957, .986]
+
+.993 
+
+> [.981, .998]
+
+.827 
+
+> [.789, .859]
+
+.978 
+
+> [.960, .988]
+
+GLM-5.2 .422 
+
+> [.377, .469]
+
+.910 
+
+> [.880, .933]
+
+.277 
+
+> [.236, .323]
+
+.764 
+
+> [.721, .802]
+
+Table 9: Proportion of reasoning traces that explicitly identify the underlying game as tic-tac-toe under each obfuscation. Results are aggregated over 100 games per model-obfuscation pair, and reported with 95% Wilson score confidence intervals. 
+
+The recognition rates in Table 9 provide other interesting insights. Recognition is uneven and, unlike optimality, does not increase with model tier: GPT-5.4 and GLM-5.2 identify Hid less often than several smaller models despite matching or exceeding their optimality. Only Gemini 3.1 Pro recog-nizes the game consistently across all obfuscations. 
+
+B.2 Nim Obfuscations 
+
+In this section, we describe the game of Nim and introduce its obfuscations. As with tic-tac-toe, each obfuscation preserves the game tree while rewriting the surface representation of states, actions, and winning conditions. 
+
+Nim is played on several piles of stones; players alternate turns, and on each turn the active player removes any positive number of stones from a single pile. We use the mis` ere vari-ant, in which the player who removes the last stone loses. Op-timal play is governed by the Nim-sum, the bitwise XOR of the pile sizes: a zero Nim-sum is losing, except in endgames where every non-empty pile has size one, which follow a sep-arate parity rule. Our experiments use the fixed initial config-uration {1, 3, 5, 7}, a forced second-player win. 
+
+Hidden Nim (Hid) is a pure relabeling. The piles become four light bulbs and a pile’s size becomes a bulb’s brightness, so removing stones corresponds to dimming a bulb, and the player who switches off the last light loses. Inverse Nim 
+
+(Inv) reverses the surface action while preserving the game tree: instead of removing stones, players add stones to piles until fixed target sizes are reached, and the player who com-pletes the target configuration loses. Story Nim (Story) re-casts Nim as a grid escape. Four characters, one per row, flee a danger advancing from the left; on each turn a player moves one character any number of cells toward the right edge, and the player who helps the last character escape loses, matching the mis` ere condition. 
+
+B.3 Nim Obfuscation Results 
+
+Across models and providers, Nim performance is largely sta-ble under the obfuscations. The Frontier tier remains near-optimal or optimal on every formulation, and most other mod-els stay close to optimal on Hid and Story. Inv causes the largest degradation, most notably for GPT-OSS 120B, GPT-5 mini, and Gemini 3.1 Flash Lite. Even there the drop is modest compared to the more severe failures on some tic-tac-toe story formulations in the main text. This supports the interpretation from Appendix A that Nim is easier for current models than tic-tac-toe, since it admits a compact state-value computation based on the Nim-sum, whereas tic-tac-toe re-quires more robust reasoning over spatial layouts and local tactical patterns. 
+
+Model Nim Hid Inv Story GPT-5 nano .955 
+
+> [.904, .979]
+
+.993 
+
+> [.962, .999]
+
+.979 
+
+> [.940, .993]
+
+.987 
+
+> [.952, .996]
+
+Gemini 3.1 FL 1.00 
+
+> [.976, 1.00]
+
+1.00 
+
+> [.975, 1.00]
+
+.954 
+
+> [.909, .978]
+
+1.00 
+
+> [.975, 1.00]
+
+GPT-OSS .980 
+
+> [.943, .993]
+
+.968 
+
+> [.926, .986]
+
+.917 
+
+> [.857, .953]
+
+.994 
+
+> [.964, .999]
+
+GPT-5 mini .993 
+
+> [.959, .999]
+
+1.00 
+
+> [.976, 1.00]
+
+.961 
+
+> [.917, .982]
+
+1.00 
+
+> [.974, 1.00]
+
+Gemini 3 F 1.00 
+
+> [.974, 1.00]
+
+1.00 
+
+> [.976, 1.00]
+
+1.00 
+
+> [.975, 1.00]
+
+1.00 
+
+> [.973, 1.00]
+
+Qwen 3.5 1.00 
+
+> [.974, 1.00]
+
+1.00 
+
+> [.975, 1.00]
+
+.994 
+
+> [.964, .999]
+
+.993 
+
+> [.960, .999]
+
+GPT-5.4 1.00 
+
+> [.974, 1.00]
+
+.993 
+
+> [.961, .999]
+
+1.00 
+
+> [.973, 1.00]
+
+.986 
+
+> [.951, .996]
+
+Gemini 3.1 Pro 1.00 
+
+> [.975, 1.00]
+
+1.00 
+
+> [.975, 1.00]
+
+1.00 
+
+> [.976, 1.00]
+
+1.00 
+
+> [.973, 1.00]
+
+GLM-5.2 1.00 
+
+> [.975, 1.00]
+
+1.00 
+
+> [.973, 1.00]
+
+.992 
+
+> [.957, .999]
+
+1.00 
+
+> [.974, 1.00]
+
+Table 10: Per-move optimality rates with 95% Wilson score confi-dence intervals for all tiers on Nim and its obfuscations against the Optimal opponent. Each model plays 100 games per formulation, switching sides after half of the games. 
+
+To inspect whether models explicitly recover the hidden structure, we also compute the proportion of reasoning-trace summaries that mention Nim by name under each obfusca-tion. Recognition is high for most models across all three obfus-cations, confirming they can usually map the rewritten rules back to Nim. As with the tic-tac-toe results, high recogni-tion does not separate reasoning from recall: once a model identifies the game, it may draw on memorized strategy. The Inv column is the informative exception: GPT-5.4 and GLM-5.2 recognize Nim in only 75 .7% and 71 .3% of traces, yet still play near-optimally. As on tic-tac-toe’s M.Sq + 5, com-petent play persists even when recognition drops, pointing to decision-time reasoning rather than recall. 
+
+Model Hid Inv Story GPT-5 nano .981 
+
+> [.963, .990]
+
+.956 
+
+> [.933, .971]
+
+.956 
+
+> [.932, .971]
+
+Gemini 3.1 FL 1.00 
+
+> [.992, 1.00]
+
+.936 
+
+> [.912, .954]
+
+.945 
+
+> [.921, .962]
+
+GPT-OSS .961 
+
+> [.939, .975]
+
+.956 
+
+> [.934, .971]
+
+.974 
+
+> [.956, .985]
+
+GPT-5 mini .907 
+
+> [.876, .931]
+
+.891 
+
+> [.858, .917]
+
+.906 
+
+> [.875, .930]
+
+Gemini 3 F 1.00 
+
+> [.993, 1.00]
+
+.987 
+
+> [.972, .993]
+
+.998 
+
+> [.989, 1.00]
+
+Qwen 3.5 .993 
+
+> [.979, .997]
+
+.988 
+
+> [.973, .994]
+
+.965 
+
+> [.944, .978]
+
+GPT-5.4 .898 
+
+> [.861, .926]
+
+.757 
+
+> [.708, .800]
+
+.860 
+
+> [.817, .895]
+
+Gemini 3.1 Pro 1.00 
+
+> [.993, 1.00]
+
+.989 
+
+> [.976, .995]
+
+1.00 
+
+> [.993, 1.00]
+
+GLM-5.2 .979 
+
+> [.958, .989]
+
+.713 
+
+> [.664, .757]
+
+.937 
+
+> [.908, .957]
+
+Table 11: Proportion of reasoning traces that explicitly identify the underlying game as Nim under each obfuscated formulation. Re-sults are aggregated over 100 games per model-obfuscation pair and reported with 95% Wilson score confidence intervals. C Cost and Reasoning Effort Analysis 
+
+This section analyzes the inference cost of the benchmark experiments from Section 3. Since all LLM inference runs through remote provider APIs, hardware-level statistics such as GPU type, GPU hours, and energy use are unavailable and would not be comparable across providers. We therefore re-port cost through a single observable quantity: output tokens per move, which, given the fixed action format, are dominated by reasoning tokens. 
+
+C.1 Output Tokens Under Obfuscations 
+
+Although per-move optimality is largely stable across obfus-cations, output tokens per move increase substantially with surface-form complexity. This suggests that models often spend additional reasoning effort to translate the obfuscated formulation into a playable state, even when action quality changes only modestly. Table 12 and Table 13 report average output tokens per move for all models on tic-tac-toe and Nim. 
+
+Model TTT Hid M.Sq M.Sq +5 Story GPT-5 nano 7247.8 
+
+> ±578.1
+
+8054.9 
+
+> ±592.7
+
+10563.6 
+
+> ±779.8
+
+12828.4 
+
+> ±743.7
+
+15517.9 
+
+> ±954.3
+
+Gemini 3.1 FL 2245.0 
+
+> ±211.0
+
+2485.8 
+
+> ±226.4
+
+4529.7 
+
+> ±356.0
+
+5766.5 
+
+> ±361.5
+
+8825.0 
+
+> ±628.1
+
+GPT-OSS 4220.1 
+
+> ±667.0
+
+4335.4 
+
+> ±662.6
+
+6147.7 
+
+> ±871.1
+
+9446.0 
+
+> ±1128.0
+
+6484.3 
+
+> ±698.4
+
+GPT-5 mini 1899.2 
+
+> ±203.4
+
+1997.0 
+
+> ±213.9
+
+3623.3 
+
+> ±389.2
+
+4625.3 
+
+> ±474.3
+
+5462.0 
+
+> ±523.3
+
+Gemini 3 F 5068.7 
+
+> ±561.2
+
+5282.4 
+
+> ±554.7
+
+6825.8 
+
+> ±663.3
+
+8879.5 
+
+> ±736.1
+
+11961.6 
+
+> ±635.9
+
+Qwen 3.5 2471.2 
+
+> ±197.1
+
+2718.5 
+
+> ±242.9
+
+2943.8 
+
+> ±228.8
+
+4127.6 
+
+> ±267.5
+
+4922.7 
+
+> ±203.5
+
+GPT-5.4 806.7 
+
+> ±145.4
+
+886.2 
+
+> ±162.0
+
+1809.2 
+
+> ±304.2
+
+1755.4 
+
+> ±270.7
+
+3587.9 
+
+> ±435.8
+
+Gemini 3.1 Pro 876.2 
+
+> ±100.3
+
+955.2 
+
+> ±95.3
+
+1484.1 
+
+> ±194.2
+
+1819.6 
+
+> ±229.4
+
+2171.7 
+
+> ±287.2
+
+GLM-5.2 3771.9 
+
+> ±516.6
+
+4193.7 
+
+> ±610.1
+
+5472.8 
+
+> ±605.8
+
+12327.7 
+
+> ±1325.5
+
+13867.7 
+
+> ±1100.8
+
+Table 12: Average output tokens per move for all tiers on tic-tac-toe and its obfuscations. Values are reported as means with 95% 
+
+Student’s t confidence intervals. 
+
+The token trends differ from the optimality trends. For tic-tac-toe, output tokens generally increase with obfusca-tion complexity, from the standard game through Hid, M.Sq, M.Sq + 5, and Story. For Nim the ordering is less strict, but Hid and Story still require more tokens than the standard game, while Inv is typically the cheapest, at least for the In-termediate and Efficient tier models. Absolute token counts vary substantially and do not track model tier: the Efficient-tier GPT-5 nano is the heaviest of all, while the Frontier tier spans the full range, with Gemini 3.1 Pro and GPT-5.4 the most efficient and GLM-5.2 among the heaviest. Similar move-level optimality can therefore cor-respond to very different inference costs. Gemini 3.1 Pro is the clearest case, playing Nim optimally (Appendix A) with about a third of GPT-5.4’s tokens per move, suggesting a more direct computation of the Nim-sum, while on tic-tac-toe the two are comparable. Therefore the gap is likely task-specific. 
+
+Model Nim Hid Inv Story GPT-5 nano 11662.5 
+
+> ±885.8
+
+13745.3 
+
+> ±863.2
+
+10456.7 
+
+> ±700.5
+
+11875.5 
+
+> ±885.8
+
+Gemini 3.1 FL 4804.2 
+
+> ±274.9
+
+7588.7 
+
+> ±302.7
+
+5652.2 
+
+> ±304.0
+
+8236.8 
+
+> ±362.7
+
+GPT-OSS 4862.7 
+
+> ±358.3
+
+6074.5 
+
+> ±401.6
+
+4122.5 
+
+> ±290.6
+
+5482.3 
+
+> ±344.8
+
+GPT-5 mini 3069.8 
+
+> ±221.5
+
+3893.5 
+
+> ±272.3
+
+2942.6 
+
+> ±210.1
+
+3927.1 
+
+> ±291.2
+
+Gemini 3 F 6693.5 
+
+> ±365.5
+
+8557.7 
+
+> ±405.0
+
+6059.9 
+
+> ±328.6
+
+7987.7 
+
+> ±369.4
+
+Qwen 3.5 3213.4 
+
+> ±226.4
+
+4621.4 
+
+> ±186.6
+
+3893.3 
+
+> ±198.7
+
+4732.8 
+
+> ±219.9
+
+GPT-5.4 2025.8 
+
+> ±239.1
+
+1865.2 
+
+> ±229.1
+
+2286.9 
+
+> ±279.4
+
+2155.3 
+
+> ±255.7
+
+Gemini 3.1 Pro 706.5 
+
+> ±40.5
+
+848.0 
+
+> ±50.0
+
+1344.1 
+
+> ±74.3
+
+1116.1 
+
+> ±83.6
+
+GLM-5.2 5234.1 
+
+> ±597.1
+
+5495.4 
+
+> ±644.6
+
+6044.8 
+
+> ±687.7
+
+6665.7 
+
+> ±695.3
+
+Table 13: Average output tokens per move for all tiers on Nim and its obfuscations. Values are reported as means with 95% Student’s t
+
+confidence intervals. 
+
+C.2 Effect of Reasoning Effort 
+
+We additionally examine how reasoning effort affects play and token cost for GPT-5 nano and GPT-5 mini on tic-tac-toe against the Optimal opponent; the setup otherwise matches Section 5.1. Table 14 reports per-move optimality and output tokens per move at low, medium, and high effort. 
+
+Model Metric Reasoning Effort Low Medium High GPT-5 nano Optimality .731 
+
+> [.667, .786]
+
+.843 
+
+> [.785, .887]
+
+.880 
+
+> [.828, .918]
+
+Tokens per move 1055.4 
+
+> ±78.7
+
+3526.6 
+
+> ±293.0
+
+7247.8 
+
+> ±578.1
+
+GPT-5 mini Optimality .758 
+
+> [.692, .813]
+
+.887 
+
+> [.836, .923]
+
+.922 
+
+> [.878, .952]
+
+Tokens per move 351.1 
+
+> ±32.5
+
+762.9 
+
+> ±73.2
+
+1899.2 
+
+> ±203.4
+
+Table 14: Per-move optimality and output tokens per move on stan-dard tic-tac-toe against the Optimal opponent for the two GPT mod-els under low, medium, and high reasoning effort. Optimality is re-ported with 95% Wilson score confidence intervals and token means with 95% Student’s t confidence intervals. 
+
+Confirming our intuition, higher reasoning effort improves optimality for both GPT models while also raising their output-token count. Moving from low to high effort increases optimality by roughly 15 percentage points, but the output to-kens grow by a factor of 5 for GPT-5 mini and 7 for GPT-5 nano. Higher effort therefore pushes play closer to optimal, but at a large inference-cost multiplier. D REAPER Details 
+
+This supplementary section gives the architectural details of REAPER omitted from Section 4 for brevity. We recall only what is needed: REAPER keeps the planner-executor loop and case memory of Baseline and adds the self-reflector and rule extractor, together with an auxiliary state descriptor. 
+
+D.1 Decision Loop 
+
+The planner and executor communicate through structured JSON schemas. At each move the planner emits either a plan or a final answer. A plan is a list of subtasks; the executor solves them one at a time, each time receiving the current assignment together with the results of the subtasks already solved for that plan. Once all subtasks are answered, control returns to the planner, which again emits a plan or a final an-swer. The loop runs for at most 3 iterations; if no final answer is produced within this budget, or a message fails to parse, the move is recorded as a failure and the game terminates. Alongside the final answer, the planner emits a natural-language action intent describing the intended effect of the chosen action. The self-reflector later uses this intent to judge whether the action achieved what the planner intended. 
+
+D.2 Reflection and Rule Memory 
+
+Once an episode ends, the self-reflector reviews the whole trajectory in a single pass and produces one reflection per move, replacing the uniform terminal reward with a finer, per-move signal (Section 4). Drawing on the state, the played action and its stated intent, and the opponent’s reply, each reflection judges the move along two axes: its local quality, whether it was sound at the point it was played, and its con-tribution to the final outcome. It also assesses whether the action achieved its stated intent, and, where relevant, notes the turning point at which the game was lost and records a short lesson for future play. This per-move judgement also determines how a retrieved case is shown to the planner: a locally sound move that did not harm the outcome is presented as an example to emulate, and any other move as a mistake to avoid. Because the la-bel is assigned per move, a sound move from a lost game is still shown as a positive example rather than penalized for the eventual loss. Which cases are retrieved in the first place is balanced separately (Appendix D.3). The rule extractor is what lets REAPER generalize beyond the states it has actually encountered (Section 4). Beyond the periodic, self-correcting regeneration described there, two constraints shape the rule set. It is kept deliberately small, on the order of twenty rules, and biased toward rules sup-ported by several cases or by clear win/loss patterns, so that one-off observations do not accumulate into noise. More im-portantly, the extractor is required to phrase rules as gen-eral strategic principles rather than statements about partic-ular board positions; this position-independence is precisely what allows them to apply to unseen states, complementing case retrieval, which can only surface states resembling those already stored. The set is presented as a short list in the plan-ner’s prompt. 
+
+D.3 Retrieval 
+
+To reuse past experience, the agent needs a key by which to compare the current position against stored cases. The natu-ral choice is the state observation itself: it is exactly what the environment exposes during play and needs no extra model call. At each move this key is embedded with a sentence en-coder 3 [Gao et al. , 2021] truncated to 256 tokens, and the 
+
+k = 8 most similar cases are retrieved by cosine similarity. 
+
+Stratified Retrieval 
+
+Ranking by similarity alone can return a neighborhood dom-inated by a single outcome, for example, only cases from lost games, starving the planner of contrasting examples. Strati-fied retrieval counters this by splitting the stored cases into a positive and a non-positive stratum by their recorded reward and drawing roughly half of the k slots from each. If one stratum cannot fill its share, the remaining slots are backfilled with the next most similar cases regardless of stratum. The retrieved set therefore holds both successful and cautionary cases whenever both exist near the query. 
+
+D.4 State Descriptor 
+
+Using the raw observation as the key, i.e. the state mode, makes retrieval sensitive to surface form. Two positions that are strategically identical but written differently, as under the obfuscations of Section 3, embed to different keys and fail to match. Similarly, if the game engine does not impose a canonical ordering of the board positions (or the state rep-resentation in general), two different observations also map to different embeddings. This motivates describing the state in natural language before embedding, decoupling retrieval from the raw encoding. That is the role of the state descrip-tor, which is introduced in this section.           
+
+> Figure 6: Effect of the state descriptor on tic-tac-toe draw rate with GPT-5 nano at medium reasoning effort against the Optimal oppo-nent. State-mode variants ( Refl. ,Refl. + Rules ) use the raw ob-servation as the retrieval key; the corresponding description-mode variants ( Refl. + Desc. ,Refl. + Desc. + Rules ) replace it with the generated state description. Lines show means over 10 independent runs; error bars show 95% Student’s tconfidence intervals.
+
+Concretely, the state descriptor is a dedicated model call that reads the raw observation and returns a short natural-language description of the current position, which is then 
+
+> 3princeton-nlp/sup-simcse-bert-base-uncased
+
+embedded in place of the raw observation, the description-mode retrieval key. The aim is to make the key independent of surface form or canonical ordering, so that positions that are strategically equivalent but encoded differently map to nearby keys; the price is an extra model call on every move. 
+
+Ablation Study 
+
+We evaluate description mode in the same setting as Sec-tion 5, GPT-5 nano at medium effort against the Optimal opponent on tic-tac-toe, layering it on both the reflection-only agent and the reflection-with-rules agent, and compar-ing against the corresponding variants with state embeddings. Figure 6 reports the draw rate across the five learning epochs. Description mode does not help. Both description-mode variants plateau below their state-mode counterparts. To see why, we measured the retrieval success rate, i.e. how often a case whose state was already in memory was actually re-trieved for that state. Under state mode, this is effectively 
+
+100% , since an embedded raw observation matches its own stored key exactly. Under description mode it falls below 
+
+100% , because the natural-language descriptions of the same states are no longer identical or sufficiently close in the em-bedding space, so the matching case is no longer reliably re-trieved among the top k.
+
+D.5 Component Setup 
+
+REAPER’s components are exposed as independent switches, which is what makes the ablations of Section 5.2 possible: re-flection, rule extraction, and the state descriptor can each be turned on or off without changing the rest of the pipeline. Beyond this, the framework allows a different LLM back-end per component and exposes the memory and retrieval hyperparameters discussed above. In all main-text experi-ments we use a single model for every component, matched to the player under evaluation, so that any improvement is attributable to the method rather than to a stronger auxiliary model; the framework nonetheless supports arbitrary model combinations. E Relation to OpenSpiel 2.0 
+
+Concurrently with this work, OpenSpiel 2.0 [Lanctot, 2026] introduced structured state, observation, and action repre-sentations that serialize losslessly to JSON, together with a minimax solver for small two-player zero-sum perfect-information games. These additions are motivated explicitly by ease of use with large language models, and overlap in spirit with PlyBench’s interface adapters; we clarify here how the two relate. PlyBench predates and is independent of these features, and remains necessary for the study conducted in this paper. It still uses OpenSpiel’s engine and game imple-mentations, but complements it with features that are tailored for LLM play and studying LLMs and differ in four respects. 
+
+Representation OpenSpiel 2.0 serializes its structs to a JSON format and sends them, in that form, to a frontend, a database, or a language model. LLM Adapter in Ply-Bench instead renders the state and legal actions as natural-language text tuned for prompting, layered on top of the same OpenSpiel engine. These are different design points rather than one dominating the other. A JSON encoding is un-ambiguous, lossless, compact, and trivially machine-parsed, which simplifies tool-based agent integration, logging, and reproducibility. A natural-language encoding mirrors how a game’s rules would be explained to a person and provides the surface on which the obfuscations below can act, making it the more natural substrate for our goal of probing whether a model understands and reasons about rules rather than recog-nizes a serialized format. 
+
+Obfuscations While OpenSpiel’s structs provider faithful state representation, PlyBench’s adapter is designed to sup-port game rule obfuscations: semantics-preserving surface transforms (Section 3.4) that alter the natural-language repre-sentation while leaving the game tree unchanged. This mech-anism presents the same game under rules the model is un-likely to have memorized, and is the basis for disentangling memorization from reasoning. 
+
+Stochastic optimal opponent OpenSpiel 2.0’s minimax solver is an oracle: it computes the minimax value of ev-ery action in each state and exposes these action values, from which the set of optimal moves can be recovered, but it nei-ther defines a playing policy nor prescribes how ties among optimal moves are resolved. PlyBench instead wraps Mini-max into a ready-to-use Optimal opponent that, at each state, samples uniformly among all moves attaining the optimal value. This stochastic tie-breaking is what our per-move op-timality metric consumes: the metric excludes states where every legal move is optimal and otherwise credits any move Minimax could have selected (Section 3), and the sampling additionally exposes the player to a diverse distribution of op-timal continuations rather than a single fixed line. 
+
+Evaluation harness Finally, OpenSpiel provides evalua-tion primitives rather than an end-to-end study harness. Its 
+
+evaluate bots routine plays a single game between a list of bots and returns the terminal utilities, and Open-Spiel 2.0 adds population-level rating aggregation (Elo and Soft-Condorcet) together with an example server through which one language model can play interactively. It ships no driver for running many games across players and rule formu-lations, no parallelization of such matchups, and no per-move analysis. PlyBench supplies exactly this layer: through its Interface Adapter it exposes a single unified interface over heterogeneous players, from random and algorithmic base-lines to search-based opponents and LLMs, then orchestrates repeated games with side switching, parallelizes them across players and rule formulations, and scores play at the per-move level against the stochastic Optimal opponent, aggregating with the 95% Wilson score confidence intervals reported in our tables. Our metric therefore evaluates whether each in-dividual move was optimal, a finer-grained signal than the terminal outcomes and population ratings that OpenSpiel’s evaluation utilities compute. This full pipeline, rather than any single adapter, is what the study in this paper relies on. None of these distinctions are exclusive. Because the ob-fuscation mechanism is largely independent of the encoding, it could equally be applied to OpenSpiel’s structs, for in-stance by relabeling actions and remapping observation fields under a semantics-preserving transform. The two frame-works are therefore complementary and could be merged: PlyBench’s obfuscations, stochastic Optimal opponent, and evaluation orchestration could be built directly on Open-Spiel 2.0’s structured representations, pairing the machine-readability of JSON with our reasoning-versus-recall probes. We accordingly view OpenSpiel 2.0 as complementary in-frastructure rather than a substitute for PlyBench, and see ex-tending or merging the two as a natural direction for future work.

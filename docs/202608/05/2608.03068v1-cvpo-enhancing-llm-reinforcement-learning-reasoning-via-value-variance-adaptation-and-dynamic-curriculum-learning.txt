@@ -1,0 +1,351 @@
+Title: CVPO: Enhancing LLM Reinforcement Learning Reasoning via Value-Variance Adaptation and Dynamic Curriculum Learning
+
+URL Source: https://arxiv.org/pdf/2608.03068v1
+
+Published Time: Wed, 05 Aug 2026 00:27:18 GMT
+
+Number of Pages: 15
+
+Markdown Content:
+# CVPO: Enhancing LLM Reinforcement Learning Reasoning via Value-Variance Adaptation and Dynamic Curriculum Learning 
+
+Ziqi Jia 1,2, ♦, Yalu Ouyang 1,3, ♦, Bo Pang 1, Panpan Li 1,
+
+Hangfei Xu 1, Shengzhao Wen 1, Shiyong Li 1, Yanpeng Wang 1,
+
+> 1
+
+AI Cloud Group, Baidu, 2Tsinghua University, 3University of California, San Diego 
+
+Correspondence: jzq_2022@163.com 
+
+Abstract 
+
+Reinforcement learning (RL) has emerged as an effective method for enhancing the reasoning capabilities of large language models (LLMs). However, existing methods suffer from insufficient precision in feedback on generated answer trajectories and exhibit the phenomenon of problem difficulty drift. To address these challenges, we propose CVPO —Curriculum-guided Value-Variance Policy 
+
+Optimization. At the response trajectory level, we find that token-level value-variance correlates with exploration intensity. Our theoretical analysis shows this variance bounds policy update magnitude. We then use the estimated trajectory value-variance to quantify the intrinsic randomness in generation. Based on this, we design a variance-aware advantage adjustment mechanism for different reward types. At the question level, we introduce a dynamic curriculum weighting method that adapts to question difficulty. This helps the model focus on tasks matched to its current ability during each training stage. Experimental results show our method outperforms strong value-based baselines like VAPO. It achieves better performance and stronger exploration, enabling more accurate and robust reasoning in language models across various math tasks. 
+
+# 1 Introduction 
+
+In recent years, reasoning models based on reinforcement learning have demonstrated remarkable performance breakthroughs in solving high-difficulty mathematical reasoning tasks, providing a new approach for solving complex logical problems Ahmadian et al. (2024); Hu (2025); Team et al. (2025); DeepSeek-AI et al. (2024); Chen et al. (2025a); Su et al. (2025); Chen et al. (2025b); Richemond et al. (2024). Among them, value-free model methods represented by GRPO Shao et al. (2024) have achieved pioneering progress in related tasks by averaging the rewards of multiple trajectories within a group to calculate advantage values. However, subsequent studies on value-based algorithms such as VAPO Yue et al. (2025) have further revealed that well-trained value models can achieve more accurate credit assignment, and their performance upper limit is significantly higher than that of value-free model methods such as GRPO, pointing out a more promising direction for the development of this field. Nevertheless, current value-based methods still have two key bottlenecks that needs addressing. First, the feedback accuracy on the generated answer trajectories is insufficient Prabhudesai et al. (2025); Shao et al. 
+
+> ♦Completed during internship at Baidu
+
+1arXiv:2608.03068v1 [cs.CL] 4 Aug 2026 (2025). When the trajectories show homogeneous results (all correct or all incorrect), the existing mechanism lacks refined gradient signals for differentiated learning, which directly weakens the distinguishability of learning gradients and ultimately restricts the further improvement of model performance. Secondly, there is the widespread phenomenon of “difficulty drift" Qu et al. (2025); Parashar et al. (2025); Shi et al. (2025)that occurs during the training process: with the accumulation of training steps, the model’s ability continues to improve, leading to dynamic changes in the relative difficulty of problems—originally high-difficulty problems gradually transform into medium or low-difficulty ones. In this case, if a fixed weight strategy is still used for undifferentiated training on all problems, it will not only reduce the overall training efficiency but also limit the reasoning upper limit of the model due to insufficient attention given to high-difficulty problems. To address these challenges, we propose CVPO (Curriculum-guided Value-Variance Policy Optimization). At the response trajectory level, we find that token-level value-variance in a trajectory correlates with explo-ration intensity: high variance implies active exploration, low variance indicates rigidity. Furthermore, our theoretical analysis shows this variance bounds the magnitude of policy updates. Based on these findings, we leverage the stochastic nature of trajectory value-variance to optimize the advantage calculation. By incorporating this variance into our advantage function adjustment mechanism, CVPO can dynamically regulate the weight of trajectories according to their reward types. At the question level, we introduce a dynamic curriculum weighting method that adapts to question difficulty. Our method dynamically adjusts the weights of problems based on their difficulty levels. This ensures that the model focuses on tasks matching its current capabilities at each training stage. Our main contributions are as follows: • We propose the CVPO method, which constructs a variance-based advantage function adjustment mechanism at the response trajectory level to enhance model exploration. At the problem level, we introduce a dynamic curriculum weighting approach to mitigate the issue difficulty drift during training. • We find that the variance of trajectory values influences the model’s gradient updates. Our theoretical analysis proves that appropriately leveraging this variance can improve the upper bound of model performance. Empirical results further confirm that this method significantly enhances both the accuracy and robustness of the model. • The evaluation results on multiple mathematical benchmarks show that CVPO outperforms other leading methods. Ablation studies further validate the effectiveness of each improvement. 
+
+# 2 Related Works 
+
+Recently, reinforcement learning (RL)-based post-training has become a crucial paradigm for enhancing the reasoning capabilities of large models. Proximal Policy Optimization (PPO) Schulman et al. (2017), a widely adopted RL algorithm, balances reward maximization and policy stability by incorporating a clipping mechanism and KL regularization to constrain policy updates. However, when dealing with long-chain reasoning tasks, standard PPO faces issues such as value function initialization bias and reward signal decay, limiting its effectiveness in complex reasoning scenarios. To improve reasoning quality, ORZ Hu et al. (2025) incorporates a value model for advantage estimation within the PPO framework but opts for Monte Carlo returns instead of Generalized Advantage Estimation 2(GAE), sacrificing the bias-variance trade-off provided by GAE, which leads to greater fluctuations during training. In contrast, DeepSeek-R1 utilizes Group Relative Policy Optimization (GRPO) Shao et al. (2024), which completely eliminates the value network and uses group-normalized rewards as advantages, achieving efficient training without relying on a value model. GRPO significantly improves training stability and efficiency whilst maintaining performance. However, “value-free" methods like GRPO cannot leverage trajectory-level value information, which limits their ability to perform fine-grained modeling of the reasoning process. To address the instability of value function training in long reasoning chains, VC-PPO Yuan et al. (2025) introduces value pre-training and decoupled GAE computation to mitigate initial value bias and reward decay. Building on this foundation, VAPO Yue et al. (2025) further incorporates length-adaptive GAE and token-level loss functions, outperforming value-free methods like GRPO in various mathematical reasoning tasks and thus validating the potential of value networks in complex reasoning tasks. Despite these advancements, existing value-based approaches still exhibit notable deficiencies in feedback precision. When the generated trajectories within a batch display high homogeneity (e.g., all correct or all incorrect), current algorithms struggle to provide discriminative gradient signals, failing to effectively utilize trajectory-level statistical characteristics (such as value-variance and intra-group differences). The current utilization of value signals has not fully exploited their supervisory potential in structured reasoning tasks. Our work aims to address this limitation by proposing a variance-aware and accuracy-adaptive weighting mechanism to enhance the expressiveness and learning efficiency of value signals. 
+
+# 3 Preliminaries 
+
+We conceptualize language generation as a token-level Markov Decision Process (MDP) represented by the tuple M = (S, A, P, R, d 0). In this framework, the state space S consists of states st =(x0, . . . , x m, y 0, . . . , y t), which encapsulate all tokens generated up to time step t — with x denoting the input prompt and y representing the generated response. The action space A corresponds to a fixed set of discrete vocabulary items, while the dynamics P describe deterministic token transitions, specifically 
+
+P(st+1 |st, a ) = 1 when a = yt+1 . The reward function R delivers scalar evaluative feedback, and d0
+
+represents the initial probability distribution over possible prompts. Proximal Policy Optimization (PPO) is a popular reinforcement learning algorithm that enhances policy performance through iterative updates while ensuring training stability. Its core mechanism limits excessive policy changes during updates using a clipped objective function, preventing significant deviations from the previous policy and avoiding the instability issues of other policy gradient methods. PPO optimizes the clipped surrogate objective: 
+
+L(θ) = Et
+
+h
+
+min( rt(θ) ˆAt, clip (rt(θ), 1 − ϵ, 1 + ϵ) ˆAt)
+
+i
+
+(1) where rt(θ) = πθ (at|st)  
+
+> πθold (at|st)
+
+represents the ratio of the new policy to the old policy, ϵ controls the clipping range, 3and ˆAt is the estimated advantage. The advantage is calculated as: 
+
+ˆAt = 
+
+> T−t−1
+
+X
+
+> k=0
+
+(γλ )kδt+k (2) with δt = rt + γV (st+1 ) − V (st), where γ is the discount factor, λ is the GAE parameter, rt is the reward at step t, and V (s) is the state value function. 
+
+# 4 Methodology 
+
+4.1 Stochasticity-Aware Adaptive Advantage Function Correction Mechanism 
+
+4.1.1 Theoretical analysis of the influence of trajectory value-variance on gradient estimation 
+
+To further understand the mechanism by which CVPO improves advantage estimation through modeling the variance of the value function, we analyze how value-variance along trajectories influences policy updates. The policy gradient is defined as: 
+
+∇θJ(θ) = Es,a ∼πθ [∇θ log πθ(a|s) · A(s, a )] , (3) where the advantage function is given by A(s, a ) = Q(s, a ) − V (s), with Q(s, a ) denoting the state-action value and V (s) the state value. Assume that the L2 norm of the policy log-probability gradient is bounded by a constant C, i.e., 
+
+∥∇ θ log πθ(a|s)∥2 ≤ C. (4) Applying the Cauchy-Schwarz inequality, we derive an upper bound on the gradient norm: 
+
+∥∇ θJ(θ)∥2 ≤ E [∥∇ θ log πθ(a|s)∥2 · | A(s, a )|]
+
+≤ C · E [|A(s, a )|] . (5) Since E[A(s, a )] = 0 , the variance of the advantage function simplifies to: Var (A) = E[A(s, a )2]. (6) By Jensen’s inequality, we have: 
+
+(E[|A(s, a )|]) 2 ≤ E[A(s, a )2] = Var (A), (7) which implies: 
+
+E[|A(s, a )|] ≤ pVar (A). (8) Expanding the variance of A(s, a ):Var (A) = Var (Q) + Var (V ) − 2 Cov (Q, V ). (9) 4Using the Cauchy-Schwarz inequality for covariance, 
+
+|Cov (Q, V )| ≤ pVar (Q) · Var (V ), (10) we obtain the following upper bound: Var (A) ≤ Var (Q) + Var (V ) + 2 pVar (Q) · Var (V )=
+
+
+
+σQ + pVar (V )
+
+2
+
+, (11) where σQ = pVar (Q).Substituting this into the earlier bound yields: 
+
+E[|A(s, a )|] ≤ σQ + pVar (V ). (12) Finally, the magnitude of the policy gradient is bounded by: 
+
+∥∇ θJ(θ)∥2 ≤ C ·
+
+
+
+σQ + pVar (V )
+
+
+
+. (13) Our theoretical analysis establishes a direct link between the magnitude of policy gradients and the variance of the value function. This highlights the critical role of controlling Var (V ) in achieving stable policy optimization, particularly in reinforcement learning and large language model reasoning tasks. We show that high value variance leads to larger gradients. When this variance is modulated with respect to trajectory quality, selectively increasing it can amplify learning signals in the right direction. This insight provides a principled approach to enhancing both learning efficiency and convergence stability. 
+
+4.1.2 Analysis: Value Stochasticity in LLM Reasoning 
+
+In the field of reinforcement learning for large models, balancing exploration and exploitation remains a key bottleneck that restricts the efficiency of policy optimization. Existing advantage function designs have two significant flaws: 1. They lack a dynamic response mechanism to the intrinsic stochasticity of generated trajectories, and the fixed-weight scheme struggles to meet the differentiated stochasticity demands of trajectories with varying quality (correct/incorrect responses). 2. They fail to incorporate statistical characteristics of value estimation (such as variance) into the policy optimization framework, resulting in positive samples being difficult to converge stably due to excessive exploration, and negative samples falling into local optima due to rigid penalty mechanisms, with limited exploration depth. To address the above issues, we propose a stochasticity-aware adaptive advantage function correction mechanism. It quantifies the intrinsic stochasticity of the generation process through the variance of trajectory value estimates, and achieves precise regulation of “strong constraints on positive samples and promotion of exploration on negative samples" by designing a dynamic weight function ( WS) to differentially weight token-level advantage values. 5Figure 1: Tokens with the highest average values from generated responses in the training set. They are closely related to the training task, which is mathe-matics in our experiment setting As shown in Figure 1, the training task strongly influences the state values of the generated tokens and the resulting states they create, with mathemat-ics terminology obtaining high values for our exper-iments dealing with math subjects. Inversely, low-value tokens tend to be less relevant to the training task. By monitoring changes in token-level values through the variance, we can use it to measure the amount of exploration being done within a single response trajectory. High variance indicates greater stochasticity and exploration, whereas low variance means limited exploration and more rigid responses. 
+
+4.1.3 Method: Stochasticity-Aware Advantage Correction 
+
+The variance of trajectory ( τ ) value estimates ( Var (τ )) is used as the stochasticity quantification index, and an asymmetric weight adjustment mechanism is constructed for trajectories of different reward types ( R(τ ) = 1 
+
+for positive samples, R(τ ) = 0 for negative samples): Let B = {(vi, r i, idx i)}Bi=1 denote a batch of B trajectories, where vi ∈ RTi is the sequence of estimated state values for the i-th sample, ri ∈ RTi is the corresponding token-level reward, and idx i ∈ N+ denotes the index of the associated prompting template or question instance. We define the value-variance signal for each sample as: 
+
+σi = std( vi),
+
+which measures the intra-trajectory uncertainty of the value estimation. To normalize this signal across samples from the same prompt, we group samples by their index. Let 
+
+Gk = {i | idx i = k} denote the set of sample indices corresponding to prompt k. The mean value standard deviation for prompt k is then computed as: 
+
+μk = 1
+
+|G k|
+
+X
+
+> i∈G k
+
+σi (14) This group-wise mean μk serves as a reference point to assess whether a given sample exhibits higher or lower value fluctuation compared to others under the same prompting context. For trajectories with correct responses, high stochasticity needs to be suppressed to accelerate convergence. When Var (τ ) exceeds the threshold ( μP ), the weight function enhances the penalty; otherwise, rewards are given to reinforce low-stochasticity strategies. The function is defined as:            
+
+> WS(Var (τ),1) = 1 .0 + αP·sigmoid (λP(Var (τ)−μk)) (15)
+
+where λP is a fixed steepness parameter, controlling the sensitivity of the weight to changes in variance; αP
+
+is a fixed gain parameter, adjusting the dynamic range of reward and penalty intensities. For trajectories with incorrect responses, high stochasticity needs to be retained to expand the exploration 6space. When Var (τ ) is below the threshold ( μN ), the weight function increases the penalty intensity; otherwise, the penalty is reduced to encourage high-stochasticity exploration. The function is defined as:            
+
+> WS(Var (τ),0) = 1 .0−αN·sigmoid (λN(μk−Var (τ))) (16)
+
+where λN is a fixed steepness parameter, regulating the penalty sensitivity of the weight to low-variance trajectories; αN is a fixed penalty amplitude parameter, limiting the adjustment range of penalty intensity for negative samples. 
+
+4.2 Difficulty-guided Advantage Weighting 
+
+4.2.1 Analysis: Difficulty Shift in Reinforcement Learning for Large Language Models 
+
+In reinforcement learning-based training, models tend to prioritize solving easy problems—due to their readily obtainable reward signals—leading to insufficient reasoning length allocated to complex problems, and sometimes even bypassing reasoning steps entirely by directly outputting answers. However, as training progresses, the model’s capabilities gradually improve, and problems initially perceived as “hard” may evolve into “medium” or “easy” ones. Training all difficulty levels with fixed weights results in overfitting to simple samples in later stages, reducing training efficiency. Moreover, the model’s insufficient focus on difficult problems limits the potential for further improvement in its overall performance. Additionally, existing curriculum learning (CL) methods typically rely on predefined, static difficulty metrics, which fail to account for the dynamic shift in the model’s perception of task difficulty during training—referred to as the “difficulty shift” phenomenon. This misalignment between the predefined curriculum and the model’s real-time learning needs negatively impacts both learning efficiency and final performance. To address these challenges, we propose a difficulty-aware dynamic curriculum weighting method. Our approach continuously assesses sample difficulty during training and dynamically adjusts the weights of problems with different difficulty levels in the advantage computation, enabling the model to focus on tasks that match its current capability at each training stage. This effectively prevents the model from falling into the “easy-problem trap” and promotes sustained learning on complex reasoning tasks. 
+
+4.2.2 Method: Difficulty-Aware Dynamic Curriculum Weighting 
+
+First, we introduce a Bayesian inference framework to maintain a posterior distribution over the accuracy for each question, and further aggregate these to obtain a dynamic estimate of the model’s current capability. During the model training process, we employ a Bayesian inference framework to dynamically track the success rate of each sample τ . Specifically, we set a Beta prior distribution for the initial success rate γ0 
+
+> τ
+
+of each sample as 
+
+γ0 
+
+> τ
+
+∼ Beta (α0 
+
+> τ
+
+, β 0 
+
+> τ
+
+), (17) where α0 
+
+> τ
+
+= β0 
+
+> τ
+
+= 1 , which corresponds to a uniform prior. After the model generates responses to these samples, we calculate the number of successes: 
+
+s0 
+
+> τ
+
+=
+
+> k
+
+X
+
+> j=1
+
+r0,j τ , (18) 7where r0,j τ ∈ { 0, 1} are binary rewards (1 for correct, 0 for incorrect). Using this, we obtain the initial posterior distribution via a recursive update rule: 
+
+γ0 
+
+> τ
+
+| H0 ∼ Beta (α0′ 
+
+> τ
+
+, β 0′ 
+
+> τ
+
+), (19) with updated parameters 
+
+α0′ 
+
+> τ
+
+= α0 
+
+> τ
+
++ s0 
+
+> τ
+
+, (20) 
+
+β0′ 
+
+> τ
+
+= β0 
+
+> τ
+
++ k − s0 
+
+> τ
+
+, (21) where H0 denotes the initial optimization history. To monitor the model’s learning dynamics, we define a trend indicator ∆tτ as: 
+
+∆tτ = ¯γtτ − ¯γt−1
+
+> τ
+
+¯γt−1
+
+> τ
+
+, (22) where ¯γtτ = αt′ 
+
+> τ
+> αt′
+> τ+βt′
+> τ
+
+is the posterior mean of sample τ at training round. Based on this indicator, we define two stagnation conditions to detect a learning bottleneck: For the low-accuracy sample set 
+
+Tlow = τ | ¯γtτ ≤ 0.3 , (23) If samples with accuracy below 30% satisfy |∆tτ | ≤ 0.05 , the model is considered to be in a stagnant state in the low-accuracy region. For the high-accuracy sample set 
+
+Thigh = τ | ¯γtτ ≥ 0.8 , (24) If samples with accuracy above 80% satisfy ∆tτ ≤ 0.03 , the model is considered to be experiencing a slowdown in accuracy improvement at a high-performance level. When both conditions are simultaneously satisfied, the model is judged to have entered a learning bottleneck, and a shift in the learning strategy is triggered. We introduce the function WD(·) to adapt to the trained policy’s mastery of currently sampled question, allowing the policy to learn gradually from training data and focus on the most difficult problems with regards to its abilities. In the initial stage of training, to promote rapid learning and effective performance improvement, we place special emphasis on tasks that the model is capable of solving but currently performs poorly on. By focusing more attention on questions with an accuracy rate around 0.5, we leverage their high reward variance and relatively high lower bound of KL divergence, thereby obtaining stronger gradient signals. This strategy not only accelerates the optimization of the policy but also ensures that the model rapidly acquires effective knowledge and skills during the early stages of training. 
+
+WD(·) is defined as follows: 
+
+WD(ρq) = 21 + e−k1(ρq −c1) · 11 + ek2(ρq −c2) , (25) 8where hyperparameters k1 = 1 .6, c1 = −0.2, k2 = 2 , and c2 = 1 .2, and ρq is the most recent accuracy for sampled question q.When the model enters a learning bottleneck, it has typically already mastered simple problems but exhibits insufficient exploration of difficult ones. To guide the model toward breaking through this plateau, we dynamically shift the difficulty weighting distribution to the left—that is, toward questions with lower accuracy—thereby increasing the learning weight on high-difficulty, low-accuracy problems. Meanwhile, to prevent the model from falling into the “easy-problem trap,” we set the weights of questions with accuracy 1
+
+to zero, effectively suppressing redundant training on fully mastered samples and encouraging the model to focus its attention on challenging, unsolved tasks. At this point, the difficulty weighting function WD(·) is defined as follows: 
+
+WD(ρq) = 2  1 − ρ2
+
+> q
+
+
+
+1 + e−k′  
+
+> 1(ρq−c′
+> 1)
+
+· 11 + ek′  
+
+> 2(ρq−c′
+> 2)
+
+, (26) where the hyperparameters are k′ 
+
+> 1
+
+= 4 .1, c′ 
+
+> 1
+
+= −0.1, k′ 
+
+> 2
+
+= 2 , c′ 
+
+> 2
+
+= 0 .9, and ρq is the most recent accuracy for sampled question q.
+
+4.3 Unified Advantage Function with Stochasticity and Difficulty Awareness 
+
+Based on the proposed methods of trajectory variance and dynamic curriculum learning, we derive the final weighted advantage function as follows: 
+
+A′ 
+
+> t′
+
+= WS(Var (τ ), R (τ )) · WD(ρq, t c) · A, (27) where τ is the output trajectory for sampled question q, tc is the current phase in curriculum training, Var (τ ) is the variance for the values of trajectory τ , and R(τ ) is the overall return of the trajectory. 
+
+# 5 Experiment 
+
+5.1 Experiment Setup 
+
+Datasets and Settings. We use DAPO-Math-17k (Yu et al., 2025) as the training set and evaluate on datasets including AIME 2024, AIME 2025, AMC 2023, MATH-500 (Hendrycks et al., 2021), and AMC 2024. For the AMC datasets, we filter out questions that require comprehending figures to answer. Performance is evaluated as the mean accuracy over 32 attempts, avg@32 .
+
+Reward Setting. We adopt a rule-based reward mechanism to provide a stable and explicit training signal for the reinforcement learning-based post-training process. Specifically, the model’s output is required to follow a predefined structured format: the final answer must be placed within the \boxed{} tag or after the text Answer: on a separate new line. The reward signal is determined by the correctness of the final answer: if the predicted answer exactly matches the ground truth, the model receives a reward of +1 ; otherwise, it receives −1.
+
+Implementation Details. We enhance the mathematical reasoning capability of the Qwen2.5-7B model using the CVPO algorithm, and include VAPO and GRPO (ASYN) for comparison purposes. All experiments are conducted on 8 server nodes, each equipped with 8 NVIDIA A800 GPUs. We use AdamW as the 9Methods AIME24 AIME25 AMC23 AMC24 MATH500 Qwen2.5-7B 0.046 0.011 0.198 0.201 0.251 GRPO (ASYN) 0.137 0.102 0.468 0.383 0.665 VAPO 0.144 0.046 0.441 0.260 0.452 CVPO (only Stochasticity) 0.188 0.100 0.676 0.497 0.765 CVPO (only Dynamic Curriculum) 0.162 0.065 0.538 0.412 0.558 CVPO (w/ 0.3 variance coeff) 0.237 0.133 0.720 0.512 0.802 
+
+Table 1: avg@32 accuracy for algorithms across math benchmarks. Best results are in bold , second best are underlined optimizer, with the actor learning rate set to 1 × 10 −6 and the critic learning rate to 2 × 10 −6. The training batch size is 256, with each rollout batch containing 16 responses, and the maximum response length is 6144 tokens. We forego the use of KL constraints in our setup as we found this to be limiting model updates when the trained policy generates long reasoning traces. We train our value model from Qwen2.5-7B, utilizing a checkpoint that has a value-model loss less than 1 and an explained variance greater than 0. We use a warm-up schedule of 21 steps for the value model checkpoint stated previously, set the GAE λcritic = 0 .1,the length-adaptive GAE factor α = 0 .17 , the discount factor γ to 1.0, clip coefficients to ϵlower = 0 .2
+
+and ϵhigher = 0 .28 , and positive LM loss coefficient μ = 0 .1. For comparison purposes with value-free algorithms, we also included GRPO in our experiments. However, in our attempts, we experienced extreme response-length collapse using the generic GRPO algorithm. Therefore, we utilized a modified version of GRPO—single-step async GRPO (ASYN) —to ensure representative comparisons with our value-based approaches. Hyperparameters such as training batch size and amount of rollout remain unchanged, and an uniform clipping coefficient of ϵ = 0 .2 is used. 
+
+Figure 2: Comparison of CVPO and previous SOTA methods on the AIME 2024 benchmark using the Qwen2.5-7B model. The x-axis represents training steps. CVPO consistently demonstrates a significant advantage throughout the training process. 10 6 Results and Discussions 
+
+6.1 Results 
+
+As shown in Table 1, our proposed method CVPO significantly outperforms existing SOTA methods across multiple datasets. Specifically, it achieves improvements of 9.3% , 3.1% , 25.2% , 12.9% , and 13.7% over the second-best methods on AIME24, AIME25, AMC23, AMC24, and MATH500, respectively. These results demonstrate the strong effectiveness of CVPO in complex mathematical reasoning tasks. We also conduct ablation studies on the two core components of CVPO. The variant with only stochasticity-aware advantage correction ( CVPO (only Stochasticity) ) and the variant with only difficulty-aware dynamic curriculum weighting ( CVPO (only Dynamic Curriculum) ) both outperform the baseline method VAPO . This confirms the effectiveness of each individual component. Among them, the stochasticity-aware correction brings greater performance gain. This is because it expands the upper bound of model exploration. As shown in Figure 2, CVPO, VAPO, and GRPO (ASYN) are all trained for over 2000 steps. CVPO focuses on “medium-difficulty” problems in the early stage and uses trajectory variance to adjust advantage estimation, which helps boost performance quickly. In the mid-training stage, when performance plateaus, CVPO changes the advantage function to focus more on hard problems. This improves the model’s reasoning ability. As a result, CVPO continues to improve in accuracy after 1500 training steps, showing its more effective learning strategy. 
+
+6.2 Discussions 
+
+Figure 3: Trajectory-level value-variance distribution on the training set between Qwen2.5 7B Base and evaluated algorithms. The distribution steadily shifts towards higher values from the base model to value-based algorithms Figure 3 shows the distribution of trajectory-level value-variance on the training set. Predictably, the base Qwen2.5-7B model displays the least value-variance on average, reflecting the lack of exploration 11 within response trajectories. Training via GRPO-ASYN resulted in incrementally more responses with higher value-variances, but due to the lack of a value model to guides policy updates on a finely-grained level, the difference is not too pronounced. Coming to the value-based VAPO method, we can observe a noticeable shift in value-variance distribution towards higher values. This shift is much more visible with CVPO, This shift in value-variance distribution towards higher values indicates a greater degree of exploration in the generated response trajectories, which can potentially assist models to generate correct answers by considering more possible pathways. To investigate the impact of stochasticity-aware adaptive advantage weighting, we conduct ablation studies by evaluating performance using different value-variance coefficients. As shown in Figure 4, higher coefficients values generally led to better performance, but there exists a crossover point where increasing coefficients actually results in degraded performance. This falls in line with our expectation, as the coefficients directly affect the magnitude of policy loss. With a bigger value and thereby bigger policy loss, the policy model undergoes larger updates which impacts convergence and undermines the model’s ability to adapt tasks that require complex and elaborate reasoning processes. This can be seen in the results where performance on AMC increased steadily along with value-variance coefficients but deteriorated on the harder questions of AIME. 
+
+Figure 4: CVPO performance using different value-variance coefficients. Higher coefficient values display better performance for AMC tests, but less performance for harder AIME questions As shown in Figure 5 (a), without the difficulty-aware dynamic curriculum weighting mechanism, the model tends to fall into a "simple-question trap". It mainly focuses on easier questions and pays insufficient attention to harder ones. This limits the model’s exposure to challenging tasks and constrains its overall performance ceiling. In contrast, as illustrated in Figure 5 (b), the model focuses more on questions with accuracy around 50% during early training. This promotes rapid knowledge convergence. When a training bottleneck occurs (e.g., around step 1000), the model dynamically adjusts its attention to different difficulty levels. It increases updates for difficult questions and reduces updates for simple ones. As shown in the Figure 5 (b), this adaptive adjustment enables the model to achieve a higher performance ceiling. 12 (a) Without Dynamic Question Difficulty Weighting (b) With Dynamic Question Difficulty Weighting 
+
+Figure 5: Comparison of training with and without dynamic question difficulty weighting. The color in each cell represents the proportion of questions within that accuracy bin relative to the total number of questions. Warmer colors (yellow) indicate a higher proportion, while cooler colors (blue) indicate a lower proportion. 
+
+# 7 Conclusion 
+
+In this paper, we address two critical challenges faced by existing value-based reinforcement learning methods for enhancing the reasoning capabilities of large language models: insufficient precision in feedback on generated answer trajectories and the phenomenon of problem difficulty drift. To tackle these issues, we propose CVPO (Curriculum-guided Value-Variance Policy Optimization), which incorporates a variance-based advantage function adjustment mechanism at the response trajectory level and a dynamic curriculum weighting method at the problem level. At the trajectory level, we observe that the token-level variance of values along a trajectory is correlated with the degree of exploration. Our theoretical analysis further proves that the variance of trajectory values affects the model’s policy gradient updates. Based on this, we design an adaptive advantage function that uses the variance of trajectory values to perform differential weighting across trajectories. This function adjusts the weights according to the type of reward, encouraging exploration of incorrect responses while stabilizing convergence on correct ones. Both theoretical analysis and empirical results show that this method significantly improves model accuracy and robustness. At the question level, CVPO uses a dynamic curriculum weighting scheme. This scheme adapts to the difficulty of each question. During training, it continuously assesses the difficulty of samples. It then adjusts the weights of problems with different difficulty levels. This ensures the model focuses on tasks that match its current ability at each stage. As a result, it reduces difficulty drift and improves training efficiency. Our experiments on multiple mathematical benchmarks, including AIME 2024, AIME 2025, AMC 2023, MATH-500, and AMC 2024, demonstrate that CVPO achieves higher performance and greater exploration capabilities, leading to more accurate and robust reasoning in language models across various mathematical tasks. 
+
+# References 
+
+Arash Ahmadian, Chris Cremer, Matthias Gallé, Marzieh Fadaee, Julia Kreutzer, Olivier Pietquin, Ahmet Üstün, and Sara Hooker. 2024. Back to basics: Revisiting reinforce-style optimization for learning from human feedback in llms. In Proceedings of the 62nd Annual Meeting of the Association for Computational 
+
+13 Linguistics (Volume 1: Long Papers), ACL 2024, Bangkok, Thailand, August 11-16, 2024 , pages 12248– 12267. Association for Computational Linguistics. Aili Chen, Aonian Li, Bangwei Gong, Binyang Jiang, Bo Fei, Bo Yang, Boji Shan, Changqing Yu, Chao Wang, Cheng Zhu, Chengjun Xiao, Chengyu Du, Chi Zhang, Chu Qiao, Chunhao Zhang, Chunhui Du, Congchao Guo, Da Chen, Deming Ding, and 80 others. 2025a. Minimax-m1: Scaling test-time compute efficiently with lightning attention. CoRR , abs/2506.13585. Jiaze Chen, Tiantian Fan, Xin Liu, Lingjun Liu, Zhiqi Lin, Mingxuan Wang, Chengyi Wang, Xiangpeng Wei, Wenyuan Xu, Yufeng Yuan, Yu Yue, Lin Yan, Qiying Yu, Xiaochen Zuo, Chi Zhang, Ruofei Zhu, Zhecheng An, Zhihao Bai, Yu Bao, and 80 others. 2025b. Seed1.5-thinking: Advancing superb reasoning models with reinforcement learning. CoRR , abs/2504.13914. DeepSeek-AI, Aixin Liu, Bei Feng, Bing Xue, Bingxuan Wang, Bochao Wu, Chengda Lu, Chenggang Zhao, Chengqi Deng, Chenyu Zhang, Chong Ruan, Damai Dai, Daya Guo, Dejian Yang, Deli Chen, Dongjie Ji, Erhang Li, Fangyun Lin, Fucong Dai, and 81 others. 2024. Deepseek-v3 technical report. CoRR ,abs/2412.19437. Dan Hendrycks, Collin Burns, Saurav Kadavath, Akul Arora, Steven Basart, Eric Tang, Dawn Song, and Jacob Steinhardt. 2021. Measuring mathematical problem solving with the MATH dataset. In Proceedings of the Neural Information Processing Systems Track on Datasets and Benchmarks 1, NeurIPS Datasets and Benchmarks 2021, December 2021, virtual .Jian Hu. 2025. REINFORCE++: A simple and efficient approach for aligning large language models. CoRR ,abs/2501.03262. Jingcheng Hu, Yinmin Zhang, Qi Han, Daxin Jiang, Xiangyu Zhang, and Heung-Yeung Shum. 2025. Open-reasoner-zero: An open source approach to scaling up reinforcement learning on the base model. CoRR ,abs/2503.24290. Shubham Parashar, Shurui Gui, Xiner Li, Hongyi Ling, Sushil Vemuri, Blake Olson, Eric Li, Yu Zhang, James Caverlee, Dileep Kalathil, and Shuiwang Ji. 2025. Curriculum reinforcement learning from easy to hard tasks improves LLM reasoning. CoRR , abs/2506.06632. Mihir Prabhudesai, Lili Chen, Alex Ippoliti, Katerina Fragkiadaki, Hao Liu, and Deepak Pathak. 2025. Maximizing confidence alone improves reasoning. CoRR , abs/2505.22660. Yun Qu, Qi Cheems Wang, Yixiu Mao, Vincent Tao Hu, and Xiangyang Ji. 2025. Can prompt difficulty be online predicted for accelerating rl finetuning of reasoning models? arXiv preprint arXiv:2507.04632 .Pierre Harvey Richemond, Yunhao Tang, Daniel Guo, Daniele Calandriello, Mohammad Gheshlaghi Azar, Rafael Rafailov, Bernardo Ávila Pires, Eugene Tarassov, Lucas Spangher, Will Ellsworth, Aliaksei Severyn, Jonathan Mallinson, Lior Shani, Gil Shamir, Rishabh Joshi, Tianqi Liu, Rémi Munos, and Bilal Piot. 2024. Offline regularised reinforcement learning for large language models alignment. CoRR , abs/2405.19107. John Schulman, Filip Wolski, Prafulla Dhariwal, Alec Radford, and Oleg Klimov. 2017. Proximal policy optimization algorithms. CoRR , abs/1707.06347. 14 Rulin Shao, Shuyue Stella Li, Rui Xin, Scott Geng, Yiping Wang, Sewoong Oh, Simon Shaolei Du, Nathan Lambert, Sewon Min, Ranjay Krishna, Yulia Tsvetkov, Hannaneh Hajishirzi, Pang Wei Koh, and Luke Zettlemoyer. 2025. Spurious rewards: Rethinking training signals in RLVR. CoRR , abs/2506.10947. Zhihong Shao, Peiyi Wang, Qihao Zhu, Runxin Xu, Junxiao Song, Mingchuan Zhang, Y. K. Li, Y. Wu, and Daya Guo. 2024. Deepseekmath: Pushing the limits of mathematical reasoning in open language models. 
+
+CoRR , abs/2402.03300. Taiwei Shi, Yiyang Wu, Linxin Song, Tianyi Zhou, and Jieyu Zhao. 2025. Efficient reinforcement finetuning via adaptive curriculum learning. CoRR , abs/2504.05520. Xuerui Su, Liya Guo, Yue Wang, Yi Zhu, Zhiming Ma, Zun Wang, and Yuting Liu. 2025. DGRO: en-hancing LLM reasoning via exploration-exploitation control and reward variance management. CoRR ,abs/2505.12951. Kimi Team, Angang Du, Bofei Gao, Bowei Xing, Changjiu Jiang, Cheng Chen, Cheng Li, Chenjun Xiao, Chenzhuang Du, Chonghua Liao, Chuning Tang, Congcong Wang, Dehao Zhang, Enming Yuan, Enzhe Lu, Fengxiang Tang, Flood Sung, Guangda Wei, Guokun Lai, and 75 others. 2025. Kimi k1.5: Scaling reinforcement learning with llms. CoRR , abs/2501.12599. Qiying Yu, Zheng Zhang, Ruofei Zhu, Yufeng Yuan, Xiaochen Zuo, Yu Yue, Tiantian Fan, Gaohong Liu, Lingjun Liu, Xin Liu, Haibin Lin, Zhiqi Lin, Bole Ma, Guangming Sheng, Yuxuan Tong, Chi Zhang, Mofan Zhang, Wang Zhang, Hang Zhu, and 16 others. 2025. DAPO: an open-source LLM reinforcement learning system at scale. CoRR , abs/2503.14476. Yufeng Yuan, Yu Yue, Ruofei Zhu, Tiantian Fan, and Lin Yan. 2025. What’s behind ppo’s collapse in long-cot? value optimization holds the secret. CoRR , abs/2503.01491. Yu Yue, Yufeng Yuan, Qiying Yu, Xiaochen Zuo, Ruofei Zhu, Wenyuan Xu, Jiaze Chen, Cheng-Xiang Wang, Tiantian Fan, Zhengyin Du, Xiangpeng Wei, Xiangyu Yu, Gaohong Liu, Juncai Liu, Lingjun Liu, Haibin Lin, Zhiqi Lin, Bole Ma, Chi Zhang, and 8 others. 2025. VAPO: efficient and reliable reinforcement learning for advanced reasoning tasks. CoRR , abs/2504.05118. 15

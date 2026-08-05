@@ -1,0 +1,847 @@
+Title: BODHI: Do LLMs Branch Out and Discover Heterogeneous Inferences?
+
+URL Source: https://arxiv.org/pdf/2608.02867v1
+
+Published Time: Wed, 05 Aug 2026 00:17:29 GMT
+
+Number of Pages: 16
+
+Markdown Content:
+# BODHI: Do LLMs Branch Out and Discover Heterogeneous Inferences? 
+
+Soumadeep Saha †, Krish Sharma †, Akshay Chaturvedi *,Nicholas Asher ††ANITI, Université de Toulouse; *LINAGORA Labs  
+
+> Correspondence: soumadeep.saha97@gmail.com
+
+Abstract 
+
+Although reinforcement learning with verifi-able rewards (RLVR) has improved the per-formance of large language models (LLMs) across a variety of reasoning tasks, there is sig-nificant debate as to whether RLVR expands the reasoning capability boundary, or just im-proves sampling efficiency. In this paper, we investigate the nature of test-time exploration in RLVR-trained LLMs by employing controlled maze-solving experiments and extracting a tree structure from mathematical reasoning traces (BODHI-T REE s) based on semantic equiva-lence. This helps us delineate between entropy arising from stylistic variations and genuine in-ferential branching. Our findings demonstrate that the policy entropy collapse observed in RLVR models is not merely syntactic, and is accompanied by a significant reduction in se-mantic branching entropy. While RLVR im-proves adherence to environmental constraints and backtracking capabilities, it constricts the space of continuations; we provide evidence suggesting that this might be responsible for the sample efficiency gains of RLVR, albeit at the cost of genuine rollout diversity. 
+
+1 Introduction 
+
+> 1
+
+Several recent papers have pointed to a curious problem in reinforcement learning with verifiable rewards (RLVR)-trained large language models (LLMs). These models do not seem to “discover” novel abilities beyond the base model, are less ex-ploratory, and are reliant on a minority of high-entropy tokens to drive reasoning diversity (Chen et al., 2026a; Saha et al., 2026; Wang et al., 2025; Yue et al., 2025). An exploratory model with the ability to access a large number of valid, semanti-cally distinct continuations is evidently desirable— it allows for the realisation of novel solutions, in-creased diversity, and even performance scaling       
+
+> 1All associated artifacts can be found at espressovi.github.io/BODHI.
+
+with techniques such as self-consistency (Wang et al., 2023), tree-of-thought (Yao et al., 2023), etc. However, it is also clear that not all exploration is desirable . For instance, an LLM with the capability to produce a large set of valid continuations , i.e., correct mathematical reasoning traces, which differ in superficial ways such as the naming of variables, order of commutative operations, or minor syntac-tic variations in its natural language (NL) framing does not constitute meaningful exploration, as it fails to traverse fundamentally distinct reasoning pathways or yield novel solution strategies. This brings us to the core tenet motivating this study: do LLMs Branch Out and Discover Hetero-geneous Inferences , or is the exploration largely decorative? To this end, we pose three research questions in this study: 
+
+⋄ RQ1 : Does RLVR limit test-time exploration and demonstrate stronger preferences for certain trajectories? 
+
+⋄ RQ2 : If so, is the policy concentration merely syntactic/stylistic? 
+
+⋄ RQ3 : And how is the RLVR-induced policy shift connected to performance? Surprisingly, despite many recent papers making fundamental improvements to our understanding of the dynamics of RL training, especially pertaining to preventing policy collapse, encouraging explo-ration, etc. (Yu et al., 2026; Liu et al., 2025; Li et al., 2025; Yang et al., 2025b; Zhao et al., 2026), the fundamental question of how RLVR changes preferences among semantically distinct reasoning continuations remains under-explored. We investigate exploration in LLMs through two modalities: mazes , where the notion of exploration is rather straightforward, and mathematical rea-soning , where it is much less straightforward due to the complexities of the mathematical and lin-guistic expressions used. In order to investigate ex-ploration in mathematical reasoning, we concretize the notion of exploration by collapsing a large num-1arXiv:2608.02867v1 [cs.CL] 3 Aug 2026 Figure 1: Construction of mathematical reasoning trees. We first segment reasoning traces into a chain of reasoning nodes, followed by merging said nodes based on semantic similarity. Further details are provided in Appendix A. 
+
+ber of alternate traces corresponding to a problem into a tree structure (BODHI-T REE , see Figure 1), wherein each node represents several semantically identical reasoning traces and its distinct children represent conceptually different continuations, thus allowing for fine-grained analysis of the nature of exploration. 
+
+The core contributions of our work are as follows: (i) Using our BODHI-T REE dataset and mazes, we demonstrate that the policy resulting from RL-training shows a collapse in branching behavior, (ii) the collapse in entropy is not just syn-tactic , and RLVR-trained models also demonstrate a significant collapse in the semantic-branch prefer-ence entropy , and (iii) further, we provide evidence suggesting that RLVR drives performance by con-stricting the accessible state space of both invalid continuations and valid, semantically distinct ones .Additionally, in the course of this study we created and open-sourced several fully-reproducible inter-mediate post-training checkpoints (in addition to datasets and code), to aid future work into RLVR dynamics. 
+
+2 Background 
+
+RLVR reframes next-token prediction as a Markov Decision Process, learning a policy πθ for predict-ing next tokens oi, that leads to trajectories of states 
+
+[Input ] → [Input , o 1] → . . . → [Input , o 1, . . . o T ],that maximize expected reward from deterministic verifiers. This paradigm has significantly improved overall performance on several reasoning and plan-ning benchmarks, and has pushed the frontiers of capabilities such as integration of tools and agentic 
+
+applications. It also enables an ancillary technique, called Long-CoT distillation or simply distillation 
+
+(Guo et al., 2025; Shao et al., 2024), wherein an LLM is fine-tuned (SFT) on traces generated from a more capable RL-trained “teacher” LLM. Given a state st, the set of continuations—every finite string with st as a prefix—can be segmented into various classes which are “ verifier equivalent ”. However, since the verifier often only evaluates the last few tokens of the terminal state (Shao et al., 2024; Guo et al., 2025; Yu et al., 2026; Liu et al., 2025), verifier equivalence does not cleanly map to semantic equivalence. For instance, a specious continuation which happens to present the correct answer has the same utility as a semantically cor-rect continuation, and there is no a priori guaran-tee that verifier-equivalent but semantically diverse continuations have an equal propensity of realiza-tion (Anschel et al., 2025). This serves as the core object of analysis in our study: the accessibility of different verifier-equivalent trajectories 2 at test time , a property we refer to as exploration . This is different from inter-trace exploration (Jiang et al., 2025), and asks the counterfactual question: what other continuations were likely? 
+
+Test-time exploration elicits the “reasoning ca-pability” boundary (Yue et al., 2025), since, given enough samples, a model capable of accessing di-verse trajectories will arrive at novel solution ap-proaches or techniques. Thus, a litmus test for the efficacy of RL-training is its ability to explore. Additionally, exploration can amplify performance with the aid of accessory ensembling techniques such as tree-of-thought (Yao et al., 2023). With the proliferation of RL-trained LLMs, it is there-fore critical to understand the impact of the reward signal on the model’s generative policy , especially since the assumption that RLVR consistently in-centivizes semantically diverse and meaningful ex-ploration has been widely challenged (Saha et al., 2026; Wang et al., 2025; Yue et al., 2025; Anschel et al., 2025). 
+
+> 2i.e., the probabilities of different (finite) continuations that are verifier-equivalent.
+
+2Yue et al. (2025) claimed that RL-trained LLMs have degraded pass @k scaling and do not discover fundamentally novel reasoning pathways beyond the base LLM. Saha et al. (2026) posited that RL-trained models are “over-confident” compared to distilled models: they have a lower entropy pol-icy which is correlated with a drop in performance. Similarly, Wang et al. (2025) demonstrated that the RL-policy is reliant on a minority ( ∼ 20% ) of high-entropy “forking tokens” to drive meaning-ful exploration at test time (Cheng et al., 2026), and Jang et al. (2026) attributed this collapse to “over-confidence at a small number of structurally critical decision points”. Yuan et al. (2026), how-ever, oppose the view that decline of high-k pass @k
+
+performance is indicative of a decline in reasoning diversity. They liken RLVR exploration collapse to “overtraining” and proffer re-weighting policy updates to favor low-success rollout groups. Cai et al. (2026) make a similar diagnosis, and advance “boundary-aware” curriculum learning to enhance the frontier of reasoning capabilities. Huang et al. (2026) argue that token-level statistics do not reflect how reasoning progresses over multi-token seman-tic structures. This debate underscores a critical gap: existing performance-based and token-level metrics do not indicate if entropy collapse implies a lack of reasoning diversity .The collapse of policy entropy during RL-training has received significant attention, and sev-eral recent papers propose modifications to the standard RL-training regimen. Monte Carlo Tree Search-based algorithms (Li et al., 2025; Yang et al., 2025b; Zheng et al., 2025) that sample roll-outs during training in a tree-like structure and assign segment-level credits have been proposed. Other techniques explicitly include cues to en-hance exploration based on properties of the roll-out group (Chen et al., 2026a). Techniques such as those based on occurrence frequency (Anschel et al., 2025), embedding similarity (Zhao et al., 2026), feedback from auxiliary models (Mishra et al., 2026; Hu et al., 2026a), and many others (Li and Li, 2026; He et al., 2026; Cai et al., 2026; Hu et al., 2026b; Jang et al., 2026; Yuan et al., 2026; Huang et al., 2026; Chen et al., 2026b) have been proposed, with varying degrees of success (Zhao et al., 2026; Hao et al., 2026). Hao et al. (2026) study factors influencing entropy collapse during training and highlight that recent approaches rely on heuristic adjustments to some of these factors, thus limiting their efficacy. In related studies, Jin et al. (2026) studied the relationship between model performance and train-ing entropy, finding a negative but task-dependent correlation. Wen et al. (2026) used an LLM-as-a-judge framework to evaluate intermediate trace correctness (CoT-pass @k) alongside the answer, demonstrating that RLVR-trained models have en-hanced trace validity compared to the base model. The results for CoT-pass @k scaling in mathemati-cal reasoning tasks are mixed, and the authors spec-ulate that the “distilled LLM may already master major reasoning capabilities that can be learned with RLVR” , which further underscores the need to isolate the effect of RLVR post-training on test-time exploration. Jiang et al. (2025) introduce LCoT2Tree, which parses Long CoT traces into trees by mapping segments of reasoning traces to an extracted high-level summary. By classifying segment functions (e.g., verification, exploration, backtracking), they identify structural error pat-terns such as over-branching. Our work, instead of focusing on token-level metrics or performance alone, attempts to measure how RLVR changes preferences among semanti-cally distinct reasoning continuations, and tries to ascertain if the entropy collapse is simply an artifact of stronger policy preferences for syntax and style or if the model also has calcified preferences when it comes to semantically diverse verifier-equivalent continuations. 
+
+3 Methodology: Measuring Exploration 
+
+In this section, we outline the construction of the 
+
+probing datasets that enable us to distinguish differ-ences between the policies of various LLMs with regard to exploration. While NL mathematical rea-soning directly measures an LLM’s logical capa-bilities, it is inherently noisy; the vast linguistic state space allows models to generate superficial restatements or varying syntactic formulations that mimic diversity without representing genuine infer-ential branching. Thus, we employ two modalities: (i) maze solving , to isolate the routing and plan-ning capabilities and completely eliminate effects of superficial restatements; and (ii) mathematical reasoning .
+
+3.1 Maze Exploration 
+
+As a probe, maze solving serves as a rigorous, noise-free proxy for multi-step logical reasoning. Maze traversal preserves the fundamental struc-3Distil   
+
+> ST
+> ST
+> ST
+> ST
+> STST
+> ST
+> ST
+> ST
+> RLVR  ST
+> ST
+> ST
+> ST
+> STST
+> ST
+> ST
+> ST
+
+Figure 2: RL-trained models are less exploratory. We plot how often a node is visited by the distilled and RLVR-trained Qwen3-8B .
+
+ture of step-by-step problem-solving—the model must sequentially execute valid, discrete actions to reach a goal state—while stripping away the lin-guistic confounders that arise from NL reasoning tasks. Because the action space is strictly con-strained, alternate trace realizations reflect a shift in the model’s policy. Furthermore, because local trace validity (e.g., avoiding walls) and distance to the goal are trivial to formalize, mazes provide an ideal, controlled environment to investigate how RL-based post-training alters an LLM’s policy. In this study, we employed the Maze Dataset (Ivanitskiy et al., 2023) library to instantiate various deterministic graph traversal tasks, constraining the model’s action space to four directional moves: 
+
+{<left> , <right> , <up> , <down> }.
+
+3.2 Exploration in Mathematical Reasoning 
+
+To study exploration in NL mathematical reason-ing, given a question Q, we first generate sev-eral reasoning traces by sampling from a diverse set of frontier LLMs, followed by filtering based on ground truth to get “correct” reasoning re-sponses A(1) , A (2) , . . . , A (n).3 These are then seg-mented (with the help of an LLM) into individ-ual reasoning steps/nodes a(i) 
+
+> j
+
+, such that A(i) =
+
+concat ([ a(i)1 , a (i)2 , . . . , a (i) 
+
+> ni
+
+]) .With this set of reasoning nodes, and a notion of semantic similarity sim (a(i) 
+
+> α
+
+, a (j) 
+
+> β
+
+), we can create a 
+
+prefix tree T = ( V, E ) of mathematical reasoning traces, called a BODHI-T REE , where each node 
+
+v = {a(i) 
+
+> α
+
+} ∈ V represents a set of semantically equivalent mathematical statements, and an edge 
+
+u ; v ∈ E if every statement in v comes after some statement in u in some reasoning trace A(i)
+
+(see Figure 1, Algorithm 1). Thus, every distinct path from the root to a leaf in this tree represents an alternate solution to the mathematical reason-    
+
+> 3n≈90 per question, total API budget of USD 3000 .
+
+ing question Q. Creating such a structure allows us to explicitly analyze differences in exploration between different kinds of LLMs . 235 questions from AIME, alongside ∼ 20 K responses and their corresponding trees constitute our probe dataset BODHI-T REE . Semantic similarity of two seg-ments is gauged using GPT-oss-120b in an LLM-as-a-judge framework. Further details on the con-struction of BODHI-T REE s, like prompts, settings, validation of the LLM-as-a-judge framework, etc., can be found in Appendix A. 
+
+3.3 Metrics 
+
+Since this work focuses on the probability of dif-ferent continuations, the quantity of interest is can-didate preference entropy ( CPE ). A branch node from BODHI-T REE (or the tree implicit in maze exploration) gives us a prefix a, and at least two al-ternative completions s(1) and s(2) . Given an LLM 
+
+Pmodel we can compute: 
+
+Smodel 
+
+ s(i)|a
+
+= 1
+
+|s(i)|
+
+> |s(i)|
+
+X
+
+> k=1
+
+log  Pmodel (s(i) 
+
+> k
+
+|s(i)
+
+> <k
+
+, a ) (1) Which we can normalize to obtain 
+
+P (s(i)|a) = exp( Smodel (s(i)|a)) 
+
+P 
+
+> i=1 ,2
+
+exp( Smodel (s(i)|a)) , (2) and compute: CPE model (s(1) , s (2) ; a) = HBranch  
+
+> model
+
+(s(1) , s (2) )= − X
+
+> i=1 ,2
+
+P (s(i)|a) log  P (s(i)|a) (3) where HBranch  
+
+> model
+
+(s(1) , s (2) ) is the conditional en-tropy in the choice of s(1) , s(2) (or CPE ), given prefix a, and s(i) 
+
+> k
+
+is the kth token of s(i). Further, 4since we want to study differences resulting from post-training, we compute: 
+
+∆CPE model (s(1) , s (2) ; a) = ∆ HBranch  
+
+> model
+
+(s(1) , s (2) )= HBranch  
+
+> model
+
+(s(1) , s (2) ) − HBranch  
+
+> base
+
+(s(1) , s (2) )
+
+(4) 
+
+∆HBranch  
+
+> model
+
+is the difference in conditional prefer-ence entropy (or ∆CPE ) and measures changes in preferences of branches arising from a certain post-training scheme. 
+
+3.4 Models 
+
+A notable challenge in analyzing differences aris-ing out of RLVR is the dearth of intermediate post-training checkpoints. Popular model vendors usu-ally do not release both the pre-trained and RLVR checkpoints, and even if these were available, the opacity of the training data makes it hard to discern the effects of RLVR. Thus, most of our experi-ments use models where post-training (distillation and RLVR) was performed by us with controlled matched datasets starting from publicly available pre-training checkpoints. For mazes , we distilled (SFT) HuggingFace’s 
+
+SmolLM3-3B-Base (Bakouch et al., 2025) and 
+
+Qwen3-8B-Base (Yang et al., 2025a) on 30 Koracle-generated solutions, followed by RLVR on 
+
+12 K samples. To construct ( LLM Base , LLM Distil ,LLM RLVR ) triplets for mathematical reasoning , we selected Google’s gemma-3-12b-pt (Team et al., 2025) alongside three Qwen foundation models: 
+
+Qwen3-8B-Base , Qwen3.5-9B-Base (Team, 2026), and Qwen2.5-32B-Base (Qwen et al., 2024). These underwent Long-CoT distillation using 
+
+50 K samples from the OpenThoughts-114k-math 
+
+dataset, and RLVR employing the DAPO-Math-17k 
+
+dataset (Yu et al., 2026). We directly adopted 
+
+DAPO-Qwen2.5-32B (Yu et al., 2026) as the RL-trained counterpart for Qwen2.5-32B-Base since it is also trained on DAPO-Math-17k . Further experi-mental details are deferred to Appendix B .
+
+4 Results 
+
+4.1 Measuring Test-time Exploration 
+
+Figure 2 plots the number of times each node in the maze was visited by the RLVR and dis-tillation policies (in 1K generations per maze), and clearly shows that RL-training results in a much less exploratory policy, i.e., fewer states are accessible at test time. We empirically com-pute the probability of visiting a node using 1Kgenerations for 50 mazes, and compute its en-tropy to find out how spread out each distribu-tion is. We find that for Qwen3-8B , average 
+
+HDistil = 2 .3380 (95% CI [2 .1815 , 2.4899] )4 and 
+
+HRLVR = 1 .8138 (95% CI [1 .6477 , 1.9755] ). Ex-ploration is significantly reduced in the RL-trained model at test time ( ∆H = −0.5242 ,
+
+95% CI [−0.7005 , −0.3435] , p < 0.0001 ). Re-sults with SmolLM3-3B are similar, and we have: HDistil = 1 .9288 (95% CI [1 .7938 , 2.0632] ), 
+
+HRLVR = 1 .6092 (95% CI [1 .4344 , 1.7756] ), and 
+
+∆H = −0.3196 (95% CI [−0.4252 , −0.2085] ,
+
+p < 0.0001 ). 
+
+4.2 Trajectory Preference in RLVR 
+
+BODHI-T REE s allow for controlled tests to inves-tigate if there are differences in exploration patterns between different policies, and in particular, we can check whether models trained with Long-CoT 
+
+distillation have different trajectory preferences compared to RLVR -trained models. To this end, we compute ∆CPE (s(1) , s(2) ; a) (Eq. 4) for 10 Ktuples from BODHI-T REE s. Our experiment (see Table 1) shows that there is a significant drop 
+
+in ∆CPE for RL-trained models, i.e., they have lower branching entropy, and this effect is ob-served in nearly every sample . This indicates that RL-trained models have stronger preferences when choosing between alternate completions at branch points, which reinforces test-time compute scaling results. The distribution is plotted in Figure 9 in Appendix C. 
+
+4.3 Exploring Invalid Continuations 0.75 1.00 1.25            
+
+> H[P]024Density
+> SmolLM-3-3B
+> DKS = 0 .6880, p < 10 −99
+> 0.00.51.01.5
+> H[P]02Density
+> Qwen-3-8B
+> DKS = 0 .6104, p < 10 −99
+> RLVR Distil
+
+Figure 3: RL-trained models successfully learn the semantics of mazes. We plot the entropy of the mod-els at hall nodes (degree 2) to see if different training modalities produce models which correctly model the lack of ambiguity at halls. 
+
+A part of the observed entropy collapse could be explained by the model assigning less probability   
+
+> 4Bootstrapped 95% confidence intervals.
+
+5Model ∆CPE Difference % with reduced ∆CPE 
+
+Qwen3-8B −0.0061 [−0.0062 , −0.0060] 95 .49 [95 .07 , 95 .89] 
+
+Qwen3.5-9B −0.0069 [−0.0070 , −0.0068] 100 .0 [100 .0, 100 .0] 
+
+Gemma3-12B −0.0225 [−0.0227 , −0.0223] 99 .98 [99 .95 , 100 .0] 
+
+Qwen2.5-32B −0.0345 [−0.0349 , −0.0340] 99 .46 [99 .31 , 99 .60]             
+
+> Table 1: Effect of post-training on LLM branching. The table shows the change in ∆CPE (∆CPE RLVR −
+> ∆CPE Distil ) between distilled and RLVR models, and the percentage of samples where ∆CPE reduced in the RL-trained model compared to the distilled one. There is a significant drop in ∆CPE (p < 0.0001 ) for almost all samples, suggesting that RL-trained models have significantly stronger trajectory preferences at branch points. 95%
+> CIs with paired bootstrap tests are reported.
+
+mass to invalid continuations. To investigate this possibility, we turn to the maze task. We choose 5K
+
+“hall” nodes (nodes with degree 2) along maze so-lution paths, and since there is no ambiguity in the choice of next-token, a semantically faithful policy should have lower entropy at these nodes. We find that (see Figure 3) the RL-trained models demon-strate statistically significant entropy collapse in halls , suggesting that the RLVR policy better delin-eates between different verifier-equivalence classes. A related notion for mathematical reasoning is “lo-cal trace coherence”, i.e., the ability of a model to avoid logical errors within sub-segments of traces, and there is preliminary evidence suggesting that RLVR-trained models perform better in this regard (Samineni et al., 2025). 
+
+4.4 Is Entropy Collapse Stylistic? 
+
+To analyze whether the entropy collapse in the RLVR policy arises due to the model developing stronger preferences for trivial mathematical rep-resentational choices (such as how variables are named or the order of commutative operations) alone, or also encompasses lack of semantic diver-sity such as the choice of the mathematical ap-proach to use, we select a branching node α (with at least 2 children), and its two children β and γ
+
+from a BODHI-T REE . We pick an anchor trace A
+
+from the node α, two continuations a, b from child 
+
+β that are semantically similar but have different syntax, and a continuation g from child γ which has different semantics from a, b . Then, as in Eq. 4, we can compute ∆CPE Syntax  
+
+> model
+
+:= ∆ CPE model (a, b ; A)
+
+and ∆CPE Semantics  
+
+> model
+
+:= ∆ CPE model (a, g ; A).Since we are interested in the difference, we plot the distribution of the differences (see Figure 4), i.e., ∆CPE ∗ 
+
+> RLVR
+
+− ∆CPE ∗
+
+> Distil
+
+, for 2.5K sampled nodes from BODHI-T REE s. We observe a drop in 
+
+∆CPE Syntax for all RL-trained models compared to their distilled counterparts except for Qwen3.5-9B ,where the drop is not statistically significant. How-ever, all RL-trained models in the study have a statistically significant drop in ∆CPE Semantics 
+
+compared to their distilled counterparts. The dif-ference between them is statistically significant (p < 0.02 except for Qwen3-8B , p = 0 .11 ). This suggests that the policy distribution is more col-lapsed when it comes to making choices between semantically distinct continuations . Thus, the policy collapse cannot be explained by just syntac-tic/stylistic artifacts, and RL-trained models have a lower propensity for semantically meaningful ex-ploration . This is important because this underlines the fact that RLVR doesn’t just eliminate spurious variations but also legitimate exploration. 
+
+5 Discussion 
+
+5.1 Constraints, Diversity and RLVR 
+
+The evidence presented in this paper thus far sug-gests that RLVR restricts the space of continuations accessible to the model (§4.1), with reduced proba-bility of branching (§4.2) and invalid continuations (§4.3). More importantly, the observed reduction in diversity cannot be attributed to calcification of stylistic choices alone, as there is a greater calcifica-tion in the choice of alternate semantically distinct continuations (§4.4). This leads us to ask: does RLVR achieve better sample efficiency ( pass @1 per-formance) by learning environmental constraints, but it does so at the cost of trajectory diversity? 
+
+To establish a more compelling connection be-tween these, we design the following interven-tions on the decoding strategy in the mazes case: 
+
+(i) “Legal Only ” where invalid next tokens (e.g., moves that result in wall collisions) are masked out, and (ii) “Avoid Short Path ” where the model is steered away from the shortest path. The Legal 
+
+6−0.02 −0.01 0.00 0.01 ∆CPE RLVR − ∆CPE Distil 
+
+> Density
+
+Qwen-3-8B              
+
+> μsynt =−0.0023 [ −0.0030 ,−0.0015]
+> μsem =−0.0030 [ −0.0035 ,−0.0025] ∆ = −0.0007 [ −0.0016 ,0.0002]
+> Syntax Semantics
+> −0.04 −0.02 0.00 0.02 ∆CPE RLVR −∆CPE Distil
+
+Qwen-3.5-9B             
+
+> μsynt =−0.0002 [ −0.0011 ,0.0008]
+> μsem =−0.0016 [ −0.0026 ,−0.0005] ∆ = −0.0014 [ −0.0026 ,−0.0002]
+> −0.10 −0.05 0.00 ∆CPE RLVR −∆CPE Distil
+
+Gemma-3-12B            
+
+> μsynt =−0.0152 [ −0.0168 ,−0.0137]
+> μsem =−0.0213 [ −0.0231 ,−0.0195] ∆ = −0.0061 [ −0.0082 ,−0.0040]
+> −0.10.0∆CPE RLVR −∆CPE Distil
+
+Qwen-2.5-32B         
+
+> μsynt =−0.0138 [ −0.0166 ,−0.0109]
+> μsem =−0.0240 [ −0.0276 ,−0.0205] ∆ = −0.0103 [ −0.0144 ,−0.0062]
+
+Figure 4: Is the entropy collapse just syntactic? We observe that RLVR-trained models usually have lower entropy ( CPE ) both when choosing between two syntactic variants of a mathematical statement and two semantically distinct continuations. The entropy collapse in choosing between continuations with different semantics is stronger. The 
+
+dashed lines show the means of the distributions. 
+
+Only intervention sets the probability of invalid continuations to zero, and thus if a particular pol-icy already had very low likelihood of selecting these continuations, it will be affected less. Simi-larly, the Avoid Short Path intervention sets the probability of the optimal continuation to zero (an-other verifier-equivalent continuation is guaranteed to exist), and thus should have a larger effect on a policy which has stronger trajectory preferences. Table 2 presents our results with the distilled and RL-trained variants of Qwen3-8B (T=1.0 ) with 500 
+
+mazes. 
+
+Decoding Policy Training Method 
+
+Distil RLVR 
+
+Baseline 7.6 ± 1.2 13 .0 ± 1.5
+
+Legal Only 62 .6 ± 2.2 39 .2 ± 2.2
+
+Avoid Short Path 3.8 ± 0.9 4.6 ± 0.9
+
+No Reversal 8.0 ± 1.2 13 .8 ± 1.5
+
+Table 2: RLVR restricts accessible states. 
+
+As predicted by the hypothesis, we see that the 
+
+Legal Only intervention has only a ∼ 3× improve-ment on the RL-trained model, which is dwarfed by the ∼ 8× improvement on the distilled model. The distilled model with the Legal Only constraint shows a ∼ 60% improvement over the RL-trained model, illustrating that a policy which has a flatter distribution amongst verifier-equivalent continua-tions is more performant. Figure 5 plots the ratio of the performance with the Legal Only intervention and the baseline through the course of RL training. As this measures the magnitude of the effect the 0200 400 800 1600 3000 Training Steps 5.07.510 .012 .5Accuracy (%)  Baseline 468Ratio 
+
+Figure 5: Environmental constraint-adherence im-proves during RL-training. We plot the baseline per-formance ( dashed line ) of different RL-training check-points of Qwen3-8B , and the ratio of performance with the Legal Only decoding strategy to baseline. 
+
+Legal Only intervention has, it shows that the pol-icy continually evolves to assign lower probabilities to invalid continuations as training progresses. The 
+
+Avoid Short Path intervention reduces perfor-mance by ∼ 65% for the RL-trained model but only by ∼ 50% for the distilled model, showing that RL-trained models have ossified preferences, i.e., other valid continuations are less likely to be ex-plored. The RL policy deprioritizes invalid moves to achieve a higher baseline ( 13% ), but suffers sig-nificantly owing to a lack of trajectory diversity. 
+
+5.2 Backtracking 
+
+During reasoning, a model may reach a state where further progress is impossible, and a sound rea-soning model must be able to backtrack out of these “dead-ends” to a valid state and explore alter-nate trajectories. To test this in mazes, as in §5.1, we design the “ No Reversal ” intervention, where 7Model Method Original (%) Distracted (%) Unchanged (%) ∆(%) 
+
+Acc. [Pass@3] Acc. [Pass@3] 
+
+Qwen3-8B Distilled 28 .76 ± 1.85 10 .54 ± 1.26 7.69 ± 1.09 +5.52 ± 1.76 
+
+RLVR 33 .61 ± 1.93 17 .73 ± 1.56 13 .21 ± 1.38 
+
+Qwen3.5-9B Distilled 34 .78 ± 1.95 9.20 ± 1.18 7.02 ± 1.04 +7.36 ± 1.77 
+
+RLVR 32 .11 ± 1.91 25 .08 ± 1.77 14 .38 ± 1.43 
+
+Gemma3-12B Distilled 23 .58 ± 1.74 11 .54 ± 1.31 9.03 ± 1.17 +4.18 ± 1.81 
+
+RLVR 26 .42 ± 1.80 16 .22 ± 1.51 13 .21 ± 1.38 
+
+Qwen2.5-32B Distilled 70 .40 ± 1.87 60 .03 ± 2.00 52 .68 ± 2.04 +29 .09 ± 2.58 
+
+RLVR 85 .95 ± 1.42 86 .06 ± 1.38 81 .77 ± 1.58       
+
+> Table 3: RLVR models have improved ability to recover from dead-ends. The Unchanged column lists the proportion of samples for which the distraction intervention did not change the final answer, and the ∆column shows the change between the two policies.
+
+two consecutive moves that are opposites of each other (e.g., <up> followed by <down> ) are masked out. Our results show that (see Table 2) the No Reversal intervention does not have a statistically significant effect on either variant. However, this does not imply that the models cannot backtrack, as it could also be explained by the fact that the policies do not reach dead-ends in the first place. To investigate this further, we resort to prefix steer-ing to evaluate policies, and ask: what trajectories are available to the model at dead-ends? 
+
+For the maze case, we sampled 2.5K dead-end states—defined as states where the goal is only reachable if the last move is reversed— and measured the probability of the backtrack-ing move (pb). Our results indicate that RLVR training significantly enhances backtrack-ing capabilities compared to distillation. For 
+
+SmolLM3-3B , the average backtracking probabil-ity increases from E[pb] = 0.0647 ± 0.0008 
+
+(Distil) to 0.1687 ± 0.0035 (RLVR) (∆ =0.1040 , 95% CI [0 .0978 , 0.1101] , p < 0.0001 ). 
+
+Qwen3-8B demonstrates a similar improvement, ris-ing from 0.0068 ±0.0010 to 0.1537 ±0.0062 (∆ = 0.1469 , 95% CI [0 .1348 , 0.1589] , p < 0.0001 ). Furthermore, RLVR reduces absolute failures (pb = 0 ), with zero-probability instances dropping from 2422 → 1824 for Qwen-3-8B and 476 → 357 
+
+for SmolLM-3-3B . The distribution is plotted in Fig-ure 10 in Appendix C. Analyzing dead-ends in mathematical reasoning is less straightforward, because unlike mazes, the valid action space is unconstrained. To simulate this, we utilize a partial mathematical reasoning trajectory (a non-leaf node from a BODHI-T REE )and append a “distractor”—a spurious reasoning step sampled from a different tree—intended to derail generation (see Figure 8). We then evaluate whether the model can still arrive at the correct final answer, which measures the model’s ability to re-cover from missteps in reasoning. As shown in Ta-ble 3, RLVR-trained models exhibit a significantly enhanced capability to backtrack compared to their distilled counterparts. Since trajectories that do not involve backtracking are verifier-invalid, these results also suggest that the RLVR policy better de-lineates between valid and invalid continuations. 
+
+6 Conclusions 
+
+We investigated the nature of the policy shift aris-ing from RLVR training through controlled experi-ments using maze traversal and our mathematical exploration trees (BODHI-T REE s). We establish that RL-trained models have stronger trajectory preferences at branch points, and that this is not merely an artifact of stylistic or syntactic prefer-ences. RLVR policies show a significant collapse in candidate preference entropy, suggesting that they prune semantically distinct, verifier-equivalent tra-jectories. While the policy concentration restricts trajectory diversity, it also enhances the model’s adherence to environmental constraints and ability to backtrack. The improved trace validity is likely responsible for RLVR’s success, but it comes at the cost of genuine trajectory diversity. Future work must address this limitation to push the boundaries of reasoning capabilities further. 8Limitations 
+
+Mathematical Reasoning Trees The BODHI-TREE construction uses an LLM-as-a-judge frame-work with GPT-oss-120b to gauge semantic equiv-alence, which might introduce some errors. We performed spot checks and inter-annotator agree-ment tests with more capable frontier LLMs such as 
+
+deepseek-v4-pro and OpenAI’s gpt-5.6-luna ,finding near-perfect agreement (see Appendix A); however, some errors may remain. We could not perform rigorous human evaluations owing to re-source constraints. 
+
+Domain Specificity The presented empirical ev-idence is limited to deterministic environments (mazes) and mathematical reasoning (AIME). Since we study exploration, this involves sam-pling a large number of continuations from frontier LLMs which is prohibitively expensive for some domains (USD 3000 for collecting AIME traces). Future work that extends this to domains such as code generation would be compelling. 
+
+Ethics Statement 
+
+In keeping with ACL ethical guidelines, all scien-tific artifacts generated for this study—including code, prompts, data, and raw model outputs—are made freely available as open source under the MIT license. Only public datasets available on the Hug-gingface platform were used in the study. AI assis-tants were not used in ideation, coding, or writing involved in this work, and their usage was limited to copyediting tasks (e.g., checking spelling, gram-mar, tone). We do not foresee any potential ethical, societal, or environmental risks from this work. 
+
+References 
+
+Oron Anschel, Alon Shoshan, Adam Botach, Shunit Ha-viv Hakimi, Asaf Gendler, Emanuel Ben Baruch, Na-dav Bhonker, Igor Kviatkovsky, Manoj Aggarwal, and Gerard Medioni. 2025. Group-aware reinforce-ment learning for output diversity in large language models. In Proceedings of the 2025 Conference on Empirical Methods in Natural Language Processing ,pages 32394–32415, Suzhou, China. Association for Computational Linguistics. Elie Bakouch, Loubna Ben Allal, Anton Lozhkov, Noua-mane Tazi, Lewis Tunstall, Carlos Miguel Patiño, Edward Beeching, Aymeric Roucher, Aksel Joonas Reedi, Quentin Gallouédec, Kashif Rasul, Nathan Habib, Clémentine Fourrier, Hynek Kydlicek, Guil-herme Penedo, Hugo Larcher, Mathieu Morlon, Vaib-hav Srivastav, Joshua Lochner, and 4 others. 2025. SmolLM3: smol, multilingual, long-context reasoner. 
+
+https://huggingface.co/blog/smollm3 .Pengxiang Cai, Tianchen Fang, Xiaohan Li, Qingyuan Zeng, Guocong Li, and Jintai Chen. 2026. Curricu-lum reinforcement learning can incentivize reasoning capacity in llms beyond the base model. Preprint ,arXiv:2606.22317. Xiwen Chen, Wenhui Zhu, Peijie Qiu, Xuanzhao Dong, Hao Wang, Haiyu Wu, Huayu Li, Aris Sotiras, Yalin Wang, and Abolfazl Razi. 2026a. DRA-GRPO: Your GRPO needs to know diverse reasoning paths for mathematical reasoning. In Findings of the Associa-tion for Computational Linguistics: ACL 2026 , pages 13995–14019, San Diego, California, United States. Association for Computational Linguistics. Zhipeng Chen, Xiaobo Qin, Youbin Wu, Yue Ling, Qinghao Ye, Xin Zhao, and Guang Shi. 2026b. Pass@k training for adaptively balancing exploration and exploitation of large reasoning models. Daixuan Cheng, Shaohan Huang, Xuekai Zhu, Bo Dai, Wayne Xin Zhao, Zhenliang Zhang, and Furu Wei. 2026. Reasoning with exploration: An entropy per-spective. In Proceedings of the AAAI Conference on Artificial Intelligence , volume 40, pages 30377– 30385. DeepSeek-AI, Anyi Xu, Bangcai Lin, Bing Xue, Bingx-uan Wang, Bingzheng Xu, Bochao Wu, Bowei Zhang, Chaofan Lin, Chen Dong, Chenchen Ling, Chengda Lu, Chenggang Zhao, Chengqi Deng, Chengyu Hou, Chenhao Xu, Chenze Shao, Chong Ruan, Conner Sun, and 300 others. 2026. Deepseek-v4: Towards highly efficient million-token context intelligence. 
+
+Preprint , arXiv:2606.19348. Tim Dettmers, Artidoro Pagnoni, Ari Holtzman, and Luke Zettlemoyer. 2023. Qlora: Efficient finetuning of quantized llms. In Advances in Neural Information Processing Systems , volume 36, pages 10088–10115. Curran Associates, Inc. Daya Guo, Dejian Yang, Haowei Zhang, Junxiao Song, Peiyi Wang, Qihao Zhu, Runxin Xu, Ruoyu Zhang, Shirong Ma, Xiao Bi, Xiaokang Zhang, Xingkai Yu, Yu Wu, Z. F. Wu, Zhibin Gou, Zhihong Shao, Zhuoshu Li, Ziyi Gao, Aixin Liu, and 175 oth-ers. 2025. DeepSeek-R1 incentivizes reasoning in LLMs through reinforcement learning. Nature ,645(8081):633–638. Zhezheng Hao, Hong Wang, Haoyang Liu, Jian Luo, Jiarui Yu, Hande Dong, Qiang Lin, Can Wang, and Jiawei Chen. 2026. Rethinking entropy interven-tions in RLVR: An entropy change perspective. In 
+
+Proceedings of the 64th Annual Meeting of the As-sociation for Computational Linguistics (Volume 1: Long Papers) , pages 31105–31133, San Diego, Cali-fornia, United States. Association for Computational Linguistics. Xu He, Jialiang Guo, Fucheng Xiong, Haodong Zhao, Xingyang Li, Ke Zeng, and Xunliang Cai. 2026. 
+
+9VANE: Guiding high-value exploration in RLVR via outcome-process novelty shaping. In Findings of the Association for Computational Linguistics: ACL 2026 , pages 28721–28739, San Diego, California, United States. Association for Computational Lin-guistics. Jingcheng Hu, Yinmin Zhang, Qi Han, Daxin Jiang, Xi-angyu Zhang, and Heung-Yeung Shum. 2025. Open-reasoner-zero: An open source approach to scaling up reinforcement learning on the base model. In The Thirty-ninth Annual Conference on Neural Informa-tion Processing Systems .Zhiyuan Hu, Yucheng Wang, Yufei He, Jiaying Wu, Yilun Zhao, See-Kiong Ng, Cynthia Breazeal, Anh Tuan Luu, Hae Won Park, and Bryan Hooi. 2026a. Rewarding the rare: Uniqueness-aware RL for creative problem solving in LLMs. In Findings of the Association for Computational Linguistics: ACL 2026 , pages 39765–39790, San Diego, California, United States. Association for Computational Lin-guistics. Zican Hu, Shilin Zhang, Yafu Li, Jianhao Yan, Xuyang Hu, Leyang Cui, Xiaoye Qu, Chunlin Chen, Yu Cheng, and Zhi Wang. 2026b. Diversity-incentivized exploration for versatile reasoning. In 
+
+The Fourteenth International Conference on Learn-ing Representations .Fanding Huang, Guanbo Huang, Xiao Fan, Yi He, Xiao Liang, Xiao Chen, Qinting Jiang, Faisal Nadeem Khan, Jingyan Jiang, and Zhi Wang. 2026. Semantic-space exploration and exploitation in RLVR for LLM reasoning. In Findings of the Association for Compu-tational Linguistics: ACL 2026 , pages 38402–38449, San Diego, California, United States. Association for Computational Linguistics. Michael Igorevich Ivanitskiy, Rusheb Shah, Alex F. Spies, Tilman Räuker, Dan Valentine, Can Rager, Lucia Quirke, Chris Mathwin, Guillaume Corlouer, Cecilia Diniz Behn, and Samy Wu Fung. 2023. A configurable library for generating and manipulating maze datasets. Preprint , arXiv:2309.10498. Jaeeun Jang, Hansle Lee, and Sangmin Kim. 2026. A few bad apples spoil the bunch: Preventing global en-tropy collapse driven by a small set of tokens in LLM reasoning. In Findings of the Association for Compu-tational Linguistics: ACL 2026 , pages 13134–13154, San Diego, California, United States. Association for Computational Linguistics. Gangwei Jiang, Yahui Liu, Zhaoyi Li, Wei Bi, Fuzheng Zhang, Linqi Song, Ying Wei, and Defu Lian. 2025. What makes a good reasoning chain? uncovering structural patterns in long chain-of-thought reasoning. In Proceedings of the 2025 Conference on Empiri-cal Methods in Natural Language Processing , pages 6490–6514, Suzhou, China. Association for Compu-tational Linguistics. Renren Jin, Pengzhi Gao, Yuqi Ren, Zhuowen Han, Tongxuan Zhang, Wuwei Huang, Wei Liu, Jian Luan, and Deyi Xiong. 2026. Revisiting entropy in rein-forcement learning for large reasoning models. In 
+
+Findings of the Association for Computational Lin-guistics: ACL 2026 , pages 25300–25322, San Diego, California, United States. Association for Computa-tional Linguistics. Wendi Li and Sharon Li. 2026. LAD: Learning advan-tage distribution for reasoning. In Findings of the As-sociation for Computational Linguistics: ACL 2026 ,pages 14327–14348, San Diego, California, United States. Association for Computational Linguistics. Yizhi Li, Qingshui Gu, Zhoufutu Wen, Ziniu Li, Tian-shun Xing, Shuyue Guo, Tianyu Zheng, Xin Zhou, Xingwei Qu, Wangchunshu Zhou, Zheng Zhang, Wei Shen, Qian Liu, Chenghua Lin, Jian Yang, Ge Zhang, and Wenhao Huang. 2025. Treepo: Bridging the gap of policy optimization and efficacy and inference effi-ciency with heuristic tree-based modeling. Preprint ,arXiv:2508.17445. Zichen Liu, Changyu Chen, Wenjun Li, Penghui Qi, Tianyu Pang, Chao Du, Wee Sun Lee, and Min Lin. 2025. Understanding r1-zero-like training: A critical perspective. Preprint , arXiv:2503.20783. Kshitij Mishra, Nils Lukas, and Salem Lahlou. 2026. SD-e2: Semantic exploration for reasoning under token budgets. In Findings of the Association for Computational Linguistics: EACL 2026 , pages 6144– 6157, Rabat, Morocco. Association for Computa-tional Linguistics. OpenAI, :, Sandhini Agarwal, Lama Ahmad, Jason Ai, Sam Altman, Andy Applebaum, Edwin Arbus, Rahul K. Arora, Yu Bai, Bowen Baker, Haiming Bao, Boaz Barak, Ally Bennett, Tyler Bertao, Nivedita Brett, Eugene Brevdo, Greg Brockman, Sebastien Bubeck, and 108 others. 2025. gpt-oss-120b & gpt-oss-20b model card. Preprint , arXiv:2508.10925. OpenAI. 2025. OpenAI o3 and o4-mini system card. OpenAI. 2026. GPT-5.6: Frontier intelligence that scales with your ambition. Qwen, An Yang, Baosong Yang, Beichen Zhang, Binyuan Hui, Bo Zheng, Bowen Yu, Chengyuan Li, Dayiheng Liu, Fei Huang, Haoran Wei, Huan Lin, Jian Yang, Jianhong Tu, Jianwei Zhang, Jianxin Yang, Jiaxi Yang, Jingren Zhou, Junyang Lin, and 24 oth-ers. 2024. Qwen2.5 technical report. ArXiv preprint ,abs/2412.15115. Soumadeep Saha, Akshay Chaturvedi, Saptarshi Saha, Utpal Garain, and Nicholas Asher. 2026. KisMATH: Do LLMs have Knowledge of Implicit Structures in mathematical reasoning? Transactions of the Associ-ation for Computational Linguistics , 14:1308–1328. Soumya Rani Samineni, Durgesh Kalwar, Vardaan Gan-gal, Siddhant Bhambri, and Subbarao Kambham-pati. 2025. Local coherence or global validity? in-vestigating rlvr traces in math domains. Preprint ,arXiv:2510.18176. 
+
+10 Zhihong Shao, Peiyi Wang, Qihao Zhu, Runxin Xu, Junxiao Song, Xiao Bi, Haowei Zhang, Mingchuan Zhang, Y. K. Li, Y. Wu, and Daya Guo. 2024. Deepseekmath: Pushing the limits of mathemati-cal reasoning in open language models. Preprint ,arXiv:2402.03300. Gemma Team, Aishwarya Kamath, Johan Ferret, Shreya Pathak, Nino Vieillard, Ramona Merhej, Sarah Perrin, Tatiana Matejovicova, Alexandre Ramé, Morgane Rivière, Louis Rouillard, Thomas Mesnard, Geoffrey Cideron, Jean bastien Grill, Sabela Ramos, Edouard Yvinec, Michelle Casbon, Etienne Pot, Ivo Penchev, and 197 others. 2025. Gemma 3 technical report. 
+
+Preprint , arXiv:2503.19786. Qwen Team. 2026. Qwen3.5: Accelerating productivity with native multimodal agents. Leandro von Werra, Younes Belkada, Lewis Tunstall, Edward Beeching, Tristan Thrush, Nathan Lambert, Shengyi Huang, Kashif Rasul, and Quentin Gal-louédec. 2020. TRL: Transformers Reinforcement Learning. Shenzhi Wang, Le Yu, Chang Gao, Chujie Zheng, Shix-uan Liu, Rui Lu, Kai Dang, Xiong-Hui Chen, Jianxin Yang, Zhenru Zhang, Yuqiong Liu, An Yang, Andrew Zhao, Yang Yue, Shiji Song, Bowen Yu, Gao Huang, and Junyang Lin. 2025. Beyond the 80/20 rule: High-entropy minority tokens drive effective reinforcement learning for LLM reasoning. In The Thirty-ninth An-nual Conference on Neural Information Processing Systems .Xuezhi Wang, Jason Wei, Dale Schuurmans, Quoc V. Le, Ed H. Chi, Sharan Narang, Aakanksha Chowd-hery, and Denny Zhou. 2023. Self-consistency improves chain of thought reasoning in language models. In The Eleventh International Conference on Learning Representations, ICLR 2023, Kigali, Rwanda, May 1-5, 2023 . OpenReview.net. Xumeng Wen, Zihan Liu, Shun Zheng, Shengyu Ye, Zhirong Wu, Yang Wang, Zhijian Xu, Xiao Liang, Junjie Li, Ziming Miao, Jiang Bian, and Mao Yang. 2026. Reinforcement learning with verifiable re-wards implicitly incentivizes correct reasoning in base LLMs. In The Fourteenth International Confer-ence on Learning Representations .An Yang, Anfeng Li, Baosong Yang, Beichen Zhang, Binyuan Hui, Bo Zheng, Bowen Yu, Chang Gao, Chengen Huang, Chenxu Lv, Chujie Zheng, Day-iheng Liu, Fan Zhou, Fei Huang, Feng Hu, Hao Ge, Haoran Wei, Huan Lin, Jialong Tang, and 41 others. 2025a. Qwen3 technical report. Preprint ,arXiv:2505.09388. Zhicheng Yang, Zhijiang Guo, Yinya Huang, Xiao-dan Liang, Yiwei Wang, and Jing Tang. 2025b. Treerpo: Tree relative policy optimization. Preprint ,arXiv:2506.05183. Shunyu Yao, Dian Yu, Jeffrey Zhao, Izhak Shafran, Thomas L. Griffiths, Yuan Cao, and Karthik R Narasimhan. 2023. Tree of thoughts: Deliberate problem solving with large language models. In 
+
+Thirty-seventh Conference on Neural Information Processing Systems .Qiying Yu, Zheng Zhang, Ruofei Zhu, Yufeng Yuan, Xi-aochen Zuo, YuYue, Weinan Dai, Tiantian Fan, Gao-hong Liu, Juncai Liu, LingJun Liu, Xin Liu, Haibin Lin, Zhiqi Lin, Bole Ma, Guangming Sheng, Yuxuan Tong, Chi Zhang, Mofan Zhang, and 17 others. 2026. DAPO: An open-source LLM reinforcement learning system at scale. In The Thirty-ninth Annual Confer-ence on Neural Information Processing Systems .Suqin Yuan, Jinkun Chen, Jiyang Zheng, Muyang Li, Lei Feng, Dadong Wang, Tao Xiang, Tongliang Liu, and Bo An. 2026. Understanding diversity col-lapse in rlvr via the lens of overtraining. Preprint ,arXiv:2606.15455. Yang Yue, Zhiqi Chen, Rui Lu, Andrew Zhao, Zhaokai Wang, Yang Yue, Shiji Song, and Gao Huang. 2025. Does reinforcement learning really incentivize rea-soning capacity in LLMs beyond the base model? In 
+
+2nd AI for Math Workshop @ ICML 2025 .Ziqi Zhao, Zhaochun Ren, Jiahong Zou, Liu Yang, Zhi-wei Xu, Xuri Ge, Zhumin Chen, Xinyu Ma, Dait-ing Shi, Shuaiqiang Wang, Dawei Yin, and Xin Xin. 2026. Reinforced efficient reasoning via semanti-cally diverse exploration. In Proceedings of the 64th Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers) , pages 47994– 48007, San Diego, California, United States. Associ-ation for Computational Linguistics. Tianyu Zheng, Tianshun Xing, Qingshui Gu, Taoran Liang, Xingwei Qu, Xin Zhou, Yizhi Li, Zhou-futu Wen, Chenghua Lin, Wenhao Huang, Qian Liu, Ge Zhang, and Zejun Ma. 2025. First return, entropy-eliciting explore. Preprint , arXiv:2507.07017. 
+
+A BODHI-T REE Construction 
+
+To construct BODHI-T REE s, we start with 
+
+304 questions from AIME as in Saha et al. (2026) and sample responses from a diverse set of LLMs, namely OpenAI o3-2025-04-16 ,OpenAI o4-mini-2025-04-16 (OpenAI, 2025), DeepSeek r1-0528 (Guo et al., 2025), and Qwen’s 
+
+qwen3-235b-a22b-07-25 (Yang et al., 2025a), with T = 1.0 and reasoning effort set to the highest available setting. The number of sam-ples was decided by the API budget, which in this case totaled USD 3000 . All responses with incor-rect answers were removed and this resulted in 
+
+∼ 20 K responses to 235 questions, with an aver-age of ∼ 85 responses per question. These were then split into reasoning segments using OpenAI 
+
+o4-mini-2025-04-16 .11 Given a question Q, a set of “correct” reason-ing traces A(1) , A (2) , . . . , A (n), and their corre-sponding segmentations a(i) 
+
+> j
+
+, such that A(i) =
+
+concat ([ a(i)1 , a (i)2 , . . . , a (i) 
+
+> ni
+
+]) , we employ Algorithm 1 to create BODHI-T REE s. Algorithm 1 starts with a root node, and each trace is assigned to this root node ( z[i] ← vroot ). At each iteration, for every trace we try to consume its first available segment into its assigned node, failing which we either try to match it with one of its children or spawn a new branch. If the head of the trace matches any of the children, we consume it at the child, and assign the rest of the trace to the child. If no such match is found, a new child is spawned, consuming the head segment, and the rest of the trace is assigned here. The algorithm terminates when no trace has any unassigned seg-ments. The resulting tree (BODHI-T REE ) has the property that the lowest common ancestor of two traces represents their longest shared equivalent reasoning prefix. The matching function M (x, y ) is instantiated with OpenAI GPT-oss-120b (OpenAI et al., 2025) and checks if x is mathematically equivalent to y or 
+
+y is mathematically equivalent to a part of x. This helps align traces with differing levels of granular-ity. In practice, when consuming a segment into a node, we pick a representative of the node to match against the segment. The LLM is sampled at T = 1 ,
+
+top p = 0 .99 , reasoning_effort = medium , us-ing 4-shot prompts. A total of 470 K LLM calls are made for the construction of the BODHI-TREE s ( ∼ 2K calls per BODHI-T REE ). We also measured the inter-annotator agreement between 
+
+GPT-oss-120b and more capable frontier LLMs, namely deepseek-v4-pro (DeepSeek-AI et al., 2026) and gpt-5.6-luna (OpenAI, 2026), and the Cohen’s κ scores are 0.815 and 0.837 , respec-tively, suggesting that there is near-perfect agree-ment. The prompt is given in Figure 6, and some example trees are given in Figure 7. 
+
+B Experimental Details 
+
+B.1 Training 
+
+For math , we performed Long-CoT distillation employing 50 K randomly chosen samples from the OpenThoughts-114k-math dataset. We per-form Q-LoRA ( r = 64 , α = 128 ; Dettmers et al. (2023)) fine-tuning for 1 epoch ( lr = 5 e − 4) with 
+
+max_tokens = 16 K, batch size of 64 , a cosine learning rate scheduler with warm-up ( 5% ), and 
+
+Algorithm 1 BODHI-T REE Construction  
+
+> 1:
+
+Given a question Q. 
+
+> 2:
+
+Given A(i) = concat ([ a(i)1 , a (i)2 , . . . , a (i) 
+
+> ni
+
+]) for 
+
+i ∈ { 1, . . . n }. 
+
+> 3:
+
+Given M (x, y ) an LLM-based matching func-tion, true if y is equivalent to x, or equivalent to a part of x (subsumed in x).  
+
+> 4:
+
+Initialize T with a single root node vroot  
+
+> 5:
+
+for i ∈ 1 . . . n do  
+
+> 6:
+
+z[i] ← vroot  
+
+> 7:
+
+end for  
+
+> 8:
+
+while ∃A(i) with remaining segments do # Try to consume a segment into a node.  
+
+> 9:
+
+for Each A(i) with remaining segments do  
+
+> 10:
+
+shead ← dequeue (A(i)); v ← z[i] 
+
+> 11:
+
+if M (v, s head ) is true then  
+
+> 12:
+
+Consume shead in v 
+
+> 13:
+
+else  
+
+> 14:
+
+requeue (shead , A (i)) 
+
+> 15:
+
+end if  
+
+> 16:
+
+end for # Move trace to child node or fork.  
+
+> 17:
+
+for Each A(i) with remaining segments do  
+
+> 18:
+
+shead ← dequeue (A(i)); v ← z[i] 
+
+> 19:
+
+matched ← false  
+
+> 20:
+
+for Each child vchild of v in T do  
+
+> 21:
+
+if M (vchild , s head ) is true then  
+
+> 22:
+
+z[i] ← vchild  
+
+> 23:
+
+Consume shead in vchild  
+
+> 24:
+
+matched ← true  
+
+> 25:
+
+break  
+
+> 26:
+
+end if  
+
+> 27:
+
+end for  
+
+> 28:
+
+if matched is false then  
+
+> 29:
+
+Create new node vnew  
+
+> 30:
+
+Add edge v ; vnew  
+
+> 31:
+
+z[i] ← vnew  
+
+> 32:
+
+Consume shead in vnew  
+
+> 33:
+
+end if  
+
+> 34:
+
+end for  
+
+> 35:
+
+end while  
+
+> 36:
+
+return T
+
+12 <system>         
+
+> # Identity You are an expert mathematician who gauges similarity of mathematical statements. Help the user detect similarity in statements by answering yes/no. # Instructions * ONLY answer with ’yes’ or ’no’. Do not produce any extra text. * The user will provide two statements Statement A and Statement B. * Answer ’yes’ if and only if Statement B is completely equivalent to Statement A or Statement B is equivalent to a part of Statement A. * Answer ’no’ if the statements are not equivalent, if Statement A is contained in Statement B, or if they have different mathematical meaning. * Ignore superficial elements like names of variables, whitespace, synonyms, phrasing, etc. * The only important aspect is the mathematical meaning of the statements. # Examples ...
+> </system> <user>
+> # Statement A: The equation of the circle is given by x2+y2= 5 .# Statement B: The circle’s equation is z2+y2= 5 .
+> </user> <assistant>
+> yes
+> </assistant>
+
+Figure 6: System prompt to instantiate the M (x, y ) function in Algorithm 1. 
+
+AdamW optimizer. RL-training was performed with the TRL library (von Werra et al., 2020) using the 
+
+DAPO-Math-17k dataset (Yu et al., 2026) for 1Ksteps with lr = 1 e−6, group size of 8, batch size of 
+
+48 , and max_tokens = 4 K. Following suggestions by Yu et al. (2026), we set ϵlow = 0 .2, ϵ high = 0 .28 ,and following suggestions by Liu et al. (2025); Yu et al. (2026); Hu et al. (2025), we set β = 0 . We employ the Dr. GRPO loss (Liu et al., 2025) to avoid length-based biases. We use the Math-Verify library to compute accuracy rewards, and use a format reward which ensures that <think> tags are present and there is exactly one \boxed{} con-taining the answer. Length-based rewards are not employed. Qwen3.5-9B , like DAPO-Qwen2.5-32B ,was trained with Zero-RL, whereas for Qwen3-8B 
+
+and gemma3-12b-pt we perform distillation fol-lowed by RLVR. The chat templates for the dis-tilled and RL models are matched, and are dis-tributed alongside the model. All training datasets are de-duplicated against the probing set .For mazes , we performed SFT with oracle-generated traces employing the Maze Dataset by Ivanitskiy et al. (2023). We used 30 K mazes with sizes 5 × 5, 7 × 7, 9 × 9 and similar settings as described above (except max_tokens = 2 K). For RL-training, 12 K mazes were used with similar set-tings as described above (except group size 16 , and 
+
+max_tokens = 1 .5K). We used a custom verifier to check correctness, and a format reward to ensure that the predicted moves were parsable. Five tokens were added to the tokenizer before the distillation stage: they are <left>, <right>, <up>, <down> 
+
+(for predicting a path), and <–> (to denote an edge while express the maze as an adjacency list). RL-training was performed with 4 × 4 H100 
+
+93 GB GPUs, and all other experiments used 1 × 4
+
+H100s. 
+
+B.2 Evaluation 
+
+For results in §4.1, we used 50 mazes and sampled 
+
+1K generations from the models at T = 1 .0 and 
+
+top_k = 10 . For results in §4.2, §4.3, and §4.4, we directly employ the logits, and we truncate candi-date continuations to 20 tokens for CPE calculation (see Eq. 4). The results in §5.1 and §5.2 are sam-pled at T = 1 .0. Unless explicitly mentioned, all sampling parameters are at default values. An example distractor for the experiment in §5.2 is given in Figure 8. 
+
+C Additional Results 
+
+13 Figure 7: Examples of extracted BODHI-T REE s. 
+
+14 <system> 
+
+You are a helpful AI assistant. Assist the user with their math query. The final answer must be in \boxed{}. 
+
+</system> <user> Question : For non-negative integers a and b with a + b ≤ 6, let T (a, b ) =  6
+
+> a
+
+  6
+
+> b
+
+  6
+
+> a+b
+
+. Let S denote the sum of all 
+
+T (a, b ), where a and b are non-negative integers with a + b ≤ 6. Find the remainder when S is divided by 1000 .
+
+</user> <assistant> 
+
+# Added prefix, BODHI-Tree segments. 
+
+Let S = P6
+
+> a=0
+
+P6−ab=0 
+
+ 6
+
+> a
+
+  6
+
+> b
+
+  6
+
+> a+b
+
+.Rewrite with k = a + b.
+
+S = P6
+
+> k=0
+
+ 6
+
+> k
+
+ P ka=0 
+
+ 6
+
+> a
+
+  6
+
+> k−a
+
+Pka=0 
+
+ 6
+
+> a
+
+  6
+
+> k−a
+
+ is the coefficient of xk in (1 + x)6(1 + x)6 = (1 + x)12 , so it equals  12 
+
+> k
+
+.
+
+S = P6
+
+> k=0
+
+ 6
+
+> k
+
+  12 
+
+> k
+
+
+
+Compute each term: 
+
+k = 0 : 1 
+
+k = 1 : 6 · 12 = 72 
+
+k = 2 : 15 · 66 = 990 
+
+k = 3 : 20 · 220 = 4400 
+
+k = 4 : 15 · 495 = 7425 
+
+k = 5 : 6 · 792 = 4752 
+
+Solving gives c = 4±√16+240 6 = 4±16 6 , so c = 10 3 or c = −2.
+
+# Model continues... 
+
+k = 6 :  66
+
+  12 6
+
+ = 1 · 924 = 924 . . . 
+
+Figure 8: Example distractor ( red ) for experiment in §5.2. 
+
+15 −0.05 0.00 Density  20%-ile 
+
+Qwen-3-8B 
+
+DKS = 0 .138, p < 10 −82   
+
+> −0.05 0.00 0.05
+
+Qwen-3.5-9B 
+
+DKS = 0 .120, p < 10 −62   
+
+> −0.20.00.2
+
+Gemma-3-12B 
+
+DKS = 0 .072, p < 10 −22    
+
+> −0.2−0.10.00.1
+
+Qwen-2.5-32B 
+
+DKS = 0 .207, p < 10 −99          
+
+> −0.15 −0.10 −0.05 ∆CPE Density  Distil RLVR
+> −0.10 −0.08 −0.06 −0.04 ∆CPE
+> −0.4−0.3−0.2∆CPE
+> −0.4−0.3−0.2∆CPE
+
+Figure 9: Effect of post-training on LLM branching. (top ) We plot the distribution of ∆CPE as described in §4.2 for distilled and RLVR-trained models. There is a significant leftward shift in the distribution of ∆CPE suggesting that RL-trained models have enhanced preference at branch points. The ( bottom ) row shows a zoomed-in view of the left 20-%ile tail of each distribution. 0.00 0.25 0.50 0.75 0510 15 20 Density         
+
+> SmolLM-3-3B
+> DKS = 0 .3408, p < 10 −99
+> Distil RLVR
+> 0.00.51.00123Density
+> Qwen-3-8B
+> DKS = 0 .2392, p < 10 −62
+
+Figure 10: RL-trained models are more likely to back-track. We plot the distribution of probability of back-tracking ( pb) as described in §5.2. 
+
+16

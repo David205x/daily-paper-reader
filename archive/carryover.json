@@ -1,190 +1,49 @@
 {
-  "generated_at": "2026-08-04T21:48:07.975532+00:00",
-  "updated_date": "20260804",
+  "generated_at": "2026-08-05T21:45:37.676731+00:00",
+  "updated_date": "20260805",
   "carryover_days": 9,
   "tag_states": {
     "rl": {
-      "updated_date": "20260804",
+      "updated_date": "20260805",
       "carryover_days": 9,
       "items": [
         {
-          "id": "2608.02356v1",
+          "id": "2608.03545v1",
           "source": "arxiv",
-          "title": "SkillTrace: Traversing a Query-Skill Graph for Composable LLM Agents",
-          "abstract": "Large language model agents increasingly solve complex tasks by composing reusable skills from a library. To address this, the key challenge is not merely to retrieve individually relevant skills, but to identify a complete and executable skill composition. In this paper, we argue that this problem can be solved in a graph with three levels: compositional relations among skill queries, similarity between queries and candidates in the skill library, and the dependencies among the selected candidates. We introduce SkillTrace, which organizes the user query into a semantic hierarchy, matches skill queries and candidates, and propagates over the skill dependencies. Experiments on SkillsBench and ALFWorld demonstrate that SkillTrace achieves state-of-the-art performance, reaching a success rate of 53.17% on SkillsBench and 91.43% on ALFWorld. SkillTrace also delivers consistent improvements across different backbone language models, demonstrating the generality and robustness of graph-based skill retrieval.",
+          "title": "Hi-TTRL: Regulating Consensus with Hints for Test-Time Reinforcement Learning",
+          "abstract": "Test-time reinforcement learning (TTRL) improves the reasoning capabilities of large language models without labeled data by updating the policy with pseudo-labels constructed through majority voting. While effective, the reward signal assigned from majority voting is highly sensitive to consensus strength, defined as the frequency of the most common answer within a rollout group. In TTRL, consensus strength plays a dual role: it reflects both the reliability of the pseudo-label and the distribution of advantages. Low consensus can amplify updates from unreliable pseudo-labels through disproportionately large advantages, whereas high consensus reduces reward contrast and ultimately yields vanishing gradients. In this paper, we introduce Hi-TTRL, a test-time reinforcement learning framework that utilizes hints during sampling to regulate rollout consensus strength. Hi-TTRL first estimates consensus strength from a partial rollout group. When the consensus strength falls outside a target interval, it invokes a Markov chain Monte Carlo (MCMC) hint sampler. The sampler targets the power-transformed prefix distribution and uses finite-step approximate sampling to generate rollout prefixes as hints. By tuning the power exponent, Hi-TTRL generates hints with a sharpened or flattened power target, steering rollout consensus strength toward the target interval. Experiments on multiple datasets and backbones show that Hi-TTRL consistently improves over standard TTRL, with ablations and consensus-steering analyses validating the effectiveness of adaptive hint-guided consensus regulation.",
           "authors": [
-            "Yue Yao",
-            "Shengyuan Wang",
-            "Xin Chen",
-            "Minke Zhang",
-            "Jia He",
-            "Bingjun Luo",
-            "Tom Gedeon"
-          ],
-          "primary_category": "cs.AI",
-          "categories": [
-            "cs.AI"
-          ],
-          "published": "2026-08-03T15:07:11+00:00",
-          "link": "https://arxiv.org/pdf/2608.02356v1",
-          "tags": [
-            "keyword:rl",
-            "query:rl"
-          ],
-          "llm_score": 8.0,
-          "llm_evidence_en": "query-skill graph for composable LLM agents",
-          "llm_evidence_cn": "基于查询-技能图的可组合大模型智能体",
-          "llm_evidence": "基于查询-技能图的可组合大模型智能体",
-          "canonical_evidence": "基于查询-技能图的可组合大模型智能体",
-          "llm_tldr_en": "Proposes SkillTrace, a three-level query-skill graph approach for composing reusable skills in LLM agents, matching query-candidates and propagating over dependencies, achieving SOTA on SkillsBench and ALFWorld.",
-          "llm_tldr_cn": "针对大模型智能体在组合技能时仅检索单技能而忽视组合完整性的问题，本文提出SkillTrace。该方法构建查询-技能三层图，将用户查询组织成语义层次，匹配候选技能并沿技能依赖进行传播，从而找到可执行的技能组合。在SkillsBench和ALFWorld上的实验表明其达到了现有最优性能，为可组合智能体的技能编排提供了图结构新方案。",
-          "llm_tldr": "针对大模型智能体在组合技能时仅检索单技能而忽视组合完整性的问题，本文提出SkillTrace。该方法构建查询-技能三层图，将用户查询组织成语义层次，匹配候选技能并沿技能依赖进行传播，从而找到可执行的技能组合。在SkillsBench和ALFWorld上的实验表明其达到了现有最优性能，为可组合智能体的技能编排提供了图结构新方案。",
-          "llm_tags": [
-            "query:rl"
-          ],
-          "matched_query_tag": "query:rl",
-          "matched_query_text": "large language model agents for task automation",
-          "matched_requirement_id": "req-4",
-          "selection_source": "carryover_cache",
-          "paper_id": "2608.02356v1",
-          "carry_days": 1
-        },
-        {
-          "id": "2608.02101v1",
-          "source": "arxiv",
-          "title": "Cross-Domain Hybrid OPD for Generalizable Search Agents",
-          "abstract": "Recent advances in Reinforcement Learning (RL) have substantially improved the capabilities of autonomous search agents, enabling sophisticated planning, and iterative retrieval over dynamic information sources. However, optimizing language models for specialized search behaviors often incurs an alignment tax, where gains in search performance come at the expense of general-purpose capabilities, limiting their effectiveness as universal assistants. In this technical report, we present the training framework behind the Yuanbao search agent, designed to achieve search specialization without sacrificing general intelligence. Built upon the Hunyuan3 architecture, our framework combines agentic reinforcement learning for autonomous search with a cross-domain expert On-Policy Distillation (OPD) pipeline. Experts specializing in complementary general-purpose domains are distilled into the search-specialized student, restoring and further enhancing its broad capabilities. Rather than treating specialization and general capability as competing objectives, our hybrid training strategy jointly optimizes both, effectively mitigating the alignment tax. Extensive experiments demonstrate that the resulting model achieves competitive search performance while consistently improving its general-purpose capabilities, providing a favorable balance between specialized execution and broad generalization in real-world search scenarios.",
-          "authors": [
-            "Hongzhan Chen",
-            "Xiaoyu Liu",
-            "Dengming Zhang",
-            "Minzhou Huang",
-            "Dongliang Xu",
-            "Jingcheng Xie",
-            "Dongxiang Fang",
-            "Bowen Qin",
-            "Minsheng Hao",
-            "Yaozong Shen",
-            "Xiaojun Quan",
-            "Mona Zhou",
-            "Haosheng Zou",
-            "Jeff Chen"
+            "Kunbin Xu",
+            "Xingzuo Li",
+            "Xuefeng Bai",
+            "Kehai Chen"
           ],
           "primary_category": "cs.CL",
           "categories": [
             "cs.CL"
           ],
-          "published": "2026-08-03T12:01:18+00:00",
-          "link": "https://arxiv.org/pdf/2608.02101v1",
+          "published": "2026-08-04T12:20:17+00:00",
+          "link": "https://arxiv.org/pdf/2608.03545v1",
           "tags": [
             "keyword:rl",
             "query:rl"
           ],
           "llm_score": 8.0,
-          "llm_evidence_en": "Agentic reinforcement learning for autonomous search agents with iterative retrieval over dynamic sources, balancing search specialization and general intelligence",
-          "llm_evidence_cn": "面向自主检索搜索智能体的强化学习训练框架，兼顾检索专业化与通用智能",
-          "llm_evidence": "面向自主检索搜索智能体的强化学习训练框架，兼顾检索专业化与通用智能",
-          "canonical_evidence": "面向自主检索搜索智能体的强化学习训练框架，兼顾检索专业化与通用智能",
-          "llm_tldr_en": "RL improves autonomous search agents but specialized search training can create an alignment tax. The Yuanbao search agent framework, built on Hunyuan3, combines agentic RL with cross-domain expert OPD to preserve general intelligence while specializing in iterative retrieval over dynamic sources.",
-          "llm_tldr_cn": "强化学习显著提升了自主搜索智能体的规划与迭代检索能力，但专用搜索行为优化常带来对齐税，损害通用能力。该技术报告基于Hunyuan3架构提出Yuanbao搜索智能体训练框架，将智能体强化学习与跨领域专家在线策略蒸馏（OPD）相结合，在搜索专业化与通用智能之间取得平衡。该框架为可泛化搜索智能体的强化学习训练提供了可复用的解决方案。",
-          "llm_tldr": "强化学习显著提升了自主搜索智能体的规划与迭代检索能力，但专用搜索行为优化常带来对齐税，损害通用能力。该技术报告基于Hunyuan3架构提出Yuanbao搜索智能体训练框架，将智能体强化学习与跨领域专家在线策略蒸馏（OPD）相结合，在搜索专业化与通用智能之间取得平衡。该框架为可泛化搜索智能体的强化学习训练提供了可复用的解决方案。",
+          "llm_evidence_en": "Regulates consensus strength with hints in test-time RL for LLM reasoning",
+          "llm_evidence_cn": "通过提示调控多数投票伪标签中的共识强度，改进面向大语言模型推理的测试时强化学习",
+          "llm_evidence": "通过提示调控多数投票伪标签中的共识强度，改进面向大语言模型推理的测试时强化学习",
+          "canonical_evidence": "通过提示调控多数投票伪标签中的共识强度，改进面向大语言模型推理的测试时强化学习",
+          "llm_tldr_en": "Test-time RL for LLM reasoning relies on majority-vote pseudo-labels, but consensus strength distorts rewards. Hi-TTRL regulates consensus with hints to stabilize advantages and avoid vanishing gradients, improving reasoning.",
+          "llm_tldr_cn": "测试时强化学习无需标注数据，通过多数投票构造伪标签来更新策略，从而改善大语言模型推理能力。但多数投票产生的奖励对共识强度高度敏感：低共识会放大不可靠伪标签的更新，高共识则导致奖励对比度不足和梯度消失。论文提出Hi-TTRL，利用提示调节共识信号，使优势估计更稳定并保持有效学习梯度。实验表明该方法能够显著提升测试时强化学习的推理效果。该工作为无标注条件下的大语言模型推理强化学习提供了稳健的奖励调控机制。",
+          "llm_tldr": "测试时强化学习无需标注数据，通过多数投票构造伪标签来更新策略，从而改善大语言模型推理能力。但多数投票产生的奖励对共识强度高度敏感：低共识会放大不可靠伪标签的更新，高共识则导致奖励对比度不足和梯度消失。论文提出Hi-TTRL，利用提示调节共识信号，使优势估计更稳定并保持有效学习梯度。实验表明该方法能够显著提升测试时强化学习的推理效果。该工作为无标注条件下的大语言模型推理强化学习提供了稳健的奖励调控机制。",
           "llm_tags": [
             "query:rl"
           ],
           "matched_query_tag": "query:rl",
-          "matched_query_text": "retrieval augmented generation for knowledge intensive tasks",
-          "matched_requirement_id": "req-8",
+          "matched_query_text": "application of reinforcement learning in large language model reasoning",
+          "matched_requirement_id": "req-7",
           "selection_source": "carryover_cache",
-          "paper_id": "2608.02101v1",
-          "carry_days": 1
-        },
-        {
-          "id": "2608.02181v1",
-          "source": "arxiv",
-          "title": "Start Classifying: Categorical Critics for LLM Reinforcement Learning",
-          "abstract": "Proximal Policy Optimization (PPO) for large language models typically trains its critic by mean-squared-error (MSE) regression on scalar value targets. Although scalar MSE is statistically valid for estimating the conditional expected return, sparse binary rewards in reinforcement learning with verifiable rewards (RLVR) make critic optimization and calibration especially consequential: small value errors directly distort the scalar advantages used by PPO. We study whether a classification-based training objective can improve this critic signal. HL-Gauss PPO replaces the scalar MSE head with a categorical predictor over a discretized value support, trained by cross-entropy against smoothed HL-Gauss targets. Its output is decoded to a scalar expectation for standard GAE and PPO; the actor update is therefore unchanged and is not distributional. Across mathematical reasoning, tool-augmented math, and Search-R1, and on both Qwen2.5 and Qwen3 backbones, HL-Gauss PPO consistently improves over strong PPO and DAPO baselines. Controls with one-hot, two-hot, and Bernoulli two-bin critics show that neither a larger output head nor binary classification alone explains the gains. On a common collection of reasoning prefixes, HL-Gauss improves Brier score and calibration error and yields more symmetric, lower-variance advantages. These results position categorical value learning as an effective optimization surrogate for PPO critics in RLVR.",
-          "authors": [
-            "Zhijian Zhou",
-            "Long Li",
-            "Xuan Zhang",
-            "Zongkai Liu",
-            "Yulei Qin",
-            "Ke Li",
-            "Xing Sun",
-            "Xiaoyu Tan",
-            "Chao Qu",
-            "Yuan Qi"
-          ],
-          "primary_category": "cs.LG",
-          "categories": [
-            "cs.LG"
-          ],
-          "published": "2026-08-03T13:05:38+00:00",
-          "link": "https://arxiv.org/pdf/2608.02181v1",
-          "tags": [
-            "keyword:rl",
-            "query:rl"
-          ],
-          "llm_score": 8.0,
-          "llm_evidence_en": "Improves PPO critic for LLM reinforcement learning with sparse verifiable rewards; directly refines policy-gradient language model training",
-          "llm_evidence_cn": "面向大语言模型策略梯度强化学习的PPO评论者建模改进，提升稀疏奖励下的优势估计",
-          "llm_evidence": "面向大语言模型策略梯度强化学习的PPO评论者建模改进，提升稀疏奖励下的优势估计",
-          "canonical_evidence": "面向大语言模型策略梯度强化学习的PPO评论者建模改进，提升稀疏奖励下的优势估计",
-          "llm_tldr_en": "PPO for LLMs usually learns a scalar critic by MSE; sparse binary RLVR rewards make small value errors hurt advantages. HL-Gauss PPO replaces the scalar MSE head with a categorical predictor trained by smoothed cross-entropy, yielding better-calibrated critics for LLM policy-gradient RL.",
-          "llm_tldr_cn": "PPO训练大语言模型时通常用MSE回归学习标量价值，但在RLVR的稀疏二元奖励下，微小价值误差会扭曲PPO使用的优势估计。论文提出HL-Gauss PPO，将标量MSE价值头替换为离散价值支撑上的分类预测，用平滑HL-Gauss目标的交叉熵训练，再解码为标量期望。该方法改善了批评者信号的校准性，为大模型策略梯度强化学习提供更稳定的价值建模方案。",
-          "llm_tldr": "PPO训练大语言模型时通常用MSE回归学习标量价值，但在RLVR的稀疏二元奖励下，微小价值误差会扭曲PPO使用的优势估计。论文提出HL-Gauss PPO，将标量MSE价值头替换为离散价值支撑上的分类预测，用平滑HL-Gauss目标的交叉熵训练，再解码为标量期望。该方法改善了批评者信号的校准性，为大模型策略梯度强化学习提供更稳定的价值建模方案。",
-          "llm_tags": [
-            "query:rl"
-          ],
-          "matched_query_tag": "query:rl",
-          "matched_query_text": "policy gradient methods for language generation",
-          "matched_requirement_id": "req-3",
-          "selection_source": "carryover_cache",
-          "paper_id": "2608.02181v1",
-          "carry_days": 1
-        },
-        {
-          "id": "2608.02508v1",
-          "source": "arxiv",
-          "title": "RoMeRL: Balancing Feedback Coverage and the Memory-Reward Trap in Self-Evolving Agent Memory via Reduced-Order Utility States",
-          "abstract": "Learning-based memory systems for self-evolving LLM agents face two tightly coupled challenges. First, trajectory-indexed utilities grow with the interaction history, thereby dispersing limited feedback over an ever-expanding state space. Second, because trajectory-level rewards are jointly assigned to co-retrieved memories, irrelevant experiences may receive misleading utility updates and consequently enter the memory-reward trap. To address these challenges, we introduce Reduced-Order Memory Reinforcement Learning (RoMeRL), which represents the growing trajectory-indexed utility space using a fixed-dimensional per-task memory state factorized by outcome polarity and memory dynamics. RoMeRL incorporates new experiences through a fixed set of semantic coordinates whose contents are updated or replaced over time, thereby concentrating feedback over a bounded utility support. Theoretically, we show that this reduced-order parameterization increases the average feedback received by each utility coordinate and characterize the steady-state occupancy of erroneous coordinates under a generic coordinate-transition model. Empirically, across ALFWorld and LifelongAgentBench, RoMeRL improves task performance, reduces the Cold-Q ratio by 80.0%, increases feedback density by approximately 6.0 times, reduces the maintained memory size by 84.4%, and cuts LLM calls by 21.1%. These results show that reduced-order utility states support efficient self-evolving agent memory while limiting persistent reward contamination. Code is available at: https://github.com/YOUNG-fnxm/RoMeRL",
-          "authors": [
-            "Yi Yang",
-            "Zhennan Chen",
-            "Yihong Zhuang",
-            "Tiehan Fan",
-            "Yinan Chen",
-            "Jian Li",
-            "Jian Yang",
-            "Ying Tai"
-          ],
-          "primary_category": "cs.LG",
-          "categories": [
-            "cs.LG",
-            "cs.CL"
-          ],
-          "published": "2026-08-03T17:07:50+00:00",
-          "link": "https://arxiv.org/pdf/2608.02508v1",
-          "tags": [
-            "keyword:rl",
-            "query:rl"
-          ],
-          "llm_score": 8.0,
-          "llm_evidence_en": "Reinforcement learning for self-evolving LLM agent memory; addresses memory-reward trap in long-horizon task automation",
-          "llm_evidence_cn": "面向自进化大模型智能体记忆的强化学习方法，解决记忆奖励陷阱",
-          "llm_evidence": "面向自进化大模型智能体记忆的强化学习方法，解决记忆奖励陷阱",
-          "canonical_evidence": "面向自进化大模型智能体记忆的强化学习方法，解决记忆奖励陷阱",
-          "llm_tldr_en": "Self-evolving LLM agent memory suffers from expanding trajectory-indexed utilities and the memory-reward trap. RoMeRL compresses the utility space into fixed-dimensional per-task memory states factorized by outcome polarity and memory dynamics, providing more balanced feedback coverage and more stable memory updates for LLM agents.",
-          "llm_tldr_cn": "自进化LLM智能体的学习型记忆面临两个耦合挑战：轨迹索引效用随交互历史膨胀使反馈分散，轨迹级奖励共同分配给共检索记忆会使无关经验获得误导更新。RoMeRL将增长的效用空间表示为按结果极性和记忆动力学分解的固定维度任务记忆状态，并进行记忆强化学习。该方法减轻了记忆奖励陷阱，有助于智能体在长期任务中更稳定地积累和利用经验。",
-          "llm_tldr": "自进化LLM智能体的学习型记忆面临两个耦合挑战：轨迹索引效用随交互历史膨胀使反馈分散，轨迹级奖励共同分配给共检索记忆会使无关经验获得误导更新。RoMeRL将增长的效用空间表示为按结果极性和记忆动力学分解的固定维度任务记忆状态，并进行记忆强化学习。该方法减轻了记忆奖励陷阱，有助于智能体在长期任务中更稳定地积累和利用经验。",
-          "llm_tags": [
-            "query:rl"
-          ],
-          "matched_query_tag": "query:rl",
-          "matched_query_text": "large language model agents for task automation",
-          "matched_requirement_id": "req-4",
-          "selection_source": "carryover_cache",
-          "paper_id": "2608.02508v1",
+          "paper_id": "2608.03545v1",
           "carry_days": 1
         }
       ]
