@@ -1,0 +1,328 @@
+Title: Language-Specialized Multi-Teacher On-Policy Distillation for Multilingual LLM-Based ASR
+
+URL Source: https://arxiv.org/pdf/2608.03610v1
+
+Published Time: Wed, 05 Aug 2026 01:03:18 GMT
+
+Number of Pages: 7
+
+Markdown Content:
+LANGUAGE-SPECIALIZED MULTI-TEACHER ON-POLICY DISTILLATION FOR MULTILINGUAL LLM-BASED ASR 
+
+Yuan Xie ∗, Jiaqi Song, Xianliang Wang, Ming Lei, Jie Gao, Jie Wu 
+
+Advanced Intelligent Systems Group, NIO, Beijing, China 
+
+> ryan.xie2@nio.com
+
+ABSTRACT 
+
+Modern LLM-based ASR systems have established multilin-gual capability as a standard feature, leveraging large-scale multilingual corpora and LLMs’ cross-lingual knowledge to achieve competitive performance across multilingual bench-marks. However, joint modeling of languages with hetero-geneous acoustic, phonological, and lexical characteristics inevitably introduces optimization conflicts, undermining language-wise specialization. To address this challenge, we propose Language-Specialized Multi-Teacher On-Policy Distillation (LS-MOPD) , which decouples language-specific knowledge acquisition from multilingual capability integra-tion: language-specialized teachers are independently op-timized via reinforcement learning (RL), after which their expertise is integrated into a generalist multilingual student through language routing and token-level multi-teacher dis-tillation, thereby reducing direct cross-lingual optimization conflicts. We further explore two acoustic-prefix configura-tions, static and dynamic, to examine how teacher–student prefix consistency influences the efficacy of on-policy dis-tillation. Experiments on benchmarks covering Mandarin, Mandarin subdialects, Cantonese, and English demonstrate that LS-MOPD substantially outperforms RL baselines and consistently surpasses the empirical performance envelope defined by best-performing RL teachers, revealing its poten-tial to generalize beyond all teachers in multilingual ASR. 
+
+Index Terms — multilingual ASR, speech large language models, multi-teacher on-policy distillation 
+
+1. INTRODUCTION 
+
+LLM-based ASR has rapidly advanced as the mainstream paradigm in speech recognition, capitalizing on the extensive model capacity and rich linguistic priors of pretrained LLMs to achieve impressive performance across dozens of lan-guages and dialects. Frontier systems such as Seed-ASR [1], Fun-ASR [2], and Qwen3-ASR [3] primarily rely on scal-ing up multilingual corpora, consolidating broad language capabilities into a generalist model in a data-driven manner.  
+
+> ∗Corresponding author.
+
+Despite advances on multilingual ASR benchmarks, con-solidating cross-lingual capabilities within a generalist model remains challenging. Languages and dialects differ system-atically in their phonological, acoustic, and linguistic prop-erties. For instance, Mandarin is characterized by pervasive homophony and thus relies heavily on contextual seman-tic disambiguation, whereas English exhibits considerable variability in pronunciation and prosody, demanding precise modeling of stress-timed rhythm and connected-speech phe-nomena such as phonetic reduction and cross-word linking. Jointly modeling such heterogeneous languages inevitably in-troduces gradient conflicts, leading to performance trade-offs across languages. This challenge is amplified in real-time ASR systems, where stringent latency constraints limit model scale, requiring heterogeneous multilingual capabilities to be accommodated within a finite model capacity budget. Recent advances in multi-teacher on-policy distillation (MOPD) [4, 5] offer a principled remedy to this challenge. MOPD first trains a set of task-specialized teachers and dis-tills their expertise into a student through task-routed supervi-sion on the student’s on-policy rollouts [6, 7]. In multilingual ASR, task routing can be naturally adapted to language rout-ing, decoupling language-specific optimization from mul-tilingual integration. Heterogeneous language-wise objec-tives are independently optimized by specialized teachers and then distilled into the student, mitigating direct cross-lingual optimization conflicts. However, extending MOPD to LLM-based ASR raises several previously unexplored is-sues. Unlike text-only LLMs, LLM-based ASR conditions decoding on continuous acoustic prefixes produced by the encoder–adaptor. The teacher–student prefix consistency de-pends on the teacher training strategy and may directly affect distillation efficacy. Moreover, cross-lingual heterogeneity is generally less pronounced than cross-task heterogene-ity, leaving it unclear whether aggregating supervision from multiple language-specialized teachers can yield genuinely complementary gains in multilingual ASR. To address these issues, we compare alternative MOPD variants and analyze their behavior from the perspectives of gradient alignment and multi-teacher complementarity. Based on these insights, we propose Language-Specialized Multi-Teacher On-Policy Distillation (LS-MOPD) . Specif-arXiv:2608.03610v1 [cs.CL] 4 Aug 2026 Token 1  Token 2  Token  n                       
+
+> ......
+> Student rollout
+> embeddings prompt
+> Student Model
+> (Encoder +adaptor )
+> Student Model
+> (LLM decoder)
+> Token 1 Token 2 Token n
+> ......
+> Text prompt
+> Student rollout
+> Student Model
+> (LLM decoder)
+> Teacher Model
+> 【LLM decoder 】
+> Teacher Model
+> 【LLM decoder 】
+> Teacher Model
+> (LLM decoder)
+> Token 1 Token 2 Token n
+> ......
+> Teacher supervision
+> Reverse KL
+> (a) Standard text-based MOPD
+> 1. Generate
+> 2. Prefill
+> 3. Optimization
+> Top-1
+> routing
+> Teacher Model 1
+> (Encoder +adaptor )
+> Teacher Model 1
+> (LLM decoder)
+> Token 1 Token 2 Token n
+> ......
+> Teacher 1 supervision
+> Teacher Model m
+> (Encoder +adaptor )
+> Teacher Model m
+> (LLM decoder)
+> Token 1 Token 2 Token n
+> ......
+> Teacher msupervision
+> 1. Generate
+> 2. Prefill
+> 3. Optimization
+> embeddings prompt
+> embeddings prompt
+> Optimization only when using
+> dynamic acoustic prefix
+> Reverse KL
+> Reverse KL
+> Weighted Sum
+> (b) LS-MOPD with Dynamic / Static acoustic prefix
+> ...
+> ...
+> (active only with a dynamic acoustic prefix)
+> Dynamic acoustic prefix
+> ...
+> static mode
+> dynamic mode
+> unified
+> Input speech
+> Static acoustic prefix :
+> reuse student's
+> embeddings
+
+Fig. 1 . Comparison of (a) standard text-based MOPD and (b) LS-MOPD for ASR under two acoustic-prefix configurations. In the dynamic configuration, the student and teachers use independently optimized encoder–adaptors and thus obtain model-specific acoustic prefixes. In the static configuration, all models share a frozen encoder–adaptor and therefore allow teachers to reuse the student’s acoustic prefixes. Both configurations support weighted multi-teacher supervision. ically, we first train language-specialized teachers using the Decoupled Clip and Dynamic Sampling Policy Optimization (DAPO) algorithm [8] with an ASR-specific reward. During distillation, each student-generated on-policy rollout is routed to top-K teachers for the corresponding input-language cat-egory. The token-level supervision signals are then weighted and aggregated to distill complementary expertise into the generalist student. Our contributions are as follows: • As the first study to explore MOPD for ASR, we present a systematic framework comprising DAPO-based teacher optimization, acoustic-prefix configura-tions, and multi-teacher weighted aggregation, offering practical guidance for effective distillation. • We validate the effectiveness of LS-MOPD through analyses of gradient alignment and multi-teacher com-plementarity across distinct configurations. • We empirically demonstrate the advantages of LS-MOPD over RL baselines and its potential to generalize beyond all teachers. 
+
+2. RELATED WORK Multilingual ASR. Extending multilingual capability has become a major focus of modern ASR systems, with exist-ing efforts following two main directions. The first lever-ages industrial-scale data expansion: systems such as Seed-ASR [1], Fun-ASR [2], Qwen3-ASR [3], FireRedASR2S [9], and NIM4-ASR [10] achieve strong multilingual perfor-mance by combining large-scale multilingual speech corpora with LLMs’ cross-lingual priors. However, phonological and lexical heterogeneity across languages generally de-mands greater model capacity, whereas real-time ASR sys-tems must operate under stringent latency and computational constraints. This tension is reflected in deployment prac-tice, where providers release multilingual-optimized variants, such as Seed-ASR (ML) [1] and Fun-ASR-MLT-nano [2], alongside their flagship models. The second direction in-troduces language-specific architectural mechanisms, such as language-aware adaptors, mixture-of-experts routing, and gated query banks [11, 12, 13]. While these methods can improve multilingual performance at lower cost, they do not directly enhance the model’s underlying acoustic or seman-tic modeling capacity and may incur additional deployment overhead under high-concurrency inference. 
+
+Multi-teacher on-policy distillation. On-policy distillation (OPD) [14] has recently emerged as an effective LLM post-training algorithm, providing token-level supervision on the student’s sampled trajectories to mitigate exposure mismatch. This property makes OPD well suited to LLM-based ASR systems, which perform autoregressive generation yet re-quire strict token-level transcription accuracy. Multi-teacher OPD [4, 5] extends this idea by independently optimizing multiple domain-specialized teachers and distilling them into the student model with reverse-KL-style objectives, making it suitable for capability integration. This is particularly ap-pealing for multilingual ASR, as different languages rely on distinct acoustic-phonetic perception and lexical-semantic modeling capabilities. To the best of our knowledge, we are the first to introduce MOPD into the ASR domain. 
+
+3. METHODS 3.1. Language-Specialized RL Teacher Training 
+
+Prior to conducting MOPD, we construct a suite of teacher models specialized for distinct language categories. Starting from a base model πθ0 built upon the encoder–adaptor–LLM architecture, we perform reinforcement learning with verifi-able rewards (RLVR) based on DAPO [8]. For a given utter-ance x with reference transcription y, the rollout policy πθold 
+
+samples G = 8 hypotheses, {τi}Gi=1 ∼ πθold (· | x). Fol-lowing the reward design adopted in [10], each hypothesis is scored by an accuracy reward: 
+
+Ri = Racc (τi, y ) = exp −2 · ER ℓ(x) (τi, y ) , (1) where ℓ(x) denotes the language category of the input and 
+
+ER ℓ(x) denotes the language-dependent transcription error rate, instantiated as character error rate (CER) for Chinese and word error rate (WER) for English. The group-normalized advantage estimate is given by bAi = ( Ri − R)/(σR + ε),where R and σR are the mean and standard deviation of the rewards within the rollout group, respectively. Groups with 
+
+σR = 0 are discarded through dynamic sampling. DAPO then optimizes the following policy-gradient objective: 
+
+JDAPO (θ) = E
+
+PGi=1 
+
+P|τi| 
+
+> t=1
+
+min 
+
+
+
+ri,t bAi, eri,t bAi
+
+PGi=1 |τi|
+
+ , (2) where ri,t = πθ (τi,t | x, τ i,<t )/π θold (τi,t | x, τ i,<t ) is the token-level importance ratio, and eri,t = clip( ri,t , 1−εlow , 1+ 
+
+εhigh ) is its asymmetrically clipped counterpart. Here, εlow 
+
+and εhigh denote the clipping margins. Compared with clas-sic RLVR objectives, DAPO uses a token-level objective to balance contributions across transcription lengths and prevent errors in long utterances from being underweighted. Its dy-namic sampling strategy further improves efficiency by re-sampling informative instances. We construct a fixed multilingual pool of 50k utterances: 20k Mandarin, 10k Mandarin subdialects, 10k Cantonese, and 10k English samples. We group these data into three routing categories: Mandarin, Chinese dialects (Mandarin subdi-alects and Cantonese), and English. Each specialist teacher is trained on all data from its target routing category together with a randomly sampled 20% subset from each of the other routing categories, yielding three language-specialized teach-ers. In addition, a generalist teacher is trained on the full pool. For controlled comparison, DAPO training varies the acoustic front end along two orthogonal dimensions: encoder mode (streaming vs. offline) and encoder-adaptor trainabil-ity (frozen vs. trainable), resulting in four configurations: 
+
+{streaming , offline } × { frozen , trainable }.
+
+3.2. Language-Routed Multi-teacher OPD 
+
+After obtaining the three language-specialized teachers and the generalist teacher, we assess all teachers on held-out val-idation sets and rank them separately for Mandarin, Chinese dialects (including Mandarin subdialects and Cantonese), and English. Let πT 
+
+> ϕℓ(x),k
+
+denote the k-th ranked teacher for rout-ing category ℓ(x), where k = 1 denotes the best-performing teacher. The MOPD student πθ is initialized from the base model πθ0 . Following MOPD [5], the student generates an on-policy trajectory τ ∼ πθ (· | x). Let st = ( x, τ <t ) denote the decoding state at step t. The distillation loss from the k-th ranked teacher is defined as 
+
+Lk(x; θ) = Eτ ∼πθ
+
+ 1
+
+|τ | 
+
+> |τ|
+
+X
+
+> t=1
+
+DKL 
+
+
+
+πθ (· | st) ∥ πT 
+
+> ϕℓ(x),k
+
+(· | st)
+
+ ,
+
+(3) and the final MOPD objective aggregates contributions from the top-K teachers ( K = 3 by default): 
+
+LMOPD (θ) = Ex∼D 
+
+" KX
+
+> k=1
+
+λk Lk(x; θ)
+
+#
+
+,
+
+> K
+
+X
+
+> k=1
+
+λk = 1 . (4) The weights {λk} govern the relative influence of each ranked teacher, while setting λk = 0 allows the effective number of active teachers to range from three to one. The formulation recovers top-1 teacher distillation (see Fig. 1 (a)) by setting (λ1, λ 2, λ 3) = (1 , 0, 0) , while also supporting weighted multi-teacher aggregation such as (0 .6, 0.2, 0.2) .Importantly, the supervising teacher πT 
+
+> ϕℓ(x),k
+
+is determined according to the evaluation performance of all candidate teachers for the language category ℓ(x). This ensures that each student trajectory can be supervised by the empirically strongest teachers for its target language category. 
+
+3.3. Preliminary Analysis on the Effect of Acoustic Prefix 0 2 4 6  
+
+> Training step (×10³)
+> 0.9400
+> 0.9425
+> 0.9450
+> 0.9475
+> 0.9500
+> 0.9525
+> 0.9550
+> Train reward ↑
+> (a) Train reward during teacher training
+> Static prefix (Frozen)
+> Dynamic prefix (Trainable)
+> Top-1 Top-2 Top-3
+> Number of teachers in the OPD target
+> 0.76
+> 0.78
+> 0.80
+> 0.82
+> 0.84
+> Mean cosine similarity between
+> OPD and CE logit gradients ↑
+> (b) OPD supervision aligns with the GT direction
+> 88
+> 89
+> 90
+> 91
+> 92
+> 93
+> Tokens with a positive OPD–CE
+> gradient dot product (%) ↑
+
+Fig. 2 . Comparison of static and dynamic acoustic-prefix con-figurations in terms of (a) accuracy reward trajectories during RL and (b) OPD–CE gradient alignment metrics during distil-lation. Error bars are estimated from 10k bootstrap resamples. When adapting MOPD to ASR, the LLM is conditioned on acoustic embeddings that serve as acoustic prefixes, whose configuration directly influences distillation effectiveness. A static acoustic-prefix configuration ensures prefix consistency between teachers and the student, mitigating the teacher– student conditioning mismatch during distillation. However, this configuration requires the teacher and student to share a frozen encoder–adaptor throughout RL and OPD, which limits the attainable performance of teachers. In contrast, a dynamic configuration allows unrestricted joint optimiza-tion of all model components, but at the risk of increased conditioning inconsistency. To illustrate this trade-off, we conduct a preliminary anal-ysis under static and dynamic acoustic-prefix configurations. Table 1 . Offline ASR performance measured by CER (%) for Chinese and WER (%) for English (lower is better). Model sizes are shown in brackets.                                                                                                                                                                                            
+
+> Method WeNet KeSpeech WeNet-Yue LibriSpeech Avg.
+> meet. |net test short |long clean |other
+> Advanced Open-source Models
+> [0.8B] Fun-ASR-Nano [2] 4.68 |5.22 7.18 7.31 |10.02 1.63 |4.35 5.77 [2.0B] Qwen3-ASR-1.7B [3] 4.00 |4.13 4.98 5.79 |8.00 1.56 |3.49 4.56
+> [8B] Step-Audio2-mini [15] 4.23 |4.63 3.98 7.78 |8.44 1.22 |2.61 4.70 [30B/A3B] Qwen3-Omni-Inst [16] 3.92 |3.85 5.96 6.97 |8.60 1.15 |2.38 4.69 [8B] MiMo-V2.5-ASR [17] 4.63 |4.52 7.76 6.53 |10.52 1.35 |3.42 5.53
+> Our Methods
+> [2.3B] Base Model (NIM4-ASR) 5.01 |4.80 4.57 5.22 |9.48 1.23 |2.61 4.70
+> with static acoustic prefix
+> RL (Generalist Teacher) 4.88 |4.74 4.40 5.27 |9.49 1.18 |2.58 4.65 RL (Best-Teacher Oracle) 4.77 |4.70 4.40 5.19 |9.30 1.18 |2.56 4.59 LS-MOPD with 1 teacher 4.62 |4.53 4.06 5.19 |9.12 1.15 |2.57 4.46 LS-MOPD with 2 teachers 4.60 |4.52 4.13 5.17 |9.16 1.15 |2.53 4.47 LS-MOPD with 3 teachers 4.60 |4.53 4.08 5.14 |9.14 1.12 |2.56 4.45
+> with dynamic acoustic prefix
+> RL (Generalist Teacher) 4.56 |4.69 4.49 5.35 |9.55 1.20 |2.57 4.63 RL (Best-Teacher Oracle) 4.56 |4.69 4.45 5.25 |9.19 1.17 |2.56 4.55 LS-MOPD with 1 teacher 4.60 |4.55 4.14 5.28 |9.15 1.14 |2.56 4.49 LS-MOPD with 2 teachers 4.49 |4.58 4.13 5.23 |9.16 1.17 |2.48 4.46 LS-MOPD with 3 teachers 4.52 |4.62 4.12 5.17 |9.27 1.15 |2.51 4.48
+
+Note: Boldface separately indicates the best result among “Advanced Open-source Models” and among “Our Methods” for each benchmark. 
+
+As shown in Fig. 2, we compare (a) the accuracy-reward trajectories during RL training and (b) token-level alignment between the OPD gradients and the cross-entropy (CE) gra-dients derived from ground-truth labels during distillation. The latter is quantified by the mean cosine similarity and the proportion of directionally aligned tokens, defined as those with a positive OPD–CE gradient dot product. The results clearly show that the static prefix yields slightly lower teacher performance but better-aligned distillation gradients, whereas the dynamic prefix improves teacher performance at the expense of slightly reduced gradient alignment. This reveals a trade-off between teacher strength and distillation compatibility, further examined in the following section. 
+
+4. EXPERIMENTS 4.1. Experimental Setup 
+
+The base student model in this work is built upon an in-house backbone pretrained on approximately 560k hours of labeled speech, comprising a 0.6B FireRed Conformer [9], a 
+
+4× downsampling linear adaptor, and a Qwen3-1.7B LLM decoder. For RL and MOPD, we construct a 50k-utterance multilingual training pool by sampling from representative datasets: 20k Mandarin utterances from WenetSpeech [18], 10k Mandarin subdialect utterances from KeSpeech [19], 10k Cantonese utterances from WenetSpeech-Yue [20], and 10k English utterances from LibriSpeech [21]. The general-ist teacher and MOPD stages use the full multilingual pool, whereas language-specialized teachers are trained on their re-spective language-skewed subsets constructed with sampling ratios specified in Section 3.1. For evaluation, we employ the official test sets of the 
+
+Table 2 . Streaming ASR performance measured by CER (%) for Chinese and WER (%) for English (lower is better).                                                                                                                                     
+
+> Method WeNet KeSpeech WeNet-Yue LibriSpeech Avg.
+> meet. |net test short |long clean |other Base Model (NIM4-ASR) 6.19 |5.26 5.69 6.06 |12.33 1.34 |3.32 5.74
+> with static acoustic prefix
+> RL (Generalist Teacher) 5.92 |5.19 5.54 5.68 |11.10 1.29 |3.27 5.43 RL (Best-Teacher Oracle) 5.84 |5.18 5.54 5.50 |11.10 1.25 |3.20 5.37 LS-MOPD with 1 teacher 5.76 |5.00 5.12 5.61 |10.83 1.25 |3.21 5.25 LS-MOPD with 2 teachers 5.67 |4.99 5.17 5.59 |10.67 1.24 |3.15 5.21 LS-MOPD with 3 teachers 5.69 |4.96 5.09 5.52 |10.61 1.23 |3.19 5.18
+> with dynamic acoustic prefix
+> RL (Generalist Teacher) 5.90 |5.26 5.52 5.60 |11.10 1.35 |3.22 5.42 RL (Best-Teacher Oracle) 5.72 |5.26 5.50 5.58 |10.96 1.31 |3.16 5.36 LS-MOPD with 1 teacher 5.65 |5.17 5.30 5.58 |11.19 1.29 |3.17 5.34 LS-MOPD with 2 teachers 5.71 |5.16 5.24 5.99 |11.02 1.27 |3.12 5.36 LS-MOPD with 3 teachers 5.78 |5.26 5.22 5.51 |10.90 1.28 |3.15 5.30
+
+aforementioned four datasets, comprising seven subsets in total. Across all evaluations, a unified text normalization pipeline based on WenetTextProcess is applied to mitigate the effects of surface-form variations. All experiments adopt deterministic decoding strategies. In the streaming setting, speech is encoded in 640 ms chunks, with four preceding chunks retained as left context, and greedy decoding (beam size = 1) is employed. In the offline setting, the encoder oper-ates over the complete utterance, and beam search decoding is applied with a beam size of 3. 
+
+4.2. Training Details 
+
+For RL training, we train for at most 6k optimization steps with a maximum learning rate of 2 × 10 −6 linearly decayed to zero, and a sampling temperature that is cosine-annealed from 1.0 to 0.7. For MOPD, we train for 20k steps using a maximum learning rate of 4 × 10 −6 cosine-annealed to 2 ×
+
+10 −6 and a fixed sampling temperature of 1.0. All RL and MOPD experiments are conducted on 8 NVIDIA A100 GPUs with BF16 precision and DeepSpeed ZeRO-2 [22]. 
+
+4.3. Main Results 
+
+Tables 1 and 2 report the performance of our proposed meth-ods on benchmarks, alongside leading open-source models as references for the current state of the art. Within each acoustic-prefix configuration, the generalist teacher serves as the RL baseline, whereas the best result attained by any can-didate teacher on each benchmark is reported as “RL (Best-Teacher Oracle)”. For LS-MOPD, the number of supervis-ing teachers is determined by the loss weights in Eq. (4): the one-, two-, and three-teacher variants use LMOPD = L1,
+
+LMOPD = 0 .6L1 + 0 .4L2, and LMOPD = 0 .6L1 + 0 .2L2 +0.2L3, respectively. We analyze the results as follows: 
+
+(1) Overall Performance. Using only a 50k-utterance post-training pool, LS-MOPD substantially improves upon the base model and consistently outperforms the RL baseline. The average error rate drops to a minimum of 4.45%, outper-forming all open-source baselines, including models trained on million-hour-scale speech corpora [2, 3] and those built upon larger LLM backbones [15, 16, 17], using only 2.3B pa-rameters. Notably, LS-MOPD surpasses the empirical perfor-mance envelope defined by the best-teacher oracle on almost all benchmarks, and achieves the best results among all com-pared leading systems on WeNetSpeech-Yue-short and Lib-riSpeech test-clean. These results demonstrate that the dis-tilled student can outperform all teachers, achieving highly competitive multilingual recognition accuracy together with measurable emergent gains. As shown by the streaming re-sults in Table 2, LS-MOPD also delivers substantial gains in the streaming setting, with relative improvements exceeding those observed in the offline configuration. 
+
+(2) Static vs. dynamic acoustic prefix. Before distil-lation, dynamic-prefix RL teachers achieve slightly better average performance than their static-prefix counterparts, owing to joint encoder–adaptor optimization that yields more refined acoustic representations. After MOPD, however, static-prefix variants attain the best average results in both the offline and streaming settings. We attribute this reversal to teacher–student acoustic-prefix mismatch under the dynamic configuration: when teacher supervision depends on acous-tic cues absent from the student’s representation, distillation may shift from learnable preference transfer toward fitting partially unreachable targets. 
+
+(3) Top-K teacher weighted aggregation. Since cross-lingual heterogeneity is generally less pronounced than cross-task heterogeneity, we extend the default top-1 routing of MOPD to weighted top-K teacher aggregation. This yields modest gains, particularly in the streaming setting, suggest-ing a beneficial regularization effect that becomes more pro-nounced under higher decoding uncertainty. Notably, we find that incorporating the second- and third-ranked teachers can lead to improvements despite their substantially lower standalone performance than the best teacher, suggesting that teacher diversity can provide complementary supervision and alleviate token-level overconfidence. 
+
+4.4. Sources of Improvement and Emergent Gains 
+
+Beyond benchmark results, we conduct visual analyses to val-idate LS-MOPD and offer insight into its emergent behavior. As shown in Fig. 3 (a), we examine the relationship be-tween the benchmark gains of different LS-MOPD variants and the proportion of tokens with aligned OPD and CE gra-dients, as defined in Section 3.3. The results show a positive association: static-prefix LS-MOPD variants exhibit more consistently aligned gradients and achieve larger performance gains. By contrast, although dynamic-prefix teachers show stronger standalone performance, their supervision induces gradients that are less aligned with the CE gradients, leading to smaller distillation gains. Moreover, multi-teacher super-vision generally yields better gradient alignment than single-teacher supervision. This finding provides a preliminary 90.0 90.5 91.0 91.5   
+
+> Tokens with a positive OPD–CE gradient dot product (%) ↑
+> 0.00
+> 0.05
+> 0.10
+> 0.15
+> Error-rate reduction relative to
+> the dataset-best teacher (points) ↑
+> Top-1
+> Top-2
+> Top-3
+> Top-1
+> Top-2
+> Top-3
+> (a) Helpful-gradient prevalence is associated with error-rate gain
+> Static prefix (Frozen)
+> Dynamic prefix (Trainable)
+> Top-1 Top-2 Top-3
+> Number of teachers in the OPD target
+> 0.00
+> 0.05
+> 0.10
+> 0.15
+> 0.20
+> 0.25
+> 0.30
+> Student correct while all teachers
+> are wrong (% of reference tokens) ↑
+> (b) Student-only correct positions
+
+Fig. 3 . (a) Relationship between OPD–CE gradient alignment and the performance gains achieved by LS-MOPD. (b) Emer-gent gains: the proportion of tokens incorrectly predicted by all teachers but correctly predicted by the student. mechanistic explanation for why multi-teacher distillation can outperform its single-teacher counterpart: lower-ranked teachers can still contribute complementary supervision that induces more favorable optimization directions. Fig. 3 (b) further reveals the emergent benefit of LS-MOPD: a non-negligible proportion of tokens are predicted incorrectly by all teachers, yet are correctly recognized by the student. Together with the consistent improvements of LS-MOPD over the best-teacher oracle in Tables 1 and 2, these results highlight the potential of LS-MOPD for multilingual ASR, demonstrating that coordinated supervision from mul-tiple teachers can enable the student to generalize beyond the performance envelope of any individual teacher. 
+
+5. CONCLUSION 
+
+This work proposes a multi-teacher on-policy distillation framework for multilingual LLM-based ASR. We systemat-ically investigate the impact of static and dynamic acoustic-prefix configurations and integrate language-specialized teachers through language-routed, weighted supervision. Ex-perimental results across both offline and streaming scenarios demonstrate that LS-MOPD substantially outperforms RL baselines and has the potential to generalize beyond the em-pirical upper envelope of trained RL teachers. We further analyze the effectiveness of LS-MOPD from the perspectives of gradient alignment and multi-teacher complementarity, and derive practical insights into acoustic-prefix selection and multi-teacher aggregation. Our work also has several limitations. First, the evaluation is relatively narrow in scope, covering only a single model backbone and a limited set of target languages. Broader val-idation across model architectures and languages is still war-ranted. Second, our current dynamic acoustic-prefix configu-ration remains preliminary and does not yet fully exploit the potential of this design. Future work will explore teacher– student supervision mechanisms that preserve the optimiza-tion flexibility of dynamic acoustic prefixes while reducing the resulting conditioning mismatch. 6. REFERENCES 
+
+[1] Ye Bai, Jingping Chen, Jitong Chen, Wei Chen, Zhuo Chen, Chuang Ding, Linhao Dong, Qianqian Dong, Yu-jiao Du, Kepan Gao, et al., “Seed-asr: Understanding di-verse speech and contexts with llm-based speech recog-nition,” arXiv preprint arXiv:2407.04675 , 2024. [2] Keyu An, Yanni Chen, Zhigao Chen, Chong Deng, Zhi-hao Du, Changfeng Gao, Zhifu Gao, Bo Gong, Xian-gang Li, Yabin Li, et al., “Fun-asr technical report,” 
+
+arXiv preprint arXiv:2509.12508 , 2025. [3] Xian Shi, Xiong Wang, Zhifang Guo, Yongqi Wang, Pei Zhang, Xinyu Zhang, Zishan Guo, Hongkun Hao, Yu Xi, Baosong Yang, et al., “Qwen3-asr technical re-port,” arXiv preprint arXiv:2601.21337 , 2026. [4] Bangjun Xiao, Bingquan Xia, Bo Yang, Bofei Gao, Bowen Shen, Chen Zhang, Chenhong He, Chiheng Lou, Fuli Luo, Gang Wang, et al., “Mimo-v2-flash technical report,” arXiv preprint arXiv:2601.02780 , 2026. [5] Wenhan Ma, Jianyu Wei, Liang Zhao, Hailin Zhang, Bangjun Xiao, Lei Li, Qibin Yang, Bofei Gao, Yudong Wang, Rang Li, Jinhao Dong, Zhifang Sui, and Fuli Luo, “Mopd: Multi-teacher on-policy distillation for ca-pability integration in llm post-training,” arXiv preprint arXiv:2606.30406 , 2026. [6] Zhuolin Yang, Zihan Liu, Yang Chen, Wenliang Dai, Boxin Wang, Sheng-Chieh Lin, Chankyu Lee, Yangyi Chen, Dongfu Jiang, Jiafan He, et al., “Nemotron-cascade 2: Post-training llms with cascade rl and multi-domain on-policy distillation,” arXiv preprint arXiv:2603.19220 , 2026. [7] Anyi Xu, Bangcai Lin, Bing Xue, Bingxuan Wang, Bingzheng Xu, Bochao Wu, Bowei Zhang, Chaofan Lin, Chen Dong, Chenchen Ling, et al., “Deepseek-v4: Towards highly efficient million-token context in-telligence,” arXiv preprint arXiv:2606.19348 , 2026. [8] Qiying Yu, Zheng Zhang, Ruofei Zhu, Yufeng Yuan, Xi-aochen Zuo, Yu Yue, Weinan Dai, Tiantian Fan, Gao-hong Liu, Lingjun Liu, et al., “Dapo: An open-source llm reinforcement learning system at scale,” Advances in Neural Information Processing Systems , vol. 38, pp. 113222–113244, 2025. [9] Kaituo Xu, Yan Jia, Kai Huang, Junjie Chen, Wen-peng Li, Kun Liu, Feng-Long Xie, Xu Tang, and Yao Hu, “Fireredasr2s: A state-of-the-art industrial-grade all-in-one automatic speech recognition system,” arXiv preprint arXiv:2603.10420 , 2026. [10] Yuan Xie, Jiaqi Song, Guang Qiu, Xianliang Wang, Kai Qiao, Junfeng Yuan, Shengqing Liu, Yi Zhang, Bowen Chen, Ming Lei, et al., “Nim4-asr: Towards efficient, robust, and customizable real-time llm-based asr,” arXiv preprint arXiv:2604.18105 , 2026. [11] Junjie Li, Jing Peng, Yangui Fang, Shuai Wang, and Kai Yu, “Mosa: Mixtures of simple adapters outperform monolithic approaches in llm-based multilingual asr,” in 2026 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP) . IEEE, 2026, pp. 18822–18826. [12] Guodong Lin, Ziqi Chen, Yuxiang Fu, Ke Li, and Wei-Qiang Zhang, “Enhancing multilingual llm-based asr with mixture of experts and dynamic downsampling,” in 2026 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP) . IEEE, 2026, pp. 18807–18811. [13] Shreyas Gopal, Donghang Wu, Ashutosh Anshul, Yeo Yue Heng, Yizhou Peng, Haoyang Li, Hexin Liu, and Eng Siong Chng, “Language-aware distillation for multilingual instruction-following speech llms with asr-only supervision,” arXiv preprint arXiv:2603.07025 ,2026. [14] Rishabh Agarwal, Nino Vieillard, Yongchao Zhou, Pi-otr Stanczyk, Sabela Ramos Garea, Matthieu Geist, and Olivier Bachem, “On-policy distillation of language models: Learning from self-generated mistakes,” in 
+
+International Conference on Learning Representations ,2024. [15] Boyong Wu, Chao Yan, Chen Hu, Cheng Yi, Chengli Feng, Fei Tian, Feiyu Shen, Gang Yu, Haoyang Zhang, Jingbei Li, et al., “Step-audio 2 technical report,” arXiv preprint arXiv:2507.16632 , 2025. [16] Jin Xu, Zhifang Guo, Hangrui Hu, Yunfei Chu, Xiong Wang, Jinzheng He, Yuxuan Wang, Xian Shi, Ting He, Xinfa Zhu, et al., “Qwen3-omni technical report,” arXiv preprint arXiv:2509.17765 , 2025. [17] LLM-Core-Team Xiaomi, “Mimo-v2.5-asr: Robust speech recognition across languages, dialects, and com-plex acoustic scenarios,” 2026. [18] Binbin Zhang, Hang Lv, Pengcheng Guo, Qijie Shao, Chao Yang, Lei Xie, Xin Xu, Hui Bu, Xiaoyu Chen, Chenchen Zeng, et al., “Wenetspeech: A 10000+ hours multi-domain mandarin corpus for speech recognition,” in 2022 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP) . IEEE, 2022, pp. 6182–6186. [19] Zhiyuan Tang, Dong Wang, Yanguang Xu, Jianwei Sun, Xiaoning Lei, Shuaijiang Zhao, Cheng Wen, Xingjun Tan, Chuandong Xie, Shuran Zhou, et al., “Kespeech: An open source speech dataset of mandarin and its eight subdialects,” in Thirty-fifth conference on neural in-formation processing systems datasets and benchmarks track (Round 2) , 2021. [20] Longhao Li, Zhao Guo, Hongjie Chen, Yuhang Dai, Ziyu Zhang, Hongfei Xue, Tianlun Zuo, Chengyou Wang, Shuiyuan Wang, Xin Xu, et al., “Wenetspeech-yue: A large-scale cantonese speech corpus with multi-dimensional annotation,” in Proceedings of the AAAI Conference on Artificial Intelligence , 2026, vol. 40, pp. 31627–31635. [21] Vassil Panayotov, Guoguo Chen, Daniel Povey, and San-jeev Khudanpur, “Librispeech: an asr corpus based on public domain audio books,” in 2015 IEEE international conference on acoustics, speech and signal processing (ICASSP) . IEEE, 2015, pp. 5206–5210. [22] Samyam Rajbhandari, Jeff Rasley, Olatunji Ruwase, and Yuxiong He, “Zero: Memory optimizations toward training trillion parameter models,” in SC20: interna-tional conference for high performance computing, net-working, storage and analysis . IEEE, 2020, pp. 1–16.

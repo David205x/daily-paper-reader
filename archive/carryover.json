@@ -1,52 +1,12 @@
 {
-  "generated_at": "2026-08-05T21:45:37.676731+00:00",
-  "updated_date": "20260805",
+  "generated_at": "2026-08-07T02:05:39.273830+00:00",
+  "updated_date": "20260807",
   "carryover_days": 9,
   "tag_states": {
     "rl": {
-      "updated_date": "20260805",
+      "updated_date": "20260807",
       "carryover_days": 9,
-      "items": [
-        {
-          "id": "2608.03545v1",
-          "source": "arxiv",
-          "title": "Hi-TTRL: Regulating Consensus with Hints for Test-Time Reinforcement Learning",
-          "abstract": "Test-time reinforcement learning (TTRL) improves the reasoning capabilities of large language models without labeled data by updating the policy with pseudo-labels constructed through majority voting. While effective, the reward signal assigned from majority voting is highly sensitive to consensus strength, defined as the frequency of the most common answer within a rollout group. In TTRL, consensus strength plays a dual role: it reflects both the reliability of the pseudo-label and the distribution of advantages. Low consensus can amplify updates from unreliable pseudo-labels through disproportionately large advantages, whereas high consensus reduces reward contrast and ultimately yields vanishing gradients. In this paper, we introduce Hi-TTRL, a test-time reinforcement learning framework that utilizes hints during sampling to regulate rollout consensus strength. Hi-TTRL first estimates consensus strength from a partial rollout group. When the consensus strength falls outside a target interval, it invokes a Markov chain Monte Carlo (MCMC) hint sampler. The sampler targets the power-transformed prefix distribution and uses finite-step approximate sampling to generate rollout prefixes as hints. By tuning the power exponent, Hi-TTRL generates hints with a sharpened or flattened power target, steering rollout consensus strength toward the target interval. Experiments on multiple datasets and backbones show that Hi-TTRL consistently improves over standard TTRL, with ablations and consensus-steering analyses validating the effectiveness of adaptive hint-guided consensus regulation.",
-          "authors": [
-            "Kunbin Xu",
-            "Xingzuo Li",
-            "Xuefeng Bai",
-            "Kehai Chen"
-          ],
-          "primary_category": "cs.CL",
-          "categories": [
-            "cs.CL"
-          ],
-          "published": "2026-08-04T12:20:17+00:00",
-          "link": "https://arxiv.org/pdf/2608.03545v1",
-          "tags": [
-            "keyword:rl",
-            "query:rl"
-          ],
-          "llm_score": 8.0,
-          "llm_evidence_en": "Regulates consensus strength with hints in test-time RL for LLM reasoning",
-          "llm_evidence_cn": "通过提示调控多数投票伪标签中的共识强度，改进面向大语言模型推理的测试时强化学习",
-          "llm_evidence": "通过提示调控多数投票伪标签中的共识强度，改进面向大语言模型推理的测试时强化学习",
-          "canonical_evidence": "通过提示调控多数投票伪标签中的共识强度，改进面向大语言模型推理的测试时强化学习",
-          "llm_tldr_en": "Test-time RL for LLM reasoning relies on majority-vote pseudo-labels, but consensus strength distorts rewards. Hi-TTRL regulates consensus with hints to stabilize advantages and avoid vanishing gradients, improving reasoning.",
-          "llm_tldr_cn": "测试时强化学习无需标注数据，通过多数投票构造伪标签来更新策略，从而改善大语言模型推理能力。但多数投票产生的奖励对共识强度高度敏感：低共识会放大不可靠伪标签的更新，高共识则导致奖励对比度不足和梯度消失。论文提出Hi-TTRL，利用提示调节共识信号，使优势估计更稳定并保持有效学习梯度。实验表明该方法能够显著提升测试时强化学习的推理效果。该工作为无标注条件下的大语言模型推理强化学习提供了稳健的奖励调控机制。",
-          "llm_tldr": "测试时强化学习无需标注数据，通过多数投票构造伪标签来更新策略，从而改善大语言模型推理能力。但多数投票产生的奖励对共识强度高度敏感：低共识会放大不可靠伪标签的更新，高共识则导致奖励对比度不足和梯度消失。论文提出Hi-TTRL，利用提示调节共识信号，使优势估计更稳定并保持有效学习梯度。实验表明该方法能够显著提升测试时强化学习的推理效果。该工作为无标注条件下的大语言模型推理强化学习提供了稳健的奖励调控机制。",
-          "llm_tags": [
-            "query:rl"
-          ],
-          "matched_query_tag": "query:rl",
-          "matched_query_text": "application of reinforcement learning in large language model reasoning",
-          "matched_requirement_id": "req-7",
-          "selection_source": "carryover_cache",
-          "paper_id": "2608.03545v1",
-          "carry_days": 1
-        }
-      ]
+      "items": []
     }
   }
 }

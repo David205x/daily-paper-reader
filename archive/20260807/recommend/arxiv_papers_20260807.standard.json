@@ -1,0 +1,719 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-08-07T02:05:39.272555+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 11,
+    "deep_cap": 6,
+    "deep_selected": 6,
+    "quick_candidates": 12,
+    "quick_skim_target": 11,
+    "quick_selected": 11
+  },
+  "deep_dive": [
+    {
+      "id": "2608.02110v1",
+      "source": "arxiv",
+      "title": "IACM-RL: Intent-Aware Context Management and Reinforcement Learning for Complex Tool Invocation under Dynamic Intent Fluctuations",
+      "abstract": "Executing long-horizon tool invocations in real-world environments is severely challenged by dynamic user intent noise. Existing methods attempt robustness via implicit history scanning or text compression, yet predominantly assume perfect instructions in simplistic scenarios. Inevitably, under fluctuating contexts, obsolete constraints dilute model attention, triggering catastrophic intent deviation and infinite API loops. To resolve this, we propose IACM-RL, a comprehensive framework for robust tool invocation. First, we introduce the DynamicIntent pipeline, synthesizing trajectories across 13 fine-grained fluctuation scenarios, paired with a five-dimensional diagnostic metric suite. Second, IACM-RL deploys a BeliefState-based Self-Generated Context Manager that proactively tracks shifting goals and isolates overwritten parameters using structural stale flags. To autonomously internalize this state-tracking capability, we optimize the policy using a hierarchical intent-driven reward alongside three auxiliary losses (action calibration, CM extraction, and state distillation). Experiments on DynamicIntent, BFCL-V3, and $\\mathrmτ^2$-Bench demonstrate that IACM-RL significantly outperforms baselines, reducing infinite loops and stale context errors while enhancing out-of-domain generalization.",
+      "authors": [
+        "Dingwei Zhu",
+        "Jiahan Li",
+        "Chengjun Pan",
+        "Yunxian Yang",
+        "Yunbin Zhao",
+        "Yunke Zhang",
+        "Zhonghang Lu",
+        "Zhuohui Sheng",
+        "Chenhao Huang",
+        "Jiahang Lin",
+        "Yajie Yang",
+        "Junlin Shang",
+        "Shichun Liu",
+        "Yuhui Wang",
+        "Honglin Guo",
+        "Junjie Ye",
+        "Xin Guo",
+        "Jiazheng Zhang",
+        "Ming Zhang",
+        "Shihan Dou",
+        "Zhiheng Xi",
+        "Tao Gui",
+        "Qi Zhang",
+        "Xipeng Qiu",
+        "Xuanjing Huang"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.AI"
+      ],
+      "published": "2026-08-03T12:09:50+00:00",
+      "link": "https://arxiv.org/pdf/2608.02110v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "RL framework for LLM tool invocation under dynamic intent fluctuations",
+      "llm_evidence_cn": "面向动态意图波动的RL工具调用框架",
+      "llm_evidence": "面向动态意图波动的RL工具调用框架",
+      "canonical_evidence": "面向动态意图波动的RL工具调用框架",
+      "llm_tldr_en": "Long-horizon tool invocation suffers from dynamic user intent noise. IACM-RL synthesizes 13 fluctuation scenarios and uses intent-aware context management with RL to improve robustness and avoid intent deviation and API loops.",
+      "llm_tldr_cn": "真实环境中的长时间工具调用常受动态用户意图噪声干扰，现有方法在指令不完美时易导致意图偏移与API死循环。为此提出IACM-RL，通过DynamicIntent流水线合成13种细粒度波动场景轨迹并设计五维诊断指标，结合意图感知的上下文管理进行强化学习训练。该框架针对动态意图波动显式建模，能更好地保持上下文相关性，从而提升复杂工具调用任务的鲁棒性和成功率。",
+      "llm_tldr": "真实环境中的长时间工具调用常受动态用户意图噪声干扰，现有方法在指令不完美时易导致意图偏移与API死循环。为此提出IACM-RL，通过DynamicIntent流水线合成13种细粒度波动场景轨迹并设计五维诊断指标，结合意图感知的上下文管理进行强化学习训练。该框架针对动态意图波动显式建模，能更好地保持上下文相关性，从而提升复杂工具调用任务的鲁棒性和成功率。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.03077v1",
+      "source": "arxiv",
+      "title": "PAMT: Process-Aligned Reinforcement Learning for Multi-Domain Machine Translation",
+      "abstract": "Multi-domain machine translation (MDMT) requires more than fluent generation: it demands domain-sensitive translation decisions such as domain disambiguation, terminology control, and stylistic adaptation. Large reasoning models (LRMs) make such decisions explicit through intermediate translation steps, but our analysis across 15 domains and four translation directions shows that this explicit reasoning is double-edged: it improves long-form and high-difficulty translation, yet often drifts in terminology-intensive and stylistically constrained settings. We trace this failure to a credit-assignment bottleneck: existing methods optimize final outputs or coarse trajectories, but cannot identify which translation steps actually help the final translation. To address this, we propose PAMT, a process-aligned training framework that combines cold-start domain-aware Long-CoT supervision with reinforcement learning. PAMT uses sequence-level format and outcome rewards for the final translation, together with a step-level process reward that measures how much each explicit translation step increases the likelihood of the reference translation. Across two backbones, PAMT improves over base models, outperforms MT-specialized baselines on average, and remains competitive with strong LLMs/LRMs across in-domain, OOD, and multilingual settings.",
+      "authors": [
+        "Yongshi Ye",
+        "Biao Fu",
+        "Chongxuan Huang",
+        "Yidong Chen",
+        "Xiaodong Shi"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-08-04T03:42:54+00:00",
+      "link": "https://arxiv.org/pdf/2608.03077v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "reinforcement learning for large language model translation with process-aligned rewards",
+      "llm_evidence_cn": "采用过程对齐奖励的大语言模型强化学习翻译",
+      "llm_evidence": "采用过程对齐奖励的大语言模型强化学习翻译",
+      "canonical_evidence": "采用过程对齐奖励的大语言模型强化学习翻译",
+      "llm_tldr_en": "PAMT applies process-aligned reinforcement learning to multi-domain machine translation, assigning rewards to translation steps to fix credit assignment and improve domain-sensitive decisions.",
+      "llm_tldr_cn": "多领域机器翻译需要领域消歧、术语控制和风格适配等敏感决策，大推理模型的显式步骤虽有助于长难句，却容易在术语密集型场景中漂移。PAMT提出过程对齐强化学习，将最终翻译质量归因到具体翻译步骤，按步骤分配奖励，从而精准优化策略。在15个领域四种翻译方向上，PAMT有效提升术语与风格表现，验证了过程级奖励分配对克服LLM生成中信用分配瓶颈的重要性。",
+      "llm_tldr": "多领域机器翻译需要领域消歧、术语控制和风格适配等敏感决策，大推理模型的显式步骤虽有助于长难句，却容易在术语密集型场景中漂移。PAMT提出过程对齐强化学习，将最终翻译质量归因到具体翻译步骤，按步骤分配奖励，从而精准优化策略。在15个领域四种翻译方向上，PAMT有效提升术语与风格表现，验证了过程级奖励分配对克服LLM生成中信用分配瓶颈的重要性。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "reinforcement learning for large language model",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.03545v1",
+      "source": "arxiv",
+      "title": "Hi-TTRL: Regulating Consensus with Hints for Test-Time Reinforcement Learning",
+      "abstract": "Test-time reinforcement learning (TTRL) improves the reasoning capabilities of large language models without labeled data by updating the policy with pseudo-labels constructed through majority voting. While effective, the reward signal assigned from majority voting is highly sensitive to consensus strength, defined as the frequency of the most common answer within a rollout group. In TTRL, consensus strength plays a dual role: it reflects both the reliability of the pseudo-label and the distribution of advantages. Low consensus can amplify updates from unreliable pseudo-labels through disproportionately large advantages, whereas high consensus reduces reward contrast and ultimately yields vanishing gradients. In this paper, we introduce Hi-TTRL, a test-time reinforcement learning framework that utilizes hints during sampling to regulate rollout consensus strength. Hi-TTRL first estimates consensus strength from a partial rollout group. When the consensus strength falls outside a target interval, it invokes a Markov chain Monte Carlo (MCMC) hint sampler. The sampler targets the power-transformed prefix distribution and uses finite-step approximate sampling to generate rollout prefixes as hints. By tuning the power exponent, Hi-TTRL generates hints with a sharpened or flattened power target, steering rollout consensus strength toward the target interval. Experiments on multiple datasets and backbones show that Hi-TTRL consistently improves over standard TTRL, with ablations and consensus-steering analyses validating the effectiveness of adaptive hint-guided consensus regulation.",
+      "authors": [
+        "Kunbin Xu",
+        "Xingzuo Li",
+        "Xuefeng Bai",
+        "Kehai Chen"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-08-04T12:20:17+00:00",
+      "link": "https://arxiv.org/pdf/2608.03545v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Test-time reinforcement learning for LLM reasoning with consensus-aware reward regulation",
+      "llm_evidence_cn": "面向LLM推理的测试时强化学习，通过提示调节投票共识奖励",
+      "llm_evidence": "面向LLM推理的测试时强化学习，通过提示调节投票共识奖励",
+      "canonical_evidence": "面向LLM推理的测试时强化学习，通过提示调节投票共识奖励",
+      "llm_tldr_en": "Hi-TTRL improves test-time RL for LLM reasoning by regulating consensus-strength sensitivity of majority-voting rewards, using hints to control advantages from low-consensus pseudo-labels and prevent vanishing gradients at high consensus.",
+      "llm_tldr_cn": "测试时强化学习（TTRL）无需标注数据即可提升大模型推理，但多数投票给出的奖励对共识强度敏感：低共识时放大不可靠伪标签的更新，高共识时造成梯度消失。本文提出Hi-TTRL，通过提示调节共识奖励和优势分布，缓解这两个问题。实验表明，方法在多个推理任务上提高了TTRL的稳定性和最终性能。",
+      "llm_tldr": "测试时强化学习（TTRL）无需标注数据即可提升大模型推理，但多数投票给出的奖励对共识强度敏感：低共识时放大不可靠伪标签的更新，高共识时造成梯度消失。本文提出Hi-TTRL，通过提示调节共识奖励和优势分布，缓解这两个问题。实验表明，方法在多个推理任务上提高了TTRL的稳定性和最终性能。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "application of reinforcement learning in large language model reasoning",
+      "matched_requirement_id": "req-7",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.03545v2",
+      "source": "arxiv",
+      "title": "Hi-TTRL: Regulating Consensus with Hints for Test-Time Reinforcement Learning",
+      "abstract": "Test-time reinforcement learning (TTRL) improves the reasoning capabilities of large language models without labeled data by updating the policy with pseudo-labels constructed through majority voting. While effective, the reward signal assigned from majority voting is highly sensitive to consensus strength, defined as the frequency of the most common answer within a rollout group. In TTRL, consensus strength plays a dual role: it reflects both the reliability of the pseudo-label and the distribution of advantages. Low consensus can amplify updates from unreliable pseudo-labels through disproportionately large advantages, whereas high consensus reduces reward contrast and ultimately yields vanishing gradients. In this paper, we introduce Hi-TTRL, a test-time reinforcement learning framework that utilizes hints during sampling to regulate rollout consensus strength. Hi-TTRL first estimates consensus strength from a partial rollout group. When the consensus strength falls outside a target interval, it invokes a Markov chain Monte Carlo (MCMC) hint sampler. The sampler targets the power-transformed prefix distribution and uses finite-step approximate sampling to generate rollout prefixes as hints. By tuning the power exponent, Hi-TTRL generates hints with a sharpened or flattened power target, steering rollout consensus strength toward the target interval. Experiments on multiple datasets and backbones show that Hi-TTRL consistently improves over standard TTRL, with ablations and consensus-steering analyses validating the effectiveness of adaptive hint-guided consensus regulation.",
+      "authors": [
+        "Kunbin Xu",
+        "Xingzuo Li",
+        "Xuefeng Bai",
+        "Kehai Chen"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-08-04T12:20:17+00:00",
+      "link": "https://arxiv.org/pdf/2608.03545v2",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Introduces hint-based consensus regulation for test-time policy optimization in LLM multi-step reasoning",
+      "llm_evidence_cn": "为大模型多步推理的测试时策略优化引入基于提示的共识调节",
+      "llm_evidence": "为大模型多步推理的测试时策略优化引入基于提示的共识调节",
+      "canonical_evidence": "为大模型多步推理的测试时策略优化引入基于提示的共识调节",
+      "llm_tldr_en": "Hi-TTRL regulates reward consensus in test-time reinforcement learning by injecting hints, mitigating low-consensus unreliability and high-consensus vanishing gradients, improving LLM reasoning without labeled data.",
+      "llm_tldr_cn": "测试时强化学习用多数投票构造伪标签更新大模型策略，但共识强度对奖励信号影响很大：低共识放大不可靠伪标签的更新，高共识使梯度消失。论文提出Hi-TTRL，在测试时强化学习中以提示调节共识信号。该方法使得奖励对比更稳定，提升可靠更新并减少噪声影响。实验表明Hi-TTRL能有效增强大模型的推理能力且无需标注数据。",
+      "llm_tldr": "测试时强化学习用多数投票构造伪标签更新大模型策略，但共识强度对奖励信号影响很大：低共识放大不可靠伪标签的更新，高共识使梯度消失。论文提出Hi-TTRL，在测试时强化学习中以提示调节共识信号。该方法使得奖励对比更稳定，提升可靠更新并减少噪声影响。实验表明Hi-TTRL能有效增强大模型的推理能力且无需标注数据。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "policy optimization methods for multi step reasoning in llms",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.05040v1",
+      "source": "arxiv",
+      "title": "Private Direct Preference Optimization for LLM Alignment",
+      "abstract": "Direct preference optimization (DPO) is now a standard method for aligning large language models (LLMs) using human preference data. Each DPO example contains a prompt and a pair of candidate model responses. While prompts and responses are often public or model-generated, the relative preference between responses reflects subjective judgments and can reveal sensitive attributes of annotators or end users. Off-the-shelf privacy-preserving approaches are not well matched to this structure, leading to unnecessary noise injection and biased updates in training.   In this paper, we formalize preference privacy, a label-DP-style privacy notion for DPO that protects only the relative preference between candidate responses, assuming an adversary who already knows the prompt and responses. We then design PrivDPO, a DPO variant that enforces preference privacy while remaining compatible with large-scale LLM training. Our main observation is that, for neighboring examples differing only in their preference signal, the gradient difference lies on a one-dimensional preference axis determined solely by the text; all preference information flows through this axis. PrivDPO adds calibrated randomness only along this axis via an unbiased randomized rescaling of the DPO objective, avoiding per-example gradient operations. Our experiments on three alignment benchmarks and three LLM families show that PrivDPO consistently achieves strong privacy-utility trade-offs compared with privacy-preserving baselines.",
+      "authors": [
+        "Yangfan Jiang",
+        "Fei Wei",
+        "Ergute Bao",
+        "Xiaokui Xiao",
+        "Yaliang Li",
+        "Bolin Ding"
+      ],
+      "primary_category": "cs.CR",
+      "categories": [
+        "cs.CR"
+      ],
+      "published": "2026-08-05T16:51:02+00:00",
+      "link": "https://arxiv.org/pdf/2608.05040v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "DPO-based LLM alignment with privacy guarantee",
+      "llm_evidence_cn": "基于DPO的LLM对齐与隐私保护",
+      "llm_evidence": "基于DPO的LLM对齐与隐私保护",
+      "canonical_evidence": "基于DPO的LLM对齐与隐私保护",
+      "llm_tldr_en": "DPO for LLM alignment uses human preference data but may leak sensitive preferences. This paper formalizes preference privacy, a label-DP notion protecting the relative preference between candidate responses, and designs a private DPO method with less noise injection and biased updates.",
+      "llm_tldr_cn": "直接偏好优化（DPO）是大语言模型对齐的常用方法，但偏好数据中的相对对比可能泄露标注者或用户的敏感属性。现有隐私保护方法不匹配该结构，导致不必要噪声和偏置更新。本文形式化了偏好隐私，一种针对DPO的标签差分隐私概念，在对手已知提示和候选响应的前提下仅保护相对偏好，并据此设计私有DPO方法，减少了噪声注入和训练偏差。这项工作为大模型对齐中的隐私保护提供了理论和方法支撑。",
+      "llm_tldr": "直接偏好优化（DPO）是大语言模型对齐的常用方法，但偏好数据中的相对对比可能泄露标注者或用户的敏感属性。现有隐私保护方法不匹配该结构，导致不必要噪声和偏置更新。本文形式化了偏好隐私，一种针对DPO的标签差分隐私概念，在对手已知提示和候选响应的前提下仅保护相对偏好，并据此设计私有DPO方法，减少了噪声注入和训练偏差。这项工作为大模型对齐中的隐私保护提供了理论和方法支撑。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "reinforcement learning from human feedback for llm alignment",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.02087v2",
+      "source": "arxiv",
+      "title": "Instruction-Conditioned Exploration for Reinforcement Learning with Self-Distillation to an Unconditioned Policy",
+      "abstract": "Post-training Large Language Models (LLMs) with Reinforcement Learning (RL) has become an important tool for improving model capabilities, but the LLM action-space structure introduces challenges distinct from classical RL, with implications for inducing exploration. New methods are required that leverage the broad knowledge and flexibility of pre-trained LLMs to deliberately generate diverse experience at training time. We propose Instruction-Conditioned Exploration (ICE), which appends one of a small fixed set of instructions to task prompts during training, using the same set for every problem, increasing the coverage of behaviours attempted. To facilitate ICE, we combine RL on the instruction-conditioned policy with self-distillation of its correct rollouts into the unconditioned test-time policy. ICE with this objective improves Qwen3-1.7B held-out pass@1 performance at 4K response length on mathematical reasoning tasks by $5.0\\%$ relative to training with DAPO, with improvement persisting at a longer 8K context. The improvement does not appear for Qwen3-4B at 4K, where the instructions do not expand base-model coverage.",
+      "authors": [
+        "Jim Dilkes",
+        "Vahid Yazdanpanah",
+        "Sebastian Stein"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI",
+        "cs.CL",
+        "cs.LG"
+      ],
+      "published": "2026-08-03T11:47:52+00:00",
+      "link": "https://arxiv.org/pdf/2608.02087v2",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Proposes an exploration mechanism for RL post-training of LLMs via instruction conditioning and self-distillation, directly relevant to RL for LLM",
+      "llm_evidence_cn": "提出基于指令条件化的探索机制与自蒸馏策略，直接适用于大模型的强化学习后训练",
+      "llm_evidence": "提出基于指令条件化的探索机制与自蒸馏策略，直接适用于大模型的强化学习后训练",
+      "canonical_evidence": "提出基于指令条件化的探索机制与自蒸馏策略，直接适用于大模型的强化学习后训练",
+      "llm_tldr_en": "Introduces Instruction-Conditioned Exploration (ICE) to increase behavioral coverage during LLM reinforcement learning, combined with self-distillation to an unconditioned policy.",
+      "llm_tldr_cn": "用强化学习后训练大模型时，需要利用预训练模型的知识主动生成多样化经验。本文提出指令条件化探索（ICE），在训练中为任务提示附加一组固定指令，以扩大尝试行为覆盖范围，并对无条件策略进行自蒸馏。该方法在无需额外监督的情况下改善LLM的探索效率，缓解了RL训练中的探索不足问题，为后训练策略优化提供了通用工具。",
+      "llm_tldr": "用强化学习后训练大模型时，需要利用预训练模型的知识主动生成多样化经验。本文提出指令条件化探索（ICE），在训练中为任务提示附加一组固定指令，以扩大尝试行为覆盖范围，并对无条件策略进行自蒸馏。该方法在无需额外监督的情况下改善LLM的探索效率，缓解了RL训练中的探索不足问题，为后训练策略优化提供了通用工具。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "reinforcement learning for large language model",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2608.02645v1",
+      "source": "arxiv",
+      "title": "Verified Tool Calls Improve LLM Agent Reliability Under Non-Atomic Failures",
+      "abstract": "Large Language Model (LLM) agents rely on external tools to perform multistage tasks. Existing agent frameworks typically assume that tool calls are atomic and return binary success or failure signals. However, real-world systems exhibit non-atomic behaviors such as timeouts after dispatch, delayed visibility, and partial state updates. These mismatches lead to reliability issues including duplicate actions, task success, and unnecessary tool executions. A lightweight, verification-aware tool wrapper is introduced that augments tool calls with postcondition verification, verify-before-retry logic, and idempotency keys. The approach is evaluated in a controlled simulated environment with injected non-atomic failures across multiple task templates. The results demonstrate that the proposed method significantly reduces duplicate actions, while maintaining comparable task success rates. Overall, the findings suggest that strengthening tool interaction semantics is a promising direction for improving LLM agent reliability without requiring modifications to the underlying language model.",
+      "authors": [
+        "Isham Kalappurackal Mansoor",
+        "Abhishek Phadke",
+        "Pratip Rana"
+      ],
+      "primary_category": "cs.SE",
+      "categories": [
+        "cs.SE",
+        "cs.AI"
+      ],
+      "published": "2026-07-31T16:16:14+00:00",
+      "link": "https://arxiv.org/pdf/2608.02645v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "LLM agent tool-use reliability for multistage task automation",
+      "llm_evidence_cn": "面向多阶段任务自动化的LLM智能体工具调用可靠性",
+      "llm_evidence": "面向多阶段任务自动化的LLM智能体工具调用可靠性",
+      "canonical_evidence": "面向多阶段任务自动化的LLM智能体工具调用可靠性",
+      "llm_tldr_en": "LLM agents assume atomic tool calls, but real systems show timeouts and partial updates. A verification-aware wrapper adds postcondition checks, verify-before-retry, and idempotency keys, improving reliability by reducing duplicate actions and unnecessary tool executions.",
+      "llm_tldr_cn": "现有LLM智能体框架假设工具调用是原子的，但真实系统常出现超时、延迟可见和部分状态更新等非原子故障，导致重复动作和不必要的执行。本文提出一种轻量的验证感知工具包装器，通过后置条件验证、验证后重试和幂等键来增强调用可靠性。在注入非原子故障的受控模拟环境中评估，表明该方法能显著减少重复执行并提升任务成功率。该工作为工具型智能体在真实复杂系统中的任务自动化提供了更可靠的保障。",
+      "llm_tldr": "现有LLM智能体框架假设工具调用是原子的，但真实系统常出现超时、延迟可见和部分状态更新等非原子故障，导致重复动作和不必要的执行。本文提出一种轻量的验证感知工具包装器，通过后置条件验证、验证后重试和幂等键来增强调用可靠性。在注入非原子故障的受控模拟环境中评估，表明该方法能显著减少重复执行并提升任务成功率。该工作为工具型智能体在真实复杂系统中的任务自动化提供了更可靠的保障。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2608.01881v1",
+      "source": "arxiv",
+      "title": "Hear, Invoke, and Understand: A Skill-Calling Multimodal Agent for Large Audio Language Models",
+      "abstract": "Complex acoustic problems may require models to perform acoustic operations, interact with external tools and reason over the resulting textual or processed-audio observations rather than answer directly from a fixed audio input. We study such problems as tool-interactive audio reasoning and develop SpeechAgent-R, an audio agent that coordinates its intrinsic multimodal understanding with external skills and tools. To support this capability, we construct HIU-Corpus, comprising 65,492 interaction trajectories and 507.6 hours of audio across 24 tasks, 8 skills and 9 tools. SpeechAgent-R first learns structured interaction behaviors through trajectory-based supervised fine-tuning and then improves its decisions through multi-turn reinforcement learning. We further introduce HIU-Bench to jointly evaluate task performance, interaction quality and generalization to diverse task settings. It contains 1,395 samples across 56 tasks, including in-distribution (ID) and out-of-distribution (OOD) splits with substantial shifts in tool usage and workflow composition. SpeechAgent-R achieves 84.17 on ID tasks and 70.94 on OOD tasks, improving over the base model under the same agent harness by 15.40 and 14.23 points. These results demonstrate that learning skill and tool coordination improves audio agents' ability to handle diverse task settings and adaptive tool interactions.",
+      "authors": [
+        "Yuwen Wang",
+        "Tian-Hao Zhang",
+        "Minghao Cai",
+        "Yilin Ren",
+        "Ziyang Jiang",
+        "Xin Wang",
+        "Zhichao Wang",
+        "Pan Zhou",
+        "Kun Zhan",
+        "Xinyuan Qian"
+      ],
+      "primary_category": "cs.MM",
+      "categories": [
+        "cs.MM",
+        "cs.AI"
+      ],
+      "published": "2026-08-03T08:24:54+00:00",
+      "link": "https://arxiv.org/pdf/2608.01881v1",
+      "tags": [
+        "keyword:rl"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "multimodal agent with skill calling and tool use for task automation",
+      "llm_evidence_cn": "具备技能调用和工具使用能力的多模态任务自动化智能体",
+      "llm_evidence": "具备技能调用和工具使用能力的多模态任务自动化智能体",
+      "canonical_evidence": "具备技能调用和工具使用能力的多模态任务自动化智能体",
+      "llm_tldr_en": "SpeechAgent-R is a skill-calling multimodal agent for audio reasoning, built on HIU-Corpus with 65K trajectories, trained via SFT and multi-turn RL to improve tool-interactive decisions.",
+      "llm_tldr_cn": "面对需要调用外部工具并推理的复杂声学问题，SpeechAgent-R构造了包含65,492条交互轨迹的HIU语料库，覆盖24个任务、8种技能和9种工具。该智能体先通过轨迹级监督微调学习结构化的工具调用行为，再利用多轮强化学习优化决策。实验显示其显著提升多模态音频推理和工具交互能力，为大型音频语言模型实现任务自动化提供了数据与方法基础。",
+      "llm_tldr": "面对需要调用外部工具并推理的复杂声学问题，SpeechAgent-R构造了包含65,492条交互轨迹的HIU语料库，覆盖24个任务、8种技能和9种工具。该智能体先通过轨迹级监督微调学习结构化的工具调用行为，再利用多轮强化学习优化决策。实验显示其显著提升多模态音频推理和工具交互能力，为大型音频语言模型实现任务自动化提供了数据与方法基础。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2608.01175v1",
+      "source": "arxiv",
+      "title": "The Graph Language: How Knowledge Graphs Speak to Large Language Models",
+      "abstract": "Large Language Models (LLMs) excel at reasoning but benefit from grounding provided by Knowledge Graphs (KGs). However, integrating these paradigms is challenging. We introduce GRALAN, which enables KGs to speak directly in the LLM's semantic space through relational tokens that preserve graph structure. GRALAN-s trainable language mediator generates structured tokens for any frozen LLM, creating a foundation for knowledge-intensive applications. We demonstrate its effectiveness in question-answering by re-framing the task as entity classification over question-focused subgraphs. Experiments show that GRALAN significantly outperforms existing methods, particularly on complex multi-hop reasoning tasks, establishing a new paradigm for KG-LLM integration that maintains structural fidelity while leveraging LLMs' reasoning capabilities.",
+      "authors": [
+        "Giuseppe Pirrò"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-08-02T11:53:12+00:00",
+      "link": "https://arxiv.org/pdf/2608.01175v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "knowledge graph grounding for knowledge-intensive question answering and multi-hop reasoning",
+      "llm_evidence_cn": "面向知识密集型问答与多跳推理的知识图谱-大模型集成方法",
+      "llm_evidence": "面向知识密集型问答与多跳推理的知识图谱-大模型集成方法",
+      "canonical_evidence": "面向知识密集型问答与多跳推理的知识图谱-大模型集成方法",
+      "llm_tldr_en": "GRALAN lets knowledge graphs communicate in the LLM semantic space via relational tokens, enabling a trainable language mediator to ground frozen LLMs for knowledge-intensive QA and complex multi-hop reasoning.",
+      "llm_tldr_cn": "大语言模型虽擅长推理，但需要知识图谱提供事实支撑，二者集成一直困难。GRALAN让知识图谱通过保持图结构的可学习关系词元直接在语言模型语义空间中表达，从而实现任意冻结大模型的即插即用知识增强。在复杂多跳问答任务上，该方法显著优于现有方法，为知识图谱与大模型融合提供了新范式。",
+      "llm_tldr": "大语言模型虽擅长推理，但需要知识图谱提供事实支撑，二者集成一直困难。GRALAN让知识图谱通过保持图结构的可学习关系词元直接在语言模型语义空间中表达，从而实现任意冻结大模型的即插即用知识增强。在复杂多跳问答任务上，该方法显著优于现有方法，为知识图谱与大模型融合提供了新范式。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "retrieval augmented generation for knowledge intensive tasks",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2608.03573v1",
+      "source": "arxiv",
+      "title": "SFT Conflicts, RL Coexists: A Theoretical and Empirical Analysis of Multi-Task Learning for LLMs",
+      "abstract": "Supervised Fine-Tuning (SFT) and Reinforcement Learning (RL) exhibit fundamentally different behaviors in enhancing multi-task reasoning for large language models (LLMs). Our preliminary experiments revealed a phenomenon: SFT suffers from severe task conflicts under multi-stage training, whereas RL enables stable coexistence across diverse tasks. Empirically, we trace this to the parameter level, observing that RL induces sparse and approximately orthogonal updates across tasks. We provide a theoretical explanation for this mechanism by analyzing multi-task gradient interference. Our results reveal a distinction: interference in SFT is norm-limited, scaling with the absolute gradient magnitude, whereas interference in RL is variance-limited, bounded by the gradient variance induced by advantage normalization and on-policy optimization. This small variance bound yields near-orthogonal optimization directions across tasks. Leveraging this insight, we propose Parallel-RL, a paradigm that decouples multi-task training, significantly improving efficiency and flexibility.",
+      "authors": [
+        "Kejian Zhu",
+        "Zhuoran Jin",
+        "Shangqing Tu",
+        "Hongbang Yuan",
+        "Yushi Bai",
+        "Kang Liu",
+        "Juanzi Li",
+        "Jun Zhao"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.LG"
+      ],
+      "published": "2026-08-04T12:32:26+00:00",
+      "link": "https://arxiv.org/pdf/2608.03573v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Analysis of RL behavior in multi-task reasoning for LLMs",
+      "llm_evidence_cn": "分析RL在LLM多任务推理中的行为",
+      "llm_evidence": "分析RL在LLM多任务推理中的行为",
+      "canonical_evidence": "分析RL在LLM多任务推理中的行为",
+      "llm_tldr_en": "An empirical and theoretical study showing that in multi-task LLM reasoning, SFT suffers from task conflicts while RL induces sparse and approximately orthogonal updates, enabling stable coexistence; interference is norm-limited for SFT but variance-driven for RL.",
+      "llm_tldr_cn": "论文发现SFT与RL在多任务LLM推理训练中行为迥异：SFT在多阶段训练下出现严重任务冲突，而RL能让不同任务稳定共存。通过参数级追踪和梯度干扰分析，作者证明RL产生的更新稀疏且近似正交，而SFT的干扰受梯度范数限制。该理论解释揭示了多任务RL训练更稳的机制，为后续策略优化提供了理论指导。",
+      "llm_tldr": "论文发现SFT与RL在多任务LLM推理训练中行为迥异：SFT在多阶段训练下出现严重任务冲突，而RL能让不同任务稳定共存。通过参数级追踪和梯度干扰分析，作者证明RL产生的更新稀疏且近似正交，而SFT的干扰受梯度范数限制。该理论解释揭示了多任务RL训练更稳的机制，为后续策略优化提供了理论指导。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "application of reinforcement learning in large language model reasoning",
+      "matched_requirement_id": "req-7",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2608.03872v1",
+      "source": "arxiv",
+      "title": "EvoHIL: Self-Evolving Reward and Flow-Matched Policy Optimization for Robust Human-in-the-Loop Reinforcement Learning",
+      "abstract": "Human-in-the-loop reinforcement learning (HIL-RL) enables robots to learn contact-rich manipulation from limited real-world interaction, but deployment exposes three coupled limitations: static visual reward models fail under scene changes; independently sampled actions cause temporally inconsistent motion; and vision-based policies remain sensitive to appearance shifts. We present EvoHIL, a unified framework that adapts the reward model, action generator, and visual do main within a staged human-in-the-loop learning process. First, self-evolving reward (SER) adapts the success classifier from human-confirmed positives and provisional weak negatives. Second, Action Flow Stabilization (AFS) generates temporally coherent action chunks through flow matching, grounding policy updates in executed action prefixes and demonstrated behavior. Third, retention-aware offline fine-tuning replays relit interaction data while anchoring the AFS actor-critic to prior behavior, adapting the visual domain without additional robot interaction. Across six manipulation tasks on Franka FR3 and SO-101 arms under a controlled lighting shift, EvoHIL improves task success, agreement with human-confirmation labels, motion smoothness, and completion time relative to human-in-the-loop and imitation baselines.Project page: https://anonymous4366.github.io/EvoHIL/",
+      "authors": [
+        "Shuoqin Zhang",
+        "Tongtong Cheng",
+        "Xiru Gao",
+        "Jinzhuo Peng",
+        "Bin Zheng",
+        "Jiahao Tu",
+        "Ke Wang",
+        "Jia Pan",
+        "Zhe Hu",
+        "Kai Liu"
+      ],
+      "primary_category": "cs.RO",
+      "categories": [
+        "cs.RO"
+      ],
+      "published": "2026-08-04T16:12:05+00:00",
+      "link": "https://arxiv.org/pdf/2608.03872v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "adaptive reward model design in human-in-the-loop RL",
+      "llm_evidence_cn": "人在回路强化学习中的自演化奖励模型设计",
+      "llm_evidence": "人在回路强化学习中的自演化奖励模型设计",
+      "canonical_evidence": "人在回路强化学习中的自演化奖励模型设计",
+      "llm_tldr_en": "EvoHIL adapts reward model, action generator, and visual domain in a staged HIL-RL process, using self-evolving reward and action flow stabilization to improve robustness in contact-rich robot manipulation.",
+      "llm_tldr_cn": "针对人在回路强化学习在真实部署中奖励模型静态、动作时间不一致和视觉敏感等问题，EvoHIL提出统一框架，利用自演化奖励模型、动作流稳定化以及分阶段人机协同，同时适应奖励、动作生成与视觉域。实验在接触丰富的操作任务上显示，该方法显著提升奖励模型应对场景变化的能力、生成动作的时间一致性以及视觉鲁棒性，为机器人操作中的奖励设计和策略优化提供了新的解决思路。",
+      "llm_tldr": "针对人在回路强化学习在真实部署中奖励模型静态、动作时间不一致和视觉敏感等问题，EvoHIL提出统一框架，利用自演化奖励模型、动作流稳定化以及分阶段人机协同，同时适应奖励、动作生成与视觉域。实验在接触丰富的操作任务上显示，该方法显著提升奖励模型应对场景变化的能力、生成动作的时间一致性以及视觉鲁棒性，为机器人操作中的奖励设计和策略优化提供了新的解决思路。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "design of reward functions in RL",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2608.01366v1",
+      "source": "arxiv",
+      "title": "Asking Questions the Right Way: A Multi-Agent Conversational System for Prompt Formulation in Complex Task Resolution",
+      "abstract": "Large language models (LLMs) are integral to complex intellectual tasks, yet output quality remains constrained by user-provided prompts. Iterative multi-turn prompting often leads to context degradation and diminishing cognitive returns. We present PAWNI (Prompt Architecture Wizard using Neural Intelligence), an agentic conversational interface of eight agents that transforms unstructured queries into structured prompts through guided question-and-answer dialogue informed by a self-evolving knowledge base. Rather than optimizing the models response, PAWNI optimizes the question itself by front-loading intent clarification. We also propose a three-tier framework of 18 prompt elements across Essential, Enhancement, and Elevation categories.To evaluate system behavior and validate a measurement protocol, we conducted an exploratory within-subjects study (N=4) across four complex tasks, integrating 32-channel EEG, NASA-TLX workload, and behavioral metrics. Participants produced more structurally complete prompts with PAWNI (42% to 91% of assessed elements), rated LLM outputs higher across all quality dimensions, and reported lower workload (39.6 vs. 21.7 NASA-TLX). Every participant reached satisfactory output in a single turn, compared to 1-12 turns unaided. While effect sizes are unstable due to sample size, direction consistency supports the hypothesis that optimizing prompt formulation front-end is a critical lever for human-AI collaboration.",
+      "authors": [
+        "B. Sankar",
+        "Pawni Yadav",
+        "Srinidhi Ranjini Girish",
+        "Amogh A. S"
+      ],
+      "primary_category": "cs.MA",
+      "categories": [
+        "cs.MA",
+        "cs.AI"
+      ],
+      "published": "2026-08-02T16:33:27+00:00",
+      "link": "https://arxiv.org/pdf/2608.01366v1",
+      "tags": [
+        "keyword:rl"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Multi-agent conversational system for structured prompt formulation in complex task resolution",
+      "llm_evidence_cn": "多智能体对话系统，通过引导式问答生成结构化提示以完成复杂任务",
+      "llm_evidence": "多智能体对话系统，通过引导式问答生成结构化提示以完成复杂任务",
+      "canonical_evidence": "多智能体对话系统，通过引导式问答生成结构化提示以完成复杂任务",
+      "llm_tldr_en": "PAWNI is an agentic conversational interface with eight agents that transforms unstructured queries into structured prompts via guided Q&A and a self-evolving knowledge base, improving output by front-loading intent clarification.",
+      "llm_tldr_cn": "大语言模型的输出质量受提示词限制，多轮追问又易致上下文退化。本文提出PAWNI，由八个智能体组成的对话式提示构建系统，通过引导式问答和自我演进知识库将非结构化查询转化为结构化提示，在回答前完成意图澄清。系统还提出18种提示元素的三层框架，从提问端优化大模型复杂任务表现。",
+      "llm_tldr": "大语言模型的输出质量受提示词限制，多轮追问又易致上下文退化。本文提出PAWNI，由八个智能体组成的对话式提示构建系统，通过引导式问答和自我演进知识库将非结构化查询转化为结构化提示，在回答前完成意图澄清。系统还提出18种提示元素的三层框架，从提问端优化大模型复杂任务表现。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2608.04588v1",
+      "source": "arxiv",
+      "title": "EASy: Towards Efficient LLM-Based Agentic System",
+      "abstract": "Agentic systems have emerged as a promising paradigm for solving complex tasks by coordinating specialized LLM-based agents. However, most existing systems primarily optimize task success while giving limited consideration to execution efficiency under practical constraints such as executor capability and computational cost. Existing router-based methods have limited ability to reason over rich, evolving task contexts, multi-step dependencies, and intermediate execution feedback, and often generalize poorly to unseen executors. We propose EASy, a trainable agentic framework that jointly optimizes task performance and computational efficiency through reinforcement learning. EASy equips an LLM-based orchestrator with explicit knowledge of the capability and cost profiles of heterogeneous executors, enabling context-sensitive coordination beyond performance-only routing. It further introduces a milestone-plan-act workflow that decomposes complex tasks into manageable milestones, constructs dependency-aware execution graphs, assigns suitable executors, and parallelizes independent steps while adapting subsequent decisions to intermediate outcomes. To train the orchestrator, we develop a tree-structured rollout procedure that explores alternative milestone decompositions and execution plans, together with multi-component rewards that capture task correctness, execution efficiency, and trajectory completeness. Extensive experiments on mathematical reasoning, embodied decision-making, and deep research benchmarks show that EASy consistently achieves stronger performance-efficiency trade-offs than strong agentic baselines.",
+      "authors": [
+        "Junnan Liu",
+        "Linhao Luo",
+        "Thuy-Trang Vu",
+        "Gholamreza Haffari"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.AI"
+      ],
+      "published": "2026-08-05T08:50:36+00:00",
+      "link": "https://arxiv.org/pdf/2608.04588v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "RL-based trainable orchestrator jointly optimizing task performance and efficiency for LLM agentic systems",
+      "llm_evidence_cn": "基于强化学习的可训练编排器联合优化大模型智能体系统的任务性能与效率",
+      "llm_evidence": "基于强化学习的可训练编排器联合优化大模型智能体系统的任务性能与效率",
+      "canonical_evidence": "基于强化学习的可训练编排器联合优化大模型智能体系统的任务性能与效率",
+      "llm_tldr_en": "EASy introduces a trainable LLM-based agentic framework that uses reinforcement learning to jointly optimize task success and execution efficiency, giving the orchestrator explicit executor capability and cost profiles to improve generalization to unseen executors.",
+      "llm_tldr_cn": "现有的大模型智能体系统主要优化任务成功率，较少考虑执行器能力与算力成本等效率约束，且路由器泛化能力有限。论文提出EASy，一个可训练的智能体编排框架，通过强化学习联合优化任务性能与计算效率。EASy让大模型编排器显式感知各执行器的能力与成本画像。实验显示其在复杂任务上兼顾成功率与效率，并泛化到未见过的执行器。",
+      "llm_tldr": "现有的大模型智能体系统主要优化任务成功率，较少考虑执行器能力与算力成本等效率约束，且路由器泛化能力有限。论文提出EASy，一个可训练的智能体编排框架，通过强化学习联合优化任务性能与计算效率。EASy让大模型编排器显式感知各执行器的能力与成本画像。实验显示其在复杂任务上兼顾成功率与效率，并泛化到未见过的执行器。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2608.04843v1",
+      "source": "arxiv",
+      "title": "MemoryCPT: An End-to-End Agent Memory Framework for Cost-Performance Trade-off",
+      "abstract": "Long-horizon LLM agents require memory systems that recover useful evidence from large interaction histories without passing excessive context to downstream models. Existing memory pipelines often rely on hand-crafted heuristics and repeated LLM calls, which can introduce redundant context and high inference cost. We propose MemoryCPT, an end-to-end trainable agent memory pipeline that spans offline memory construction and online query-conditioned context generation. MemoryCPT consists of two stages: Query-agnostic Distillation (QAD), which distills a modular memory-construction pipeline into a compact model using explicit reasoning traces; and Query-aware Retrieval and Summarization (QAR), which combines reciprocal rank fusion (RRF) with a LoRA-based summarizer trained via Group Relative Policy Optimization (GRPO) under a cost-aware reward. We further introduce Quality per Cost (QPC) to quantify answer quality per unit inference cost. Experiments on LoCoMo and LongMemEval show that MemoryCPT improves the cost-performance trade-off over the evaluated baselines, while ablation and sensitivity analyses characterize the contributions of its components and the effects of key design choices.",
+      "authors": [
+        "Songxin Lei",
+        "Kun Ouyang",
+        "Weilin Ruan",
+        "Yuqian Wu",
+        "Zhijiang Guo",
+        "Yushi Sun",
+        "Fugee Tsung"
+      ],
+      "primary_category": "cs.IR",
+      "categories": [
+        "cs.IR"
+      ],
+      "published": "2026-08-05T13:37:08+00:00",
+      "link": "https://arxiv.org/pdf/2608.04843v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "retrieval-augmented context generation for LLM agents",
+      "llm_evidence_cn": "面向LLM智能体的检索增强上下文生成",
+      "llm_evidence": "面向LLM智能体的检索增强上下文生成",
+      "canonical_evidence": "面向LLM智能体的检索增强上下文生成",
+      "llm_tldr_en": "MemoryCPT is an end-to-end trainable agent memory pipeline with query-agnostic distillation and query-aware retrieval/summarization, using RRF and LoRA to reduce inference cost while maintaining quality.",
+      "llm_tldr_cn": "长周期LLM智能体的记忆系统通常依赖手工规则和多次LLM调用，导致冗余上下文和过高推理开销。MemoryCPT提出了端到端可训练的记忆管线，先通过查询无关蒸馏把模块化记忆构建压缩成轻量模型，再用查询感知检索和摘要生成上下文，结合RRF与LoRA提升效率。实验表明该方法在相近质量下显著降低推理成本，为智能体记忆和检索增强生成提供了一种可扩展的训练范式。",
+      "llm_tldr": "长周期LLM智能体的记忆系统通常依赖手工规则和多次LLM调用，导致冗余上下文和过高推理开销。MemoryCPT提出了端到端可训练的记忆管线，先通过查询无关蒸馏把模块化记忆构建压缩成轻量模型，再用查询感知检索和摘要生成上下文，结合RRF与LoRA提升效率。实验表明该方法在相近质量下显著降低推理成本，为智能体记忆和检索增强生成提供了一种可扩展的训练范式。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "retrieval augmented generation for knowledge intensive tasks",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2608.03610v1",
+      "source": "arxiv",
+      "title": "Language-Specialized Multi-Teacher On-Policy Distillation for Multilingual LLM-Based ASR",
+      "abstract": "Modern LLM-based ASR systems have established multilingual capability as a standard feature, leveraging large-scale multilingual corpora and LLMs' cross-lingual knowledge to achieve competitive performance across multilingual benchmarks. However, joint modeling of languages with heterogeneous acoustic, phonological, and lexical characteristics inevitably introduces optimization conflicts, undermining language-wise specialization. To address this challenge, we propose Language-Specialized Multi-Teacher On-Policy Distillation (LS-MOPD), which decouples language-specific knowledge acquisition from multilingual capability integration: language-specialized teachers are independently optimized via reinforcement learning (RL), after which their expertise is integrated into a generalist multilingual student through language routing and token-level multi-teacher distillation, thereby reducing direct cross-lingual optimization conflicts. We further explore two acoustic-prefix configurations, static and dynamic, to examine how teacher--student prefix consistency influences the efficacy of on-policy distillation. Experiments on benchmarks covering Mandarin, Mandarin subdialects, Cantonese, and English demonstrate that LS-MOPD substantially outperforms RL baselines and consistently surpasses the empirical performance envelope defined by best-performing RL teachers, revealing its potential to generalize beyond all teachers in multilingual ASR.",
+      "authors": [
+        "Yuan Xie",
+        "Jiaqi Song",
+        "Xianliang Wang",
+        "Ming Lei",
+        "Jie Gao",
+        "Jie Wu"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.SD",
+        "eess.AS"
+      ],
+      "published": "2026-08-04T13:02:47+00:00",
+      "link": "https://arxiv.org/pdf/2608.03610v1",
+      "tags": [
+        "keyword:rl"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "RL used to optimize teachers for LLM-based multilingual ASR",
+      "llm_evidence_cn": "在LLM语音识别中用RL优化多语言教师模型",
+      "llm_evidence": "在LLM语音识别中用RL优化多语言教师模型",
+      "canonical_evidence": "在LLM语音识别中用RL优化多语言教师模型",
+      "llm_tldr_en": "Proposes LS-MOPD, using RL to train language-specialized teachers for multilingual LLM-based ASR, decoupling language-specific knowledge acquisition from multilingual integration to mitigate optimization conflicts.",
+      "llm_tldr_cn": "多语言LLM语音识别中，异构语言联合建模会引发优化冲突，削弱各语言专化性能。本文提出语言专化多教师在线策略蒸馏LS-MOPD，先独立用强化学习优化各语言专化教师，再将其知识蒸馏到统一系统中，实现专化学习与多语言集成的解耦。实验显示该方法缓解了语言间干扰，提升了多语言ASR的整体性能。该工作为RL在LLM下游任务中的应用提供了范例。",
+      "llm_tldr": "多语言LLM语音识别中，异构语言联合建模会引发优化冲突，削弱各语言专化性能。本文提出语言专化多教师在线策略蒸馏LS-MOPD，先独立用强化学习优化各语言专化教师，再将其知识蒸馏到统一系统中，实现专化学习与多语言集成的解耦。实验显示该方法缓解了语言间干扰，提升了多语言ASR的整体性能。该工作为RL在LLM下游任务中的应用提供了范例。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "reinforcement learning for large language model",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2608.04788v1",
+      "source": "arxiv",
+      "title": "Agentic Reinforcement Learning with Observation-Calibrated Self-Distillation",
+      "abstract": "Large language model agents are commonly trained through reinforcement learning with sparse trajectory-level rewards, which offer limited guidance on how strongly individual tokens should be updated. On-Policy Self-Distillation (OPSD) addresses this by re-scoring generated tokens under a privileged replay view to obtain dense, token-level supervision. However, we identify a confounding issue: the resulting support may reflect both the privileged information contained in the replay view and score shifts induced by the replay scaffold, making it difficult to attribute the support specifically to that information. This issue is especially pronounced when future environment observations serve as privileged information, since replaying them requires reconstructing an extended scaffold that itself perturbs token scores. To resolve this confounding, we propose Observation-Calibrated Self-Distillation (OCSD), which contrasts two structurally matched replay views, Full and Observation-Ablated, differing only in whether the actual future observation is present, to derive an observation residual that discounts score changes shared by the replay scaffold. OCSD then applies this residual to modulate token-level GRPO updates at high-uncertainty steps, while preserving the trajectory-level update direction. Experiments on ALFWorld, WebShop, and Search-QA across three Qwen3 model scales show that OCSD consistently outperforms strong baselines. Diagnostic analyses further confirm that the calibrated residual aligns better with local environment feedback. Our code is publicly available at https://github.com/yiy1x/OCSD.",
+      "authors": [
+        "Yi Yang",
+        "Cong Qin",
+        "Xiaodan Liu",
+        "Chishui Chen",
+        "Qing Dong",
+        "Yan Zhang",
+        "Cao Liu",
+        "Zhao Yang",
+        "Lu Pan",
+        "Jiaye Lin",
+        "Yi Feng"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI",
+        "cs.CL"
+      ],
+      "published": "2026-08-05T12:52:14+00:00",
+      "link": "https://arxiv.org/pdf/2608.04788v1",
+      "tags": [
+        "keyword:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Agentic RL with observation-calibrated self-distillation to produce dense token-level supervision",
+      "llm_evidence_cn": "面向智能体强化学习的观测校准自蒸馏，提供密集词元级监督",
+      "llm_evidence": "面向智能体强化学习的观测校准自蒸馏，提供密集词元级监督",
+      "canonical_evidence": "面向智能体强化学习的观测校准自蒸馏，提供密集词元级监督",
+      "llm_tldr_en": "This paper tackles sparse trajectory-level rewards in LLM agent reinforcement learning by proposing observation-calibrated self-distillation, which corrects posterior support to avoid confounding from replay scaffolding, yielding dense and better-attributed token supervision.",
+      "llm_tldr_cn": "大模型智能体常以稀疏轨迹奖励训练，难以判断每个词元的更新强度。论文指出现有自蒸馏方法在重放视角下给出的支持信号混杂了重放脚手架导致的分数偏移，尤其在以未来环境观测作为特权信息时。作者提出观测校准的自蒸馏方法，对支持信号进行校准，使密集词元监督更准确地反映特权信息。从而提升智能体强化学习的训练效率和可解释性。",
+      "llm_tldr": "大模型智能体常以稀疏轨迹奖励训练，难以判断每个词元的更新强度。论文指出现有自蒸馏方法在重放视角下给出的支持信号混杂了重放脚手架导致的分数偏移，尤其在以未来环境观测作为特权信息时。作者提出观测校准的自蒸馏方法，对支持信号进行校准，使密集词元监督更准确地反映特权信息。从而提升智能体强化学习的训练效率和可解释性。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2608.04934v1",
+      "source": "arxiv",
+      "title": "State2State: Environment-Derived Mid-Training for LLM Agents",
+      "abstract": "Training LLM agents commonly relies on supervised fine-tuning from expert trajectories or online reinforcement learning over human-specified tasks with handcrafted verifiers. Though effective, both remain bottlenecked by externally specified tasks and supervision signals, limiting the scalability and diversity of agent training. We study an environment learning paradigm in which agents acquire interaction and manipulation capabilities solely through environment interaction, without externally specified tasks. We propose State2State, an environment-derived mid-training method that converts explored environment states into training objectives, challenging agents to reach a specified target state. By deriving tasks from environment exploration and verifying success through rule-based state matching, State2State provides scalable and verifiable training objectives without expert supervision or manual task design. Experiments on ALFWorld and ScienceWorld show that State2State improves agent performance as a standalone environment-learning stage in most settings. As initialization for downstream RL, it further improves final performance and learning efficiency, with promising evidence of cross-environment generalization.",
+      "authors": [
+        "Xuanyu Lei",
+        "Yiqi Zhu",
+        "Chenliang Li",
+        "Kaiming Liu",
+        "Peng Li",
+        "Ming Yan",
+        "Jieping Ye",
+        "Ya-Qin Zhang",
+        "Yang Liu"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.LG"
+      ],
+      "published": "2026-08-05T15:02:41+00:00",
+      "link": "https://arxiv.org/pdf/2608.04934v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "environment-derived training for LLM agents",
+      "llm_evidence_cn": "面向LLM代理的环境派生训练方法",
+      "llm_evidence": "面向LLM代理的环境派生训练方法",
+      "canonical_evidence": "面向LLM代理的环境派生训练方法",
+      "llm_tldr_en": "State2State derives mid-training tasks from environment exploration, letting LLM agents learn interaction skills without externally specified tasks or expert trajectories, improving scalability and diversity.",
+      "llm_tldr_cn": "当前训练LLM代理通常依赖专家轨迹的监督微调或人工指定任务的在线强化学习，这限制了训练数据的规模与多样性。为此本文提出State2State，一种环境派生的中期训练方法，通过从环境探索中自动生成目标状态，使代理学会从当前状态到达指定目标状态。该方法无需外部任务定义，仅通过与环境的交互即可获得交互和操作能力，为更可扩展的代理训练提供了新思路。",
+      "llm_tldr": "当前训练LLM代理通常依赖专家轨迹的监督微调或人工指定任务的在线强化学习，这限制了训练数据的规模与多样性。为此本文提出State2State，一种环境派生的中期训练方法，通过从环境探索中自动生成目标状态，使代理学会从当前状态到达指定目标状态。该方法无需外部任务定义，仅通过与环境的交互即可获得交互和操作能力，为更可扩展的代理训练提供了新思路。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    }
+  ]
+}

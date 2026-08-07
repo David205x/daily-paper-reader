@@ -1,0 +1,1363 @@
+Title: IACM-RL: Intent-Aware Context Management and Reinforcement Learning for Complex Tool Invocation under Dynamic Intent Fluctuations
+
+URL Source: https://arxiv.org/pdf/2608.02110v1
+
+Published Time: Tue, 04 Aug 2026 02:50:33 GMT
+
+Number of Pages: 43
+
+Markdown Content:
+Fudan NLP Lab 2026-8-4 
+
+# IACM-RL: Intent-Aware Context Management and Reinforcement Learning for Complex Tool Invocation under Dynamic Intent Fluctuations 
+
+Dingwei Zhu 1* , Jiahan Li 1* , Chengjun Pan 3, Yunxian Yang 1, Yunbin Zhao 2,Yunke Zhang 2, Zhonghang Lu 1, Zhuohui Sheng 1, Chenhao Huang 1, Jiahang Lin 1,Yajie Yang 1, Junlin Shang 1, Shichun Liu 1, Yuhui Wang 1, Honglin Guo 1,Junjie Ye 1, Xin Guo 1, Jiazheng Zhang 1, Ming Zhang 1, Shihan Dou 1,Zhiheng Xi 1, Tao Gui 1†, Qi Zhang 1, Xipeng Qiu 1, Xuanjing Huang 1
+
+> 1
+
+Fudan University 2Honor Device Co., Ltd. 3Peking University 
+
+dwzhu25@m.fudan.edu.cn, tgui@fudan.edu.cn 
+
+Executing long-horizon tool invocations in real-world environments is severely challenged by dy-namic user intent noise. Existing methods attempt robustness via implicit history scanning or text compression, yet predominantly assume perfect instructions in simplistic scenarios. Inevitably, un-der fluctuating contexts, obsolete constraints dilute model attention, triggering catastrophic intent deviation and infinite API loops. To resolve this, we propose IACM-RL, a comprehensive framework for robust tool invocation. First, we introduce the DynamicIntent pipeline, synthesizing trajecto-ries across 13 fine-grained fluctuation scenarios, paired with a five-dimensional diagnostic metric suite. Second, IACM-RL deploys a BeliefState-based Self-Generated Context Manager that proac-tively tracks shifting goals and isolates overwritten parameters using structural stale flags. To autonomously internalize this state-tracking capability, we optimize the policy using a hierarchical intent-driven reward alongside three auxiliary losses (action calibration, CM extraction, and state distillation). Experiments on DynamicIntent, BFCL-V3, and 𝜏 2-Bench demonstrate that IACM-RL significantly outperforms baselines, reducing infinite loops and stale context errors while enhanc-ing out-of-domain generalization. 
+
+## 1. Introduction 
+
+Large Language Models (LLMs) (Pan et al., 2026; Xi et al., 2026; Zhu et al., 2026a,b,c) have demon-strated profound potential in automated tool invocation, yet existing training paradigms predomi-nantly assume “perfect static instructions,” presuming that user queries evolve linearly without in-terruption. (Liu et al., 2025; Zhou et al., 2024) In stark contrast, real-world interactions are fraught with intent noise, where users frequently modify tasks, insert irrelevant chit-chat, or articulate am-biguous constraints. (Li et al., 2024; Shi et al., 2023) Achieving robust reinforcement learning (RL) under such noisy supervision remains a critical, unresolved prerequisite for deploying reliable AI agents. To mitigate these dynamic perturbations, previous methodologies attempt robustness through long-context fine-tuning, implicit reasoning chains, or context compression (Kang et al., 2026). How-ever, these paradigms predominantly rely on the assumption of perfect instructions, forcing agents to implicitly scan verbose, raw histories. Consequently, under complex and fluctuating contexts, the accumulation of obsolete constraints and irrelevant interruptions severely dilutes the model’s token-level attention. (Liu et al., 2024) Critical tokens representing updated goals receive dispropor- 
+
+> *Equal contribution. †Corresponding author. arXiv:2608.02110v1 [cs.CL] 3 Aug 2026 IACM-RL: Intent-Aware Context Management and Reinforcement Learning for Complex Tool Invocation under Dynamic Intent Fluctuations
+
+Figure 1 | Overview of the IACM-RL framework. The framework consists of three core mod-ules: (Left) The scalable DynamicIntent data pipeline that synthesizes multi-turn trajectories across five intent-fluctuation modes. (Top Right) The training paradigm, featuring an autoregressive BeliefState-based Context Manager that proactively tracks shifting goals and utilizes structural stale flags to decouple state tracking from action generation. (Bottom Right) The optimization process, which internalizes state-tracking capabilities using a hierarchical intent-driven reward system (span-ning cognitive, behavioral, and outcome dimensions) alongside three auxiliary consistency losses. tionately low attention weights, causing the agent to overlook key information. This severe attention dilution subverts multi-tool data dependencies, inevitably trapping the agent in catastrophic intent deviation and infinite API calling loops (Arike et al., 2025; Wang et al., 2025). While Contextual Belief Management tracks evidence shifts under contextual pressure (Xu et al., 2026), and probing studies underscore the necessity of explicit external guidance due to LLMs’ unstable internal repre-sentations (Luo et al., 2026), these approaches exhibit fault-tolerance only in simplistic tool scenarios and collapse when confronted with long-horizon, parallel multi-tool tasks. To resolve this, we propose IACM-RL , a comprehensive framework for robust tool invocation. Concretely, IACM-RL integrates the DynamicIntent pipeline, a scalable data construction frame-work that synthesizes multi-turn trajectories spanning 13 fine-grained intent fluctuation scenar-ios, accompanied by a five-dimensional metric suite for dynamic intent diagnosis. At its core, a BeliefState-based Self-Generated Context Manager neutralizes history-induced noise by proactively tracking shifting goals and isolating overwritten parameters via structural stale flags, forcibly de-coupling critical states from verbose histories. Crucially, IACM-RL autonomously internalizes this mechanism. Guided by a hierarchical intent-driven reward and three auxiliary losses (action calibra-tion, CM extraction, and state distillation), the agent learns to dynamically extract robust state blocks from noisy trajectories and distill this explicit tracking capability directly into its implicit parameters. We validate IACM-RL on the DynamicIntent Benchmark encompassing both ID and OOD sce-narios, alongside BFCL-V3 and 𝜏 2-Bench. Empirical results demonstrate that IACM-RL achieves the highest overall average among all methods, demonstrates strong out-of-domain generalization, and shows consistent gains on adversarial drift and per-scenario analysis. Our core contributions are summarized as follows: 
+
+DynamicIntent Dataset and Benchmark: We construct a large-scale dataset of multi-turn tool-
+
+> 2IACM-RL: Intent-Aware Context Management and Reinforcement Learning for Complex Tool Invocation under Dynamic Intent Fluctuations
+
+calling trajectories spanning 13 fine-grained intent fluctuation scenarios, and establish the Dynam-icIntent Benchmark with a five-dimensional metric suite for dynamic intent diagnosis, covering both ID and OOD evaluation. 
+
+Self-Generated Context Manager via BeliefState: We introduce an explicit Context Manager where the model proactively tracks user goals and marks overwritten parameters with a structural stale flag. 
+
+Intent-Driven RL Optimization: We design a hierarchical reward system providing dense super-vision across cognitive, behavioral, and outcome dimensions. Crucially, three auxiliary consistency losses empower the agent to autonomously internalize robust, long-horizon state tracking. 
+
+Figure 2 | DynamicIntent data construction pipeline. This process synthesizes complex trajectories through: (1) unified tool abstraction across heterogeneous APIs, (2) dependency graph construction via constraint-aware LLM voting, (3) trajectory augmentation that injects realistic behavioral noise across 13 fine-grained scenarios (grouped into Modification, Interruption, Clarification, Accumula-tion, and Chaining modes), (4) multi-dimensional data filtering for consistency, plausibility, and complexity, and (5) LLM-driven simulation execution to produce complete multi-turn dialogues. 
+
+## 2. Related Work 
+
+Intent Fluctuation and Contextual Belief Management. Intent fluctuation describes how an agent’s objectives deviate amid dynamic user feedback and redundant context, fundamentally challenging the LLM assumption of static instruction adherence. Precise intent tracking strips away historical noise and captures genuine requirement shifts, thereby improving multi-turn tool stability. Early works quantify this deviation by tracking temporal transitions (Wang et al., 2025), observing goal divergence as contextual signals accumulate (Arike et al., 2025), and designing intent assurance frameworks to extract key indicators for drift detection (Dzeparoska et al., 2024). Recently, (Xu et al., 2026) extended dynamic tracking to explicit belief state maintenance to capture evidence shifts, while other studies examined how explicit value conflicts trigger asymmetric goal drift (Saebo et al., 2026). Furthermore, (Kang et al., 2026; Luo et al., 2026; Sun et al., 2026) revealed that LLMs lack stable internal representations, necessitating external belief guidance. Building upon these insights, our IACM-RL framework autonomously manages dynamic intents by internalizing a self-generated BeliefState directly within the RL optimization loop. 
+
+Multi-Turn Reasoning Instability and Agent State Management. Maintaining reasoning stability in long-horizon environments is a critical challenge, as LLMs frequently lose relevant evidence, suc-cumb to noise, exhibit contextual inertia, and suffer instruction degradation (Chen et al., 2026; Laban et al., 2025; Liu et al., 2024; Shi et al., 2023), often leading to severe error cascades across execution steps (Lin et al., 2026; Ma et al., 2026). To mitigate this, recent frameworks utilize reinforcement 
+
+> 3IACM-RL: Intent-Aware Context Management and Reinforcement Learning for Complex Tool Invocation under Dynamic Intent Fluctuations
+
+learning to jointly optimize memory (Zhou et al., 2025), refine prompts to filter noise (Kang et al., 2026), or employ scalable external memory layers to consolidate salient information across ses-sions (Chhikara et al., 2025). Unlike these methods, IACM-RL empowers the agent to autonomously internalize complex state management by explicitly decoupling state tracking from action generation via a self-generated BeliefState. 
+
+## 3. Intent-Aware Tool Dataset and Evaluation Framework 
+
+The scarcity of high-quality, multi-turn dialogue trajectories containing complex intent fluctuations constitutes a foundational bottleneck in robust tool-calling research. Because existing benchmarks predominantly focus on static, single-shot instructions, we introduce the DynamicIntent Dataset .This dataset is generated via a highly scalable simulation pipeline and is accompanied by a novel multi-dimensional evaluation metric suite specifically designed for dynamic intent diagnosis. De-tailed dataset statistics, scenario distributions, and comprehensive quantitative breakdowns are pro-vided in Appendix D. 
+
+3.1. Data Construction Pipeline 
+
+Our pipeline synthesizes complex multi-turn tool-calling trajectories without real backends, in five stages (Figure 2). 
+
+Stage 1: Tool Abstraction and Collection. We aggregate heterogeneous API sources, including En-glish ToolBench and proprietary third-party and mid-control applications, and normalize each API into the unified schema via UTAL, so that format differences across sources are hidden from down-stream stages. The normalized tools form a cross-source pool from which each trajectory samples its own candidate-tool subset; because the subset varies across samples, the model is forced to read the schema and select the correct tool rather than memorize tool names. 
+
+Stage 2: Dependency Graph Construction. We build the directed Tool Dependency Graph 𝐺 by asking multiple LLMs, each voting twice (once from schema descriptions alone and once with a concrete input example), whether the return of one tool can satisfy a parameter of another. An edge is kept only when both votes of an account agree and a majority of accounts concur, which suppresses spurious edges and keeps the graph precise. Constraint-aware random walks on 𝐺 then sample baseline Function Sequence Patterns (FSP) as workflow backbones, ensuring that adjacent tools in a backbone are genuinely related by data flow. 
+
+Stage 3: Trajectory Augmentation. The intent-augmentation methods inject realistic human be-havioral noise into the FSP backbones. They split into graph-level methods, which edit the FSP structure over 𝐺 , and trajectory-level methods, which rewrite already-synthesized dialogues, orga-nized into the five intent-fluctuation modes detailed in Section 3.2. A shared subroutine across the interruption-family methods is graph-constrained splicing (Algorithm 2): an orthogonal sub-trajectory is spliced into a base trajectory only when its tools are name-disjoint from the base and no dependency edge connects the two tool sets, guaranteeing that the spliced segment introduces a genuinely new task rather than a logical continuation. 
+
+Stage 4: Data Filtering. Each auto-generated trajectory is screened along three dimensions before RL use: 
+
+• Consistency. Every tool call must be schema-conformant: arguments use the declared parameter names, include all required parameters, contain no undeclared extra keys, respect declared types and allowed values, and correctly map any user-mentioned information that corresponds to a tool 
+
+> 4IACM-RL: Intent-Aware Context Management and Reinforcement Learning for Complex Tool Invocation under Dynamic Intent Fluctuations
+
+parameter. Calls that reference tools absent from the candidate pool are discarded, and recoverable cases are repaired in place. 
+
+• Plausibility. The trajectory must form a closed loop that resolves the user’s request: tool returns must be coherent with the call arguments, and the assistant summary must faithfully reflect the returns. Samples whose task goal diverges substantially from the executed result are deleted, while those needing only a minor parameter fix are corrected. 
+
+• Complexity. Trajectories are filtered against a prompt-length budget so that the distribution stays informative: overlong samples are clipped or rejected, and trivially short or degenerate samples are removed. The human-annotated ID/OOD test set additionally undergoes a two-tier annotation pass, with uni-versal rules and scenario-specific checks, to guarantee exact evaluation labels. 
+
+Stage 5: LLM-Driven Simulation Execution. An LLM-based simulator interprets the filtered FSP traces via back-and-forth translation: for each tool call it renders a natural user query from the schema, generates the assistant tool call, synthesizes a mock API return conforming to the tool’s re-sponse schema, and produces an assistant summary, yielding complete multi-turn dialogues without any real backend. Where real responses are available they are cached and reused; otherwise the simulator generates schema-conformant mock returns. The pipeline also records the expected final tool dependencies and argument states as a golden map, which serves as the exact optimization and evaluation target for the rule-based reward and metrics. 
+
+3.2. Intent-Fluctuation Construction and Dataset Composition 
+
+The intent-augmentation methods introduced in the main pipeline (Section 3.1) are organized around the same five intent-fluctuation modes that the BeliefState fields and reward metrics target. Each mode is realized by a combination of graph-level methods and trajectory-level methods. Table 1 summarizes the mapping; we detail each mode below. 
+
+Intent Mode Graph-level methods Trajectory-level methods BeliefState field 
+
+Modification — “task change”, “rewrite param”, “rewrite function”, “personalization” 
+
+Cslots (stale )Interruption — “function switch”, “function insert”, “add fsp”, “add question node”, “pre-task new query” 
+
+Gcurrent , Isignal 
+
+Clarification “FSP split param”, “FSP split function” “none function”, “non query”, “ask intent”, “clarify unclear intent” 
+
+Qpending 
+
+Accumulation “FSP merge” “function parallel”, “inherit param”, “in-herit function”, “param reference” 
+
+Cslots , Gcurrent 
+
+Chaining “FSP insert”, “FSP insert long” — Alast 
+
+Table 1 | Augmentation methods grouped by the five intent-fluctuation modes. Graph-level methods act on the FSP over 𝐺 ; trajectory-level methods act on synthesized dialogues. Each mode maps to the BeliefState field it most stresses (Eq. 6). 
+
+Modification. The user overwrites a previously set parameter, and the agent must not regress to the stale value. The task change method uses an LLM to inject a three-message block at a chosen insertion point: a user message overwriting a parameter, a re-invoked tool call with updated arguments, and a modified tool return. The rewrite param and rewrite function methods paraphrase a parameter value or swap to a functionally similar tool. The personalization method injects a user profile that 
+
+> 5IACM-RL: Intent-Aware Context Management and Reinforcement Learning for Complex Tool Invocation under Dynamic Intent Fluctuations
+
+is updated between rounds so the same tool yields different arguments. These directly exercise the stale flag on Cslots .
+
+Interruption. The user switches to a new task mid-flow. All five methods splice an orthogonal sub-trajectory into a base trajectory under the graph-constrained conflict check of Algorithm 2, differing only in insertion position. Function switch appends the new task to the end of the trajectory. Function insert splices 1–3 rounds into the middle. Pre-task new query inserts after the last user or last tool message, yielding the after-user and after-tool variants. Add fsp and add question node attach a new complex or simple task right after a parameter-clarification question. They test Gcurrent and the interrupted Isignal .
+
+Clarification. Information is missing or ambiguous, forcing proactive questioning. The graph-level FSP split param method marks a parameter as intentionally omitted, and FSP split function marks a missing tool; during trajectory synthesis these flags trigger branches where the assistant must ask for the missing information. The trajectory-level none function and non query methods insert empty or chitchat turns, while ask intent and clarify unclear intent prepend LLM-generated ambiguous or fragmented utterances. These populate Qpending .
+
+Accumulation. The user appends parallel or inherited requests. The graph-level FSP merge method merges two FSPs so the agent executes two tool chains in one turn. The trajectory-level function parallel method appends a second request to an existing user turn. Inherit param, inherit function, and param reference replace a turn with a structurally similar tool whose arguments are inherited from prior results rather than re-stated by the user. These stress multi-goal slot management in Cslots 
+
+and Gcurrent .
+
+Chaining. The return of tool A feeds the parameter of tool B, so prior results must be retained. This mode is realized purely at the graph level. The FSP insert method appends a graph-successor along a dependency edge, and FSP insert long enforces a non-empty dependency to build a deeper chain. The resulting trajectories rely on Alast to chain calls correctly. The finalized corpus contains four splits. The multi-turn training set consists of 5,639 trajec-tories; the single-step training set contains 17,391 trajectories. To prevent catastrophic forgetting of conversational capabilities during RL, approximately 9.3% of the multi-turn set and 9.5% of the single-step set are supplemented with pure linguistic clarification queries. Table 2 summarizes the scale and average tool-pool size.                
+
+> Dataset Split Total Samples Mean Tools in Pool Max Tools
+> Multi-turn Train 5,639 11.7 40 Multi-turn Validation 753 --Single-step Train 17,391 12.2 40 Single-step Validation 3,733 --
+
+Table 2 | Overview of the DynamicIntent Dataset splits. 
+
+ID/OOD partitioning. The Intent Benchmark is split into ID and OOD along the tool-source axis. The ID set uses the same tool sources as training, while the OOD set uses a held-out, disjoint tool pool of 244 tools so that OOD scenarios exercise genuinely unseen schemas. Both splits cover the full 13 scenarios with approximately 100 dialogs each. The ID set contains 1,272 dialogs; the OOD set contains 1,278. The split is designed primarily to assess generalization to held-out tool schemas while maintaining comparable scenario coverage. 
+
+Visualizing the distributions. Figure 3 shows the per-scenario composition of both training sets as chord diagrams, with each scenario colored by its intent-fluctuation mode. Clarification dominates in 
+
+> 6
+
+IACM-RL: Intent-Aware Context Management and Reinforcement Learning for Complex Tool Invocation under Dynamic Intent Fluctuations 
+
+Figure 3 | Per-scenario distribution of both training sets as chord diagrams. Left: multi-turn (𝑁 =5,639 ); Right: single-step ( 𝑁 =17 ,391 ). Each sector is colored by its intent-fluctuation mode, with labels showing count. both sets, followed by Interruption and Accumulation. Modification is the scarcest mode, deliberately over-augmented to 258 trajectories in the multi-turn set. 
+
+Per-Trajectory Tool Statistics. Figure 4 shows the distribution of optimal tool count and candidate tool pool size for both the single-step and multi-turn sets. All tools in the dataset are text-based API calls; no multimodal tools are included. In the single-step set, most trajectories ( 71 .1% ) require only 1 tool (mean 1.1), while the multi-turn set shifts toward 2 tools ( 56 .1% , mean 1.9), reflecting more complex multi-tool workflows. The candidate tool pool is similar across both sets: single-step averages 12.2 tools (p50 at 8, p90 at 32), multi-turn averages 11.7 (p50 at 6, p90 at 32), ensuring sufficient selection pressure for schema-reading rather than name memorization. 0 1 2 3 4                       
+
+> Number of Gold Tools (Single-step)
+> 0
+> 10
+> 20
+> 30
+> 40
+> 50
+> 60
+> 70
+> 80
+> Percentage (%)
+> 9.5%
+> 71.1%
+> 19.2%
+> (a) Optimal Tool Count — Single-step
+> 0510 15 20 25 30 35 40
+> Candidate Tool Pool Size (Single-step)
+> 0
+> 20
+> 40
+> 60
+> 80
+> 100
+> Cumulative (%)
+> p50=8
+> p90=32
+> (b) Candidate Tool Pool CDF — Single-step
+> 01234567
+> Number of Gold Tools (Multi-turn)
+> 0
+> 10
+> 20
+> 30
+> 40
+> 50
+> 60
+> Percentage (%)
+> 9.3%
+> 15.7%
+> 56.1%
+> 13.4%
+> 3.4%
+> (c) Optimal Tool Count — Multi-turn
+> 0510 15 20 25 30 35 40
+> Candidate Tool Pool Size (Multi-turn)
+> 0
+> 20
+> 40
+> 60
+> 80
+> 100
+> Cumulative (%)
+> p50=6
+> p90=32
+> (d) Candidate Tool Pool CDF — Multi-turn
+
+Figure 4 | Tool count distributions for single-step (top) and multi-turn (bottom) training sets. Left: optimal tools per trajectory. Right: candidate tool pool size CDF. 
+
+7IACM-RL: Intent-Aware Context Management and Reinforcement Learning for Complex Tool Invocation under Dynamic Intent Fluctuations 
+
+Prompt Token-Length Distribution. Figure 5 shows the cumulative distribution of prompt length for the two training sets. The dashed lines mark exact char percentiles after overlong filtering: the single-step set has p50 of 2,387, p90 of 5,076, p95 of 5,887, and p99 of 11,961; the multi-turn set has a tighter p99 of 8,698. Both distributions are right-skewed, with the single-step set exhibiting a heavier tail from the mixed open-source trajectories. The few overlong samples in the single-step set are handled by left-truncation preserving the most recent messages, while the multi-turn set uses error-mode truncation to avoid corrupting structured state. 
+
+3.3. Multi-dimensional Intent Metrics 
+
+Single-turn accuracy fails to capture the cascading failures of long-horizon intent fluctuation, so we design a five-metric matrix diagnosing dynamic fault-tolerance and structural compliance. 
+
+Joint Goal Accuracy (JGA) evaluates parameter-level extraction and tool selection at turn 𝑡 , where 
+
+ˆA𝑡 and A∗ 
+
+> 𝑡
+
+are the predicted and ground-truth arguments: 
+
+JGA 𝑡 = I
+
+ ˆA𝑡 = A∗
+
+> 𝑡
+
+
+
+(1) 
+
+Stale Context Residual Rate (SCRR) measures how often the agent reuses overwritten values, over modification turns Tmod ; P𝑡 is the parameter set at turn 𝑡 , ˆ𝑉 ( 𝑝 ) the predicted value, and 𝑉 stale ( 𝑝 ) the overwritten stale value: 
+
+SCRR = 1
+
+|T mod |∑︁ 𝑡 ∈ T mod ∑︁ 𝑝 ∈ P 𝑡 
+
+I
+
+ˆ𝑉 ( 𝑝 ) = 𝑉 stale ( 𝑝 )
+
+
+
+(2) 
+
+Redundant and Infinite-loop Rate (RIR) detects repeated tool calls across turns, where 𝑇 is the total number of turns, Δ is a temporal lag, and 𝑎 𝑡 denotes the tool call at turn 𝑡 :
+
+RIR = 1
+
+> 𝑇
+> 𝑇
+
+∑︁ 
+
+> 𝑡 =1
+
+I (∃ Δ > 0, 𝑎 𝑡 = 𝑎 𝑡 −Δ) (3) 
+
+Dependency Tool Chain Rate (DTCR) gives tiered credit by chain completion ratio 𝑟 𝑘 = |hit 𝑘 |/|T 𝑘 |,where |hit 𝑘 | is the number of correctly completed tools in chain 𝑘 , |T 𝑘 | the chain length, and [𝑙 𝑘 , 𝑢 𝑘 )
+
+the completion-ratio interval for tier 𝑣 𝑘 (partial/high/full), so partially completed chains still receive a signal: 
+
+DTCR =∑︁  
+
+> 𝑘
+> 𝑣 𝑘
+
+I(𝑟 𝑘 ∈ [ 𝑙 𝑘 , 𝑢 𝑘 )) , 𝑣 𝑘 ∈ { 𝑣 partial , 𝑣 high , 𝑣 full } (4) 
+
+Intent Switch Success Rate (ISSR) rewards pivoting to an interruption goal, gated by an LLM judge 
+
+𝑠 LLM ∈ [− 1, 1] above a threshold 𝜏 , with 𝜆 switch the reward magnitude for a successful pivot: 
+
+ISSR = 𝜆 switch I(pivot success ) · I(𝑠 LLM > 𝜏 ) (5) 
+
+> 8
+
+IACM-RL: Intent-Aware Context Management and Reinforcement Learning for Complex Tool Invocation under Dynamic Intent Fluctuations 0 5000 10000 15000 20000 25000      
+
+> Prompt Length (chars, approximate)
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> Cumulative Proportion
+> p50
+> 2,388 char
+> p90
+> 5,090 char
+> p95
+> 5,451 char
+> p99
+> 8,698 char
+> Multi-turn Train
+> (N=5,639)
+> 05000 10000 15000 20000 25000
+> Prompt Length (chars, approximate)
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> Cumulative Proportion
+> p50
+> 2,387 char
+> p90
+> 5,076 char
+> p95
+> 5,887 char
+> p99
+> 11,961 char
+> Single-step Train
+> (N=17,391)
+
+Prompt Length CDF — Training Sets 
+
+Figure 5 | Prompt-length CDF for the multi-turn and single-step training sets. Curves use character length for shape; dashed lines mark exact char percentiles. 
+
+Figure 6 | Attention-level analysis of a failure case under dynamic intent fluctuations. (Top) In con-ventional paradigms, obsolete constraints and injected noise during drift turns (e.g., Modification or Interruption) severely dilute the model’s token-level attention across verbose raw histories, causing the model to lose focus on critical keywords. (Bottom) IACM-RL neutralizes this by deploying a Con-text Manager that structurally isolates overwritten parameters and refocuses attention exclusively on valid state boundaries and current goals. Darker colors indicate higher attention. 
+
+## 4. Methodology 
+
+4.1. Problem Formulation and Motivation 
+
+We formulate multi-turn tool invocation under dynamic intent noise as a POMDP M = ⟨S , A, T , R, Ω, O, 𝛾 ⟩,where S is the latent intent state, A the action space (linguistic responses and tool calls), T the state transition, R the reward, Ω the observation space, O the observation function, and 𝛾 the discount factor. The latent intent S is only partially observed through noisy observations (mid-task modifica-tions, irrelevant chit-chat, ambiguous constraints). Conventional imitation learning implicitly scans the raw history ℎ𝑡 −1 to optimize 𝜋 (𝑎 𝑡 | ℎ𝑡 −1, 𝑜 𝑡 ), bundling state tracking and action generation into a single black box. This work is motivated by an attention-level diagnosis of the catastrophic failures exhibited by conventional policies learning under dynamic intent fluctuations (Figure 6). During drift turns, such as mid-task modifications or interruptions, the accumulation of obsolete constraints and injected noise severely dilutes the model’s token-level attention across the verbose dialogue history. Conse-
+
+9IACM-RL: Intent-Aware Context Management and Reinforcement Learning for Complex Tool Invocation under Dynamic Intent Fluctuations 
+
+quently, critical tokens representing the updated goal or the latest parameter changes receive low attention weights, causing the agent to overlook key information. This severe attention dilution fundamentally subverts the strict data dependencies required for multi-tool execution, inevitably trapping the agent in catastrophic intent deviation and infinite API calling loops. 
+
+4.2. Self-Generated Context Manager via BeliefState 
+
+To systematically neutralize the error amplification identified above, we introduce an autoregressive Self-Generated Context Manager. During training, at each turn the policy first decodes a compact state block from the current observation and history, then conditions the downstream tool action on this block rather than on the raw history. The block is governed by an explicit BeliefState with five core components (instantiated as nine XML sub-blocks, Figure 7): 
+
+b𝑡 =
+
+
+
+Cslots , Gcurrent , Alast , Qpending , Isignal 
+
+
+
+(6) 
+
+where b𝑡 is the BeliefState at turn 𝑡 , Gcurrent captures the core objective, Isignal the intent deviation category such as clarify, modify, or interrupt, Alast the most recent tool execution for loop suppres-sion, Qpending the missing information that requires clarification, and Cslots the verified parameters. Crucially, when a parameter is overwritten, the old value is not deleted but marked with a structural stale flag, explicitly forbidding the policy from regressing to it. 
+
+Context Manager Block Structure 
+
+<Context_Manager> 
+
+> <Current_User> intent & tool-call flag </Current_User> <Overall_User_Task> goal & deferred intents </Overall_User_Task> <History_Relation> inherit / override / delete slots </History_Relation> <Resolved_References> resolved entity references </Resolved_References> <Active_Objects> last execution & active objects </Active_Objects> <Pending_Or_Interrupted_Tasks> blocked & interrupted tasks </Pending_Or_Interrupted_Tasks> <Task_Graph_For_Current_Turn> slots & tool plan </Task_Graph_For_Current_Turn> <Deferred_Tasks_After_Current_Turn> postponed sub-goals </Deferred_Tasks_After_Current_Turn> <Tool_Decision_Guide> call / ask & unresolved slots </Tool_Decision_Guide>
+
+</Context_Manager> 
+
+Figure 7 | The nine sub-blocks of the self-generated Context Manager. 
+
+CM update timing. The BeliefState is updated at well-defined points, and the granularity differs by stage. In single-step training, the CM is initialized and rendered once before generation, then the tool result is recorded once after generation. In multi-turn training, the state is updated at every interaction boundary: each user message triggers intent detection, slot and stale-flag updates, and goal revision; each tool execution triggers a last-action and active-object update, followed by a fresh render that re-injects the updated CM into the system prompt for the next assistant turn. 
+
+4.3. Hierarchical Intent-Driven Reward System 
+
+To provide dense, diagnostically meaningful reinforcement, we decompose the reward into three layers mirroring the cognitive, behavioral, and outcome aspects of tool calling:  
+
+> 𝑅 total
+
+= 𝛼 𝑅 belief + 𝛽 𝑅 action + 𝛾 𝑅 outcome + 𝑅 format (7) 
+
+> 10 IACM-RL: Intent-Aware Context Management and Reinforcement Learning for Complex Tool Invocation under Dynamic Intent Fluctuations
+
+where 𝛼, 𝛽, 𝛾 are the layer weights and 𝑅 format is a small penalty on malformed responses such as empty outputs or residual tool-call tags. Each layer aggregates the metrics defined in Section 3.3 and supervises a subset of the BeliefState fields: 𝑅 belief combines JGA with stale and hallucination penal-ties to supervise Cslots ; 𝑅 action incorporates loop and invalid-call penalties as well as LLM-evaluated Active Clarification Reward (ACR) to supervise Alast and Qpending ; and 𝑅 outcome combines DTCR and ISSR to supervise Gcurrent and Isignal . This yields a direct correspondence between reward layers and subsets of the BeliefState fields, turning the opaque trajectory reward into field-level credit assign-ment. Layer weights and all signal coefficients are reported below and in Appendix C. 
+
+Metric definitions. The reward signals are built upon the five evaluation metrics defined in Section 3.3, together with the ACR clarification signal used by the reward. 
+
+Joint Goal Accuracy (JGA). The evaluation JGA uses exact turn-level matching: a turn is a hit only if the predicted call set matches the gold set in name, parameter names, and parameter values. The training JGA reward is a denser call-level partial-credit shaping signal rather than a strict turn-level indicator. The two definitions are intentionally distinct: the reward provides a dense training signal while the metric measures strict end-task accuracy. 
+
+Stale Context Residual Rate (SCRR). The gold label A∗ 
+
+> 𝑡
+
+maintains a consumption queue of expected arguments per tool. If the model replicates an already-consumed (overwritten) value rather than the current active value, a stale violation 𝑣 𝑖 ∈ { 0, 1} is counted. SCRR is disabled in Stage 1 because the single-step reward does not perform cross-turn stale-value tracking. 
+
+Redundant and Infinite-Loop Rate (RIR). The evaluation RIR aggregates repeated tool calls across turns (Section 3.3). The training-time reward instantiates this through three distinct penalties: a consecutive-identical-call loop short-circuit at −2.0 with early return (training-loop-penalty); an invalid-call penalty of −0.5 (Stage 1) or −1.0 (Stage 2) per out-of-pool tool (training-invalid-penalty); and, in Stage 2 only, redundant duplicates ( −0.5/excess call) and a low-precision composite (JGA  
+
+> <
+
+0.3 with > 3 calls, −2.0). Trajectory progress is rewarded +0.3 per newly completed tool (capped 
+
++0.9). The three reward terms are not the same as the evaluation metric; the metric counts occur-rences over the whole trajectory, while the reward applies per-turn and uses different magnitudes to balance with the other layers. When the expected response is a natural-language clarification rather than a tool call, an LLM judge (GPT-5.4) scores the agent’s response quality along relevance, specificity, and completeness, producing 𝑠 LLM ∈ [− 1, 1]. In the single-step reward, the raw score directly feeds the reward (halved for pure-query turns). In the multi-turn reward (Stage 2), the ACR reward is +1.0 × 𝑠 LLM when   
+
+> 𝑠 LLM >
+
+0, active only on Clarification-labeled turns. On Tint , an LLM judge compares the current turn’s tool selection against a gold post-interruption reference, producing 𝑠 LLM ∈ [− 1, 1]. Unlike the evaluation indicator, the training-time reward is score-weighted so that stronger pivots receive proportionally larger positive signals. The binary pivot-success indicator matches the evaluation definition in Section 3.3; the 𝑠 LLM factor is a training-time shaping choice. On Tchain where interdependent calls are required, the chain completion ratio 𝑐 is the fraction of 
+
+A∗ 
+
+> 𝑡
+
+correctly called (JGA hits). The two training stages instantiate two reward variants that share the same detector primitives but differ in scope. Both parse the model response with a multi-call extractor, then branch on whether any tool call was produced. 
+
+Single-step reward . Designed for one-shot calls where the expected tool calls form a flat name-to-arguments map with no multi-tool sequence. It operates as four mutually exclusive branches keyed 
+
+> 11 IACM-RL: Intent-Aware Context Management and Reinforcement Learning for Complex Tool Invocation under Dynamic Intent Fluctuations
+
+on question type: 1. Tool call issued but question type is language : return −1.0, the agent should have clarified. 2. Tool call issued and question type is not language : compute JGA as 2·𝑛 hit  
+
+> 𝑛 calls
+
+, with loose matching for in-domain data and strict matching for BFCL. 3. No tool call and question type is language : invoke the ACR rubric on the natural-language response, yielding a score in [− 1, 1].4. No tool call and question type is query : invoke the same ACR rubric but halve the score to down-weight ungrounded answers. Malformed responses receive −0.3 to −0.5 format penalties. No loop, chain, or switch detection is applied, since a single step cannot exhibit them. 
+
+Multi-turn reward . Covers full trajectories and aggregates the three hierarchical layers, with 𝛼 =1.0,
+
+𝛽 =1.0, 𝛾 =0.5, and final score clamping to [− 4.0, 8.0]. Each detector is gated by the scenario label to bound LLM judging to at most 2 calls per sample. A consecutive-identical-call loop short-circuits to −2.0 and returns early. 1. Cognitive Reward Layer ( 𝑅 belief ). Joint Goal Accuracy (JGA) grants positive signals based on the hit rate: (𝑛 hit /𝑛 calls ) × 2.5, capped at 5.0. Rule-based penalties counter memory failures: retrieving obsolete variables flagged as stale incurs 𝑅 stale = − 0.5 per parameter, and hallucinating keys not present in the user query incurs 𝑅 halluc = − 0.8. 𝑅 belief directly supervises the Confirmed Slots field 
+
+Cslots of the BeliefState. 2. Behavioral Reward Layer ( 𝑅 action ). Action rewards consist of several precision heuristics: calls to tools not in the active schema incur 𝑅 invalid =− 1.0; excessively generating redundant tools beyond required limits triggers 𝑅 redundant = − 0.5 per excess call; and generating > 3 calls with a hit rate 
+
+< 0.3 yields a heavy precision penalty of −2.0. Conversely, Trajectory Progress rewards +0.3 per unique valid tool execution (capped at +0.9). For clarification, when mandatory parameters are missing, an LLM judge evaluates the agent’s proactive questions (ACR), granting +1.0 × score if the score > 0.0. 𝑅 action supervises the Last Action Alast and Pending Questions Qpending fields. 3. Outcome Reward Layer ( 𝑅 outcome ). Dependency Tool Chain Rate (DTCR) provides graded re-inforcement based on chain completion rates: 100% completion yields +4.0, ≥ 80% yields +2.5,and ≥ 50% yields +1.0. Intent Switch Success Rate (ISSR) grants +2.0 × score when the agent successfully pivots to an interruption goal, gated by an LLM judge threshold of 0.3. 𝑅 outcome 
+
+supervises the Current Goal Gcurrent and Intent Signal Isignal fields. The three reward layers map directly onto subsets of the BeliefState fields, turning the opaque trajectory reward into field-level credit assignment. LLM-judged metrics (ACR, ISSR) use gpt-5.4 
+
+with a prompt template adapted from the evaluation rubric. 
+
+Signal comparison. Table 3 contrasts the two variants, detailing the precise penalty rules and grading thresholds applied in our optimization pipeline. 
+
+4.4. Intent-Driven RL Optimization via CM Auxiliary Losses 
+
+We optimize 𝜋 𝜃 via PPO with GAE. Since the CM is self-generated, we drop the cross-entropy imita-tion loss and introduce three auxiliary losses: 
+
+Ltotal = LPG + 𝑤 cal Lcal + 𝑤 ext Lext + 𝑤 dist Ldist (8) 
+
+where LPG is the standard PPO policy-gradient loss, 𝑤 cal , 𝑤 ext , 𝑤 dist are balancing weights, and 𝜏 
+
+denotes a sampled trajectory with 𝑇 turns. 
+
+> 12 IACM-RL: Intent-Aware Context Management and Reinforcement Learning for Complex Tool Invocation under Dynamic Intent Fluctuations
+
+Signal Layer Single-step Multi-turn Value / Rule 
+
+JGA (argument hit) Belief ✓ ✓ Single: 2·𝑛 hit  
+
+> 𝑛 calls
+
+/ Multi: 𝑛 hit  
+
+> 𝑛 calls
+
+× 2.5 (cap: 5.0)SCRR stale param Belief – ✓ −0.5 per overwritten param reused SCRR hallucinated param Belief – ✓ −0.8 per fabricated value RIR infinite loop Action – ✓ −2.0, early return RIR invalid call Action ✓ ✓ Single: −0.5 / Multi: −1.0 per out-of-pool tool Trajectory progress Action – ✓ +0.3 per unique hit (cap: 0.9)Precision penalties Action – ✓ Redundant: −0.5/call; Low-precision: −2.0
+
+ACR clarification Action ✓ ✓ LLM judge ∈ [− 1.0, 1.0] (Multi: +1.0 × score if > 0)DTCR chain completion Outcome – ✓ +4.0 (100% ) / +2.5 (≥ 80% ) / +1.0 (≥ 50% )ISSR intent switch Outcome – ✓ LLM judge, +2.0 × score if score > 0.3
+
+Table 3 | Reward signal comparison between the single-step and multi-turn variants. ✓: active; –: not applicable. 
+
+Action Calibration. A lightweight term that ties response likelihood to tool-call accuracy: 
+
+Lcal = −E𝜏 
+
+h
+
+log 𝜋 𝜃 (𝑎 𝑡 ) · ( 2 acc 𝑡 − 1)
+
+i
+
+(9) 
+
+where log 𝜋 𝜃 (𝑎 𝑡 ) is the mean per-token log-probability of the response 𝑎 𝑡 averaged over the response tokens, acc 𝑡 ∈ { 0, 1} indicates whether the tool call at turn 𝑡 is correct, and the expectation is taken over trajectories 𝜏 .
+
+CM Extraction. The core loss making the CM self-improving: it directly optimizes the CM block tokens with the trajectory advantage, closing the loop from state quality to reward: 
+
+Lext = −E𝜏 
+
+" Í 𝑖 ∈b𝑡 log 𝜋 𝜃 (𝑏 𝑡,𝑖 ) 𝑚 𝑖 ˆ𝐴 𝜏 
+
+Í𝑖 ∈b𝑡 𝑚 𝑖 
+
+#
+
+(10) 
+
+where 𝑏 𝑡,𝑖 is the 𝑖 -th token of the CM block b𝑡 at turn 𝑡 , 𝑚 𝑖 is the binary CM token mask indicating which tokens belong to the CM block, ˆ𝐴 𝜏 is the detached trajectory advantage aggregated from token-level advantages, and the sum is over all tokens in the CM block. 
+
+State Distillation. Distills the CM-conditioned teacher into a CM-free student via forward KL, so state tracking is internalized into the weights and survives without the explicit block: 
+
+Ldist = E𝜏 
+
+h
+
+𝐷 KL 
+
+
+
+𝜋 𝜃 (· | b𝑡 , ℎ 𝑡 −1, 𝑜 𝑡 )sg 𝜋 𝜃 (· | ℎ𝑡 −1, 𝑜 𝑡 )
+
+i 
+
+(11) 
+
+where ℎ𝑡 −1 is the dialogue history up to turn 𝑡 , 𝑜 𝑡 is the current observation at turn 𝑡 , 𝜋 𝜃 (· | b𝑡 , ℎ 𝑡 −1, 𝑜 𝑡 )
+
+is the teacher policy conditioned on the CM block, 𝜋 𝜃 (· | ℎ𝑡 −1, 𝑜 𝑡 ) is the student policy without the CM block, and the subscript sg detaches the teacher distribution so only the student receives gradients. The three losses form a progression: Lcal grades the action against the CM, Lext uses that grade to shape the CM itself, and Ldist bakes the improved CM into the weights. Balancing weights are reported in Appendix C. 
+
+## 5. Experiments 
+
+5.1. Experimental Setup Benchmarks. We evaluate on three benchmarks: (i) the DynamicIntent Benchmark (13 intent-fluctuation scenarios, ID and OOD splits with disjoint tool pools, diagnosed by the five metrics in Section 3.3 and three composite scores); (ii) BFCL-V3 (standard function-calling, partial overall 
+
+> 13 IACM-RL: Intent-Aware Context Management and Reinforcement Learning for Complex Tool Invocation under Dynamic Intent Fluctuations
+
+Method Intent ID Intent OOD 𝜏 2-Bench BFCL Avg 
+
+Cog Beh Out Cog Beh Out Air Ret Base 34.8 99.4 84.1 33.0 99.4 77.7 28.0 31.6 63.1 61.2 PPO-noCM 34.8 99.9 85.6 32.4 99.6 81.0 32.0 26.3 62.2 61.5 FIFO-k 33.3 99.5 84.8 31.4 99.4 82.5 30.0 28.9 58.9 61.0 Prompt-Comp 32.2 99.8 86.3 34.0 98.3 81.5 30.0 21.9 61.6 60.6 ACON 33.7 99.4 83.5 34.7 99.2 81.7 26.0 35.1 61.4 61.6 LLMLingua 29.6 99.9 84.7 31.2 99.8 79.5 28.0 38.6 62.2 61.5 MEM1 36.4 99.9 87.3 34.7 99.2 82.7 38.0 23.7 61.9 62.6 RL-STA 36.4 99.7 86.6 33.8 99.3 83.0 28.0 27.4 63.2 62.0 
+
+IACM-RL (Ours) 36.5 99.9 87.3 36.3 99.6 81.2 38.0 34.2 63.3 64.0 
+
+Table 4 | Main results on the Intent Benchmark, 𝜏 2-Bench, and BFCL-V3. IACM-RL achieves the highest overall average and strong tool-calling performance on complex intent-fluctuation scenarios. Compression baselines lag on Cognitive due to history truncation. On 𝜏 2-Bench, IACM-RL leads on airline and stays competitive on retail. Cognitive = (JGA −SCRR)/2, Behavioral = 100 −RIR, Outcome = (ISSR+DTCR)/2. Best in bold .
+
+Variant Intent ID Intent OOD 𝜏 2-Bench BFCL Avg 
+
+Cog Beh Out Cog Beh Out Air Ret 
+
+Full (OURS) 36.5 99.9 87.3 36.3 99.6 81.2 38.0 34.2 63.3 64.0 
+
+−L cal 35.9 99.8 87.0 35.2 99.4 82.7 28.0 27.2 60.1 61.7 
+
+−L ext 37.0 99.9 85.5 32.7 99.0 82.3 30.0 30.7 62.9 62.2 
+
+−L dist 34.6 100.0 85.2 31.4 100.0 81.0 36.0 30.9 61.1 62.2 
+
+−all aux 35.8 99.8 86.7 33.7 99.0 82.6 28.0 25.6 62.1 61.5 
+
+Table 5 | Ablation of auxiliary losses across the Intent Benchmark, 𝜏 2-Bench, and BFCL-V3. Each row removes one loss component while keeping training data, reward, and CM settings identical, and “−all aux” indicates the simultaneous removal of all three auxiliary losses. Best in bold .accuracy) (Patil et al., 2025); and (iii) 𝜏 2-Bench (long-horizon multi-turn, airline and retail do-mains) (Barres et al., 2025). All inference uses greedy decoding with thinking disabled (no-think mode). Figure 8 compares the per-scenario dialog counts of the human-annotated ID and OOD test sets, showing matched scenario coverage with comparable per-scenario volume. 
+
+Baselines. All methods originate from the same base model, a Qwen3-8B supervised-fine-tuned on the DynamicIntent Dataset. We compare Base (the foundational SFT-only model without reinforce-ment learning) against seven context-management strategies trained with the PPO pipeline: PPO-noCM retains the full, uncompressed dialogue history as the standard RL baseline; FIFO-𝑘 (Yang et al., 2024) serves as a heuristic truncation method that preserves only the most recent 𝑘 interaction turns; Prompt-Comp (Lee et al., 2025; Wang et al., 2026) acts as a naive generative baseline em-ploying a static context-summarization instruction; LLMLingua (Jiang et al., 2023; Pan et al., 2024) applies token-level extractive compression leveraging an encoder-only language model; ACON (Kang et al., 2026) represents a state-of-the-art framework that optimizes compression guidelines in natural language space via failure analysis; MEM1 (Zhou et al., 2025) employs a learnable context compres-sion policy trained jointly with the agent through reinforcement learning; and RL-STA (Chen et al., 2026) breaks contextual inertia by incorporating single-turn anchors during reinforcement learning to stabilize multi-turn interactions. Full implementation details are provided in Appendix C. 
+
+> 14 IACM-RL: Intent-Aware Context Management and Reinforcement Learning for Complex Tool Invocation under Dynamic Intent Fluctuations
+
+Dialog Length PPO-noCM IACM-RL Δ
+
+Short ( ≤5k) 45.8 56.0 +10.2 Medium (5k–11k) 35.6 36.9 +1.3 Long (11k–16k) 8.6 23.5 +14.9 Very long ( >16k) 0.0 34.8 +34.8 Overall 28.0 35.4 +7.4 
+
+Table 6 | CM training gain by dialog token length on 𝜏 2-Bench. Δ = IACM-RL − PPO-noCM. PPO-noCM struggles on long and complex dialogs, while IACM-RL sustains state tracking via the compact CM block. 
+
+Scenario Family PPO-noCM IACM-RL Δ
+
+ID 
+
+Baseline (Simple) 79.3 82.2 +2.9 Modification 75.6 76.1 +0.5 Clarification 67.7 69.8 +2.0 Interruption 97.0 97.6 +0.6 Accumulation 66.1 67.2 +1.0 Chaining 82.4 86.7 +4.3 ID Overall 78.0 79.9 +1.9 
+
+OOD 
+
+Modification 75.0 79.7 +4.7 Clarification 66.7 70.9 +4.2 Interruption 96.3 97.0 +0.7 Accumulation 65.5 64.9 −0.6 Chaining 66.1 66.1 0.0 OOD Overall 73.9 75.7 +1.8 
+
+Table 7 | Per-scenario-family comparison on the Intent Benchmark. Each family uses its primary metric: JGA for Baseline, Modification, and Clarification; ISSR for Interruption; DTCR for Chaining and Accumulation. Δ is positive when IACM-RL is better. 
+
+Training. RL is conducted in two stages. Stage 1 trains on single-turn slices to establish tool-selection proficiency with the self-generated CM; Stage 2 seeds from Stage 1 and trains on multi-turn trajec-tories with the self-generated CM, the hierarchical reward, and the three auxiliary losses. 
+
+Implementation Details. We use AdamW with a constant actor learning rate of 1×10 −6, a train batch size of 8 with 4 rollouts per prompt, entropy coefficient 0.005 , and a low-variance KL-in-reward term with coefficient 0.001 . Max prompt length is 28,672 and max response length is 1,024 tokens. The three auxiliary-loss weights are 𝑤 cal =0.02 , 𝑤 ext =0.01 , 𝑤 dist =0.01 . Training runs on 8 GPUs with Ulysses sequence parallelism of size 4, tensor parallelism of size 8, and parameter/opti-mizer offloading under a dynamic token budget of 30,720. Complete hyperparameters, and dataset configurations are in Appendix C. 
+
+5.2. Main Results IACM-RL achieves the best overall average with strong tool-calling on complex scenarios. 
+
+Table 4 shows that IACM-RL attains the highest Avg of 64.0, leading on ID Cognitive, OOD Cognitive, BFCL, and 𝜏 2-Bench. Compression baselines such as FIFO-k, Prompt-Comp, and LLMLingua trail on Cognitive because aggressive history truncation discards state needed to track shifting goals. PPO-
+
+> 15
+
+IACM-RL: Intent-Aware Context Management and Reinforcement Learning for Complex Tool Invocation under Dynamic Intent Fluctuations 
+
+Interference Level PPO-noCM IACM-RL Δ
+
+L0(clean) 81.8 83.2 +1.4 L1(3 chitchat) 34.1 50.7 +16.6 L2(8 chitchat) 27.8 40.4 +12.6 L3(fake task+chitchat) 25.6 36.8 +11.2 
+
+Table 8 | Adversarial drift robustness, measured by tool-call accuracy (%) on 500 sampled trajectories with inserted interference. L0 is the clean baseline; L1 inserts 3 chit-chat messages; L2 inserts 8 chit-chat messages; L3 inserts 3 fake tasks plus 5 chit-chat messages between the original task turns. Δ
+
+is positive when IACM-RL outperforms PPO-noCM. Simple Task (Single)                      
+
+> Simple Task (Multi)
+> Parallel Multi-task
+> Dependency Chain
+> Parameter Clarification
+> Ambiguous Intent Clarif.
+> Multi-turn Recursive Clarif.
+> Task Modification
+> Personalized Info Update
+> Irrelevant Reply (Simple)
+> Irrelevant Reply (Complex)
+> Incomplete Prior (After User)
+> Incomplete Prior (After Tool)
+> 0
+> 20
+> 40
+> 60
+> 80
+> 100
+> # Dialogs
+> 100 100 100 100 100 100 100 100
+> 72
+> 100 100 100 100
+> 78
+> 100 100 100 100 100 100 100 100 100 100 100 100
+
+ID vs OOD Test Set: Per-Scenario Dialog Counts 
+
+> ID (total 1,272)
+> OOD (total 1,278)
+
+Figure 8 | Per-scenario dialog counts of the ID and OOD test sets. Scenario coverage is matched; per-scenario volume is comparable. noCM benefits from the full reward but lacks explicit state tracking, resulting in uneven gains across metrics. 
+
+IACM-RL leads on external benchmarks without sacrificing stability. On BFCL-V3, IACM-RL reaches 63.3, edging Base at 63.1 and RL-STA at 63.2, confirming that the CM does not hurt general tool calling. On 𝜏 2-Bench, IACM-RL leads the airline domain at 38.0 while compression baselines lag on at least one domain, showing that truncation-based retention is brittle on long-horizon tracking. 
+
+IACM-RL demonstrates strong out-of-domain generalization. On the OOD split with a fully dis-joint tool pool, IACM-RL maintains a Cognitive score of 36.3, close to its ID score of 36.5. In contrast, Base drops to 33.0 and RL-STA to 33.8 on OOD. By internalizing dynamic state-tracking capabilities during optimization, IACM-RL avoids overfitting to tool-specific surface features. This inherent pro-ficiency allows the agent to robustly manage intent fluctuations and track shifting goals, ensuring stable execution even across entirely unseen tool schemas. 
+
+16 IACM-RL: Intent-Aware Context Management and Reinforcement Learning for Complex Tool Invocation under Dynamic Intent Fluctuations 
+
+5.3. Ablation Study and Discussion Each auxiliary loss contributes independently to stability and generalization. We train four variants, each removing one auxiliary loss or all three simultaneously, while keeping the base model, CM, and hierarchical reward unchanged. Table 5 shows that removing Lext degrades OOD Cognitive substantially, from 36.3 to 32.7, confirming that CM Extraction is a crucial driver of self-improving state quality. Removing Ldist also hurts OOD generalization, dropping to 31.4, as state tracking is no longer distilled into the weights. Removing all three reduces the model to pure PPO with self-generated CM, achieving Avg 61.5 versus 64.0 for the full model. It still benefits from the hierarchical reward but loses both the CM-shaping and internalization signals. 
+
+CM training gains grow with dialog length. We split 𝜏 2-Bench trajectories into four buckets by total token length and compare IACM-RL against PPO-noCM in each bucket. Table 6 shows that on short dialogs up to 5k tokens, IACM-RL improves reward from 45.8 to 56.0. On long dialogs of 11k–16k, PPO-noCM collapses to 8.6 while IACM-RL reaches 23.5. On very long dialogs above 16k, PPO-noCM scores 0.0 whereas IACM-RL still achieves 34.8, confirming that the compact CM block sustains state tracking where raw-history scanning fails entirely. 
+
+CM resistance is strongest in Modification and Clarification scenarios. We group the 13 intent scenarios into five families and compare IACM-RL against PPO-noCM using each family’s primary metric. Table 7 shows that on OOD, the gains are largest in Modification with a delta of +4.7 and Clarification with +4.2, consistent with the CM’s Cslots stale flag directly reducing SCRR on modifi-cation turns. 
+
+IACM-RL retains higher accuracy under adversarial interference. We construct adversarial tra-jectories by inserting chit-chat and fake tasks between the original task turns at four severity levels: L0 clean, L1 with 3 chit-chat messages, L2 with 8, and L3 with 3 fake tasks plus 5 chit-chat messages. Table 8 shows that at L0 both methods are comparable at 81.8% and 83.2%. As interference grows, PPO-noCM drops to 25.6% at L3 while IACM-RL still achieves 36.8%, an 11.2-point margin, because the CM solidifies Gcurrent and Cslots in the system prompt, shielding the policy from mid-context noise. 
+
+All three reward layers contribute to performance. We train four variants, each disabling one reward layer, namely 𝑅 belief , 𝑅 action , or 𝑅 outcome , or all three for a pure PPO baseline with only format penalty, while keeping the CM and auxiliary losses unchanged. Table 9 shows that removing 𝑅 belief 
+
+causes the largest drop: Avg falls from 64.0 to 57.4 and BFCL from 63.3 to 47.5, because without tool-accuracy supervision the policy overfits to behavioral rewards and loses general calling proficiency. Removing 𝑅 action hurts OOD Cognitive, dropping from 36.3 to 31.6, as loop suppression is disabled. Removing 𝑅 outcome has a milder effect. Pure PPO still leverages the CM module with Avg 61.0 but lags on Intent metrics. 
+
+> 17 IACM-RL: Intent-Aware Context Management and Reinforcement Learning for Complex Tool Invocation under Dynamic Intent Fluctuations
+
+Reward Variant Intent ID Intent OOD 𝜏 2-Bench BFCL Avg 
+
+Cog Beh Out Cog Beh Out Air Ret 
+
+Full reward 36.5 99.9 87.3 36.3 99.6 81.2 38.0 34.2 63.3 64.0 
+
+−𝑅 belief 36.0 99.9 69.6 33.1 100.0 67.1 34.0 29.8 47.5 57.4 
+
+−𝑅 action 35.7 99.8 85.3 31.6 99.3 81.3 34.0 31.5 60.7 62.1 
+
+−𝑅 outcome 36.2 99.8 87.8 33.9 99.4 82.1 30.0 28.9 62.7 62.3 Format penalty only 35.1 99.9 83.6 33.7 99.6 78.5 65.0 26.0 28.1 61.0 
+
+Table 9 | Reward component ablation. Each row disables one reward layer while keeping all other components identical, whereas “Format penalty only” denotes the complete removal of all three reward layers. Removing 𝑅 belief causes the sharpest BFCL drop from 63.3 to 47.5. Best in bold .
+
+Accumulate is the best default update policy. We separately train three variants with different CM update policies under otherwise identical settings: Accumulate, which incrementally updates the BeliefState each turn as the default; Last-only, which resets the state before each turn; and First-only, which freezes the CM after the first turn. Table 10 shows that Accumulate achieves the highest Avg at 64.0, while Last-only and First-only trail at 62.4 and 60.1, confirming that retaining prior tool results across turns benefits long-chain and parallel scenarios. 
+
+Update Policy Intent ID Intent OOD 𝜏 2-Bench BFCL Avg 
+
+Cog Beh Out Cog Beh Out Air Ret 
+
+Accumulate (OURS) 36.5 99.9 87.3 36.3 99.6 81.2 38.0 34.2 63.3 64.0 
+
+Last-only 36.4 99.9 87.2 33.8 99.8 83.0 30.0 29.8 61.7 62.4 First-only 38.7 99.8 87.4 35.1 99.4 82.6 28.0 8.8 61.3 60.1 
+
+Table 10 | CM temporal alignment ablation. Each variant is trained separately with a different CM update policy under otherwise identical settings. 
+
+LLM simulation is a faithful proxy for real tool execution. We train two SFT models on Qwen3-8B with identical settings except the tool-return source: one uses LLM-simulated returns, the other uses real MCP execution. Table 11 shows that on Intent, the two models are nearly identical in Cog and Beh. On 𝜏 2-Bench, they are comparable, with real-MCP slightly better on airline and LLM-sim better on retail. These results validate that LLM-driven simulation is a scalable proxy that matches real execution across all core metrics. 
+
+Tool Source Intent ID Intent OOD 𝜏 2-Bench Avg 
+
+Cog Beh Out Cog Beh Out Air Ret LLM-sim 39.5 99.8 87.0 35.8 99.2 85.2 17.0 18.4 60.2 
+
+Real MCP 39.6 99.8 87.4 35.9 99.8 83.6 20.0 14.9 60.1 
+
+Table 11 | LLM simulation vs. real MCP execution. Both models are SFT-only on Qwen3-8B with identical settings except tool-return source. 
+
+IACM-RL remains effective with a smaller backbone. To test whether IACM-RL transfers to a smaller backbone, we repeat the main experiment on a 1.7B Qwen model with the same two-stage training and all components (CM, hierarchical reward, auxiliary losses) kept identical. Table 12 reports the results. As expected, the 1.7B model exhibits substantially lower capacity, leading to 
+
+> 18 IACM-RL: Intent-Aware Context Management and Reinforcement Learning for Complex Tool Invocation under Dynamic Intent Fluctuations
+
+absolute score drops across all methods. Despite this, IACM-RL still achieves the highest overall average score (54.2) and leads in key metrics including ID Behavioral, ID Outcome, BFCL, and both domains of 𝜏 2-Bench. However, it no longer dominates every cognitive and outcome sub-metric (e.g., trailing MEM1 in OOD Cognitive and PPO-noCM in OOD Outcome), suggesting that the full potential of explicit Context Management relies on a baseline level of model reasoning capacity. Notably, learnable compression via MEM1 demonstrates strong robustness at this scale, ranking second overall (53.0), whereas naive truncation methods like FIFO-k suffer severe degradation (47.0). 
+
+Method Intent ID Intent OOD 𝜏 2-Bench BFCL Avg 
+
+Cog Beh Out Cog Beh Out Air Ret Base 16.0 99.3 56.3 25.1 99.6 65.8 22.4 5.3 48.5 48.7 PPO-noCM 17.8 99.6 70.0 23.0 99.1 75.0 26.0 5.3 49.1 51.6 FIFO-k 7.3 92.5 65.6 15.2 93.2 68.7 24.0 6.1 50.1 47.0 Prompt-Comp 12.9 99.7 62.5 21.4 98.8 72.3 22.0 9.7 47.5 49.6 ACON 20.1 99.3 61.8 23.8 99.5 67.1 32.0 4.4 49.7 50.9 LLMLingua 21.6 99.9 70.7 25.3 99.3 74.4 14.0 6.1 47.8 51.0 MEM1 19.7 99.7 67.9 27.9 99.6 71.1 34.0 7.0 50.1 53.0 RL-STA 17.9 99.9 60.3 24.5 98.7 65.2 28.0 4.4 50.2 49.9 
+
+IACM-RL (Ours) 17.3 100.0 71.4 25.8 99.4 74.3 34.0 14.9 50.4 54.2 
+
+Table 12 | Main results on a 1.7B Qwen model. All methods use the same 1.7B backbone, training data, and evaluation method as their corresponding 8B configurations, while retaining their method-specific context-management components. IACM-RL achieves the highest Avg at 54.2, leading in ID Behavioral, BFCL, and 𝜏 2-Bench. Learnable compression (MEM1) shows strong robustness at this scale, ranking second overall with an Avg of 53.0. 
+
+The Context Manager provides increasing inference-time gains with longer dialogues. To isolate the inference-time benefit of the self-generated CM block from training, we evaluate the same Qwen3-8B base model (no RL training) under two pipelines on 𝜏 2-Bench airline: wo CM , where the model receives the raw dialogue history, and w/ CM , where a CM proxy injects the Context Manager block into the system prompt before each assistant turn. Table 13 groups trajectories by conversation character length. On short dialogues below 5K, CM yields a marginal gain of +0.051 . As length increases, the gain grows to +0.284 on medium (5K–15K) and +0.311 on long (15K–30K) dialogues. Above 30K, the no-CM pipeline collapses entirely, while CM still achieves 0.202. This monotonic trend confirms that the CM block provides a structural anchor that scales with dialogue complexity: short interactions barely benefit, but under long-horizon intent fluctuations the explicit state summary becomes progressively more valuable. 
+
+Char length wo CM w/ CM Δ
+
+Short ( <5K) 0.615 0.667 +0.051 Medium (5K–15K) 0.216 0.500 +0.284 Long (15K–30K) 0.086 0.397 +0.311 Very long ( >30K) 0.000 0.202 +0.202 Overall 0.245 0.323 +0.078 
+
+Table 13 | Inference-time CM analysis on 𝜏 2-Bench airline (Qwen3-8B, no RL training), bucketed by conversation character length. Δ = w/ CM − wo CM. The CM gain grows with dialogue length; above 30K, wo CM collapses to 0 while CM still achieves 0.202. 
+
+> 19 IACM-RL: Intent-Aware Context Management and Reinforcement Learning for Complex Tool Invocation under Dynamic Intent Fluctuations
+
+## 6. Conclusion 
+
+We introduce IACM-RL, a framework that explicitly decouples state tracking from action generation for robust tool invocation under dynamic intent fluctuations. At its core is an autoregressive Self-Generated Context Manager governed by a BeliefState, which proactively tracks shifting goals and marks overwritten parameters with a structural stale flag to prevent regression to obsolete values. To internalize this capability, we couple the CM with a hierarchical intent-driven reward and three auxiliary consistency losses, optimized over the DynamicIntent Dataset spanning 13 fluctuation sce-narios. Experiments on the DynamicIntent Benchmark, BFCL-V3, and 𝜏 2-Bench show that IACM-RL achieves the highest overall average, demonstrates strong out-of-domain generalization, and abla-tions confirm each auxiliary loss and the CM contribute non-overlapping gains, offering a practical route toward reliable long-horizon agents under noisy, evolving intent. 
+
+> 20 IACM-RL: Intent-Aware Context Management and Reinforcement Learning for Complex Tool Invocation under Dynamic Intent Fluctuations
+
+## References 
+
+Rauno Arike, Elizabeth Donoway, Henning Bartsch, and Marius Hobbhahn. Technical report: Evalu-ating goal drift in language model agents, 2025. URL https://arxiv.org/abs/2505.02709 .Victor Barres, Honghua Dong, Soham Ray, Xujie Si, and Karthik Narasimhan. 𝜏 2-bench: Evaluating conversational agents in a dual-control environment, 2025. URL https://arxiv.org/abs/ 2506.07982 .Xingwu Chen, Zhanqiu Zhang, Yiwen Guo, and Difan Zou. Breaking contextual inertia: Reinforce-ment learning with single-turn anchors for stable multi-turn interaction, 2026. URL https: //arxiv.org/abs/2603.04783 .Prateek Chhikara, Dev Khant, Saket Aryan, Taranjeet Singh, and Deshraj Yadav. Mem0: Building production-ready ai agents with scalable long-term memory, 2025. URL https://arxiv.org/ abs/2504.19413 .Kristina Dzeparoska, Ali Tizghadam, and Alberto Leon-Garcia. Intent assurance using llms guided by intent drift, 2024. URL https://arxiv.org/abs/2402.00715 .Huiqiang Jiang, Qianhui Wu, Chin-Yew Lin, Yuqing Yang, and Lili Qiu. LLMLingua: Compressing prompts for accelerated inference of large language models. In Houda Bouamor, Juan Pino, and Kalika Bali, editors, Proceedings of the 2023 Conference on Empirical Methods in Natural Language Processing , pages 13358–13376, Singapore, December 2023. Association for Computational Lin-guistics. doi: 10.18653/v1/2023.emnlp-main.825. URL https://aclanthology.org/2023. emnlp-main.825/ .Minki Kang, Wei-Ning Chen, Dongge Han, Huseyin A. Inan, Lukas Wutschitz, Yanzhi Chen, Robert Sim, and Saravan Rajmohan. Acon: Optimizing context compression for long-horizon llm agents, 2026. URL https://arxiv.org/abs/2510.00615 .Philippe Laban, Hiroaki Hayashi, Yingbo Zhou, and Jennifer Neville. Llms get lost in multi-turn conversation, 2025. URL https://arxiv.org/abs/2505.06120 .Dongjun Lee, Juyong Lee, Kyuyoung Kim, Jihoon Tack, Jinwoo Shin, Yee Whye Teh, and Kimin Lee. Learning to contextualize web pages for enhanced decision making by llm agents, 2025. URL 
+
+https://arxiv.org/abs/2503.10689 .Zekun Li, Baolin Peng, Pengcheng He, and Xifeng Yan. Evaluating the instruction-following ro-bustness of large language models to prompt injection. In Yaser Al-Onaizan, Mohit Bansal, and Yun-Nung Chen, editors, Proceedings of the 2024 Conference on Empirical Methods in Natural Lan-guage Processing , pages 557–568, Miami, Florida, USA, November 2024. Association for Compu-tational Linguistics. doi: 10.18653/v1/2024.emnlp-main.33. URL https://aclanthology. org/2024.emnlp-main.33/ .Bohan Lin, Kuo Yang, Zelin Tan, Yingchuan Lai, Chen Zhang, Guibin Zhang, Xinlei Yu, Miao Yu, Xu Wang, Yudong Zhang, and Yang Wang. Agentask: Multi-agent systems need to ask, 2026. URL 
+
+https://arxiv.org/abs/2510.07593 .Nelson F. Liu, Kevin Lin, John Hewitt, Ashwin Paranjape, Michele Bevilacqua, Fabio Petroni, and Percy Liang. Lost in the middle: How language models use long contexts. Transactions of the Association for Computational Linguistics , 12:157–173, 2024. doi: 10.1162/tacl_a_00638. URL 
+
+https://aclanthology.org/2024.tacl-1.9/ .
+
+> 21 IACM-RL: Intent-Aware Context Management and Reinforcement Learning for Complex Tool Invocation under Dynamic Intent Fluctuations
+
+Xiao Liu, Hao Yu, Hanchen Zhang, Yifan Xu, Xuanyu Lei, Hanyu Lai, Yu Gu, Hangliang Ding, Kai-wen Men, Kejuan Yang, Shudan Zhang, Xiang Deng, Aohan Zeng, Zhengxiao Du, Chenhui Zhang, Sheng Shen, Tianjun Zhang, Yu Su, Huan Sun, Minlie Huang, Yuxiao Dong, and Jie Tang. Agent-bench: Evaluating llms as agents, 2025. URL https://arxiv.org/abs/2308.03688 .Yifan Luo, Kangping Xu, Yanzhen Lu, Yang Yuan, and Andrew Chi-Chih Yao. Probing the lack of stable internal beliefs in llms, 2026. URL https://arxiv.org/abs/2603.25187 .Wei Ma, Zhi Chen, Jingxu Gu, Tianling Li, Shangqing Liu, and Lingxiao Jiang. Same signal, different semantics: A cross-framework behavioral analysis of software engineering agents, 2026. URL 
+
+https://arxiv.org/abs/2605.18332 .Chengjun Pan, Shichun Liu, Jiahang Lin, Dingwei Zhu, Jiazheng Zhang, Shihan Dou, Songyang Gao, Zhenhua Han, Binghai Wang, Rui Zheng, Xuanjing Huang, Tao Gui, and Yansong Feng. Evpo: Explained variance policy optimization for adaptive critic utilization in llm post-training, 2026. URL https://arxiv.org/abs/2604.19485 .Zhuoshi Pan, Qianhui Wu, Huiqiang Jiang, Menglin Xia, Xufang Luo, Jue Zhang, Qingwei Lin, Victor Rühle, Yuqing Yang, Chin-Yew Lin, H. Vicky Zhao, Lili Qiu, and Dongmei Zhang. LLMLingua-2: Data distillation for efficient and faithful task-agnostic prompt compression. In Lun-Wei Ku, An-dre Martins, and Vivek Srikumar, editors, Findings of the Association for Computational Linguistics: ACL 2024 , pages 963–981, Bangkok, Thailand, August 2024. Association for Computational Lin-guistics. doi: 10.18653/v1/2024.findings-acl.57. URL https://aclanthology.org/2024. findings-acl.57/ .Shishir G Patil, Huanzhi Mao, Fanjia Yan, Charlie Cheng-Jie Ji, Vishnu Suresh, Ion Stoica, and Joseph E. Gonzalez. The berkeley function calling leaderboard (BFCL): From tool use to agentic evaluation of large language models. In Forty-second International Conference on Machine Learning ,2025. URL https://openreview.net/forum?id=2GmDdhBdDk .Magnus Saebo, Spencer Gibson, Tyler Crosse, Achyutha Menon, Eyon Jang, and Diogo Cruz. Asym-metric goal drift in coding agents under value conflict, 2026. URL https://arxiv.org/abs/ 2603.03456 .Freda Shi, Xinyun Chen, Kanishka Misra, Nathan Scales, David Dohan, Ed Chi, Nathanael Schärli, and Denny Zhou. Large language models can be easily distracted by irrelevant context. In Pro-ceedings of the 40th International Conference on Machine Learning , ICML’23. JMLR.org, 2023. Qi Sun, Stefan Nielsen, Rio Yokota, and Yujin Tang. Evolutionary context search for automated skill acquisition, 2026. URL https://arxiv.org/abs/2602.16113 .Xingyao Wang, Simon Rosenberg, Juan Michelini, Calvin Smith, Hoang Tran, Engel Nyst, Rohit Malhotra, Xuhui Zhou, Valerie Chen, Robert Brennan, and Graham Neubig. The openhands software agent sdk: A composable and extensible foundation for production agents, 2026. URL 
+
+https://arxiv.org/abs/2511.03690 .Yue Wang, Dehang Fu, Jie Tan, Junxiao Han, Yao Wan, Lixin Cui, Lu Bai, and Philip S. Yu. Detecting Intent Drift in Continuous Conversation via Temporal Transition Accumulation . In 
+
+2025 IEEE International Conference on Data Mining (ICDM) , pages 773–782, Los Alamitos, CA, USA, November 2025. IEEE Computer Society. doi: 10.1109/ICDM65498.2025.00085. URL 
+
+https://doi.ieeecomputersociety.org/10.1109/ICDM65498.2025.00085 .
+
+> 22 IACM-RL: Intent-Aware Context Management and Reinforcement Learning for Complex Tool Invocation under Dynamic Intent Fluctuations
+
+Zhiheng Xi, Dingwen Yang, Jiaqi Liu, Jixuan Huang, Honglin Guo, Baodai Huang, Tinggang Chen, Qi Zhang, Zhonghang Lu, Chenyu Liu, Jiajun Sun, Jiazheng Zhang, Dingwei Zhu, Xin Guo, Junzhe Wang, Zhihao Zhang, Yuming Yang, Junjie Ye, Minghe Gao, Dongrui Liu, Jiaming Ji, Guohao Li, Tao Gui, Qi Zhang, and Xuanjing Huang. AgentGym2: Benchmarking large language model agents in de-idealized real-world environments. In Maria Liakata, Viviane P. Moreira, Jiajun Zhang, and David Jurgens, editors, Proceedings of the 64th Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers) , pages 44451–44479, San Diego, California, United States, July 2026. Association for Computational Linguistics. ISBN 979-8-89176-390-6. doi: 10.18653/ v1/2026.acl-long.2058. URL https://aclanthology.org/2026.acl-long.2058/ .Haoming Xu, Weihong Xu, Zongrui Li, Mengru Wang, Yunzhi Yao, Chiyu Wu, Jin Shang, Yu Gong, and Shumin Deng. When should models change their minds? contextual belief management in large language models, 2026. URL https://arxiv.org/abs/2605.30219 .John Yang, Carlos E. Jimenez, Alexander Wettig, Kilian Lieret, Shunyu Yao, Karthik Narasimhan, and Ofir Press. Swe-agent: Agent-computer interfaces enable automated software engineering, 2024. URL https://arxiv.org/abs/2405.15793 .Shuyan Zhou, Frank F. Xu, Hao Zhu, Xuhui Zhou, Robert Lo, Abishek Sridhar, Xianyi Cheng, Tianyue Ou, Yonatan Bisk, Daniel Fried, Uri Alon, and Graham Neubig. Webarena: A realistic web envi-ronment for building autonomous agents, 2024. URL https://arxiv.org/abs/2307.13854 .Zijian Zhou, Ao Qu, Zhaoxuan Wu, Sunghwan Kim, Alok Prakash, Daniela Rus, Jinhua Zhao, Bryan Kian Hsiang Low, and Paul Pu Liang. Mem1: Learning to synergize memory and reasoning for efficient long-horizon agents, 2025. URL https://arxiv.org/abs/2506.15841 .Dingwei Zhu, Shihan Dou, Zhiheng Xi, Senjie Jin, Guoqiang Zhang, Jiazheng Zhang, Junjie Ye, Mingxu Chai, Enyu Zhou, Ming Zhang, Yuhui Wang, Caishuang Huang, Chenhao Huang, Yunke Zhang, Yuran Wang, Tao Gui, Qi Zhang, Xipeng Qiu, and Xuanjing Huang. VRPO: Rethinking value modeling for robust RL under noisy supervision in LLM post-training. In Maria Liakata, Viviane P. Moreira, Jiajun Zhang, and David Jurgens, editors, Proceedings of the 64th Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers) , pages 24046–24067, San Diego, California, United States, July 2026a. Association for Computational Linguistics. ISBN 979-8-89176-390-6. doi: 10.18653/v1/2026.acl-long.1103. URL https://aclanthology.org/ 2026.acl-long.1103/ .Dingwei Zhu, Zhiheng Xi, Shihan Dou, Jiahan Li, Chenhao Huang, Junjie Ye, Sixian Li, Mingxu Chai, Yuhui Wang, Yajie Yang, Ming Zhang, Jiazheng Zhang, Shichun Liu, Caishuang Huang, Yunke Zhang, Yuran Wang, Tao Gui, Xipeng Qiu, Qi Zhang, and Xuanjing Huang. Dfpo: Scaling value modeling via distributional flow towards robust and generalizable llm post-training, 2026b. URL 
+
+https://arxiv.org/abs/2602.05890 .Dingwei Zhu, Zhiheng Xi, Shihan Dou, Yuhui Wang, Sixian Li, Junjie Ye, Honglin Guo, Shichun Liu, Chenhao Huang, Yajie Yang, Junlin Shang, Senjie Jin, Ming Zhang, Jiazheng Zhang, Caishuang Huang, Yunke Zhang, Yuran Wang, and Tao Gui. Dvpo: Distributional value modeling-based policy optimization for llm post-training, 2026c. URL https://arxiv.org/abs/2512.03847 .
+
+> 23 IACM-RL: Intent-Aware Context Management and Reinforcement Learning for Complex Tool Invocation under Dynamic Intent Fluctuations
+
+## A. IACM-RL Training Algorithm 
+
+Algorithm 1: IACM-RL Two-Stage Training Algorithm 
+
+Require: Dataset D, SFT checkpoint 𝜃 0.
+
+Require: Hyperparameters: 𝑤 cal , 𝑤 ext , 𝑤 dist , 𝛼, 𝛽, 𝛾 .
+
+Ensure: Optimized policy 𝜋 𝜃 .
+
+1: // Stage 1: Single-step training with self-generated CM 
+
+2: Enable Rsingle 
+
+3: for each iteration do 
+
+4: Sample single-turn slices from Dstep 
+
+5: Rollout: 
+
+6: Ingest user message → update BeliefState b
+
+7: Model decodes self-generated CM block from history 
+
+8: Inject CM into system prompt; generate one response 𝑎 (tool call or text) 
+
+9: If tool call: execute via MockBackend, record result in b
+
+10: Compute reward Rsingle (JGA + ACR, no CM losses) 
+
+11: Compute GAE advantages ˆ𝐴 𝑡 
+
+12: Loss: L = LPG = −𝔼 𝑡 
+
+h
+
+min 
+
+
+
+𝜌 𝑡 ˆ𝐴 𝑡 , clip (𝜌 𝑡 , 1 − 𝜖, 1 + 𝜖 ) ˆ𝐴 𝑡 
+
+i 
+
+13: Update 𝜃 via ∇𝜃 L
+
+14: end for 
+
+15: Save Stage-1 checkpoint 𝜃 1
+
+16: // Stage 2: Multi-turn with self-generated CM 
+
+17: Load 𝜃 1; Rtotal , auxiliary losses 
+
+18: for each iteration do 
+
+19: Sample multi-turn trajectories from Dmulti 
+
+20: Rollout (per turn 𝑡 ): 
+
+21: Ingest user message → update BeliefState b𝑡 (slots, goal, intent, last-action) 
+
+22: Model decodes self-generated CM block from history 
+
+23: Inject CM into system prompt; generate response 𝑎 𝑡 (tool call or text) 
+
+24: If tool call: execute via MockBackend, record result in b𝑡 
+
+25: Compute hierarchical reward: 
+
+26: 𝑅 belief : JGA hits − SCRR stale − hallucination penalties 
+
+27: 𝑅 action : loop/invalid/precision penalties + trajectory progress + ACR clarification 
+
+28: 𝑅 outcome : DTCR chain completion + ISSR switch success 
+
+29: 𝑅 total = 𝛼𝑅 belief + 𝛽𝑅 action + 𝛾𝑅 outcome + 𝑅 format 
+
+30: Collect trajectory 𝜏 = {( 𝑠 𝑡 , 𝑎 𝑡 , 𝑟 𝑡 )} 
+
+31: Compute GAE advantages ˆ𝐴 𝑡 and trajectory advantage ˆ𝐴 𝜏 
+
+32: Compute auxiliary losses: 
+
+33: Lcal = −𝔼 𝜏 [log 𝜋 𝜃 (𝑎 𝑡 ) · ( 2 acc 𝑡 − 1)] {accuracy-weighted} 
+
+34: Lext = −𝔼 𝜏 
+
+h Í𝑖 log 𝜋 𝜃 (𝑏 𝑡,𝑖 ) 𝑚 𝑖 ˆ𝐴 𝜏  
+
+> Í𝑖 𝑚 𝑖
+
+i
+
+{CM tokens, with gradient} 
+
+35: Ldist = 𝔼 𝜏 [𝐷 KL (𝜋 𝜃 (·| b𝑡 )sg ∥𝜋 𝜃 (·| ℎ𝑡 −1))] {teacher detached} 
+
+36: Total loss: 
+
+37: Ltotal = LPG + 𝑤 cal Lcal + 𝑤 ext Lext + 𝑤 dist Ldist 
+
+38: Update 𝜃 via ∇𝜃 Ltotal 
+
+39: end for 
+
+40: return 𝜋 𝜃 
+
+> 24 IACM-RL: Intent-Aware Context Management and Reinforcement Learning for Complex Tool Invocation under Dynamic Intent Fluctuations
+
+## B. Additional Robustness Checks 
+
+B.1. Random Seed Variance IACM-RL is stable across random seeds. We train IACM-RL with three random seeds and report the full benchmark results in Table 14. The variance is small across all 9 metrics, confirming stable reproducibility.                                                     
+
+> Method Intent ID Intent OOD BFCL ↑Tau2 ↑Avg
+> Cog Beh Out Cog Beh Out Air Ret seed=42 36.5 99.9 87.3 36.3 99.6 81.2 63.3 38.0 34.2 64.0 seed=123 36.8 99.9 84.5 34.3 100.0 78.9 62.6 38.0 36.8 63.5 seed=7 36.5 99.9 86.4 32.4 98.5 81.7 63.6 40.0 30.7 63.3
+> mean ±std 36.6 ±0.2 99.9 ±0.0 86.1 ±1.4 34.3 ±2.0 99.4 ±0.8 80.6 ±1.6 63.2 ±0.5 38.7 ±1.2 33.9 ±3.1 63.6 ±0.4
+
+Table 14 | Random seed variance across all benchmarks (mean ±std over 3 seeds). Avg is the un-weighted mean over the 9 columns. 
+
+B.2. Auxiliary Loss Weight Sensitivity The default loss weights are well-tuned. We scale all three auxiliary-loss weights simultaneously by 0.25, 0.5, and 2.0 relative to the default, while keeping the CM and hierarchical reward un-changed. Table 15 shows that the default weights achieve the best Avg at 64.0. Halving the weights to 0.5 × reduces Avg to 62.7, while quartering to 0.25 × drops further to 62.1, as the CM-shaping and internalization signals become too weak to guide the policy effectively. Doubling to 2 × also degrades performance to 62.6, as overly strong auxiliary gradients destabilize the PPO update and interfere with the policy-gradient signal. These results confirm that the default weight setting strikes the right balance between the auxiliary losses and the main PPO objective. 
+
+Scale Intent ID Intent OOD 𝜏 2-Bench BFCL Avg 
+
+Cog Beh Out Cog Beh Out Air Ret 
+
+1.0 × (default) 36.5 99.9 87.3 36.3 99.6 81.2 38.0 34.2 63.3 64.0 
+
+0.25 × 35.9 99.8 86.5 34.1 99.4 84.4 26.0 30.7 62.4 62.1 0.5 × 36.8 99.8 86.4 33.7 98.9 83.0 34.0 29.8 61.8 62.7 2.0 × 35.9 99.8 87.2 34.2 99.5 84.2 28.0 32.5 62.4 62.6 
+
+Table 15 | Auxiliary loss weight sensitivity. All three weights 𝑤 cal , 𝑤 ext , 𝑤 dist are scaled simultane-ously. The default setting achieves the best Avg; both reducing and amplifying the weights degrade performance. 
+
+## C. Detailed Experimental Settings 
+
+C.1. Models and Infrastructure 
+
+We conduct the main experiments on an 8B Qwen-based model. Online rollout generation and infer-ence are implemented with the vLLM framework in bfloat16 precision, and PPO-based reinforcement learning is conducted with the veRL framework on 8×A800-80GB GPUs. The actor and critic share the base model. The main implementation parameters are summarized in Table 16. 
+
+> 25 IACM-RL: Intent-Aware Context Management and Reinforcement Learning for Complex Tool Invocation under Dynamic Intent Fluctuations
+
+Parameter Stage 1 (single-step) Stage 2 (multi-turn) 
+
+Algorithm PPO + GAE ( 𝛾 =0.99 , 𝜆 =0.95 )Actor learning rate 1 × 10 −6
+
+Train batch size 8PPO mini-batch size 8 2Rollout responses per prompt ( 𝑁 ) 4Clip ratio (high) 0.22 KL in reward / coef / type enabled / 0.001 / low-variance KL Entropy coefficient 0.005 Max prompt / response length 28,672 / 1,024 Truncation policy Left Error Max user / assistant turns 1 / 1 12 / 12 Tensor parallel (rollout) 8Ulysses sequence parallel 4Param offload No Yes Optimizer offload Yes Gradient checkpointing enabled GPU memory utilization (vLLM) 0.28 0.25 Self-generated CM ✓ ✓
+
+Auxiliary losses ( 𝑤 cal /𝑤 ext /𝑤 dist ) — ✓ (0.02 /0.01 /0.01 )Reward Rsingle Rtotal 
+
+Layer weights ( 𝛼 /𝛽 /𝛾 ) — 1.0/1.0/0.5
+
+Reward bounds — [− 4.0, +8.0]
+
+Reward hyperparameters (Stage 2 only) 
+
+JGA: 𝑛 hit  
+
+> 𝑛 calls
+
+× 2.5 (cap 5.0) SCRR stale: −0.5 halluc: −0.8
+
+RIR loop: −2.0 RIR invalid: −1.0 Progress: +0.3/hit Prec.: −2.0
+
+DTCR: +4.0/+2.5/+1.0 (full/high/partial) ACR: ∈ [− 1.0, 1.0] ISSR: +2.0 × 𝑠 LLM if 𝑠 LLM > 0.3
+
+Table 16 | Implementation parameters for the two-stage PPO training. Both stages use the self-generated CM. Stage 1 (single-step) establishes tool-selection proficiency; Stage 2 (multi-turn) adds hierarchical reward and auxiliary losses. Shared settings span both columns. 
+
+C.2. Two-Stage Training and Data 
+
+IACM-RL is trained in two sequential PPO stages, with Stage 1 initialized from the SFT checkpoint. Stage 1 establishes tool-selection proficiency on 17,391 single-turn slices: each sample is a history prefix ending before a gold assistant action, and the model generates exactly one response under the single-scene reward Rsingle that scores argument-level correctness. Stage 2 continues leveraging the self-generated Context Manager (CM) with state refresh triggered at every dialogue interaction boundary; it trains over 5,639 multi-turn trajectories (each containing up to 12 user utterances and 12 assistant responses), and further optimizes the policy via the hierarchical total reward Rtotal 
+
+alongside the three auxiliary consistency losses. The Stage 1 checkpoint at 600 steps seeds Stage 2, which runs for 100 to 300 steps; checkpoints are saved every 25 steps and the final model is selected by validation performance. This two-stage design isolates “learning to call tools correctly” from “learning to maintain state under dynamic intent fluctuations”, stabilizing credit assignment. The training data combines proprietary DynamicIntent tool trajectories with two open-source benchmarks (BFCL-V3 and 𝜏 2-Bench), all converted to a unified RL format via the pipeline in Sec-tion 3. A small fraction of pure-linguistic queries without tool calls is included to prevent conversa-tional capability forgetting during RL. Table 17 reports the per-source composition; the 13-scenario distribution of the Stage 2 multi-turn set is given in Appendix D. For BFCL-V3 and 𝜏 2-Bench, all offi-
+
+> 26 IACM-RL: Intent-Aware Context Management and Reinforcement Learning for Complex Tool Invocation under Dynamic Intent Fluctuations
+
+cial evaluation instances are excluded. We additionally de-duplicate training and evaluation data at the normalized tool-schema and task-instance levels.                  
+
+> Source Stage 1 (single-step) Stage 2 (multi-turn) Role
+> DynamicIntent 7,899 2,303 core intent-fluctuation scenarios BFCL-V3 5,233 1,772 open function-calling diversity
+> 𝜏 2-Bench 2,609 1,040 long-horizon dialogue Language (no tool) 1,650 524 anti-forgetting injection Total 17,391 5,639
+
+Table 17 | Training data composition by source. “DynamicIntent” denotes proprietary intent-fluctuation trajectories; “Language” denotes pure-linguistic queries without tool calls, used as an anti-forgetting injection. 
+
+C.3. Baselines and Evaluation Protocol 
+
+All methods originate from the same base model, a Qwen3-8B supervised-fine-tuned on the Dynam-icIntent Dataset. We compare Base (the foundational SFT-only model without reinforcement learn-ing) against seven context-management strategies trained with the PPO pipeline: PPO-noCM retains the full, uncompressed dialogue history as the standard RL baseline; FIFO-𝑘 (Yang et al., 2024) pre-serves only the most recent 𝑘 turns ( 𝑘 =5); Prompt-Comp (Lee et al., 2025; Wang et al., 2026) issues a static summarization instruction appended to the system prompt; LLMLingua (Jiang et al., 2023; Pan et al., 2024) applies token-level extractive compression with a Qwen3-1.7B model scor-ing high-perplexity tokens within a budget; ACON (Kang et al., 2026) iteratively refines a natural-language compression instruction via GPT-5.4, triggered when prompt length exceeds a threshold; 
+
+MEM1 (Zhou et al., 2025) jointly trains a compression policy with the agent via RL, clearing old messages and retaining only the system prompt plus the current turn; and RL-STA (Chen et al., 2026) injects single-turn anchor demonstrations during multi-turn RL to stabilize credit assignment and break contextual inertia. The Intent Benchmark evaluates each of the 13 scenarios on approximately 100 dialogs for ID, using a disjoint tool pool for OOD. For BFCL-V3 , we evaluate on the single-turn and multi-turn categories. The final score is the unweighted mean of Live, Non-Live, and Multi-turn accuracy (Partial Overall). For 𝜏 2-Bench , we evaluate airline and retail domains, extracting the Average Reward from the agent performance metrics block. All RL models use greedy decoding with temperature 0. 
+
+## D. Detailed Dataset Construction, Statistics, and Human Annotation 
+
+D.1. Per-Scenario Construction Mechanisms 
+
+Beyond the five-stage pipeline described in the main text, each of the 13 fine-grained intent fluctua-tion scenarios is instantiated by a dedicated trajectory-transformation method that injects a specific type of intent noise into a base FSP trace. These methods fall into three families: graph-constrained splicing (composing two independent trajectories under a tool-conflict check), LLM-driven rewriting (regenerating part of the dialogue to inject a perturbation), and prefix augmentation (prepending a clarification sub-dialogue). We summarize the construction mechanism of each scenario below. 
+
+Baseline scenarios. Simple Task (Single-turn) and Simple Task (Multi-turn) are produced directly by the base FSP random walk and back-and-forth translation, with no augmentation method applied; they serve as the non-fluctuation reference. 
+
+> 27 IACM-RL: Intent-Aware Context Management and Reinforcement Learning for Complex Tool Invocation under Dynamic Intent Fluctuations
+
+Modification scenarios. Task Modification uses an LLM to rewrite a complete trajectory: given a finished dialogue, the LLM identifies an insertion point and injects a three-message block, namely a user message overwriting a previously set parameter, a tool call re-invoking the same tool with updated arguments, and a tool message returning the modified result. This is the scenario that most directly exercises the structural stale flag, as the overwritten value must not be reused. Because mod-ification samples are naturally rare, this category is deliberately over-augmented to 258 trajectories. Personalized Information Update injects a user profile and device snapshot before a user request, and the profile is updated across two rounds so that re-invoking the same tool yields different ar-gument values, verifying that the agent tracks evolving personal context rather than caching stale parameters. 
+
+Interruption scenarios. Incomplete Prior Task (After User) and Incomplete Prior Task (After Tool) both insert a new query at different positions: in the After-User variant the new query interrupts immediately after the user’s instruction, before the assistant has acted; in the After-Tool variant the interruption occurs after a tool has returned but before the assistant summarizes, so the agent must abandon the pending summary and pivot to the new goal. In both cases the spliced sub-trajectory is selected under a tool-conflict and graph-edge check: the candidate’s tools must not overlap with the already-used tools, and no dependency edge may exist between them, ensuring the new task is genuinely orthogonal rather than a logical continuation. Irrelevant Reply (Simple Task) and Irrelevant Reply (Complex Task) occur when the assistant issues a parameter-clarification question and the user replies with an unrelated simple or complex request, testing whether the agent can abandon the suspended clarification and service the new request. 
+
+Clarification scenarios. Three clarification variants target different ambiguity sources. Parameter Clarification purposefully omits a mandatory parameter from the user query, so the assistant must proactively ask for it before invoking the tool. Ambiguous Intent Clarification prepends a deliberately fragmented user utterance that is neither chitchat nor a complete request, forcing the assistant to clarify the true intent before the original task proceeds. Multi-turn Recursive Clarification stacks an additional intent-clarification round on top of parameter clarification. Linguistic Clarification denotes the pure-language subset that is mixed in to prevent conversational-capability forgetting. 
+
+Accumulation scenario. Parallel Multi-task Execution merges two independent FSP traces into a single trajectory where the agent must execute two orthogonal tool chains within one response, testing concurrent multi-goal management. 
+
+Chaining scenario. Dependency Chain Execution extends a base FSP by inserting graph-successor tools along dependency edges, forcing the agent to consume the return value of one tool as the input of the next, providing the structural basis for the DTCR metric. 
+
+D.2. Test-Set Human Annotation Test-set human annotation protocol. Every test dialog undergoes a structured annotation protocol to guarantee exact evaluation labels for the rule-based metrics. The protocol consists of three uni-versal rules and nine scenario-specific checks. Each test instance was annotated by one annotator and independently verified by a second annotator. Disagreements were resolved by an adjudicator. 
+
+Universal rules (Tier 1). (1) Parameter consistency : every assistant tool call must conform to the declared tool schema—arguments must use the correct parameter names, types, and value ranges; undeclared keys are flagged as hallucinated. (2) Closed-loop resolution : each dialog must form a self-contained narrative in which the assistant’s tool calls fully resolve the user’s stated re-quest; samples that terminate prematurely or diverge from the intended goal are flagged for revision or deletion. (3) Revise-or-delete : samples contain simple mistakes (e.g., a single misnamed param-
+
+> 28 IACM-RL: Intent-Aware Context Management and Reinforcement Learning for Complex Tool Invocation under Dynamic Intent Fluctuations
+
+Algorithm 2: Graph-Constrained Trajectory Splicing 
+
+Require: Base trajectory 𝐴 ; candidate pool B; dependency graph 𝐺 ; insertion position 𝑝  
+
+> 1:
+
+Let T𝐴 ← tool names invoked in 𝐴  
+
+> 2:
+
+for each candidate 𝐵 ∈ B (shuffled) do  
+
+> 3:
+
+T𝐵 ← tool names invoked in 𝐵  
+
+> 4:
+
+if T𝐴 ∩ T 𝐵 ≠ ∅ then  
+
+> 5:
+
+continue  
+
+> 6:
+
+end if {name disjointness}  
+
+> 7:
+
+𝑐𝑜𝑛 𝑓 𝑙𝑖𝑐𝑡 ← false  
+
+> 8:
+
+for each (𝑡 𝑎 , 𝑡 𝑏 ) ∈ T 𝐴 × T 𝐵 do  
+
+> 9:
+
+𝑢 𝑎 , 𝑢 𝑏 ← NameToUuid (𝑡 𝑎 ), NameToUuid (𝑡 𝑏 ) 
+
+> 10:
+
+if edge (𝑢 𝑎 , 𝑢 𝑏 ) ∈ 𝐺 or edge (𝑢 𝑏 , 𝑢 𝑎 ) ∈ 𝐺 then  
+
+> 11:
+
+𝑐𝑜𝑛 𝑓 𝑙𝑖𝑐𝑡 ← true ; break  
+
+> 12:
+
+end if  
+
+> 13:
+
+end for  
+
+> 14:
+
+if ¬𝑐𝑜𝑛 𝑓 𝑙𝑖𝑐𝑡 then  
+
+> 15:
+
+Re-index round identifiers and tool-call identifiers of 𝐵 starting at maxRound ( 𝐴 ) + 1 
+
+> 16:
+
+Insert re-indexed 𝐵 into 𝐴 at position 𝑝 ; merge & de-duplicate tool pools  
+
+> 17: 18:
+
+return spliced trajectory 𝐴 ′ 
+
+> 19:
+
+end if  
+
+> 20:
+
+end for  
+
+> 21: 22:
+
+return Failure (no orthogonal candidate found; 𝐴 discarded) eter) are corrected in-place by the annotator; samples whose task execution substantially deviates from the expected outcome are discarded. 
+
+Scenario-specific checks (Tier 2). Nine distinct verification categories are defined to cover the thirteen fine-grained intent-fluctuation scenarios, requiring scenario-specific checks beyond the uni-versal baseline annotation rules. For Parameter Clarification , the annotator verifies that a manda-tory parameter is genuinely omitted from the user query and that the assistant proactively asks for it. For Irrelevant Reply (both Simple Task and Complex Task variants), the annotator confirms that the user’s reply introduces a genuinely new task and that the previously suspended old task is not required to be completed. For Multi-turn Recursive Clarification , both an intent-clarification and a parameter-clarification exchange must be present. For Intent Clarification , the user utterance must be deliberately ambiguous (neither chitchat nor a complete request), and the assistant’s subsequent turn must clarify the intended meaning. For Incomplete Prior Task (both After-User and After-Tool variants), the annotator verifies that the interruption is actually injected at the correct position and that the newly introduced task is successfully resolved. For Task Modification , when the interruption occurs after a tool call, all non-modified arguments in the post-interruption call must remain identical to their pre-interruption values. For Personalized Information Update , the annotator checks that the profile update is logically coherent and that when the same tool is re-invoked after the update, at least one argument must differ due to the profile change; samples where the profile update leaves all arguments unchanged are either manually modified to link the updated field to a tool parameter or deleted. For Linguistic Clarification , the annotator verifies that the sample contains only pure language exchange (no tool invocation). For Dependency Chain , the annotator confirms that a le-gitimate sequential dependence exists between two or more tool calls (i.e., the output of tool A feeds 
+
+> 29 IACM-RL: Intent-Aware Context Management and Reinforcement Learning for Complex Tool Invocation under Dynamic Intent Fluctuations
+
+the input of tool B) and that the chain completes correctly. The test set totals 2,550 annotated dialogs (1,272 ID, 1,278 OOD). Approximately 18.7% of auto-generated samples are revised in-place and 4.2% are discarded during annotation, ensuring that the final evaluation labels meet the precision requirements of the rule-based metrics. 
+
+D.3. Fine-Grained Scenario Distributions 
+
+Table 18 gives the full per-scenario breakdown of the 5,639 multi-turn training trajectories, grouped into five behavioral modes. Table 19 contrasts the single-step training sets: the single-step set’s 1,650 linguistic clarification samples carry an empty scenario tag and serve as an anti-forgetting injection. Table 20 reports the per-scenario counts of the human-annotated ID and OOD test sets. 
+
+Fine-Grained Scenario Count % Intent Mode 
+
+Parameter Clarification 1,052 18.7% Clarification Incomplete Prior Task (After User) 986 17.5% Interruption Parallel Multi-task Execution 956 17.0% Accumulation Dependency Chain Execution 617 10.9% Chaining Linguistic Clarification 523 9.3% Clarification Simple Task (Single-turn) 408 7.2% Baseline Simple Task (Multi-turn) 390 6.9% Baseline Ambiguous Intent Clarification 350 6.2% Clarification Task Modification (Augmented) 258 4.6% Modification Multi-turn Recursive Clarification 60 1.1% Clarification Irrelevant Reply (Simple Task) 32 0.6% Interruption Irrelevant Reply (Complex Task) 4 0.1% Interruption Incomplete Prior Task (After Tool) 3 0.1% Interruption 
+
+Table 18 | Per-scenario distribution of the 13 fine-grained intent fluctuation scenarios within the Multi-turn Training Dataset ( 𝑁 = 5,639 ). 
+
+Fine-Grained Scenario Count %
+
+Incomplete Prior Task (After User) 3,681 21.2% Simple Task (Single-turn) 3,289 18.9% Parallel Multi-task Execution 2,250 12.9% Simple Task (Multi-turn) 2,093 12.0% Parameter Clarification 1,910 11.0% Linguistic Clarification 1,650 9.5% Ambiguous Intent Clarification 817 4.7% Dependency Chain Execution 725 4.2% Task Modification 590 3.4% Multi-turn Recursive Clarification 146 0.8% Irrelevant Reply (Simple Task) 96 0.6% Personalized Information Update 63 0.4% Irrelevant Reply (Complex Task) 43 0.2% Incomplete Prior Task (After Tool) 38 0.2% 
+
+Table 19 | Per-scenario distribution of the Single-step Training Dataset ( 𝑁 = 17 ,391 ), contrasted with the multi-turn set. Figure 9 contrasts the turn-count distributions. The raw corpus contains trajectories of up to 17 user turns. Before Stage 2 training, trajectories exceeding 12 user/assistant turns are filtered out. The reported Stage 2 training count is computed after this filtering. 
+
+> 30 IACM-RL: Intent-Aware Context Management and Reinforcement Learning for Complex Tool Invocation under Dynamic Intent Fluctuations
+
+Fine-Grained Scenario ID dialogs OOD dialogs 
+
+Simple Task (Single-turn) 100 78 Simple Task (Multi-turn) 100 100 Parallel Multi-task Execution 100 100 Dependency Chain Execution 100 100 Parameter Clarification 100 100 Ambiguous Intent Clarification 100 100 Multi-turn Recursive Clarification 100 100 Task Modification 100 100 Irrelevant Reply (Simple Task) 100 100 Irrelevant Reply (Complex Task) 100 100 Incomplete Prior Task (After User) 100 100 Incomplete Prior Task (After Tool) 100 100 Personalized Information Update 72 100 
+
+Total 1,272 1,278 
+
+Table 20 | Per-scenario dialog counts of the human-annotated ID and OOD test sets. Both share the same scenario coverage; the OOD set uses a disjoint, held-out tool pool. 
+
+D.4. Tool Category Classification 
+
+The 1,896 unique tools across both training sets were classified into 9 functional categories via an au-tomated keyword-based classifier that inspects each tool’s name and description. The categories, or-dered by prevalence in the single-step set, are: Open/Close (e.g., toggle switches, engine start/stop, lock/unlock, dismiss alarms), OCR/Document (file system operations, notes, printing), Navigation (maps, flights, transportation, reservation management), Finance (stock trading, investment, portfo-lio), Communication (calls, messaging, notifications), Payment (orders, checkout, currency exchange, refunds), Query (information retrieval, weather, calculation, schedule reading), Set/Configure (set-tings, alarm/reminder editing, app preference management), and Media (audio/video playback, camera, screenshots). Table 21 reports the category distribution for both training sets, counting each tool appearance in the candidate tool pool of every sample. The total counts (212,901 single-step, 65,927 multi-turn) reflect that each sample carries approximately 12 candidate tools on average. The distribution is broadly consistent across the two sets, with Open/Close, OCR/Document, Navigation, and Finance together covering roughly half of all tool occurrences. The “Other” category (30.3% single-step, 29.5% multi-turn) primarily consists of tools with vague or compound descriptions, many from the vehicle-control and smart-device domains, that resist unambiguous single-category assignment. 
+
+> 31
+
+IACM-RL: Intent-Aware Context Management and Reinforcement Learning for Complex Tool Invocation under Dynamic Intent Fluctuations 
+
+Single-step Multi-turn Tool Category Count % Count %Open/Close 30,892 14.5 9,767 14.8 OCR/Document 27,623 13.0 7,728 11.7 Navigation 23,844 11.2 9,150 13.9 Finance 17,979 8.4 4,281 6.5 Communication 14,899 7.0 4,530 6.9 Payment 12,326 5.8 3,763 5.7 Query 10,458 4.9 3,867 5.9 Set/Configure 5,360 2.5 1,598 2.4 Media 5,100 2.4 1,773 2.7 Other 64,420 30.3 19,470 29.5 Total 212,901 100.0 65,927 100.0 
+
+Table 21 | Tool category distribution for both training sets. Each tool in the candidate pool of every sample is counted, so counts represent total tool-pool instances. Tools are classified into 9 functional categories via an automated keyword-based classifier; tools not fitting any category are assigned to “Other.” The “Other” category is dominated by tools with vague or compound descriptions that cannot be unambiguously assigned. All tools are text-based API calls; the dataset does not include multimodal tools. 1 2 3 4 5 6 7 8 9 10 11+               
+
+> Number of User Turns
+> 0
+> 10
+> 20
+> 30
+> 40
+> % of Trajectories
+> 2,252 2,336
+> 528
+> 201 149 79 44 22 20 17
+> 6,550 6,628
+> 1,787
+> 943
+> 627
+> 315 193 138 90 61 59
+> Trajectory Turn-Count Distribution
+> Multi-turn Train (N=5,639)
+> Single-step Train (N=17,391)
+
+Figure 9 | Trajectory turn-count distribution. The raw corpus contains trajectories of up to 17 user turns. Before Stage 2 training, trajectories exceeding 12 user/assistant turns are filtered out. The reported Stage 2 training count is computed after this filtering. 
+
+D.5. Representative Data Sample 
+
+Figure 10 shows a representative trajectory from the multi-turn training set, illustrating the Task Modification scenario. The user initially sets an alarm for 07:00 alongside enabling Bluetooth. In the subsequent turn, the user changes their mind and modifies the alarm time to 06:30. The agent must successfully update the arguments while strictly avoiding regression to the stale value (07:00), which requires precise intent tracking. 
+
+32 IACM-RL: Intent-Aware Context Management and Reinforcement Learning for Complex Tool Invocation under Dynamic Intent Fluctuations 
+
+Candidate Tools (3 of 18 shown) 
+
+remove_schedule : Delete a calendar event. Parameters: activity (event name), date_time (date and time), position 
+
+(location), type_of_range (scope: single/all/first N). 
+
+navigation_tool : Provide navigation from a departure to a destination. Parameters: departure_location (origin, required if specified), destination_location (target), type_of_action (outbound/return). 
+
+transport_service : Ride-hailing service. Parameters: type_of_action (start/cancel/query), department_location 
+
+(pickup point). 
+
+Turn 1: Initial Tool Call 
+
+User : Set an alarm for 7am tomorrow and turn on Bluetooth. 
+
+Assistant : I’ll set up both for you. 
+
+<tool_call> {"name": "alarm", "arguments": {"time": "07:00", "repeat": "once"}} {"name": "bluetooth", "arguments": {"action_type": "open"}} </tool_call> 
+
+Tool returns : Alarm set for 07:00. Bluetooth enabled. 
+
+Turn 2: Modification (parameter overwrite) 
+
+User : Actually, change the alarm to 6:30 instead. 
+
+Assistant : Got it, updating your alarm to 6:30. 
+
+<tool_call> {"name": "alarm", "arguments": {"time": "06:30", "repeat": "once"}} </tool_call> 
+
+Tool return : Alarm updated to 06:30. 
+
+Expected Output & BeliefState 
+
+Expected call : alarm(time="06:30", repeat="once") 
+
+Stale value : time="07:00" (must not regress) 
+
+BeliefState :
+
+Cslots : alarm.time = 06:30 [stale: 07:00] 
+
+Gcurrent : set alarm to 06:30 
+
+Isignal : modify 
+
+Scenario : Task Modification | Intent mode : Modification 
+
+Reward : JGA hit + SCRR stale penalty (if 07:00 is reused) 
+
+Figure 10 | A representative training trajectory from the DynamicIntent Dataset. Turn 1 shows an initial parallel tool call. Turn 2 modifies the alarm time from 07:00 to 06:30; the agent must invoke the correct tool with updated arguments and must not regress to the stale value 07:00. The BeliefState tracks the slot update with a stale flag, and the reward penalizes SCRR if the old value is reused. 
+
+## E. Attention Visualization 
+
+Figure 12 visualizes the token-level attention distribution on representative Modification turns for two models: PPO-noCM, which scans the raw dialogue history, and IACM-RL, which conditions on the self-generated CM block shown in Figure 11. For PPO-noCM, attention is uniformly diluted across the long raw history. The tokens carrying the current goal and the latest parameter change receive only a small fraction of the total attention budget, as obsolete constraints and injected chit-chat compete for the same attention mass. This dilution subverts the data dependencies among multiple tools, trapping the agent in catastrophic intent deviation and infinite API loops. 
+
+> 33 IACM-RL: Intent-Aware Context Management and Reinforcement Learning for Complex Tool Invocation under Dynamic Intent Fluctuations
+
+In contrast, IACM-RL concentrates its attention on the CM block in the system prompt, which distills the turn-critical state into a compact representation. The key tokens corresponding to the current goal, confirmed slots, and the override instruction excluding the obsolete jacket exchange receive sharply higher attention weights, while mid-context noise from chit-chat and prior modi-fications is effectively suppressed. This focused attention pattern confirms that the CM acts as an attention anchor, directing the policy toward the state-relevant information rather than re-deriving it from the verbose history. 
+
+Figure 11 | Token-level attention over the full Context Manager. IACM-RL selectively focuses on action-relevant CM fields, including the updated current goal, confirmed exchange parameters, the flag that removes the obsolete jacket exchange, and execution guidance, which facilitates the capture of key information from the interaction history. Darker colors indicate higher attention. 
+
+## F. Limitations 
+
+All experiments use text-based API tools simulated by LLM; whether the observed gains transfer to multimodal or non-tool agentic settings remains an open question. 
+
+> 34 IACM-RL: Intent-Aware Context Management and Reinforcement Learning for Complex Tool Invocation under Dynamic Intent Fluctuations
+
+Figure 12 | Token-level attention comparison on Modification turns. Top: PPO-noCM distributes attention uniformly across the raw history, failing to focus on the current goal and updated param-eters. Bottom: IACM-RL uses CM guidance to identify the current execution boundary, confirmed slots, and the override instruction, thereby enhancing attention to these elements while suppressing mid-context noise. Darker colors indicate higher attention. 
+
+## G. Prompt Templates 
+
+This appendix lists the principal prompts used across the DynamicIntent data construction pipeline, the self-generated Context Manager, and the reward/evaluation LLM-as-a-judge modules. Chinese prompts are presented verbatim; English judge prompts follow their original wording. Placeholders in braces are filled at runtime. 
+
+G.1. Data Construction Prompts 
+
+The DynamicIntent pipeline is execution-free: natural-language user queries, assistant tool calls, and mock tool returns are all synthesized by LLMs over the Tool Dependency Graph. The core primitive is a back-and-forth translation over each function in a sampled Function Sequence Pattern (FSP): a user query is generated from the schema (back-translation), an assistant tool call is generated from the query (forth-translation), a mock tool return is produced by an LLM simulator, and the assistant then summarizes the return. Intent-fluctuation methods further rewrite the query to inject modifications, interruptions, clarifications, and accumulations. 
+
+Tool dependency graph construction. The Tool Dependency Graph 𝐺 = (𝑉, 𝐸 ) is built by a multi-source LLM voting: for each ordered tool pair, several LLM accounts independently judge whether the output of the source tool can serve as (part of) the input of the target tool; an edge is added only when a majority agrees across two voting rounds (static schema judgment and input/output-example judgment), and the dependent parameter names are intersected across votes. This graph is the structural basis for long-chain (Chaining) scenarios. 
+
+> You will be given a source API function and a target API function. You will also be given an input example and output example of source API function. Your task is to: 1. Judge if the target api is related to the source API. 2. Judge which input parameters of the target API is dependent on the output of source api.
+> 35 IACM-RL: Intent-Aware Context Management and Reinforcement Learning for Complex Tool Invocation under Dynamic Intent Fluctuations
+
+We say one function is related to the source API if: 1) the output of the source API is the premise of executing the function. For example, the output of fileexists(’file. txt’) API determines whether we can call downloadfile(’file.txt’). 2) the output of the source API is exactly the input parameters of the function. For example, when calculating the area of a circle, the function getradius(obj) is the source node and calculate(radius) is the target node. 3) the output of the source API is partial input parameters of the function. For example, when posting something to social media, one might first get the content. In this case, the content = getcontent(’file.txt’) is the source node and posting(content, id, tags) is the target node. We say one parameter is dependent on the source API if: 1) the output of the source API is exactly the input parameters of the function. 2) the output of the source API is partial input parameters of the function. Notice that the relation might cross the boundary of domains. For example, when the given APIs are in the domain of weather and travel, it is possible that a weather API could be dependent on a travel API since the weather determines the travel schedule. Attention: 1. You need to first analyze what the source API function’s output is. 2. When evaluating the output of the source API function, first refer to the output examples; the description of source API function are only secondary references. 3. In case of any conflict or invalid output examples, rely on the output examples. 4. The target API function is related to the source API function, but this does not mean that the target API function necessarily has parameters that is dependent on the source API function. 5. In <think> and </think>, give a brief explanation on how you think and make judge. In <judge> and </ judge>, if the target api is related to the source API, output yes, otherwise output no, Use lower case. In < parameters> and </parameters>, give a list of parameter names of the target API which are dependent on the source API if any, like [’param1’, ’param2’, ...], otherwise output a blank list. Source API: {source_api} Target API: {target_api} Input example: {input_example} Output example of the input example: {output_example} 
+
+LLMSimBackend (mock tool execution). Because the pipeline is execution-free, a dedicated LLM acts as an API server: given a tool’s schema, examples, and a concrete call input, it crafts a JSON response that aligns with the API’s intended output. This produces the mock tool returns that popu-late the expected call records and the conversation history. The response is constrained to 100–200 words with rich, practical content. 
+
+Imagine you are an API Server operating within a specialized tool, which contains a collection of distinct APIs. Your role is to deeply understand the function of each API based on their descriptions in the API documentation. As you receive specific inputs for individual API calls within this tool, analyze these inputs to determine their intended purpose. Your task is to craft a JSON formatted response that aligns with the expected output of the API, guided by the provided examples. Your responses must adhere to a specific JSON structure: {"error": "", "response": "<Your_Response>" }The error field should remain empty. The response field should contain the content you formulate based on the API’s functionality and the input provided. Ensure that your responses are meaningful, directly addressing the API’s intended functionality. Note that: 
+
+> 36 IACM-RL: Intent-Aware Context Management and Reinforcement Learning for Complex Tool Invocation under Dynamic Intent Fluctuations
+
+− your response should be around 100 to 200 words, containing rich information given the api input parameters. Keep your answer short and simple. 
+
+− your response must be effective and have practical content. 
+
+− if the api response example is null or ineffective, ignore the example and give your independent response. 
+
+− you will also receive a conversation history, which includes previous exchanges between the user and the assistant for your reference. API Documentation: {api_doc} API Examples: {api_example} API Input: {tool_input} Conversation History: {history} 
+
+Back-translation (user query generation). Given the conversation history and the candidate func-tion schema, the LLM role-plays as the user and generates a natural query that invokes the target function. History outputs are referred to by deictic references (e.g., “the location you just found”) rather than literal values, encouraging multi-turn dependency. 
+
+Now you are role −playing as a user that involves in a multi −turn conversation with a function −calling agent. You will be given the history of this multi −turn conversation. You will also be provided with a candidate functions that can be called in this round. I would like you to generate the query of this round which calls the given function. Rules: 
+
+− If the conversation history is empty, you should independently generate a query. 
+
+− If the conversation history is not empty, then the preferred this round query should be motivated by the history of this multi −turn conversation. Preferably, those outputs are used as the input parameters for as least one of the functions being called at this round. For the parameters from the conversation history, try not to mention the exact parameters that you will use. Instead, use references such as ’the location you just found’, ’With the listed items’... to refer to the output of conversation history that will be leveraged next. 
+
+− You should NOT mention name of the function to use in your query explicitly. You can ONLY use the function once. 
+
+− Use no parameters besides the parameters indicated in the function documentation. Make sure your new query contains information for parameters of the function you want to call. 
+
+− For the parameters in the default parameter list, you can use them directly or you can generate new parameter values yourself. 
+
+− If the conversation history is not empty, try to make the conversation as natural as possible. 
+
+− Generate the query between <answer> and </answer>. Now you will be given information, generate a query accordingly. [History]:{history} [Candidate Functions]:{candidate_functions} [Default Parameters]{default_param} [Output]: 
+
+Forth-translation (assistant tool call generation). The LLM role-plays as the function-calling agent, deriving arguments from the user query and referencing prior assistant outputs. The response follows a fixed tool-call and answer format with a JSON array of function calls. 
+
+Now you are role −playing as a function −calling agent that involves in a multi −turn conversation with a user. You will be given the history of this multi −turn conversation, indicated by round numbers. You will also be provided with a list of candidate functions that can be called in this round. I would like you to generate the function call for this round using this function signature. Make sure the parameters for this candidate function should be derived from the user query and reference outputs from the history. Rules: 
+
+− You should use the function with the original name without any changes. 
+
+> 37 IACM-RL: Intent-Aware Context Management and Reinforcement Learning for Complex Tool Invocation under Dynamic Intent Fluctuations
+
+− For all the functions, make sure your generated function calls contain ALL the required parameters fields from the function documentation. You may also include some optional parameters. However, do not hallucinate any parameters outside of those. Use only the parameters indicated in the required and optional fields of the function documentation. 
+
+− Then, the parameter values for the new function should be derived from the user query and must reference the outputs of the assistant. 
+
+− You can have parallel function call with the candidate function, i.e., call the function with different set of parameters, for your new query. However, do not call more than three parallel functions. Format: Thought: ... <think> ... </think> Answer: a JSON array of {"name","arguments"} objects inside <answer> ... </answer>. [History]: {history} [Candidate Functions]: {candidate_functions} [User Query]: {query} 
+
+Tool-result summarization. After the LLM simulator produces a mock tool return, the assistant sum-marizes it into a natural, user-facing response without exposing technical details (function names, JSON, error codes). 
+
+Now you are role −playing as a user −facing AI Assistant. Your primary job is to interpret the results of a tool call that was just executed in the background and formulate a natural, helpful, and user −friendly response. You are the final bridge between the system’s actions and the user’s understanding. Rules: 
+
+− Your response must be based on the provided tool output. Do not hallucinate information that is not present in the [Last Round Tool Output]. 
+
+− You must not expose any technical details to the user. Never mention function names, JSON structures, or technical error codes. Your role is to translate these technical details into plain language. 
+
+− Your response should directly address the user’s last query, which can be inferred from the [History]. 
+
+− Handle different outcomes gracefully: present data on success, suggest alternatives on empty results, apologize on failure. 
+
+− Your tone should be helpful and conversational. 
+
+Modification method (parameter rewrite). To synthesize the “Modification” fluctuation, two con-flicting user sentences are merged into one that negates the first and adopts the second, simulating a user changing their mind (e.g., “I want Beijing, oh wait, Shanghai instead”). 
+
+You are an expert AI assistant specializing in Natural Language Understanding and task consolidation. Your primary function is to create a new sentence based on the given information. You will be given: 
+
+− Conversation History: The turn −by −turn interaction between a user and an assistant. 
+
+− Sentence List: A list of sentences which need to be synthesized. Include sentence one and sentence two. Your task is to merge all user inputs from the Sentence List into a single sentence. Rules: 
+
+− Preserve Critical Information: The final sentence must contain all critical information of each sentence. 
+
+− Appropriate Omission: For repetitive or redundant information, use omission or referential expressions. 
+
+− Ensure Natural Fluency: The merged sentence must be grammatically correct and sound like a single natural request. 
+
+− Provide Transition: Simulate the user’s change of mind and regretful statements. If the information in the second sentence conflicts with the first, negate the conflicting content of the first and adopt the second. 
+
+− Produce only the final merged sentence between <answer> and </answer>. [Conversation History]:{history} 
+
+> 38 IACM-RL: Intent-Aware Context Management and Reinforcement Learning for Complex Tool Invocation under Dynamic Intent Fluctuations
+
+[Sentence List]:{sentence_list} [Output]: 
+
+Interruption method (function switch). To synthesize “Interruption”, the current query is rewritten to make the transition from the previous query more natural, while retaining the original meaning and all information. 
+
+You are a professional user query rewriting expert. Next, you will be given the current query and the previous query. Please rewrite the current query to make the transition with the previous query more natural. 
+
+− You must retain the original meaning and all information of the current query. 
+
+− Output your answer between <query> and </query> Previous query: {last_round_query} Current query: {current_query} 
+
+DynamicMockTool fallback (training-time). During RL rollout, when the model’s tool call does not match the ground-truth expected calls, a fallback LLM simulates a realistic tool response based on the schema and the actual arguments, so that the trajectory can continue. It returns errors only for two cases, tool does not exist or undefined parameter, and otherwise produces a normal realistic result; this keeps the multi-turn loop from collapsing on out-of-distribution calls. 
+
+You are a tool server that responds to various tool call requests. Your role is to: 
+
+− Deeply understand the tool and its format based on its schema 
+
+− Process incoming tool calls with their parameters 
+
+− Generate appropriate responses based on the tool’s expected output 
+
+− Only return errors for two specific cases: tool does not exist, or undefined parameter is provided 
+
+− For all other cases (including missing required parameters, type mismatches, format errors, invalid enum values), return a normal, realistic tool call result RESPONSE GUIDELINES 
+
+− Tool call is valid OR has any error other than the two specified below −> Return a normal, realistic response based on the tool call and parameters. 
+
+− Tool does not exist −> "Error: Tool ’tool_name’ does not exist. Available tools are: [...]" 
+
+− Undefined parameter provided −> "Error: Parameter ’[parameter_name]’ is not defined in the tool schema." Keep your response simple, informative, and reasonable. Only return the tool feedback or error message, nothing else. The tool’s schema is: {tool_schema} The tool call parameter that awaits your feedback is: {tool_name}: {param} 
+
+Modification augmentation (targeted). Because Task Modification samples are a minority, we run a dedicated augmentation that materializes a creation-type tool call into the history and asks the LLM to generate a user modification utterance plus the corresponding modify, delete, or cancel tool call as the new expected calls. 
+
+Task: Based on an already −completed creation −type tool call, generate the user’s next −turn natural modification utterance, and the existing modify/delete/cancel tool that should be invoked. Requirements: 
+
+> 39 IACM-RL: Intent-Aware Context Management and Reinforcement Learning for Complex Tool Invocation under Dynamic Intent Fluctuations
+
+1. final_user must be a natural modification utterance reflecting the user changing their mind / supplementing / overwriting. 2. The post −modification tool call must be a modify/delete/cancel tool already defined in the tools list, with arguments taking the new post −modification values. 3. Old −value parameters must be findable in the historical tool_call; new values must appear literally in final_user. 4. final_user must also convey a modification signal, such as "change to / adjust / switch to / forgot to mention / supplement / cancel / don’t want". 5. Do not rewrite, expand, normalize, or complete any characters not present in final_user. 6. Prefer the three modification types: parameter overwrite, parameter supplementation, and cancel/switch −to −
+
+another. 
+
+G.2. Self-Generated Context Manager Prompts CM generation prompt. During rollout, the policy drafts a Context Manager block as the condition-ing signal for the subsequent tool-call generation. The updater U first maintains the BeliefState b𝑡 
+
+from the observable dialogue messages and tool returns (no gold intent / gold slot / gold stale label access; the same updater runs at inference). The prompt below is then constructed from a textual summary of b𝑡 and the last-action summary; the deliberately unclosed <Context_Manager> tag cues the model to continue writing the XML. The drafted tokens cmodel  
+
+> 𝑡
+
+are injected into the system prompt and condition the tool-call response 𝑎 𝑡 , while the oracle target coracle  
+
+> 𝑡
+
+= XML-Template (b𝑡 ) is kept separately for the loss. 
+
+You are a dialogue state extractor. Based on the current dialogue state, output the Context Manager. ## Current State {state} ## Last Action {last_action} Please output the Context Manager: <Context_Manager> 
+
+CM injection hint. The drafted CM block is appended to the system prompt with a usage hint that clarifies its role and conflict priority: the CM is structural context, not a user request, and any conflict is resolved in favor of the current user message and tool schema. 
+
+−−− 
+
+# Context Manager Usage The system provides a <Context_Manager> state block before the current assistant response. It is not a user request, but structured context to assist your tool −call decisions. If the Context_Manager conflicts with the current user message or tool schema, the current user message and tool schema take precedence. Do not output the <Context_Manager> content in your final answer. 
+
+−−− 
+
+# Context Manager for the Current Turn 
+
+Intent classification (LLM fallback). When the rule-based keyword classifier conflicts or is uncon-fident, an LLM classifies the user turn into one of six intent categories and extracts overridden stale slots. The JSON output is consumed by the BeliefState updater U, which then mutates b𝑡 accord-ingly. 
+
+> 40 IACM-RL: Intent-Aware Context Management and Reinforcement Learning for Complex Tool Invocation under Dynamic Intent Fluctuations
+
+You are an intent classifier for a multi −turn AI agent. Given the current agent state and the user’s latest message, classify the user’s intent into EXACTLY ONE category: 
+
+− modified: user CHANGES a previously set parameter (e.g. "change it to 8 o’clock", "change to X") 
+
+− interrupted: user SWITCHES to a completely different task mid −flow (e.g. "wait, first help me with XX", "wait, do X instead") 
+
+− reset: user wants to START OVER / cancel (e.g. "never mind, let’s not do it", "cancel") 
+
+− clarify: user ASKS for information / doesn’t know what’s available (e.g. "what’s available?", "what can you do ?") 
+
+− accumulate: user ADDS more steps to the current task (e.g. "then help me...", "based on the above...") 
+
+− none: user is continuing naturally, no intent change Output ONLY a JSON object: {"intent":"<one of the six>","confidence":<0.0 −1.0>,"reason":"<1 sentence>", "extracted_slots":{"key":"value"},"new_goal":"<if interrupted/reset>", "stale_slot_keys":["keys that were overridden"]} 
+
+CM render XML template. The target CM format represents the BeliefState using nine XML sub-blocks, each a one-line JSON. During training, the target XML used by loss is produced by a determin-istic template that fills each sub-block from the corresponding BeliefState field; the model is trained to produce tokens matching this format from (b𝑡 , ℎ 𝑡 ). The skeleton is shown below; field semantics follow the BeliefState definition in Section 4.2. 
+
+<Context_Manager> <Current_User>{"intent_type":"modify_previous_task|switches_topic|cancel_previous_task| ambiguous_modify_request|append_subtask|new_task","current_turn_requires_tool":<bool>}</Current_User> <Overall_User_Task>{"full_intent":"<current_goal>","current_turn_boundary":"continue executing|waiting for user input","deferred_intent_summary":""}</Overall_User_Task> <History_Relation>{"relation_to_history":"<relation>","inherit_slots":[<active>],"override_slots":[<stale>]," reason":"<intent>"}</History_Relation> <Resolved_References>{}</Resolved_References> <Active_Objects>{"obj_<tool>_<turn>":{"type":"tool_result","status":"active","canonical_slots":{...},"last_tool ":"<name>","last_result":"<summary>"}}</Active_Objects> <Pending_Or_Interrupted_Tasks>[{"task_id":"P1","description":"<pending_question>","status":"blocked"}]</ Pending_Or_Interrupted_Tasks> <Task_Graph_For_Current_Turn>[{"task_id":"T1","description":"<goal>","arguments":<active_slots>," depends_on":[],"status":"ready","execute_in_current_assistant_turn":true}]</Task_Graph_For_Current_Turn> <Deferred_Tasks_After_Current_Turn>[{"task_id":"D1","description":"<deferred_goal>","status":"deferred"," reason":"interrupted by new task"}]</Deferred_Tasks_After_Current_Turn> <Tool_Decision_Guide>{"call_tool_now":<bool>,"ask_user_instead":<bool>,"must_override_arguments":[< stale_keys>],"unresolved_slots":[<pending_questions>],"common_error_warnings":["do not repeat a tool call that already succeeded"]}</Tool_Decision_Guide> </Context_Manager> 
+
+G.3. Reward and Evaluation Judge Prompts 
+
+The hierarchical reward uses LLM-as-a-judge for the two semantically ambiguous signals (ACR and ISSR); SCRR and DTCR are rule-based in the reward. The evaluation suite uses a more fine-grained set of judge prompts (8-level ACR, 7-level ISSR, plus SCRR and DTCR) for diagnosis. We list the reward-side prompts and one evaluation-side prompt (ISSR) for completeness; the others follow the same structure with extended rubrics. 
+
+ACR judge (reward-side, active clarification). Scores whether the agent’s clarification response matches the ground-truth intent in [− 1, 1]; a positive score is scaled by 𝑅 ACR =1.0 into 𝑅 action .
+
+> 41 IACM-RL: Intent-Aware Context Management and Reinforcement Learning for Complex Tool Invocation under Dynamic Intent Fluctuations
+
+You are an expert evaluator for AI agent clarification quality. Evaluate whether the agent’s response matches the ground −truth intent. ## Scoring Rubric (score in [ −1.0, 1.0]) ### 1.0 — Perfect: exact semantic match, covers ALL missing params ### 0.7 −0.9 — Near Perfect: core intent aligned, minor wording differences ### 0.4 −0.6 — Good: main intent aligned, covers most params ### 0.0 −0.3 — Weak: partial alignment ### −0.1 to −0.5 — Mostly Irrelevant ### −0.6 to −1.0 — Completely Wrong / hallucinated Return ONLY: {"score": <float between −1.0 and 1.0>, "reasoning": "<1 sentence>"} 
+
+ISSR judge (reward-side, intent switch). Scores whether the agent successfully switched from the old task to the new one in [− 1, 1]; scores > 0.3 are weighted by 𝑅 ISSR =2.0 𝑠 LLM and added into 
+
+𝑅 outcome (score-weighted, not a fixed pivot bonus). 
+
+You are an expert evaluator for multi −turn agent trajectory analysis. Determine whether the agent successfully SWITCHED from old task to new task. ## Scoring Rubric (score in [ −1.0, 1.0]) ### 1.0 — Perfect Switch: fully abandoned old, correctly executed new ### 0.5 −0.9 — Good Switch: mostly switched, minor residue ### 0.0 −0.4 — Weak / Unclear ### −0.1 to −0.5 — Mostly Stuck on Old ### −0.6 to −1.0 — Completely Ignored Interruption Return ONLY: {"score": <float between −1.0 and 1.0>, "reasoning": "<1 sentence>"} 
+
+ISSR judge (evaluation-side, fine-grained). The evaluation suite uses an extended 7-level rubric with explicit abandonment / execution / transition / completeness dimensions, and emits is-interruption and switch-success fields for diagnostic aggregation. 
+
+You are an expert evaluator for multi −turn AI agent trajectory analysis. Your task: determine whether the agent successfully SWITCHED to the new user intent after the user interrupted or shifted the topic in the middle of a previous task. ## Context 
+
+− The agent was executing OLD TASK A. 
+
+− The user suddenly interrupted with NEW TASK B (or an unrelated question). 
+
+− The agent should ABANDON Task A and execute Task B. 
+
+− Failure mode: the agent gets "stuck" on Task A and either ignores Task B or tries to merge them incorrectly. ## Evaluation Dimensions 1. Abandonment of Old Task — Did the agent STOP executing Task A? 2. Execution of New Task — Did the agent correctly execute Task B? 3. Transition Quality — Did the agent acknowledge the switch gracefully? 4. Completeness — For Task B, did the agent do everything required? ## Scoring Rubric (score in [ −1.0, 1.0]) ### 1.0 — Perfect Switch: completely stopped A, fully executed B. ### 0.7~0.9 — Good Switch, Minor Residue: switched to B, minor A reference. ### 0.4~0.6 — Partial Switch: attempted B but incomplete, noticeable A residue. ### 0.0~0.3 — Weak / Unclear: acknowledged but barely acted on B. ### −0.1~ −0.3 — Mostly Stuck on Old: continued A, lip service to B. ### −0.4~ −0.6 — Confused Mix: merged A and B incoherently, called tools for both. 
+
+> 42 IACM-RL: Intent-Aware Context Management and Reinforcement Learning for Complex Tool Invocation under Dynamic Intent Fluctuations
+
+### −0.7~ −1.0 — Completely Ignored Interruption: continued A as if nothing happened. ## Output Format Return ONLY a JSON object: {"score": <float>, "is_interruption": true/false, "switch_success": true/false, "reason": "1 −2 sentence justification "} ## Input Data Previous −turn assistant tool calls: {prev_tool_calls} Previous −turn assistant response: {prev_response} Current −turn user input: {curr_user} Current −turn model tool calls: {pred_tool_calls} Current −turn model response: {pred_response} Note: switch_success is only meaningful when is_interruption=true.
