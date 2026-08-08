@@ -6,77 +6,75 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-08-07
-- 运行时间：2026-08-07 21:27:22 UTC
+- 最新运行日期：2026-08-08
+- 运行时间：2026-08-08 19:43:22 UTC
 - 运行状态：成功
-- 本次总论文数：19
-- 精读区：8
+- 本次总论文数：17
+- 精读区：6
 - 速读区：11
 
 ### 今日简报（AI）
-今日精读19篇、速读11篇，聚焦强化学习与多模态智能体的前沿进展。最值得关注的两篇高分为：指令条件化探索结合自蒸馏策略提升RL效率，以及过程对齐强化学习优化多领域机器翻译。建议普通读者优先回顾这两篇精读论文，再浏览知识图谱与工具超图相关的速读报告，把握方法与应用的连接点。
-- 详情：[/202608/07/README](/202608/07/README)
+今日共读17篇论文，其中6篇精读、11篇速读，重点聚焦强化学习与策略优化方向。
+
+最值得关注的是两篇9.0分精读：可恢复性感知的干预策略学习，以及面向搜索智能体的上下文信息策略优化。
+
+建议优先精读这两篇高分工作，理解“可恢复性”与“上下文信息”如何提升策略学习效率，再扩展至速读中的口语LLM与隐私对齐话题。
+- 详情：[/202608/08/README](/202608/08/README)
 
 ### 精读区论文标签
-1. [Instruction-Conditioned Exploration for Reinforcement Learning with Self-Distillation to an Unconditioned Policy](/202608/07/2608.02087v2-instruction-conditioned-exploration-for-reinforcement-learning-with-self-distillation-to-an-unconditioned-policy)  
+1. [Optimizing What Policies Learn From: Recoverability-aware Rollout Intervention Learning](/202608/08/2608.05080v1-optimizing-what-policies-learn-from-recoverability-aware-rollout-intervention-learning)  
    标签：评分：9.0/10、query:rl
-   evidence：针对大语言模型的强化学习后训练，提出指令条件探索方法
-2. [PAMT: Process-Aligned Reinforcement Learning for Multi-Domain Machine Translation](/202608/07/2608.03077v1-pamt-process-aligned-reinforcement-learning-for-multi-domain-machine-translation)  
+   evidence：大模型强化学习；无critic分组RL的自适应采样干预
+2. [Contextual Information Policy Optimization for Search Agents](/202608/08/2608.06128v1-contextual-information-policy-optimization-for-search-agents)  
    标签：评分：9.0/10、query:rl
-   evidence：面向LLM多步推理的策略优化强化学习
-3. [Hi-TTRL: Regulating Consensus with Hints for Test-Time Reinforcement Learning](/202608/07/2608.03545v1-hi-ttrl-regulating-consensus-with-hints-for-test-time-reinforcement-learning)  
+   evidence：面向搜索智能体检索后证据扎根的强化学习策略优化
+3. [EnvACE: Internalizing Environment Dynamics via World Rehearsal for Agentic Reinforcement Learning](/202608/08/2608.06197v1-envace-internalizing-environment-dynamics-via-world-rehearsal-for-agentic-reinforcement-learning)  
    标签：评分：9.0/10、query:rl
-   evidence：面向大模型推理的测试时强化学习，关注基于共识的奖励信号敏感性
-4. [Hi-TTRL: Regulating Consensus with Hints for Test-Time Reinforcement Learning](/202608/07/2608.03545v2-hi-ttrl-regulating-consensus-with-hints-for-test-time-reinforcement-learning)  
+   evidence：通过世界预演替代外部环境交互，支持大语言模型智能体完成长程工具使用任务
+4. [RRC: Unlocking Generative Reward Models in LLM Reinforcement Learning via Ranking-Based Reward Construction](/202608/08/2608.06310v1-rrc-unlocking-generative-reward-models-in-llm-reinforcement-learning-via-ranking-based-reward-construction)  
    标签：评分：9.0/10、query:rl
-   evidence：基于多数投票伪标签的测试时强化学习提升大语言模型推理，并用提示调控共识度。
-5. [EASy: Towards Efficient LLM-Based Agentic System](/202608/07/2608.04588v1-easy-towards-efficient-llm-based-agentic-system)  
-   标签：评分：9.0/10、query:rl
-   evidence：用强化学习训练LLM智能体编排框架，联合优化复杂任务表现与执行效率
-6. [Enhancing Social Intelligence in LLMs with Hierarchical Reasoning and Utterance-Level Goal Rewarding](/202608/07/2608.05832v1-enhancing-social-intelligence-in-llms-with-hierarchical-reasoning-and-utterance-level-goal-rewarding)  
-   标签：评分：9.0/10、query:rl
-   evidence：用于对话的层次强化学习与话语级目标奖励
-7. [DASH: Divergence-Adaptive Supervision Horizons for On-Policy Self-Distillation of Reasoning Models](/202608/07/2608.06243v1-dash-divergence-adaptive-supervision-horizons-for-on-policy-self-distillation-of-reasoning-models)  
-   标签：评分：9.0/10、query:rl
-   evidence：针对推理模型的同策略自蒸馏，提出自适应的监督视界
-8. [NeSy-RAG: Neuro-Symbolic RAG for Explainable Question Answering](/202608/07/2608.06292v1-nesy-rag-neuro-symbolic-rag-for-explainable-question-answering)  
-   标签：评分：9.0/10、query:rl
-   evidence：面向可解释问答的神经符号检索增强生成框架。
+   evidence：针对LLM强化学习设计基于排序的奖励构建方法，改进生成式奖励模型的训练信号
+5. [RoMeRL: Balancing Feedback Coverage and the Memory-Reward Trap in Self-Evolving Agent Memory via Reduced-Order Utility States](/202608/08/2608.02508v2-romerl-balancing-feedback-coverage-and-the-memory-reward-trap-in-self-evolving-agent-memory-via-reduced-order-utility-states)  
+   标签：评分：8.0/10、query:rl
+   evidence：用强化学习管理自演化LLM智能体的记忆，解决记忆奖励陷阱
+6. [Hierarchical Graph Memory for LLM Agents with Path-level Localization and Rewrite](/202608/08/2608.05095v1-hierarchical-graph-memory-for-llm-agents-with-path-level-localization-and-rewrite)  
+   标签：评分：8.0/10、query:rl
+   evidence：面向LLM智能体的层级图记忆，支持路径级定位和重写，改善多跳检索与长期推理
 
 ### 速读区论文标签
-1. [DocPO: Advancing Document Policy Optimization via Tailored Step-Aware Rewards](/202608/07/2608.00536v2-docpo-advancing-document-policy-optimization-via-tailored-step-aware-rewards)  
+1. [Towards More Expressive Spoken LLMs: Fine-Grained Intent Benchmarking and Acoustic-Lexical Decoupled Policy Optimization](/202608/08/2608.03054v1-towards-more-expressive-spoken-llms-fine-grained-intent-benchmarking-and-acoustic-lexical-decoupled-policy-optimization)  
    标签：评分：8.0/10、query:rl
-   evidence：设计了逐步退火的奖励锐化机制，解决文档解析RL中奖励判别力不足的问题
-2. [The Graph Language: How Knowledge Graphs Speak to Large Language Models](/202608/07/2608.01175v1-the-graph-language-how-knowledge-graphs-speak-to-large-language-models)  
+   evidence：为口语多轮对话设计兼顾质量与情感表达的强化学习目标
+2. [Structured LLM Reasoning for Zero-Shot Human--Robot Coordination Under Hidden Goals](/202608/08/2608.04309v1-structured-llm-reasoning-for-zero-shot-human--robot-coordination-under-hidden-goals)  
    标签：评分：8.0/10、query:rl
-   evidence：通过可训练语言中介将知识图谱接入LLM，支持知识密集型问答和多跳推理
-3. [HyperAgent: Planning and Acting over Tool-Schema Hypergraphs for Tool-Use LLM Agents](/202608/07/2608.02650v1-hyperagent-planning-and-acting-over-tool-schema-hypergraphs-for-tool-use-llm-agents)  
+   evidence：用于零样本人机协作任务的LLM智能体架构
+3. [Private Direct Preference Optimization for LLM Alignment](/202608/08/2608.05040v1-private-direct-preference-optimization-for-llm-alignment)  
    标签：评分：8.0/10、query:rl
-   evidence：通过工具Schema超图为LLM智能体复杂任务自动化提供规划
-4. [SFT Conflicts, RL Coexists: A Theoretical and Empirical Analysis of Multi-Task Learning for LLMs](/202608/07/2608.03573v2-sft-conflicts-rl-coexists-a-theoretical-and-empirical-analysis-of-multi-task-learning-for-llms)  
+   evidence：通过偏好优化进行大模型对齐，隐私保护的DPO
+4. [Hyper-ES: Effective Evolution Strategies for LLM Reasoning via Descent Direction Merging](/202608/08/2608.05541v1-hyper-es-effective-evolution-strategies-for-llm-reasoning-via-descent-direction-merging)  
    标签：评分：8.0/10、query:rl
-   evidence：理论与实证分析表明RL能使大模型多任务稳定共存
-5. [Beyond Retrieval: Analytic Memory for Multimodal Agents](/202608/07/2607.29440v2-beyond-retrieval-analytic-memory-for-multimodal-agents)  
+   evidence：通过下降方向合并的进化策略优化大语言模型推理，资源受限下的策略优化
+5. [Learning Globally Reusable Skills for Coding Agents](/202608/08/2608.06153v1-learning-globally-reusable-skills-for-coding-agents)  
+   标签：评分：8.0/10、query:rl
+   evidence：面向编码大模型智能体的技能全局演化框架，提升技能复用与任务自动化
+6. [Deep Reinforcement Learning: From First Principles to Reasoning Models](/202608/08/2608.00133v1-deep-reinforcement-learning-from-first-principles-to-reasoning-models)  
    标签：评分：7.0/10、query:rl
-   evidence：多模态大语言模型智能体的分析记忆框架，支持过滤、聚合、排序和时间比较等超越检索的操作。
-6. [SFT Conflicts, RL Coexists: A Theoretical and Empirical Analysis of Multi-Task Learning for LLMs](/202608/07/2608.03573v1-sft-conflicts-rl-coexists-a-theoretical-and-empirical-analysis-of-multi-task-learning-for-llms)  
+   evidence：系统梳理从RL基础到推理模型的桥梁性著作
+7. [MemoryCPT: An End-to-End Agent Memory Framework for Cost-Performance Trade-off](/202608/08/2608.04843v1-memorycpt-an-end-to-end-agent-memory-framework-for-cost-performance-trade-off)  
    标签：评分：7.0/10、query:rl
-   evidence：对LLM多任务训练中RL与SFT行为的理论与实证比较
-7. [InsightEmb: Learning Action-Intent Embeddings for Agentic Insight Retrieval](/202608/07/2608.04761v1-insightemb-learning-action-intent-embeddings-for-agentic-insight-retrieval)  
+   evidence：面向长程大模型智能体的端到端可训练记忆流水线
+8. [SAGA: Score-Weighted Adaptive Generation Alignment for Low-Resource Nordic Language Models](/202608/08/2608.06179v1-saga-score-weighted-adaptive-generation-alignment-for-low-resource-nordic-language-models)  
    标签：评分：7.0/10、query:rl
-   evidence：通过检索历史轨迹中的可执行洞察来改进大模型智能体
-8. [InsightEmb: Learning Action-Intent Embeddings for Agentic Insight Retrieval](/202608/07/2608.04761v2-insightemb-learning-action-intent-embeddings-for-agentic-insight-retrieval)  
-   标签：评分：7.0/10、query:rl
-   evidence：面向自改进大语言模型智能体的动作意图感知洞察检索的对比嵌入方法。
-9. [Inference-Time Policy Alignment for Fair Reinforcement Learning](/202608/07/2608.00175v1-inference-time-policy-alignment-for-fair-reinforcement-learning)  
+   evidence：基于偏好优化的LLM对齐，用解析器监督替代人类标签，引入复合奖励
+9. [TrajWiki: Source-Grounded Memory Trajectories for Long-Horizon Dialogue Agents](/202608/08/2608.00967v1-trajwiki-source-grounded-memory-trajectories-for-long-horizon-dialogue-agents)  
    标签：评分：6.0/10、query:rl
-   evidence：受大模型对齐启发，在推理时将预训练RL策略对齐到公平性偏好，与RLHF对齐目标相通
-10. [Unleashing the Potential of Large Language Models: A Blueprint for Real-Time, Enterprise-Ready Deployments](/202608/07/2608.00419v1-unleashing-the-potential-of-large-language-models-a-blueprint-for-real-time-enterprise-ready-deployments)  
+   evidence：提出基于轨迹的长期对话记忆框架，解决多轮对话中记忆的可追溯性与更新问题
+10. [Asking Questions the Right Way: A Multi-Agent Conversational System for Prompt Formulation in Complex Task Resolution](/202608/08/2608.01366v2-asking-questions-the-right-way-a-multi-agent-conversational-system-for-prompt-formulation-in-complex-task-resolution)  
    标签：评分：6.0/10、query:rl
-   evidence：结合检索增强生成、持续学习与反馈循环的LLMOps部署方案，服务于知识密集型应用
-11. [From Profiling to Synthesis: Benchmarking Implicit Behavioral Alignment in Personalized LLM Agents](/202608/07/2608.02171v1-from-profiling-to-synthesis-benchmarking-implicit-behavioral-alignment-in-personalized-llm-agents)  
+   evidence：用于大模型提示词构造的多智能体对话系统
+11. [HPFA: Hypergraph-Based Paired Failure Attribution for LLM Reasoning](/202608/08/2608.02026v1-hpfa-hypergraph-based-paired-failure-attribution-for-llm-reasoning)  
    标签：评分：6.0/10、query:rl
-   evidence：基于纵向交互历史的个性化大语言模型智能体隐式行为对齐基准。
+   evidence：基于超图的LLM推理失败归因，可扩展定位根因，对强化学习信用分配有启发
 
 
 <div class="dpr-home-promo-card">

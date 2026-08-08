@@ -1,0 +1,712 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-08-08T19:30:24.393450+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 11,
+    "deep_cap": 6,
+    "deep_selected": 6,
+    "quick_candidates": 14,
+    "quick_skim_target": 11,
+    "quick_selected": 11
+  },
+  "deep_dive": [
+    {
+      "id": "2608.05080v1",
+      "source": "arxiv",
+      "title": "Optimizing What Policies Learn From: Recoverability-aware Rollout Intervention Learning",
+      "abstract": "Critic-free group-based reinforcement learning has become a scalable approach for post-training large language models. However, most existing methods allocate the same number of rollouts to every task and trajectory state, even though some rollouts provide much more useful learning signals than others. Recent work has started to treat rollout generation as an adaptive decision, but two important limitations remain. First, intervention strategies are often based on fixed heuristics and therefore cannot adjust as the policy changes during training. Second, these methods usually decide only how many rollouts to generate, without explicitly controlling where and how to intervene. To address these limitations, we propose Recoverability-Aware Intervention Learning (RAIL), a training-time framework that learns how to generate rollouts based on the improvement produced by each intervention. RAIL models intervention selection as an online contextual-bandit problem and trains a recoverability controller using intervention traces collected through a shadow-to-live procedure. This allows the controller to keep learning while the underlying policy evolves. We evaluate RAIL in terms of effectiveness, adaptivity, expressiveness, and efficiency. Across multiple settings, RAIL consistently improves performance under limited rollout budgets. These results show that recoverability-aware intervention provides a principled way to generate more informative and less redundant rollouts, leading to stronger learning signals during post-training.",
+      "authors": [
+        "Zheyuan Zhang",
+        "Manqing Mao",
+        "Hong Wang",
+        "Zhuoer Wang",
+        "Samson Koelle",
+        "Jie Yuan",
+        "Yanjun Lin",
+        "James Feng",
+        "Nikki Lijing Kuang",
+        "Yanfang Ye",
+        "Wei Niu"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.CL"
+      ],
+      "published": "2026-08-05T17:22:02+00:00",
+      "link": "https://arxiv.org/pdf/2608.05080v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "RL for LLM; adaptive rollout intervention for critic-free group RL",
+      "llm_evidence_cn": "大模型强化学习；无critic分组RL的自适应采样干预",
+      "llm_evidence": "大模型强化学习；无critic分组RL的自适应采样干预",
+      "canonical_evidence": "大模型强化学习；无critic分组RL的自适应采样干预",
+      "llm_tldr_en": "Proposes recoverability-aware rollout intervention learning for critic-free group RL, adaptively deciding where and how to intervene in rollout generation for more efficient LLM post-training.",
+      "llm_tldr_cn": "针对无critic分组强化学习在LLM后训练中给所有任务和状态分配相同采样数的问题，本文提出可恢复性感知的采样干预学习。该方法不再依赖固定启发式，而是随策略训练变化自适应决定在哪里以及如何干预采样，兼顾干预位置与方式。相比统一分配，它能更高效利用采样预算并提升策略优化效率。这项工作为大规模语言模型后训练中的自适应采样提供了新方向。",
+      "llm_tldr": "针对无critic分组强化学习在LLM后训练中给所有任务和状态分配相同采样数的问题，本文提出可恢复性感知的采样干预学习。该方法不再依赖固定启发式，而是随策略训练变化自适应决定在哪里以及如何干预采样，兼顾干预位置与方式。相比统一分配，它能更高效利用采样预算并提升策略优化效率。这项工作为大规模语言模型后训练中的自适应采样提供了新方向。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "reinforcement learning for large language model",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.06128v1",
+      "source": "arxiv",
+      "title": "Contextual Information Policy Optimization for Search Agents",
+      "abstract": "Search agents extend large language models beyond static parametric memory by enabling them to acquire and use ex ternal evidence during multi-step reasoning. For knowledge intensive tasks involving complex or evolving information, their reliability depends not only on retrieving relevant ev idence but also on using it to guide subsequent reasoning. However, existing methods primarily reward final-answer cor rectness or intermediate progress, without directly assessing whether post-retrieval actions are grounded in the retrieved evidence. This misalignment encourages prior-driven reason ing: agents form conclusions based on internal knowledge and use retrieval mainly to confirm them, resulting in confirma tion bias and inefficient evidenceuse.Toaddressthisissue, we propose Contextual Information Policy Optimization (CIPO), an evidence-oriented reinforcement learning framework that explicitly aligns policy optimization with external evidence use. CIPO assigns dense, turn-level credit to reasoning ac tions influenced by retrieved information, while combining this evidence-use signal with a global outcome reward to pre serveanswercorrectness.Withthismanner,CIPOdiscourages evidence-detached guesses and promotes reasoning trajecto ries in which retrieved facts can guide or revise subsequent reasoning. Importantly, CIPO requires neither human process annotations nor an additional reward model. Extensive exper iments on seven in-domain and out-of-domain benchmarks show that CIPO reduces the prevalence of prior-driven rea soning and achieves excellent performance on most tasks.",
+      "authors": [
+        "Xingyu Guo",
+        "Wei Chen",
+        "Linlin Yang",
+        "Baochang Zhang"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-08-06T15:01:29+00:00",
+      "link": "https://arxiv.org/pdf/2608.06128v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "RL policy optimization for grounding post-retrieval evidence in search agents",
+      "llm_evidence_cn": "面向搜索智能体检索后证据扎根的强化学习策略优化",
+      "llm_evidence": "面向搜索智能体检索后证据扎根的强化学习策略优化",
+      "canonical_evidence": "面向搜索智能体检索后证据扎根的强化学习策略优化",
+      "llm_tldr_en": "This paper proposes contextual information policy optimization to directly reward whether post-retrieval actions are grounded in evidence, reducing confirmation bias in knowledge-intensive search agents.",
+      "llm_tldr_cn": "搜索智能体依赖外部证据进行多步推理，但现有方法仅奖励最终答案或中间进度，导致检索后动作缺乏证据扎根并产生确认偏差。本文提出上下文信息策略优化，直接将检索后动作是否基于检索证据纳入优化目标，利用强化学习调整策略。实验表明该方法能有效缓解确认偏差，提升知识密集型任务的可靠性和证据利用效率。该工作为检索增强推理智能体提供了证据对齐的强化学习优化视角。",
+      "llm_tldr": "搜索智能体依赖外部证据进行多步推理，但现有方法仅奖励最终答案或中间进度，导致检索后动作缺乏证据扎根并产生确认偏差。本文提出上下文信息策略优化，直接将检索后动作是否基于检索证据纳入优化目标，利用强化学习调整策略。实验表明该方法能有效缓解确认偏差，提升知识密集型任务的可靠性和证据利用效率。该工作为检索增强推理智能体提供了证据对齐的强化学习优化视角。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "policy optimization methods for multi step reasoning in llms",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.06197v1",
+      "source": "arxiv",
+      "title": "EnvACE: Internalizing Environment Dynamics via World Rehearsal for Agentic Reinforcement Learning",
+      "abstract": "Training large language model agents for long-horizon tool use typically relies on interactions with real or synthesized executable environments, whose construction and verification are costly, or on external simulators that are difficult to ground. We introduce EnvACE, an agentic reinforcement learning method that replaces external environment interaction during training with world rehearsal. The policy alternates between acting and rehearsal: it first generates a tool call, then plays the role of the environment to produce the response induced by that action, and conditions subsequent decisions on the rehearsed response. Both roles are jointly optimized end-to-end using task-success rewards. Through world rehearsal, the policy internalizes the relationship between actions and their environment responses in its parameters, yielding an agent world model that directly supports decision making. Across BFCL-v4, tau^2-Bench, VitaBench, and FinMCP-Bench, EnvACE achieves strong and transferable performance, outperforming environment-scaling baselines in the overall evaluation. Controlled studies further show that world rehearsal consistently improves policy learning across model scales. At test time, the internalized world model enables private rehearsal before committed execution, yielding further gains under a moderate rehearsal budget without additional external interaction. Our findings establish world rehearsal as a new path toward scaling LLM agent training beyond the constraints of external environments. Our code is publicly available at https://github.com/Within-yao/EnvACE.",
+      "authors": [
+        "Zishan Xu",
+        "Zhiyuan Yao",
+        "Yuxin Chen",
+        "Yifu Guo",
+        "Zhengxi Lu",
+        "Yuquan Lu",
+        "Jinyang Huang",
+        "Yan Xu",
+        "Yasheng Wang",
+        "Weinan Zhang",
+        "Xingshan Zeng",
+        "Weiwen Liu"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-08-06T15:54:36+00:00",
+      "link": "https://arxiv.org/pdf/2608.06197v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "world rehearsal enables LLM agents for long-horizon tool use without external environment",
+      "llm_evidence_cn": "通过世界预演替代外部环境交互，支持大语言模型智能体完成长程工具使用任务",
+      "llm_evidence": "通过世界预演替代外部环境交互，支持大语言模型智能体完成长程工具使用任务",
+      "canonical_evidence": "通过世界预演替代外部环境交互，支持大语言模型智能体完成长程工具使用任务",
+      "llm_tldr_en": "EnvACE replaces real/synthesized environments with world rehearsal where the policy alternates acting and simulating environment responses, enabling end-to-end RL for long-horizon tool-use LLM agents.",
+      "llm_tldr_cn": "针对大语言模型智能体长程工具使用训练依赖昂贵外部环境的问题，本文提出EnvACE方法，用世界预演替代真实交互。策略交替执行动作和模拟环境响应，并以任务成功奖励端到端联合优化。该方法降低了环境构造与验证成本，使智能体在无需外部模拟器的情况下完成长程多步工具调用。实验证明EnvACE能有效内化环境动态，提升智能体任务自动化能力。",
+      "llm_tldr": "针对大语言模型智能体长程工具使用训练依赖昂贵外部环境的问题，本文提出EnvACE方法，用世界预演替代真实交互。策略交替执行动作和模拟环境响应，并以任务成功奖励端到端联合优化。该方法降低了环境构造与验证成本，使智能体在无需外部模拟器的情况下完成长程多步工具调用。实验证明EnvACE能有效内化环境动态，提升智能体任务自动化能力。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.06310v1",
+      "source": "arxiv",
+      "title": "RRC: Unlocking Generative Reward Models in LLM Reinforcement Learning via Ranking-Based Reward Construction",
+      "abstract": "Recent advances in reward modeling show a paradigm shift from discriminative reward models to generative reward models. However, despite their strong capabilities in response ranking, generative reward models have not realized their potential in reinforcement learning (RL). Our analysis reveals that this limitation arises from a mismatch between the comparative nature of generative reward modeling and the scalar scoring paradigm adopted by existing RL algorithms. To bridge this gap, we propose a Ranking-based Reward Construction (RRC) approach, which enables generative reward models to provide more effective RL learning signals by deriving rewards from relative preference rankings. RRC introduces two complementary strategies: self-competitive ranking, which exploits comparisons among sampled responses, and anchor-guided ranking, which enables scalable ranking-based reward construction with a small set of reference responses. Experiments across open-ended chat and reasoning benchmarks demonstrate that RRC substantially improves RL training with generative reward models, achieving consistent gains over existing reward construction approaches. Our code can be found at https://github.com/wangclnlp/RRC.",
+      "authors": [
+        "Chenglong Wang",
+        "Ziming Zhu",
+        "Yifu Huo",
+        "Bei Li",
+        "Qiaozhi He",
+        "Yan Ding",
+        "Xiaoyang Hao",
+        "Yuxin Gao",
+        "Tianhua Zhou",
+        "Xiaojia Chang",
+        "Tongran Liu",
+        "Jingbo Zhu"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.CL"
+      ],
+      "published": "2026-08-06T17:24:36+00:00",
+      "link": "https://arxiv.org/pdf/2608.06310v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "ranking-based reward construction for generative reward models in LLM RL",
+      "llm_evidence_cn": "针对LLM强化学习设计基于排序的奖励构建方法，改进生成式奖励模型的训练信号",
+      "llm_evidence": "针对LLM强化学习设计基于排序的奖励构建方法，改进生成式奖励模型的训练信号",
+      "canonical_evidence": "针对LLM强化学习设计基于排序的奖励构建方法，改进生成式奖励模型的训练信号",
+      "llm_tldr_en": "Generative reward models rank responses well but mismatch scalar RL rewards. RRC builds rankings into reward construction, deriving effective learning signals from relative preferences. Two complementary components unlock generative reward models for LLM reinforcement learning, directly improving reward design for RL training.",
+      "llm_tldr_cn": "现有生成式奖励模型擅长对答案排序，但其比较式建模与强化学习所需标量奖励之间存在错配，导致在LLM强化学习中潜力未被释放。本文提出基于排序的奖励构建（RRC），从相对偏好排序中导出更有效的RL训练信号，并通过两个互补模块生成可用的奖励。该方法弥补了生成式奖励模型与RL策略优化之间的鸿沟。实验结果说明RRC能显著改进LLM强化学习的奖励质量，是奖励函数设计方向上的重要进展。",
+      "llm_tldr": "现有生成式奖励模型擅长对答案排序，但其比较式建模与强化学习所需标量奖励之间存在错配，导致在LLM强化学习中潜力未被释放。本文提出基于排序的奖励构建（RRC），从相对偏好排序中导出更有效的RL训练信号，并通过两个互补模块生成可用的奖励。该方法弥补了生成式奖励模型与RL策略优化之间的鸿沟。实验结果说明RRC能显著改进LLM强化学习的奖励质量，是奖励函数设计方向上的重要进展。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "design of reward functions in RL",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.02508v2",
+      "source": "arxiv",
+      "title": "RoMeRL: Balancing Feedback Coverage and the Memory-Reward Trap in Self-Evolving Agent Memory via Reduced-Order Utility States",
+      "abstract": "Learning-based memory systems for self-evolving LLM agents face two tightly coupled challenges. First, trajectory-indexed utilities grow with the interaction history, thereby dispersing limited feedback over an ever-expanding state space. Second, because trajectory-level rewards are jointly assigned to co-retrieved memories, irrelevant experiences may receive misleading utility updates and consequently enter the memory-reward trap. To address these challenges, we introduce Reduced-Order Memory Reinforcement Learning (RoMeRL), which represents the growing trajectory-indexed utility space using a fixed-dimensional per-task memory state factorized by outcome polarity and memory dynamics. RoMeRL incorporates new experiences through a fixed set of semantic coordinates whose contents are updated or replaced over time, thereby concentrating feedback over a bounded utility support. Theoretically, we show that this reduced-order parameterization increases the average feedback received by each utility coordinate and characterize the steady-state occupancy of erroneous coordinates under a generic coordinate-transition model. Empirically, across ALFWorld and LifelongAgentBench, RoMeRL improves task performance, reduces the Cold-Q ratio by 80.0%, increases feedback density by approximately 6.0 times, reduces the maintained memory size by 84.4%, and cuts LLM calls by 21.1%. These results show that reduced-order utility states support efficient self-evolving agent memory while limiting persistent reward contamination. Code is available at: https://github.com/YOUNG-fnxm/RoMeRL",
+      "authors": [
+        "Yi Yang",
+        "Zhennan Chen",
+        "Yihong Zhuang",
+        "Tiehan Fan",
+        "Yinan Chen",
+        "Jian Li",
+        "Jian Yang",
+        "Ying Tai"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.CL"
+      ],
+      "published": "2026-08-03T17:07:50+00:00",
+      "link": "https://arxiv.org/pdf/2608.02508v2",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "RL-based memory management for self-evolving LLM agents, addressing memory-reward trap",
+      "llm_evidence_cn": "用强化学习管理自演化LLM智能体的记忆，解决记忆奖励陷阱",
+      "llm_evidence": "用强化学习管理自演化LLM智能体的记忆，解决记忆奖励陷阱",
+      "canonical_evidence": "用强化学习管理自演化LLM智能体的记忆，解决记忆奖励陷阱",
+      "llm_tldr_en": "RoMeRL addresses divergent feedback and the memory-reward trap in self-evolving LLM agents by representing trajectory-indexed utilities with fixed-dimensional per-task memory states, improving memory updates.",
+      "llm_tldr_cn": "自演化LLM智能体的记忆系统面临两个问题：轨迹索引效用随交互历史增长导致反馈分散，以及轨迹级奖励被共同检索的记忆共享导致无关经验被错误更新。RoMeRL用降阶效用状态表示记忆，并引入相应的强化学习机制，缓解了记忆奖励陷阱。这提升了智能体记忆更新的准确性和反馈覆盖效率，支撑更稳定的长期自主演化。",
+      "llm_tldr": "自演化LLM智能体的记忆系统面临两个问题：轨迹索引效用随交互历史增长导致反馈分散，以及轨迹级奖励被共同检索的记忆共享导致无关经验被错误更新。RoMeRL用降阶效用状态表示记忆，并引入相应的强化学习机制，缓解了记忆奖励陷阱。这提升了智能体记忆更新的准确性和反馈覆盖效率，支撑更稳定的长期自主演化。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.05095v1",
+      "source": "arxiv",
+      "title": "Hierarchical Graph Memory for LLM Agents with Path-level Localization and Rewrite",
+      "abstract": "Agents for long term reasoning require a memory that can be efficiently and effectively updated over time, as new facts and external feedback continue to arrive. Recently, graph memory has been adopted to offer structural organization for multi-hop retrieval and reasoning. However, existing methods store all memories in a flat graph, and accumulated historical memories can introduce irrelevant contexts and increase the cost of evidence selection during retrieval. Moreover, they typically update memory units independently, requiring repeated unit-wise rewrite to cover related changes. To address these issues, we propose HiGram, an evolving hierarchical graph memory framework with path-level localization and rewriting. Specifically, we first propose a hierarchical graph memory, which organizes the memory into coarse-to-fine architecture composed of upper-level nodes and MemoryUnits, thereby reducing the amount of irrelevant information during retrieval. We further propose MicroGraph-based path-level localization, which leverages query and update conditioned MicroGraphs to identify support subgraph and evidence path before rewrite. Finally, we propose a coordinated rewriting method that jointly revises intra-unit memory and inter-unit dependencies, enable valid dependency structures updating in the localized evidence path. Experiments on benchmarks for long-term conversational question answering and conflict-aware memory evaluation demonstrate that our method demonstrate substantial improvements over baselines in answer quality and token efficiency. Besides, our method improves answer accuracy and query-valid evidence selection under dynamic, static, and conditional conflicts.",
+      "authors": [
+        "Xiawei Yue",
+        "Boran Wang",
+        "Xiaoqing Zhang",
+        "Shuxin Zheng",
+        "Ziwei Zhang"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-08-05T17:32:43+00:00",
+      "link": "https://arxiv.org/pdf/2608.05095v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Hierarchical graph memory for LLM agents with path-level localization and rewrite for retrieval",
+      "llm_evidence_cn": "面向LLM智能体的层级图记忆，支持路径级定位和重写，改善多跳检索与长期推理",
+      "llm_evidence": "面向LLM智能体的层级图记忆，支持路径级定位和重写，改善多跳检索与长期推理",
+      "canonical_evidence": "面向LLM智能体的层级图记忆，支持路径级定位和重写，改善多跳检索与长期推理",
+      "llm_tldr_en": "HiGram proposes an evolving hierarchical graph memory for LLM agents, using path-level localization and rewriting to reduce irrelevant context and update costs, improving multi-hop retrieval and long-term reasoning.",
+      "llm_tldr_cn": "长期推理智能体需要可高效更新的记忆结构，现有扁平图记忆会积累无关上下文并增加检索成本，且单元级更新效率低。本文提出HiGram，一种演化式层级图记忆框架，通过路径级定位与重写定位并更新相关记忆路径，减少无关信息干扰。实验表明该框架能提升多跳检索与长期推理的效果与效率，为LLM智能体的记忆管理提供了新思路。",
+      "llm_tldr": "长期推理智能体需要可高效更新的记忆结构，现有扁平图记忆会积累无关上下文并增加检索成本，且单元级更新效率低。本文提出HiGram，一种演化式层级图记忆框架，通过路径级定位与重写定位并更新相关记忆路径，减少无关信息干扰。实验表明该框架能提升多跳检索与长期推理的效果与效率，为LLM智能体的记忆管理提供了新思路。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "retrieval augmented generation for knowledge intensive tasks",
+      "matched_requirement_id": "req-8",
+      "selection_source": "carryover_cache",
+      "paper_id": "2608.05095v1"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2608.03054v1",
+      "source": "arxiv",
+      "title": "Towards More Expressive Spoken LLMs: Fine-Grained Intent Benchmarking and Acoustic-Lexical Decoupled Policy Optimization",
+      "abstract": "Spoken emotional dialogue requires a model to understand a user's spoken input and generate a response that is both semantically appropriate and emotionally expressive. This is challenging because communicative intent may be stated explicitly in lexical content or conveyed more implicitly through paralinguistic cues, which can complement or diverge from the words themselves. However, two limitations constrain progress in this area: the scarcity of benchmarks that distinguish these intent expressions, and the lack of reinforcement learning objectives that jointly account for response quality and emotional expression. To address the lack of suitable benchmarks, we introduce ParaIntent, a Chinese benchmark comprising 14 intent categories with balanced explicit and implicit samples, together with a multidimensional evaluation protocol covering intent fulfillment, response quality, and emotional expression. For policy optimization, existing approaches either use a shared objective for text and speech or apply reinforcement learning to only one modality, leaving modality-specific learning signals entangled within policy optimization. Motivated by this, we propose Acoustic-Lexical Decoupled Policy Optimization (ALPO), which computes independent textual and acoustic advantages and routes them to the corresponding text and speech tokens within a unified rollout. Under identical reward functions and training budgets, ALPO improves over standard GRPO on most automatic metrics and achieves the best subjective results among the fine-tuned variants, with particularly clear gains in emotional expressiveness on both the synthetic and human-recorded test sets.",
+      "authors": [
+        "Xiang Lin",
+        "Tian-Hao Zhang",
+        "Chunfeng Wang",
+        "Zhou Pan",
+        "Kun Zhan",
+        "Liang Li"
+      ],
+      "primary_category": "cs.SD",
+      "categories": [
+        "cs.SD"
+      ],
+      "published": "2026-08-04T03:09:55+00:00",
+      "link": "https://arxiv.org/pdf/2608.03054v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Proposes RL objectives for quality and emotional expression in spoken multi-turn dialogue",
+      "llm_evidence_cn": "为口语多轮对话设计兼顾质量与情感表达的强化学习目标",
+      "llm_evidence": "为口语多轮对话设计兼顾质量与情感表达的强化学习目标",
+      "canonical_evidence": "为口语多轮对话设计兼顾质量与情感表达的强化学习目标",
+      "llm_tldr_en": "Spoken emotional dialogue needs to handle lexical and paralinguistic intent. The paper introduces ParaIntent benchmark and acoustic-lexical decoupled policy optimization, improving expressive response quality with RL objectives.",
+      "llm_tldr_cn": "口语情感对话要求模型同时处理显式词汇意图与隐性副语言线索，但相关基准和RL目标缺乏。本文引入ParaIntent基准以区分细粒度意图表达，并提出声学-词汇解耦策略优化，分别处理词汇与韵律信息。实验表明该策略能提升口语对话的情感表现力和语义质量，为更具表现力的口语LLM提供了新基准与训练方法。",
+      "llm_tldr": "口语情感对话要求模型同时处理显式词汇意图与隐性副语言线索，但相关基准和RL目标缺乏。本文引入ParaIntent基准以区分细粒度意图表达，并提出声学-词汇解耦策略优化，分别处理词汇与韵律信息。实验表明该策略能提升口语对话的情感表现力和语义质量，为更具表现力的口语LLM提供了新基准与训练方法。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "reinforcement learning for multi turn dialogue systems",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2608.00133v1",
+      "source": "arxiv",
+      "title": "Deep Reinforcement Learning: From First Principles to Reasoning Models",
+      "abstract": "Deep reinforcement learning has evolved from classical dynamic programming, temporal-difference learning, and tabular control into a broad framework for sequential decision-making under uncertainty. This book provides a structured introduction to that evolution, emphasizing not only how reinforcement learning algorithms work, but also why they were developed, which problems they address, where they fail, and how they connect to real-world systems. It combines textbook foundations, research-oriented discussion, and a systems perspective. Early chapters introduce reinforcement learning, Markov decision processes, dynamic programming, Monte Carlo methods, temporal-difference learning, and the transition from tabular to deep approaches. The middle chapters cover major algorithmic families, including DQN, advanced value-based methods, policy gradients, actor-critic methods, PPO, SAC, model-based reinforcement learning, MuZero, offline reinforcement learning, and sequence-modeling approaches. Later chapters extend the discussion to multi-agent and hierarchical learning, safe reinforcement learning, reinforcement learning from human feedback, reasoning-oriented AI systems, communication networks, UAV applications, implementation pipelines, experimental methodology, failure analysis, and future research directions. Throughout the book, examples from UAV-assisted networks, SD-WAN traffic engineering, safe control, and reasoning-based AI connect mathematical concepts to practical challenges such as partial observability, competing objectives, safety constraints, deployment drift, and uncertain evaluation. The book is intended for advanced students, researchers, and engineers with basic knowledge of probability, linear algebra, calculus, and programming.",
+      "authors": [
+        "Ghoshana Bista"
+      ],
+      "primary_category": "eess.SY",
+      "categories": [
+        "eess.SY"
+      ],
+      "published": "2026-07-31T13:57:34+00:00",
+      "link": "https://arxiv.org/pdf/2608.00133v1",
+      "tags": [
+        "keyword:rl"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "systematic RL foundations bridging to reasoning models",
+      "llm_evidence_cn": "系统梳理从RL基础到推理模型的桥梁性著作",
+      "llm_evidence": "系统梳理从RL基础到推理模型的桥梁性著作",
+      "canonical_evidence": "系统梳理从RL基础到推理模型的桥梁性著作",
+      "llm_tldr_en": "A book that systematically introduces deep reinforcement learning from dynamic programming foundations to modern reasoning models, combining textbook basics, research discussion, and systems perspective.",
+      "llm_tldr_cn": "深度强化学习已从经典动态规划、时序差分等发展为面向推理模型的通用框架。本书系统梳理了RL从基本原理到前沿推理模型的知识脉络，既解释算法工作原理，也分析其设计动机、适用问题和系统联系。通过有机结合教材基础、研究讨论与系统视角，为研究人员和工程师提供了从理论到实践的结构化指南。该书有助于理解RL如何支撑当前推理模型的发展。",
+      "llm_tldr": "深度强化学习已从经典动态规划、时序差分等发展为面向推理模型的通用框架。本书系统梳理了RL从基本原理到前沿推理模型的知识脉络，既解释算法工作原理，也分析其设计动机、适用问题和系统联系。通过有机结合教材基础、研究讨论与系统视角，为研究人员和工程师提供了从理论到实践的结构化指南。该书有助于理解RL如何支撑当前推理模型的发展。",
+      "llm_tags": [
+        "query:rl:composite"
+      ],
+      "matched_query_tag": "query:rl:composite",
+      "matched_query_text": "Papers central to 查找大模型检索推理智能体、大模型强化学习领域的文章, especially work that connects or combines: reinforcement learning for large language model; design of reward functions in RL; policy gradient methods for language generation; large language model agents for task automation; reinforcement learning from human feedback for llm alignment; reinforcement learning for multi turn dialogue systems; application of reinforcement learning in large language model reasoning; retrieval augmented generation for knowledge intensive tasks; policy optimization methods for multi step reasoning in llms.",
+      "matched_requirement_id": "req-composite-rl",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2608.00967v1",
+      "source": "arxiv",
+      "title": "TrajWiki: Source-Grounded Memory Trajectories for Long-Horizon Dialogue Agents",
+      "abstract": "Large language model agents have shown strong capabilities in generating coherent and contextually appropriate responses, yet robust long-horizon dialogue remains limited by the lack of external memory that is traceable, updatable, and diagnostically transparent. Existing memory-augmented agents often store memories as isolated records or overwritable states, making it difficult to preserve how information originates, evolves, conflicts, or becomes obsolete over time. We propose TrajWiki, a trajectory-based memory framework for long-horizon conversational agents. Instead of treating memory as static entries, TrajWiki represents each memory as a source-grounded evolution trajectory, maintained through immutable episodic snapshots and claim-level operations such as ADD, REVISE, and DEPRECATE. To reduce fragmentation and retrieval cost, TrajWiki further introduces Memory Wiki, a persistent intermediate layer that incrementally compiles dialogue history into structured and interlinked wiki pages capturing salient entities, events, quantities, topics, and conflicts. At inference time, queries are routed hierarchically from relevant wiki pages to linked memory trajectories, then to corresponding snapshots and source messages for evidence-grounded answer synthesis. Experiments on LoCoMo and MedMT show that TrajWiki improves long-horizon dialogue performance across both open-source and closed-source LLM backbones, while providing greater interpretability and diagnostic visibility into memory evolution, retrieval failures, and answer generation.",
+      "authors": [
+        "Jingyu Sun",
+        "Yuyang Xue",
+        "Mingyang Li",
+        "Zhengtao Yao",
+        "Jiachen Li",
+        "Yang Cui",
+        "Wenhao Cai",
+        "Haozhe Liu",
+        "Fangying Wang",
+        "Magdalene Katharina Montgomery",
+        "Syed Murtuza Baker",
+        "Hongpeng Zhou"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-08-02T03:36:03+00:00",
+      "link": "https://arxiv.org/pdf/2608.00967v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Proposes trajectory-based memory framework for long-horizon dialogue agents, addressing multi-turn dialogue memory limitations",
+      "llm_evidence_cn": "提出基于轨迹的长期对话记忆框架，解决多轮对话中记忆的可追溯性与更新问题",
+      "llm_evidence": "提出基于轨迹的长期对话记忆框架，解决多轮对话中记忆的可追溯性与更新问题",
+      "canonical_evidence": "提出基于轨迹的长期对话记忆框架，解决多轮对话中记忆的可追溯性与更新问题",
+      "llm_tldr_en": "TrajWiki introduces source-grounded memory trajectories for long-horizon conversational agents, maintaining episodic snapshots and claim-level updates to trace information evolution.",
+      "llm_tldr_cn": "现有长期多轮对话智能体缺乏可追溯、可更新且诊断透明的外部记忆，难以处理信息来源与演变。本文提出TrajWiki，将每个记忆表示为源接地的演化轨迹，通过不可变情节快照和声明级更新维护信息，支持记忆的起源、冲突与淘汰追踪。该框架显著提升了长时对话中的记忆管理能力，为多轮对话系统提供了新的记忆建模思路。",
+      "llm_tldr": "现有长期多轮对话智能体缺乏可追溯、可更新且诊断透明的外部记忆，难以处理信息来源与演变。本文提出TrajWiki，将每个记忆表示为源接地的演化轨迹，通过不可变情节快照和声明级更新维护信息，支持记忆的起源、冲突与淘汰追踪。该框架显著提升了长时对话中的记忆管理能力，为多轮对话系统提供了新的记忆建模思路。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "reinforcement learning for multi turn dialogue systems",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2608.04309v1",
+      "source": "arxiv",
+      "title": "Structured LLM Reasoning for Zero-Shot Human--Robot Coordination Under Hidden Goals",
+      "abstract": "We present a structured large-language-model (LLM) architecture for zero-shot human--robot coordination in a cooperative construction task with private goal views. Guided by a Dec-POMDP formulation, the architecture decomposes decision-making into (i) action-conditioned Theory-of-Mind (ToM) inference, (ii) hierarchical planning, (iii) conversation interpretation, (iv) action verification, and (v) feedback-based replanning. We compare the proposed method with an ablation without ToM inference and a multi-agent reinforcement-learning policy trained offline over many goal pairs. In human-participant experiments, the proposed method required fewer interaction steps and yielded higher post-interaction trust ratings than both baselines. These results suggest that systematically decomposing the team decision problem, using LLMs as tractable surrogates for otherwise intractable inference and planning computations, and retaining conventional verification for physical feasibility can improve both task coordination and the human experience.",
+      "authors": [
+        "Dong Hae Mangalindan",
+        "Anand Gokhale",
+        "Francesco Bullo",
+        "Vaibhav Srivastava"
+      ],
+      "primary_category": "cs.RO",
+      "categories": [
+        "cs.RO",
+        "eess.SY"
+      ],
+      "published": "2026-08-05T00:40:03+00:00",
+      "link": "https://arxiv.org/pdf/2608.04309v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "LLM-agent architecture for zero-shot human-robot coordination tasks",
+      "llm_evidence_cn": "用于零样本人机协作任务的LLM智能体架构",
+      "llm_evidence": "用于零样本人机协作任务的LLM智能体架构",
+      "canonical_evidence": "用于零样本人机协作任务的LLM智能体架构",
+      "llm_tldr_en": "A structured LLM architecture guided by Dec-POMDP decomposes human-robot coordination into theory-of-mind inference, planning, and verification. It outperforms offline MARL in fewer interaction steps and higher trust, enabling zero-shot coordination.",
+      "llm_tldr_cn": "在隐藏目标的人机协作任务中，传统多智能体强化学习策略需要大量训练数据且难以零样本泛化。本文提出一种基于Dec-POMDP的结构化LLM架构，将决策分解为心理解读、分层规划、对话理解、行动验证与反馈重规划。人类实验表明该方法显著减少了交互步数并提升信任评分。该工作展示了LLM推理在零样本任务自动化中的潜力。",
+      "llm_tldr": "在隐藏目标的人机协作任务中，传统多智能体强化学习策略需要大量训练数据且难以零样本泛化。本文提出一种基于Dec-POMDP的结构化LLM架构，将决策分解为心理解读、分层规划、对话理解、行动验证与反馈重规划。人类实验表明该方法显著减少了交互步数并提升信任评分。该工作展示了LLM推理在零样本任务自动化中的潜力。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2608.04843v1",
+      "source": "arxiv",
+      "title": "MemoryCPT: An End-to-End Agent Memory Framework for Cost-Performance Trade-off",
+      "abstract": "Long-horizon LLM agents require memory systems that recover useful evidence from large interaction histories without passing excessive context to downstream models. Existing memory pipelines often rely on hand-crafted heuristics and repeated LLM calls, which can introduce redundant context and high inference cost. We propose MemoryCPT, an end-to-end trainable agent memory pipeline that spans offline memory construction and online query-conditioned context generation. MemoryCPT consists of two stages: Query-agnostic Distillation (QAD), which distills a modular memory-construction pipeline into a compact model using explicit reasoning traces; and Query-aware Retrieval and Summarization (QAR), which combines reciprocal rank fusion (RRF) with a LoRA-based summarizer trained via Group Relative Policy Optimization (GRPO) under a cost-aware reward. We further introduce Quality per Cost (QPC) to quantify answer quality per unit inference cost. Experiments on LoCoMo and LongMemEval show that MemoryCPT improves the cost-performance trade-off over the evaluated baselines, while ablation and sensitivity analyses characterize the contributions of its components and the effects of key design choices.",
+      "authors": [
+        "Songxin Lei",
+        "Kun Ouyang",
+        "Weilin Ruan",
+        "Yuqian Wu",
+        "Zhijiang Guo",
+        "Yushi Sun",
+        "Fugee Tsung"
+      ],
+      "primary_category": "cs.IR",
+      "categories": [
+        "cs.IR"
+      ],
+      "published": "2026-08-05T13:37:08+00:00",
+      "link": "https://arxiv.org/pdf/2608.04843v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "End-to-end trainable memory pipeline for long-horizon LLM agents",
+      "llm_evidence_cn": "面向长程大模型智能体的端到端可训练记忆流水线",
+      "llm_evidence": "面向长程大模型智能体的端到端可训练记忆流水线",
+      "canonical_evidence": "面向长程大模型智能体的端到端可训练记忆流水线",
+      "llm_tldr_en": "MemoryCPT is an end-to-end trainable memory pipeline that distills memory construction into a compact model and uses query-aware retrieval and summarization to trade off cost and performance.",
+      "llm_tldr_cn": "长程LLM智能体需要从大规模交互历史中恢复有用证据，而现有记忆流水线依赖手工启发式和多次LLM调用，带来冗余上下文和高推理成本。MemoryCPT提出端到端可训练记忆流水线，先通过查询无关蒸馏将记忆构建压缩为紧凑模型，再利用查询感知检索与摘要生成上下文。实验表明该方法在保证证据召回的同时显著降低推理成本，实现更好的成本-性能权衡。该工作为智能体长期记忆管理提供了一种可训练的轻量化方案。",
+      "llm_tldr": "长程LLM智能体需要从大规模交互历史中恢复有用证据，而现有记忆流水线依赖手工启发式和多次LLM调用，带来冗余上下文和高推理成本。MemoryCPT提出端到端可训练记忆流水线，先通过查询无关蒸馏将记忆构建压缩为紧凑模型，再利用查询感知检索与摘要生成上下文。实验表明该方法在保证证据召回的同时显著降低推理成本，实现更好的成本-性能权衡。该工作为智能体长期记忆管理提供了一种可训练的轻量化方案。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2608.01366v2",
+      "source": "arxiv",
+      "title": "Asking Questions the Right Way: A Multi-Agent Conversational System for Prompt Formulation in Complex Task Resolution",
+      "abstract": "Large language models (LLMs) are integral to complex intellectual tasks, yet output quality remains constrained by user-provided prompts. Iterative multi-turn prompting often leads to context degradation and diminishing cognitive returns. We present PAWNI (Prompt Architecture Wizard using Neural Intelligence), an agentic conversational interface of eight agents that transforms unstructured queries into structured prompts through guided question-and-answer dialogue informed by a self-evolving knowledge base. Rather than optimising the model's response, PAWNI optimises the question itself by front-loading intent clarification. We also propose a three-tier framework of 18 prompt elements across Essential, Enhancement, and Elevation categories. To evaluate system behaviour and validate a measurement protocol, we conducted an exploratory within-subjects study (N=4) across four complex tasks, integrating 32-channel EEG, NASA-TLX workload, and behavioural metrics. Participants produced more structurally complete prompts with PAWNI (42% to 91% of assessed elements), rated LLM outputs higher across all quality dimensions, and reported lower workload (39.6 vs. 21.7 NASA-TLX). Every participant reached satisfactory output in a single turn, compared to 1-12 turns unaided. While effect sizes are unstable due to sample size, direction consistency supports the hypothesis that optimising prompt formulation front-end is a critical lever for human-AI collaboration.",
+      "authors": [
+        "B. Sankar",
+        "Pawni Yadav",
+        "Srinidhi Ranjini Girish",
+        "Amogh A. S"
+      ],
+      "primary_category": "cs.MA",
+      "categories": [
+        "cs.MA",
+        "cs.AI"
+      ],
+      "published": "2026-08-02T16:33:27+00:00",
+      "link": "https://arxiv.org/pdf/2608.01366v2",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Multi-agent conversational system for LLM prompt formulation",
+      "llm_evidence_cn": "用于大模型提示词构造的多智能体对话系统",
+      "llm_evidence": "用于大模型提示词构造的多智能体对话系统",
+      "canonical_evidence": "用于大模型提示词构造的多智能体对话系统",
+      "llm_tldr_en": "PAWNI is an agentic conversational system of eight agents that turns unstructured queries into structured prompts via guided dialogue, improving complex task resolution.",
+      "llm_tldr_cn": "用户提示词质量直接影响大模型复杂任务表现，迭代多轮改写常导致上下文退化与收益递减。PAWNI构建八个智能体组成的对话系统，通过引导式问答和自进化知识库将非结构化请求转化为结构化提示词。研究提出三层18种提示元素框架，实验显示该方法能显著提升复杂任务求解效果与交互效率。该工作从优化提问端出发，为多智能体交互式提示工程提供了新范式。",
+      "llm_tldr": "用户提示词质量直接影响大模型复杂任务表现，迭代多轮改写常导致上下文退化与收益递减。PAWNI构建八个智能体组成的对话系统，通过引导式问答和自进化知识库将非结构化请求转化为结构化提示词。研究提出三层18种提示元素框架，实验显示该方法能显著提升复杂任务求解效果与交互效率。该工作从优化提问端出发，为多智能体交互式提示工程提供了新范式。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2608.05040v1",
+      "source": "arxiv",
+      "title": "Private Direct Preference Optimization for LLM Alignment",
+      "abstract": "Direct preference optimization (DPO) is now a standard method for aligning large language models (LLMs) using human preference data. Each DPO example contains a prompt and a pair of candidate model responses. While prompts and responses are often public or model-generated, the relative preference between responses reflects subjective judgments and can reveal sensitive attributes of annotators or end users. Off-the-shelf privacy-preserving approaches are not well matched to this structure, leading to unnecessary noise injection and biased updates in training.   In this paper, we formalize preference privacy, a label-DP-style privacy notion for DPO that protects only the relative preference between candidate responses, assuming an adversary who already knows the prompt and responses. We then design PrivDPO, a DPO variant that enforces preference privacy while remaining compatible with large-scale LLM training. Our main observation is that, for neighboring examples differing only in their preference signal, the gradient difference lies on a one-dimensional preference axis determined solely by the text; all preference information flows through this axis. PrivDPO adds calibrated randomness only along this axis via an unbiased randomized rescaling of the DPO objective, avoiding per-example gradient operations. Our experiments on three alignment benchmarks and three LLM families show that PrivDPO consistently achieves strong privacy-utility trade-offs compared with privacy-preserving baselines.",
+      "authors": [
+        "Yangfan Jiang",
+        "Fei Wei",
+        "Ergute Bao",
+        "Xiaokui Xiao",
+        "Yaliang Li",
+        "Bolin Ding"
+      ],
+      "primary_category": "cs.CR",
+      "categories": [
+        "cs.CR"
+      ],
+      "published": "2026-08-05T16:51:02+00:00",
+      "link": "https://arxiv.org/pdf/2608.05040v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "LLM alignment via preference optimization; privacy-preserving DPO",
+      "llm_evidence_cn": "通过偏好优化进行大模型对齐，隐私保护的DPO",
+      "llm_evidence": "通过偏好优化进行大模型对齐，隐私保护的DPO",
+      "canonical_evidence": "通过偏好优化进行大模型对齐，隐私保护的DPO",
+      "llm_tldr_en": "Formalizes preference privacy for DPO, protecting relative preferences in LLM alignment by a label-DP-style notion, reducing noise injection and biased updates in private training.",
+      "llm_tldr_cn": "针对直接偏好优化在对齐大模型时使用的偏好数据可能泄露标注者或用户敏感属性的问题，形式化定义偏好隐私这一标签DP风格概念，只保护候选响应之间的相对偏好。提出匹配DPO结构的隐私保护方法，避免现成方案带来的过多噪声注入和有偏更新。实验显示该方法在保护偏好的同时保持对齐效果，为大模型对齐中的偏好数据隐私保护提供了新框架。",
+      "llm_tldr": "针对直接偏好优化在对齐大模型时使用的偏好数据可能泄露标注者或用户敏感属性的问题，形式化定义偏好隐私这一标签DP风格概念，只保护候选响应之间的相对偏好。提出匹配DPO结构的隐私保护方法，避免现成方案带来的过多噪声注入和有偏更新。实验显示该方法在保护偏好的同时保持对齐效果，为大模型对齐中的偏好数据隐私保护提供了新框架。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "reinforcement learning from human feedback for llm alignment",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2608.06179v1",
+      "source": "arxiv",
+      "title": "SAGA: Score-Weighted Adaptive Generation Alignment for Low-Resource Nordic Language Models",
+      "abstract": "Preference optimisation has proven effective for improving large language models but typically relies on costly human preference annotations. Extending these methods to morphologically rich, low-resource languages remains challenging because such annotations are scarce. We present SAGA (Score-weighted Adaptive Generation Alignment), a parser-guided preference optimisation framework that replaces human labels with dependency-parser supervision. SAGA converts parser judgements into preference pairs for delta-DPO, combines parser quality with lexical diversity in a composite reward, filters low-information pairs using a reward-gap criterion, and monitors reward hacking to maintain reliable supervision. Across Danish, Icelandic, and Norwegian Bokmål using GPT-SW3-1.3B, SAGA consistently improves grammatical quality without requiring human preference labels. Danish parse success increases from 69.0% to 93.8%, Icelandic achieves a +4.5 percentage-point improvement on an independent Stanza evaluation (three-run mean +3.3 percentage points) while native speakers prefer SAGA outputs in 80% of pairwise comparisons, and Norwegian Bokmål improves by +28 percentage points. These results demonstrate that parser-derived supervision is a practical alternative to human preference annotation for grammatical alignment in low-resource languages where high-quality dependency parsers are available.",
+      "authors": [
+        "Hoda Fakharzadehjahromy",
+        "Emil Wiman",
+        "Andreas Bueff",
+        "Hafsteinn Einarsson",
+        "Fredrik Heintz"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-08-06T15:41:02+00:00",
+      "link": "https://arxiv.org/pdf/2608.06179v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Preference optimization for LLM alignment without human labels, parser-guided with composite reward",
+      "llm_evidence_cn": "基于偏好优化的LLM对齐，用解析器监督替代人类标签，引入复合奖励",
+      "llm_evidence": "基于偏好优化的LLM对齐，用解析器监督替代人类标签，引入复合奖励",
+      "canonical_evidence": "基于偏好优化的LLM对齐，用解析器监督替代人类标签，引入复合奖励",
+      "llm_tldr_en": "SAGA is a parser-guided preference optimization framework for low-resource languages, replacing costly human labels with dependency-parser supervision, using composite reward and reward-gap filtering to align LLMs.",
+      "llm_tldr_cn": "在资源稀缺的低资源语言上，依赖人工偏好标注难以实现大模型对齐。SAGA利用依存解析器生成偏好对，通过delta-DPO进行偏好优化，并用复合奖励和奖励差距筛选降低噪声、监测奖励黑客。实验表明该方法在丹麦语、冰岛语等语言上有效提升了对齐质量，为低资源语言对齐提供了不依赖人工标注的可行方案。",
+      "llm_tldr": "在资源稀缺的低资源语言上，依赖人工偏好标注难以实现大模型对齐。SAGA利用依存解析器生成偏好对，通过delta-DPO进行偏好优化，并用复合奖励和奖励差距筛选降低噪声、监测奖励黑客。实验表明该方法在丹麦语、冰岛语等语言上有效提升了对齐质量，为低资源语言对齐提供了不依赖人工标注的可行方案。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "reinforcement learning from human feedback for llm alignment",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2608.02026v1",
+      "source": "arxiv",
+      "title": "HPFA: Hypergraph-Based Paired Failure Attribution for LLM Reasoning",
+      "abstract": "Reflection is a powerful mechanism for LLM reasoning, yet its effectiveness hinges on accurately attributing failures to specific reasoning steps, a capability that current models notably lack. Existing failure attribution methods either require expensive step-by-step counterfactual testing that scales poorly with trajectory length, or treat reasoning traces as flat sequences that ignore the inherent non-linear logical dependencies. We propose a hypergraph-based paired failure attribution (HPFA) framework that attributes the failure root cause by comparing the hyperedges of the targeted failure reasoning path against a reference successful path. By reducing the search space, our method efficiently localizes root causes and enables scalable synthesis of attribution data for training a lightweight attributor model via supervised fine-tuning and reinforcement learning. Experiments on mathematical reasoning and agentic coding tasks demonstrate that HPFA can dramatically increase attribution accuracy and efficiency, and the trained attributor consistently improves reasoning accuracy at test time, outperforming baselines that lack graph structure or paired analysis.",
+      "authors": [
+        "Runchuan Zhu",
+        "Hongbin Lai",
+        "Bowen Jiang",
+        "Junrui Zhang",
+        "Zhangheng LI",
+        "Ostap Kilbasovych",
+        "Junyuan Hong"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-08-03T10:23:48+00:00",
+      "link": "https://arxiv.org/pdf/2608.02026v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Hypergraph-based failure attribution for LLM reasoning, scalable root cause localization useful for RL credit assignment",
+      "llm_evidence_cn": "基于超图的LLM推理失败归因，可扩展定位根因，对强化学习信用分配有启发",
+      "llm_evidence": "基于超图的LLM推理失败归因，可扩展定位根因，对强化学习信用分配有启发",
+      "canonical_evidence": "基于超图的LLM推理失败归因，可扩展定位根因，对强化学习信用分配有启发",
+      "llm_tldr_en": "HPFA attributes LLM reasoning failures by comparing hyperedges of failure and success paths, reducing search space for root cause localization and scalable failure synthesis.",
+      "llm_tldr_cn": "反思机制依赖对推理失败步骤的准确归因，但现有方法代价高或忽略逻辑依赖。本文提出HPFA，用超图表示推理路径的复杂逻辑关系，通过对比失败路径与成功路径的超边来定位根因，大幅缩小搜索空间。该方法高效定位失败源头并支持规模化错误样本合成，为LLM推理的错误分析与自我改进提供了新工具。",
+      "llm_tldr": "反思机制依赖对推理失败步骤的准确归因，但现有方法代价高或忽略逻辑依赖。本文提出HPFA，用超图表示推理路径的复杂逻辑关系，通过对比失败路径与成功路径的超边来定位根因，大幅缩小搜索空间。该方法高效定位失败源头并支持规模化错误样本合成，为LLM推理的错误分析与自我改进提供了新工具。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "application of reinforcement learning in large language model reasoning",
+      "matched_requirement_id": "req-7",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2608.05541v1",
+      "source": "arxiv",
+      "title": "Hyper-ES: Effective Evolution Strategies for LLM Reasoning via Descent Direction Merging",
+      "abstract": "Evolution Strategy (ES) is a promising alternative to gradient-based fine-tuning for resource-constrained Large Language Model (LLM) reasoning. However, directly applying ES to billion-parameter LLMs is highly ineffective. In such high-dimensional parameter spaces, most random perturbations are nearly orthogonal to useful update directions, leading to unstable optimization. We propose Hyper-ES, a subspace-based ES framework that avoids the weakness of ES in full-parameter search while exploiting its strength in low-dimensional optimization. Instead of asking ES to discover useful directions from random perturbations in the LLM parameter space, Hyper-ES first performs a small number of inexpensive gradient-based fine-tuning runs to obtain descent directions. Although each direction may provide only a limited improvement on its own, their span forms a compact adaptation subspace that captures useful reasoning updates. Hyper-ES then applies CMA-ES to optimize layer-wise DARE-TIES merging coefficients within this subspace, allowing ES to search over combinations of meaningful descent directions rather than over arbitrary full-model perturbations. We evaluate Hyper-ES on three Qwen2.5-Instruct and DeepSeek-R1-Distill backbones across six mathematical reasoning datasets. Results show that Hyper-ES consistently outperforms GRPO-LoRA by 1% while requiring 10% fewer space-consuming gradient updates. Code at https://github.com/kuangrepi/Hyper-ES.",
+      "authors": [
+        "Yu Gu",
+        "Zhi Zheng",
+        "Yunpeng Ba",
+        "Xialiang Tong",
+        "Mingxuan Yuan",
+        "Zhenkun Wang"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-08-06T02:39:10+00:00",
+      "link": "https://arxiv.org/pdf/2608.05541v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "evolution strategies for LLM reasoning via descent direction merging",
+      "llm_evidence_cn": "通过下降方向合并的进化策略优化大语言模型推理，资源受限下的策略优化",
+      "llm_evidence": "通过下降方向合并的进化策略优化大语言模型推理，资源受限下的策略优化",
+      "canonical_evidence": "通过下降方向合并的进化策略优化大语言模型推理，资源受限下的策略优化",
+      "llm_tldr_en": "Hyper-ES performs a few gradient fine-tuning runs to gather useful directions, then runs ES in a low-dimensional subspace, enabling effective policy optimization for LLM reasoning under constrained resources.",
+      "llm_tldr_cn": "针对资源受限环境下直接使用进化策略优化大语言模型推理效率低下的问题，本文提出Hyper-ES。该方法先用少量梯度微调获得若干有用下降方向，再在低维子空间内进行进化策略搜索，避免全参数随机扰动带来的无效更新。实验表明Hyper-ES能以更低计算代价达到与梯度微调相当的推理性能。该工作为LLM推理的策略优化提供了轻量化替代方案。",
+      "llm_tldr": "针对资源受限环境下直接使用进化策略优化大语言模型推理效率低下的问题，本文提出Hyper-ES。该方法先用少量梯度微调获得若干有用下降方向，再在低维子空间内进行进化策略搜索，避免全参数随机扰动带来的无效更新。实验表明Hyper-ES能以更低计算代价达到与梯度微调相当的推理性能。该工作为LLM推理的策略优化提供了轻量化替代方案。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "policy optimization methods for multi step reasoning in llms",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2608.06153v1",
+      "source": "arxiv",
+      "title": "Learning Globally Reusable Skills for Coding Agents",
+      "abstract": "Automated skill evolution enables Large Language Model (LLM) agents to continuously improve without expensive retraining. However, existing approaches typically treat skill evolution as a sequence of local updates, overlooking relationships among skills and often producing overfitted skill updates that fail to generalize across tasks. We propose GSE, a globalized skill evolution framework that jointly optimizes skill compatibility and skill generalization. To preserve consistency across the skill bank, GSE maintains a Skill Relation Graph (SRG) that explicitly models and co-evolves inter-skill relationships. To improve generalization, GSE performs cluster-based skill consolidation to abstract reusable capabilities from local updates and employs replay-driven verification to prevent overfitting and behavioral regressions. We evaluate GSE on two representative software engineering tasks: bug-revealing test generation and false-positive bug report filtering. Across two state-of-the-art coding agents, OpenHands and mini-SWE-agent, GSE consistently achieves the best precision, recall, and F1-score. Compared with existing evolution techniques, GSE improves precision and recall by 6.1%~34.1% and 31.8%~180.0% for test generation, and by 15.4%~96.4% and 13.1%~19.8% for false-positive filtering. Deployment on an internal industrial agent further yields a 61.4% improvement in F1-score, demonstrating the effectiveness and generalizability of GSE for evolving effective skills.",
+      "authors": [
+        "Chen Yang",
+        "Jiashuo Tian",
+        "Ziqi Wang",
+        "Xinyin Liu",
+        "Meiru Ye",
+        "Junjie Chen"
+      ],
+      "primary_category": "cs.SE",
+      "categories": [
+        "cs.SE",
+        "cs.AI"
+      ],
+      "published": "2026-08-06T15:19:56+00:00",
+      "link": "https://arxiv.org/pdf/2608.06153v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "globalized skill evolution framework for coding LLM agents",
+      "llm_evidence_cn": "面向编码大模型智能体的技能全局演化框架，提升技能复用与任务自动化",
+      "llm_evidence": "面向编码大模型智能体的技能全局演化框架，提升技能复用与任务自动化",
+      "canonical_evidence": "面向编码大模型智能体的技能全局演化框架，提升技能复用与任务自动化",
+      "llm_tldr_en": "Automated skill evolution in LLM agents often yields overfitted local updates. GSE jointly optimizes skill compatibility and generalization, maintaining a Skill Relation Graph and using cluster-based consolidation with replay-driven verification. It improves reusable skills for coding agents and complex task automation.",
+      "llm_tldr_cn": "自动化技能演化可以让大模型编码智能体持续改进，但常见方法只做局部更新，容易过拟合且难以跨任务泛化。本文提出GSE框架，联合优化技能兼容性与通用性：通过技能关系图保持技能库一致性，用基于聚类的技能整合抽取可复用的能力，并引入重放驱动验证。该方法缓解了技能更新过拟合问题，提升了技能库的整体可复用性。其为编码智能体的任务自动化提供了更稳定的技能学习机制。",
+      "llm_tldr": "自动化技能演化可以让大模型编码智能体持续改进，但常见方法只做局部更新，容易过拟合且难以跨任务泛化。本文提出GSE框架，联合优化技能兼容性与通用性：通过技能关系图保持技能库一致性，用基于聚类的技能整合抽取可复用的能力，并引入重放驱动验证。该方法缓解了技能更新过拟合问题，提升了技能库的整体可复用性。其为编码智能体的任务自动化提供了更稳定的技能学习机制。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    }
+  ]
+}
