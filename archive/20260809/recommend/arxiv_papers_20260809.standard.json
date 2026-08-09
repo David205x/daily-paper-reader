@@ -1,0 +1,311 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-08-09T20:35:23.105148+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 4,
+    "deep_cap": 6,
+    "deep_selected": 4,
+    "quick_candidates": 3,
+    "quick_skim_target": 11,
+    "quick_selected": 3
+  },
+  "deep_dive": [
+    {
+      "id": "2608.01269v2",
+      "source": "arxiv",
+      "title": "ACE-GraphRAG: Agentic Context Engineering for Hierarchical GraphRAG",
+      "abstract": "Hierarchical Graph Retrieval-Augmented Generation (GraphRAG) organizes corpus knowledge at multiple levels of granularity, yet fixed context construction may fail to translate these multi-resolution representations into a context suited to the current query. We identify this mismatch as the representation--inference gap. We propose Agentic Context Engineering for Hierarchical GraphRAG (ACE-GraphRAG), an inference-time context policy layer that supplements and adapts the initial context for generation. ACE-GraphRAG formulates context construction as a policy over gap-aware refinement, retrieval branches, and task-conditioned adaptation. Parallel Differential Retrieval acquires supplementary evidence from depth-oriented factual and breadth-oriented semantic branches. These evidence increments are consolidated with the initial context while preserving provenance and abstraction levels. Full-ACE applies the full policy uniformly within each task family, whereas Adaptive-ACE selects task- and topology-specific policies for individual queries. We evaluate ACE-GraphRAG on HotpotQA, 2WikiMultiHopQA, and four UltraDomain subsets across multi-hop QA and query-focused summarization. Full-ACE outperforms the evaluated RAG and GraphRAG baselines across both task families, while Adaptive-ACE further improves multi-hop QA and is preferred over Full-ACE on all four UltraDomain subsets. Ablation and topology analyses support treating context construction as a query- and task-dependent inference policy rather than a fixed procedure.",
+      "authors": [
+        "Yongfeng Huang",
+        "Yuren Lai",
+        "Ruiying Chen",
+        "Haoyu Huang",
+        "Mingming Zhao",
+        "James Cheng"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.AI"
+      ],
+      "published": "2026-08-02T14:22:31+00:00",
+      "link": "https://arxiv.org/pdf/2608.01269v2",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "agentic context policy for graph RAG, retrieval-augmented generation",
+      "llm_evidence_cn": "面向分层图RAG的智能体上下文策略，直接面向检索增强生成",
+      "llm_evidence": "面向分层图RAG的智能体上下文策略，直接面向检索增强生成",
+      "canonical_evidence": "面向分层图RAG的智能体上下文策略，直接面向检索增强生成",
+      "llm_tldr_en": "ACE-GraphRAG introduces an inference-time context policy layer to adapt hierarchical GraphRAG contexts, combining differential retrieval with task-conditioned adaptation to reduce the representation-inference gap.",
+      "llm_tldr_cn": "分层GraphRAG虽能组织多粒度知识，但固定上下文构造与查询需求不匹配，形成表征-推理缺口。ACE-GraphRAG提出推理期上下文策略层，通过并行差分检索和任务自适应补充证据，将上下文构造建模为策略，从而提升生成质量和对复杂查询的适应性。",
+      "llm_tldr": "分层GraphRAG虽能组织多粒度知识，但固定上下文构造与查询需求不匹配，形成表征-推理缺口。ACE-GraphRAG提出推理期上下文策略层，通过并行差分检索和任务自适应补充证据，将上下文构造建模为策略，从而提升生成质量和对复杂查询的适应性。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "retrieval augmented generation for knowledge intensive tasks",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.01867v1",
+      "source": "arxiv",
+      "title": "CRISP: Critical Step Perception for Training Efficient Deep Search Agents",
+      "abstract": "Large language models (LLMs) are increasingly extended into deep search agents that solve complex questions through multi-step interaction with external search and browsing tools. However, existing agents often incur substantial computational and interaction costs, generating lengthy trajectories that contain redundant queries, inefficient exploration, and irrelevant observations. Existing efficiency-oriented methods usually encourage agents to use tools less frequently, but treating all tool interactions uniformly may also suppress steps that gather necessary evidence. In this paper, we propose CRISP, a framework for training efficient deep search agents through critical step perception. Unlike prior efficiency methods that uniformly penalize tool use, CRISP distinguishes interactions that gather necessary evidence from redundant ones and shapes the training reward to preserve the former while pruning the latter, improving efficiency without sacrificing the evidence needed for correct answers. Specifically, CRISP first constructs critical-step labels with Backward Evidence Induction: starting from the final answer, a strong model traverses a completed search trajectory backward and judges whether each tool-interaction step provides or preserves evidence for the final answer. We then distill these step-wise judgments into a smaller critical-step recognizer, enabling full-trajectory analysis in a single pass. During policy optimization, an efficiency-aware reward is applied only to successful rollouts. Experiments on BrowseComp and HLE-Verified show that CRISP maintains competitive final-answer accuracy while reducing average interaction turns by 15.1% and 33.2%, respectively, demonstrating substantial improvements in interaction efficiency.",
+      "authors": [
+        "Haosi Mo",
+        "Zihao Yan",
+        "Ruiqing Zhang",
+        "Zhongli Li",
+        "Hexuan Deng",
+        "Xuebo Liu",
+        "Min Zhang"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-08-03T08:15:18+00:00",
+      "link": "https://arxiv.org/pdf/2608.01867v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Training efficient deep search LLM agents via critical step perception",
+      "llm_evidence_cn": "通过关键步骤感知训练高效深度搜索LLM代理",
+      "llm_evidence": "通过关键步骤感知训练高效深度搜索LLM代理",
+      "canonical_evidence": "通过关键步骤感知训练高效深度搜索LLM代理",
+      "llm_tldr_en": "Proposes CRISP, a framework training deep search LLM agents to perceive critical steps, reducing redundant tool use and improving efficiency without sacrificing quality.",
+      "llm_tldr_cn": "现有LLM深度搜索代理会产生大量冗余查询和低效探索，现有效率方法统一惩罚工具使用，可能抑制必要证据收集。本文提出CRISP框架，通过关键步骤感知训练，区分必要与冗余工具交互，从而在降低交互成本的同时保持甚至提升搜索质量。实验表明CRISP能在不牺牲性能的情况下显著缩短搜索轨迹并减少工具调用次数。该框架为深度搜索代理的高效训练提供了新思路。",
+      "llm_tldr": "现有LLM深度搜索代理会产生大量冗余查询和低效探索，现有效率方法统一惩罚工具使用，可能抑制必要证据收集。本文提出CRISP框架，通过关键步骤感知训练，区分必要与冗余工具交互，从而在降低交互成本的同时保持甚至提升搜索质量。实验表明CRISP能在不牺牲性能的情况下显著缩短搜索轨迹并减少工具调用次数。该框架为深度搜索代理的高效训练提供了新思路。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.01867v2",
+      "source": "arxiv",
+      "title": "CRISP: Critical Step Perception for Training Efficient Deep Search Agents",
+      "abstract": "Large language models (LLMs) are increasingly extended into deep search agents that solve complex questions through multi-step interaction with external search and browsing tools. However, existing agents often incur substantial computational and interaction costs, generating lengthy trajectories that contain redundant queries, inefficient exploration, and irrelevant observations. Existing efficiency-oriented methods usually encourage agents to use tools less frequently, but treating all tool interactions uniformly may also suppress steps that gather necessary evidence. In this paper, we propose CRISP, a framework for training efficient deep search agents through critical step perception. Unlike prior efficiency methods that uniformly penalize tool use, CRISP distinguishes interactions that gather necessary evidence from redundant ones and shapes the training reward to preserve the former while pruning the latter, improving efficiency without sacrificing the evidence needed for correct answers. Specifically, CRISP first constructs critical-step labels with Backward Evidence Induction: starting from the final answer, a strong model traverses a completed search trajectory backward and judges whether each tool-interaction step provides or preserves evidence for the final answer. We then distill these step-wise judgments into a smaller critical-step recognizer, enabling full-trajectory analysis in a single pass. During policy optimization, an efficiency-aware reward is applied only to successful rollouts. Experiments on BrowseComp and HLE-Verified show that CRISP maintains competitive final-answer accuracy while reducing average interaction turns by 15.1% and 33.2%, respectively, demonstrating substantial improvements in interaction efficiency.",
+      "authors": [
+        "Haosi Mo",
+        "Zihao Yan",
+        "Ruiqing Zhang",
+        "Zhongli Li",
+        "Hexuan Deng",
+        "Xuebo Liu",
+        "Min Zhang"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-08-03T08:15:18+00:00",
+      "link": "https://arxiv.org/pdf/2608.01867v2",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Training efficient deep search LLM agents via critical step perception",
+      "llm_evidence_cn": "通过关键步骤感知训练高效深度搜索LLM代理",
+      "llm_evidence": "通过关键步骤感知训练高效深度搜索LLM代理",
+      "canonical_evidence": "通过关键步骤感知训练高效深度搜索LLM代理",
+      "llm_tldr_en": "Proposes CRISP, a framework training deep search LLM agents to perceive critical steps, reducing redundant tool use and improving efficiency without sacrificing quality.",
+      "llm_tldr_cn": "现有LLM深度搜索代理会产生大量冗余查询和低效探索，现有效率方法统一惩罚工具使用，可能抑制必要证据收集。本文提出CRISP框架，通过关键步骤感知训练，区分必要与冗余工具交互，从而在降低交互成本的同时保持甚至提升搜索质量。实验表明CRISP能在不牺牲性能的情况下显著缩短搜索轨迹并减少工具调用次数。该框架为深度搜索代理的高效训练提供了新思路。",
+      "llm_tldr": "现有LLM深度搜索代理会产生大量冗余查询和低效探索，现有效率方法统一惩罚工具使用，可能抑制必要证据收集。本文提出CRISP框架，通过关键步骤感知训练，区分必要与冗余工具交互，从而在降低交互成本的同时保持甚至提升搜索质量。实验表明CRISP能在不牺牲性能的情况下显著缩短搜索轨迹并减少工具调用次数。该框架为深度搜索代理的高效训练提供了新思路。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.04444v1",
+      "source": "arxiv",
+      "title": "D$^2$F-ReAG: Dynamic Decomposition and Filtering for Multi-Hop Reasoning-Augmented Generation",
+      "abstract": "Large language models (LLMs) often generate inaccurate answers due to their reliance on static internal knowledge. Retrieval-augmented generation (RAG) addresses this limitation by integrating external knowledge and excelling at single-hop queries. However, it struggles with multi-hop questions that require cross-document reasoning. Existing methods, such as graph structured RAG or question decomposition, often lack dynamic decomposition and effective filtering, which leads to lower efficiency and accuracy. To overcome these limitations, we propose Dynamic Decomposition and Filtering for Multi-Hop Reasoning-Augmented Generation (D2F-ReAG), a novel paradigm that adaptively controls reasoning depth by judging the reliability of the root-level reasoning. If the root reasoning is reliable, the model directly generates the answer. Otherwise, the question is logically decomposed into sub-questions, and the verified reasoning derived from these sub-questions is used to refine the root reasoning. Experiments on three multi-hop benchmarks demonstrate the effectiveness of our method in handling complex multi-hop questions.",
+      "authors": [
+        "Jiaoyang Li",
+        "Junhao Ruan",
+        "Shengwei Tang",
+        "Kaiyan Chang",
+        "Zhengtao Yu",
+        "Tong Xiao",
+        "Jingbo Zhu"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.AI"
+      ],
+      "published": "2026-08-05T04:41:36+00:00",
+      "link": "https://arxiv.org/pdf/2608.04444v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Retrieval-augmented generation for multi-hop knowledge-intensive questions",
+      "llm_evidence_cn": "面向多跳知识密集型问答的检索增强生成",
+      "llm_evidence": "面向多跳知识密集型问答的检索增强生成",
+      "canonical_evidence": "面向多跳知识密集型问答的检索增强生成",
+      "llm_tldr_en": "LLMs using static knowledge produce inaccurate answers; RAG helps single-hop but struggles multi-hop. Proposes dynamic decomposition and filtering to adaptively control reasoning depth, improving efficiency and accuracy on cross-document questions.",
+      "llm_tldr_cn": "大模型依靠静态内部知识常生成不准确答案，检索增强生成（RAG）可引入外部知识，但在需要跨文档推理的多跳问题上表现不佳。现有图结构RAG或问题分解方法缺乏动态分解与有效过滤，导致效率与准确率较低。作者提出D2F-ReAG范式，通过判断检索结果的可靠性自适应控制推理深度，动态分解问题并过滤无关信息。实验表明该方法在复杂多跳问答任务上提升了效率与准确性，为知识密集型推理增强生成提供了新思路。",
+      "llm_tldr": "大模型依靠静态内部知识常生成不准确答案，检索增强生成（RAG）可引入外部知识，但在需要跨文档推理的多跳问题上表现不佳。现有图结构RAG或问题分解方法缺乏动态分解与有效过滤，导致效率与准确率较低。作者提出D2F-ReAG范式，通过判断检索结果的可靠性自适应控制推理深度，动态分解问题并过滤无关信息。实验表明该方法在复杂多跳问答任务上提升了效率与准确性，为知识密集型推理增强生成提供了新思路。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "retrieval augmented generation for knowledge intensive tasks",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2608.03872v1",
+      "source": "arxiv",
+      "title": "EvoHIL: Self-Evolving Reward and Flow-Matched Policy Optimization for Robust Human-in-the-Loop Reinforcement Learning",
+      "abstract": "Human-in-the-loop reinforcement learning (HIL-RL) enables robots to learn contact-rich manipulation from limited real-world interaction, but deployment exposes three coupled limitations: static visual reward models fail under scene changes; independently sampled actions cause temporally inconsistent motion; and vision-based policies remain sensitive to appearance shifts. We present EvoHIL, a unified framework that adapts the reward model, action generator, and visual do main within a staged human-in-the-loop learning process. First, self-evolving reward (SER) adapts the success classifier from human-confirmed positives and provisional weak negatives. Second, Action Flow Stabilization (AFS) generates temporally coherent action chunks through flow matching, grounding policy updates in executed action prefixes and demonstrated behavior. Third, retention-aware offline fine-tuning replays relit interaction data while anchoring the AFS actor-critic to prior behavior, adapting the visual domain without additional robot interaction. Across six manipulation tasks on Franka FR3 and SO-101 arms under a controlled lighting shift, EvoHIL improves task success, agreement with human-confirmation labels, motion smoothness, and completion time relative to human-in-the-loop and imitation baselines.Project page: https://anonymous4366.github.io/EvoHIL/",
+      "authors": [
+        "Shuoqin Zhang",
+        "Tongtong Cheng",
+        "Xiru Gao",
+        "Jinzhuo Peng",
+        "Bin Zheng",
+        "Jiahao Tu",
+        "Ke Wang",
+        "Jia Pan",
+        "Zhe Hu",
+        "Kai Liu"
+      ],
+      "primary_category": "cs.RO",
+      "categories": [
+        "cs.RO"
+      ],
+      "published": "2026-08-04T16:12:05+00:00",
+      "link": "https://arxiv.org/pdf/2608.03872v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Reward model adaptation and policy optimization in human-in-the-loop RL",
+      "llm_evidence_cn": "人在回路强化学习中的奖励模型自适应与策略优化",
+      "llm_evidence": "人在回路强化学习中的奖励模型自适应与策略优化",
+      "canonical_evidence": "人在回路强化学习中的奖励模型自适应与策略优化",
+      "llm_tldr_en": "EvoHIL solves reward staleness, action inconsistency, and appearance sensitivity in HIL-RL by self-evolving rewards, action flow stabilization, and domain adaptation for contact-rich manipulation.",
+      "llm_tldr_cn": "人在回路强化学习用于机器人接触丰富的操作时，面临静态视觉奖励模型无法应对场景变化、动作采样时间不一致等问题。EvoHIL提出自进化奖励（SER），利用人类确认的正样本与弱负样本更新分类器，并通过动作流稳定化（AFS）生成时间一致的动作。框架还统一适应视觉域。实验表明该方法提升了在场景变化下的鲁棒性和操作性能，为奖励与策略联合优化提供了框架。",
+      "llm_tldr": "人在回路强化学习用于机器人接触丰富的操作时，面临静态视觉奖励模型无法应对场景变化、动作采样时间不一致等问题。EvoHIL提出自进化奖励（SER），利用人类确认的正样本与弱负样本更新分类器，并通过动作流稳定化（AFS）生成时间一致的动作。框架还统一适应视觉域。实验表明该方法提升了在场景变化下的鲁棒性和操作性能，为奖励与策略联合优化提供了框架。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "design of reward functions in RL",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2608.01149v1",
+      "source": "arxiv",
+      "title": "PATH-Bench: Path-Dependent Evaluation of Lifelong Agents",
+      "abstract": "Lifelong LLM agents increasingly adapt through external learning states that store past interactions as retrievable memories or reusable skills, yet existing benchmarks rarely account for how the path of accumulated experience shapes what agents transfer and retain. In this work, we establish PATH-Bench, a benchmark for path-dependent evaluation of lifelong agents. PATH-Bench estimates directed task relationships via multi-model in-context learning, constructs probe-centered sequences with controlled helpful and interfering histories, and repeatedly evaluates probe tasks to measure average performance, forward transfer, backward transfer, and forgetting. We evaluate eight representative agents on single-turn code generation and multi-turn tool-use tasks under positive- and negative-dominant histories. Benchmark results show that experience utility depends jointly on how experience is represented and on the task's interaction structure, that strong transfer does not ensure retention, and that later experience can reshape gains acquired earlier in the learning path. Based on these findings, we propose Selective Experience Use (SEU), an agent harness that regulates how path-accumulated experience influences each new task, admitting helpful items while filtering out potential interference. SEU consistently reduces forgetting while improving forward transfer in the majority of settings. The PATH-Bench provides both a controlled evaluation framework and actionable guidance for designing more selective and robust lifelong agents.",
+      "authors": [
+        "Xidong Yang",
+        "Xingyi Zhang",
+        "Wenhao Li",
+        "Wenyan Liu",
+        "Junjie Sheng",
+        "Yun Hua",
+        "Wei Yin",
+        "Tao Fang",
+        "Chuyun Shen",
+        "Xiangfeng Wang"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-08-02T11:00:04+00:00",
+      "link": "https://arxiv.org/pdf/2608.01149v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "benchmark for lifelong LLM agents on multi-turn tool-use tasks",
+      "llm_evidence_cn": "面向终身LLM智能体的多轮工具使用任务基准",
+      "llm_evidence": "面向终身LLM智能体的多轮工具使用任务基准",
+      "canonical_evidence": "面向终身LLM智能体的多轮工具使用任务基准",
+      "llm_tldr_en": "PATH-Bench is a benchmark for path-dependent evaluation of lifelong LLM agents, estimating directed task relationships and measuring transfer and forgetting across controlled histories.",
+      "llm_tldr_cn": "针对现存基准忽略经验路径对终身LLM智能体影响的问题，提出了PATH-Bench基准。它利用多模型上下文学习估计任务关系，构造受控帮助和干扰历史的探针序列，并重复评估以测量前向迁移、后向迁移和遗忘。在代码生成和工具使用任务上评估了八种代表性智能体，为终身智能体研究提供了更全面的评估方法。",
+      "llm_tldr": "针对现存基准忽略经验路径对终身LLM智能体影响的问题，提出了PATH-Bench基准。它利用多模型上下文学习估计任务关系，构造受控帮助和干扰历史的探针序列，并重复评估以测量前向迁移、后向迁移和遗忘。在代码生成和工具使用任务上评估了八种代表性智能体，为终身智能体研究提供了更全面的评估方法。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2608.04934v1",
+      "source": "arxiv",
+      "title": "State2State: Environment-Derived Mid-Training for LLM Agents",
+      "abstract": "Training LLM agents commonly relies on supervised fine-tuning from expert trajectories or online reinforcement learning over human-specified tasks with handcrafted verifiers. Though effective, both remain bottlenecked by externally specified tasks and supervision signals, limiting the scalability and diversity of agent training. We study an environment learning paradigm in which agents acquire interaction and manipulation capabilities solely through environment interaction, without externally specified tasks. We propose State2State, an environment-derived mid-training method that converts explored environment states into training objectives, challenging agents to reach a specified target state. By deriving tasks from environment exploration and verifying success through rule-based state matching, State2State provides scalable and verifiable training objectives without expert supervision or manual task design. Experiments on ALFWorld and ScienceWorld show that State2State improves agent performance as a standalone environment-learning stage in most settings. As initialization for downstream RL, it further improves final performance and learning efficiency, with promising evidence of cross-environment generalization.",
+      "authors": [
+        "Xuanyu Lei",
+        "Yiqi Zhu",
+        "Chenliang Li",
+        "Kaiming Liu",
+        "Peng Li",
+        "Ming Yan",
+        "Jieping Ye",
+        "Ya-Qin Zhang",
+        "Yang Liu"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.LG"
+      ],
+      "published": "2026-08-05T15:02:41+00:00",
+      "link": "https://arxiv.org/pdf/2608.04934v1",
+      "tags": [
+        "keyword:rl",
+        "query:rl"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Environment-based training for LLM agents without external task specifications",
+      "llm_evidence_cn": "无需外部任务规范的环境交互式智能体训练",
+      "llm_evidence": "无需外部任务规范的环境交互式智能体训练",
+      "canonical_evidence": "无需外部任务规范的环境交互式智能体训练",
+      "llm_tldr_en": "Training LLM agents usually needs expert trajectories or handcrafted verifiers. State2State derives tasks purely from environment exploration, setting target states as objectives, and verifies success automatically. This improves scalability and diversity of agent behavior in interaction and manipulation.",
+      "llm_tldr_cn": "大模型智能体的训练通常依赖专家轨迹或人工设计的验证器，受限于外部任务与监督信号，难以规模化。作者提出环境学习范式，让智能体仅通过与环境交互获取能力，不依赖外部指定任务。State2State把探索得到的环境状态转换为训练目标，要求智能体到达指定目标状态并自动验证成功。实验显示该中期训练显著增强智能体的交互与操作能力，为智能体自主技能习得提供了一种可扩展的新路径。",
+      "llm_tldr": "大模型智能体的训练通常依赖专家轨迹或人工设计的验证器，受限于外部任务与监督信号，难以规模化。作者提出环境学习范式，让智能体仅通过与环境交互获取能力，不依赖外部指定任务。State2State把探索得到的环境状态转换为训练目标，要求智能体到达指定目标状态并自动验证成功。实验显示该中期训练显著增强智能体的交互与操作能力，为智能体自主技能习得提供了一种可扩展的新路径。",
+      "llm_tags": [
+        "query:rl"
+      ],
+      "matched_query_tag": "query:rl",
+      "matched_query_text": "large language model agents for task automation",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    }
+  ]
+}

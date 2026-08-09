@@ -1,0 +1,452 @@
+Title: CRISP: Critical Step Perception for Training Efficient Deep Search Agents
+
+URL Source: https://arxiv.org/pdf/2608.01867v1
+
+Published Time: Tue, 04 Aug 2026 02:30:54 GMT
+
+Number of Pages: 15
+
+Markdown Content:
+# CRISP: Critical Step Perception for Training Efficient Deep Search Agents 
+
+# Haosi Mo 1,2 ∗, Zihao Yan 1,2 ∗, Ruiqing Zhang 1†, Zhongli Li 1, Hexuan Deng 2, Xuebo Liu 2†, Min Zhang 2
+
+> 1
+
+Baidu Inc., China 
+
+> 2
+
+Institute of Computing and Intelligence, Harbin Institute of Technology, Shenzhen, China zhangruiqing01@baidu.com, liuxuebo@hit.edu.cn 
+
+Abstract 
+
+Large language models (LLMs) are increasingly extended into deep search agents that solve complex questions through multi-step interaction with external search and browsing tools. However, existing agents often incur substantial computational and interaction costs, generating lengthy trajectories that con-tain redundant queries, inefficient exploration, and irrelevant observations. Existing efficiency-oriented methods usually encourage agents to use tools less frequently, but treating all tool interactions uniformly may also suppress steps that gather necessary evidence. In this paper, we propose CRISP, a frame-work for training efficient deep search agents through critical step perception. Unlike prior efficiency methods that uniformly penalize tool use, CRISP distinguishes interactions that gather necessary evidence from redundant ones and shapes the train-ing reward to preserve the former while pruning the latter, improving efficiency without sacrificing the evidence needed for correct answers. Specifically, CRISP first constructs critical-step labels with Backward Evidence Induction: starting from the final answer, a strong model traverses a completed search trajectory backward and judges whether each tool-interaction step provides or preserves evidence for the final answer. We then distill these step-wise judgments into a smaller critical-step recognizer, enabling full-trajectory analysis in a single pass. During policy optimization, an efficiency-aware reward is applied only to successful rollouts. Experiments on BrowseC-omp and HLE-Verified show that CRISP maintains competitive final-answer accuracy while reducing average interaction turns by 15.1% and 33.2%, respectively, demonstrating substantial improvements in interaction efficiency. 
+
+# 1 Introduction 
+
+Large language models (LLMs) are increasingly extended into interactive search agents that acquire and synthesize external information (Xi et al. 2025; Huang et al. 2025b). In complex scenarios, answering questions often requires multi-step evidence gathering and reasoning rather than a single retrieval or one-shot response (Gupta et al. 2026; Lan et al. 2025; Wei et al. 2025). This has motivated deep search agents that combine LLM reasoning with external search, browsing, and document-reading tools to tackle challenging problems (Huang et al. 2025a; Jin et al. 2025). As these agents tackle increasingly difficult tasks, their full interaction 
+
+> ∗
+
+These authors contributed equally. 
+
+> †
+
+Corresponding author. 
+
+Table 1: Representative open-source agents still require many interaction turns on BrowseComp. 
+
+Model Acc. (%) Avg. Turns 
+
+GLM-4.5-Air (Zeng et al. 2025) 14.49 31.23 GLM-4.7 (Zhipu AI 2025) 28.78 31.07 GPT-OSS-120B (Agarwal et al. 2025) 14.57 30.47 DeepSeek-V4-Flash (Xu et al. 2026) 35.56 31.49 WebSailor-V2 (Li et al. 2025) 20.21 35.54 S1-Deep-Research (Dong et al. 2026) 22.83 38.54 
+
+Note: Acc. is final-answer accuracy, and Avg. Turns is the average number of tool-interaction turns per query. All models are evaluated under max_turn = 60 and context length = 131 , 072 .
+
+trajectories provide a rich record of how models seek, access, and use evidence to support the final answer. Despite their growing capability, deep search agents of-ten incur high interaction costs on complex tasks. Agentic reinforcement learning can induce redundant tool use, en-couraging over-reliance on external tools rather than selective interaction (Chen et al. 2026a). This issue is also evident in representative open-source agents. As shown in Table 1, they still average over 30 interaction turns on BrowseComp (Wei et al. 2025) under the same max_turn = 60 budget. The deeper problem, however, is not trajectory length itself, but that long traces mix necessary evidence gathering with repeated queries, weak clues, inefficient exploration, and observations unused in the final answer. Such redundancy wastes computation and thinking effort while increasing the burden of long-context understanding and critical information discrimination. Recent work improves search efficiency along two lines. One regulates how often the agent acts, rewarding correct answers with fewer or more selective tool calls (Wang et al. 2025; Qian et al. 2025; Lin et al. 2025); but penalizing call frequency treats all interactions alike, suppressing evidence-gathering steps along with redundant ones. A second selects which steps matter for more efficient tuning (Chen et al. 2025b), yet defines criticality by structural or planning roles rather than evidential value. Complex search tasks call for a more evidence-centered notion: evidence-critical steps, defined as tool-interaction steps that provide or preserve evidence needed to support the final answer. To address this gap, we propose CRISP (Cri tical Step arXiv:2608.01867v1 [cs.CL] 3 Aug 2026 Figure 1: Overview of CRISP . CRISP introduces a critical-step recognizer identifying critical steps in policy rollouts. The recognized critical-step structure is combined with the outcome reward to perform efficiency-aware policy optimization, encouraging the policy to preserve necessary evidence while reducing redundant search behavior. 
+
+Perception), a framework for training deep search agents to identify evidence-critical steps. Figure 1 illustrates the overall workflow. The key idea is to separate steps that provide or preserve evidence for the final answer from redundant tool interactions. For example, in Figure 1, the first rollout gives a wrong answer and receives no efficiency bonus. The second rollout reaches the correct answer, but Step 2 performs an irrelevant intermediate check, so only two of its three tool interactions are recognized as critical, yielding a critical-step ratio of 2/3 = 66 .6% . In contrast, every tool interaction in the third rollout obtains evidence for the final answer and is recognized as critical. In this way, CRISP evaluates not only final correctness, but also how much of a successful search process contributes useful evidence. To operationalize this idea, CRISP trains a critical-step recognizer to analyze full trajectories and predict critical tool-interaction steps. The recognizer is trained on search trajectories annotated by Back-ward Evidence Induction, in which a strong model traces each trajectory backward from the final answer, judging one candi-date step at a time with all subsequently confirmed critical steps as context, and produces step-wise criticality labels and rationales. During policy optimization, CRISP applies the recognizer to successful rollouts, computing an efficiency-aware reward from the predicted numbers of critical steps and redundant steps. This reward encourages the policy to pre-serve evidence-critical interactions while reducing redundant search, rather than blindly shortening all trajectories. Empiri-cally, on BrowseComp and HLE-Verified, CRISP maintains competitive final-answer accuracy while reducing average interaction turns by 15.1% and 33.2%, respectively. Our main contributions are summarized as follows: 
+
+• We introduce critical step perception for deep search agents, aiming to identify evidence-critical steps that form a compact evidence chain supporting the final answer. 
+
+• We propose CRISP, an end-to-end framework that learns a critical-step recognizer and leverages its perception of critical steps to guide efficiency-aware policy optimization. 
+
+• We empirically show that CRISP improves deep-search efficiency on challenging benchmarks, maintaining com-parable answer accuracy while reducing interaction turns. 
+
+# 2 Related Work 
+
+Deep Search Agents These agents tackle knowledge-intensive questions through multi-turn web search, document retrieval, and information extraction, spending substantial test-time compute on many tool-call turns rather than para-metric memory (Guo et al. 2025; Zhu et al. 2025; Huang et al. 2025b). A line of work elicits this behavior end-to-end via reinforcement learning rather than hand-crafted pipelines: Search-R1 (Jin et al. 2025) and ReSearch (Chen et al. 2025a) learn to query from the final-answer signal alone, R1-Searcher (Song et al. 2025) uses a two-stage outcome-only scheme, and ZeroSearch (Sun et al. 2025) replaces the live engine with an LLM-simulated retriever to cut cost and noise. The loop has since scaled from single lookups to long-horizon research and synthesis (Dong et al. 2026). DeepResearcher (Zheng et al. 2025) trains in real web environments, Web-Thinker (Li et al. 2026c) interleaves search, navigation, and drafting, SFR-DeepResearch (Nguyen et al. 2025) trains a sin-gle autonomous agent without a fixed workflow, and Tongyi DeepResearch (Team et al. 2025) reports a full-stack deep-research system at scale. As the interaction horizon grows, the accumulated context becomes a bottleneck, and recent Figure 2: Detailed procedure of CRISP . Left : Backward Evidence Induction obtains step-wise criticality annotations by traversing trajectories backward from the final response. Middle : Critical-Step Recognizer Distillation formats these annotations into full-trajectory supervision and trains a student recognizer for single-pass critical-step analysis. Right : Efficiency-Aware Policy Optimization uses the recognizer to estimate critical steps in successful rollouts and construct an efficiency-aware reward. systems address it from the infrastructure side: Flash-Searcher (Qin et al. 2025) restructures execution as a DAG for parallel speedup, ReSum (Wu et al. 2025b) periodically compresses history, and DeepMiner (Tang et al. 2025) holds a fixed window by discarding bulky tool logs while preserving the reasoning trace. Across these advances, however, stronger capability generally comes at the price of longer trajectories and more tool-call turns, so the interaction cost of deep search agents keeps growing, which is the efficiency bottleneck this work aims to address. 
+
+Efficiency Optimization for Deep Search Efficiency meth-ods for deep search mainly differ in how they judge step usefulness. One group regulates how often the agent acts: OTC (Wang et al. 2025) rewards reaching the answer in fewer tool calls, while IKEA (Huang et al. 2025c) retrieves externally only when internal knowledge is insufficient. A second reshapes the behavior distribution over a trajectory: ET-Agent (Chen et al. 2026b) corrects redundant tool use through a self-evolving data flywheel, Tool-Star (Dong et al. 2025) coordinates multiple tools with hierarchical rewards, and HDPO (Yan et al. 2026) enforces economy only within already-correct trajectories. A third assigns step-level credit: DeepSearch (Wu et al. 2025a) embeds Monte Carlo Tree Search into the RL loop for fine-grained credit assignment, ATLAS (Chen et al. 2025b) trains only on the expert steps it deems critical, CSO (Li et al. 2026b) marks a step critical when an alternative action verifiably flips failure into success, and MatchTIR (Qu et al. 2026) derives turn-level rewards by matching predicted against ground-truth traces. Closer to the tool calling, process reward models such as DataPRM (Qiu et al. 2026) and ToolPRMBench (Li et al. 2026a) push su-pervision from outcomes to individual tool-call steps. These works judge steps by length cost, outcome and structural role, or execution success. Our work differs in the criterion itself: while these criteria capture different aspects of step usefulness, none explicitly characterizes the evidential role of each interaction. We instead judge each step by whether the evidence it observes causally contributes to the final answer, letting CRISP reduce redundancy while preserving the steps that carry necessary evidence. 
+
+# 3 Methodology 
+
+We propose CRISP, a framework that locates evidence-critical steps in deep search trajectories and turns this perception into a training signal for efficiency. It has three stages: Backward Evidence Induction uses a strong model as a teacher to annotate which steps carry evidence for the final answer; Critical-Step Recognizer Distillation distills these annotations into a smaller student recognizer that labels critical steps for a full trajectory in a single pass; and Efficiency-Aware Policy Optimization applies the recognizer to successful rollouts and rewards trajectories with a higher proportion of critical steps. Figure 2 illustrates the three stages, and all prompts are provided in Appendix A.1. Formally, a deep search agent answers a question x with a trajectory τ = ( s1, . . . , s n) and a final answer ˆy, where each step si = ( ti, a i, o i) collects the model’s thought, action, and the observation returned by the environment. The last step sn
+
+carries the final answer ˆy and invokes no tool. Based on this formulation, we address critical-step perception in the three subsections below. 
+
+## Backward Evidence Induction 
+
+A straightforward way to obtain critical-step supervision is to ask a strong model to read the full trajectory and extract all evidence-critical steps. However, deep search trajectories can be long and noisy, containing repeated queries, weak clues, and observations that are never used in the final answer. Direct full-trajectory extraction therefore places a high demand on the teacher model’s long-context understanding and structured extraction ability, making the annotation unstable. To obtain more reliable supervision, we introduce Backward Evidence Induction, which decomposes critical-step annotation into a sequence of local backward decisions. The key idea is to judge each step with respect to the evidence that has already been confirmed as useful in the future steps. This motivates a backward pass: the teacher traverses the trajectory from sn−1 to s1, so that when a step is evaluated, all later steps have already been judged. For each step i = n−1, . . . , 1, the teacher model Tϕ evaluates whether the current step is critical conditioned on the question, the final answer, the current step, the thought of the next step, and the already confirmed valid future steps: 
+
+(ci, r i) = Tϕ(x, ˆy, s i, t i+1 , Vi+1 ) (1) where ci ∈ { 0, 1} is the criticality label and ri is the teacher’s brief rationale. Here Vi+1 denotes steps already confirmed as evidence-critical among the future steps; it is initialized as Vn = {sn}, since the final-response step sn contains the answer ˆy. The next-step thought ti+1 is used only as an auxil-iary hint for what information from the current observation was noticed or used by the confirmed valid future steps. A step is labeled as critical if it provides or preserves evidence for the final answer or directly enables a later confirmed step to access such evidence. We further require this contribution to be marginal: if the same evidence is already provided more directly or completely by steps in 
+
+Vi+1 , the current step is treated as non-critical. After each judgment, we obtain Vi from Vi+1 by adding the current step only when it is labeled critical: Vi = Vi+1 ∪{si} if ci = 1 , and Vi = Vi+1 otherwise. The final set V1
+
+therefore contains the trajectory steps that the teacher regards as evidence-critical. This backward formulation makes teacher annotation more tractable. At each step, the teacher only needs to decide whether the current step provides additional evidence value beyond the confirmed valid future steps. The confirmed future steps serve as an explicit reference set, allowing the teacher to focus on local evidence contribution and redundancy rather than reconstructing the entire evidence chain from scratch. This step-wise procedure improves the stability and accuracy of critical-step supervision on long and noisy trajectories. 
+
+## Critical-Step Recognizer Distillation 
+
+Although Backward Evidence Induction provides reliable step-level annotations, it requires one teacher call per trajec-tory step, which becomes prohibitive for large-scale rollout analysis during policy optimization. To make critical-step per-ception efficient, we distill the teacher’s backward annotation behavior into a smaller generative recognizer that reproduces the full backward analysis in a single pass. After the backward traversal, the teacher has assigned each step si a criticality label ci with a brief rationale ri. We aggregate these local judgments into one structured target that mirrors the teacher’s backward reasoning order: 
+
+˜z = Format  (sn−1, c n−1, r n−1), . . . , (s1, c 1, r 1), (2) where Format serializes the per-step decisions from the last tool-interaction step to the first and appends a summary listing all critical steps. This target preserves the teacher’s backward evidence induction while compressing n − 1 teacher calls into a single generative response. We train the student recognizer with supervised fine-tuning, taking the question x, the final answer ˆy, and the full tra-jectory τ as input and the formatted target ˜z as output. At inference time, the recognizer reads a trajectory once and the predicted critical steps are parsed from the final summary. This distillation amortizes the cost of Backward Evidence Induction and yields a reusable recognizer for trajectories beyond the offline annotation set. In the next section, we use it to estimate the numbers of critical and redundant steps in successful rollouts and construct an efficiency-aware reward for policy optimization. 
+
+## Efficiency-Aware Policy Optimization 
+
+The distilled recognizer enables CRISP to use critical-step perception as a training signal for search agents. Standard outcome-based reinforcement learning only evaluates whether the final answer is correct, but does not distinguish between trajectories that gather the necessary evidence efficiently and trajectories that reach the same answer after many redun-dant tool interactions. To encourage more effective search behavior, we augment the answer correctness reward with an efficiency-aware reward computed from the recognizer’s predicted critical steps. For each question x, the current policy samples a group of rollouts: 
+
+{(τi, ˆyi)}Gi=1 ∼ πθ (· | x) (3) where G is the rollout group size. Let Rans  
+
+> i
+
+∈ { 0, 1} denote the answer correctness reward. We apply the critical-step recognizer only to successful rollouts, i.e., rollouts with 
+
+Rans  
+
+> i
+
+= 1 . For a successful rollout τi = ( si, 1, . . . , s i,n i ),the recognizer predicts a critical-step indicator for each tool-interaction step: 
+
+ˆci,j ∈ { 0, 1}, j = 1 , . . . , n i − 1 (4) where the final response step is excluded from the efficiency reward. We then define the number of predicted critical and redun-dant interaction steps as 
+
+Ki =
+
+> ni−1
+
+X
+
+> j=1
+
+ˆci,j , Ti = ( ni − 1) − Ki (5) Here, Ki measures how many tool-interaction steps are judged to contribute to the evidence chain, while Ti measures the remaining redundant interaction steps. Based on these quanti-ties, we define the efficiency-aware reward as 
+
+Rcrit  
+
+> i
+
+= Ki
+
+Ki + αT i
+
+(6) where α controls the penalty strength for redundant steps. This reward favors trajectories in which a larger proportion of tool interactions are critical, while still allowing longer trajectories when additional steps contribute useful evidence. The final reward combines answer correctness with the efficiency-aware reward: 
+
+Ri = Rans  
+
+> i
+
++ λR ans  
+
+> i
+
+Rcrit  
+
+> i
+
+(7) Table 2: Main results on BrowseComp and HLE-Verified. Official Acc. denotes reported model scores, and Official Setting lists the corresponding context length and maximum number of interaction turns. Because official evaluations are reported only on the original HLE benchmark, the HLE-Verified Official Acc. column lists the corresponding HLE scores rather than HLE-Verified results. All other results use our unified evaluation setting. Down-arrow annotations denote relative reductions in average turns over Vanilla RL. The asterisk indicates evaluation without tools, and a dash denotes an unreported or inapplicable result.                                                                                             
+
+> Model Official Setting BrowseComp HLE-Verified
+> Context Length Max Turns Official Acc. ↑Acc. ↑Avg Turns ↓Official Acc. ↑Acc. ↑Avg Turns ↓
+> GLM-4.5-Air 128k –21.30 14.49 31.23 10.60 *18.01 8.34 GLM-4.7 128k –52.00 28.78 31.07 42.80 33.56 14.00 GPT-OSS-120B –––14.57 30.47 19.00 25.29 4.24 DeepSeek-V4-Flash 512k 500 53.50 35.56 31.49 40.30 47.28 16.77 WebSailor-V2 128k 100 35.30 20.21 35.54 30.60 35.40 13.51 S1-Deep-Research 128k 150 36.70 22.83 38.54 30.30 27.82 12.00 GLM-4.5-Air-Midtrain 128k 60/100 17.59 17.59 11.53 17.09 17.09 4.38
+> Vanilla RL 128k 60/100 36.22 36.22 30.95 33.02 33.02 9.86
+> OTC-GRPO 128k 60/100 29.40 29.40 21.15 31.87 31.87 4.55
+> CRISP 128k 60/100 35.69 35.69 26.28 ↓15.1% 33.41 33.41 6.58 ↓33.2%
+
+Since Rans  
+
+> i
+
+gates the efficiency-aware reward, unsuccessful rollouts receive no efficiency bonus. This prevents the policy from being rewarded for short but incorrect trajectories. In other words, CRISP does not reward acting less in isolation; it rewards successful trajectories whose tool interactions contain a higher proportion of evidence-critical steps. We optimize the policy with GRPO (Shao et al. 2024) using the final reward Ri. By incorporating critical-step perception into the reward, CRISP guides the policy toward reducing redundant search while preserving interactions needed to gather evidence for correct answers. 
+
+# 4 Experiments 
+
+## Experimental Setup 
+
+Datasets and Models Our trained policies are initialized from GLM-4.5-Air-Midtrain, which we obtain by mid-training GLM-4.5-Air (Zeng et al. 2025) for agentic deep search. We use Qwen3.5-397B-A17B (Qwen Team 2026) as the teacher for Backward Evidence Induction and train a Qwen3.5-9B (Qwen Team 2026) student recognizer with teacher-labeled data built from collected search trajectories and a subset of BrowseComp-Plus (BCP) (Chen et al. 2026c) trajectories. We evaluate CRISP on two deep-search benchmarks that require multi-step evidence gathering rather than single-shot retrieval: BrowseComp (Wei et al. 2025), which targets hard-to-find web evidence and is closer to the BCP trajectories used to train the recognizer, and the pure-text subset of HLE-Verified (Zhai et al. 2026), a reliability-enhanced version of Humanity’s Last Exam (HLE) (Phan et al. 2025) that contains challenging multi-domain QA-style problems and serves as a cross-domain test of whether the learned critical-step structure generalizes beyond BCP-specific patterns. The resulting datasets contain approximately 1.3k questions for BrowseComp and 2.2k questions for HLE-Verified. For each benchmark, we randomly partition the questions into an 80% 
+
+training split and a 20% held-out test split. Agents operate in a tool-augmented environment: all tasks allow external web search and browsing, while HLE-Verified additionally permits executable code for computation-oriented reasoning. 
+
+Baselines We compare CRISP with these paradigms: 
+
+• Foundation Models with Tools We test general-purpose LLMs under our agent scaffold, including GPT-OSS-120B (Agarwal et al. 2025), GLM-4.5-Air (Zeng et al. 2025), GLM-4.7 (Zhipu AI 2025), and DeepSeek-V4-Flash (Xu et al. 2026). 
+
+• Open-Source Deep-Search Agents We compare with recent open-source deep search agents trained for long-horizon search, including S1-Deep-Research (Dong et al. 2026) and WebSailor-V2 (Li et al. 2025). 
+
+• Reward-Design Baselines We train policies from the same GLM-4.5-Air-Midtrain backbone under our RL setup, but vary the reward design. Vanilla RL uses only the outcome-based GRPO reward (Shao et al. 2024), and OTC-GRPO 
+
+(Wang et al. 2025) is an efficiency-oriented variant that penalizes tool-use cost to reduce interactions. 
+
+Implementation Details We train the critical-step recog-nizer with full-parameter supervised fine-tuning and apply it to each successful rollout during policy optimization. Ap-pendix A.2 provides a standalone evaluation of the recognizer and its critical-step extraction quality. For the efficiency-aware reward, we set α = 0 .7 to favor trajectories with a higher proportion of evidence-critical interactions, discouraging re-dundant exploration without uniformly penalizing tool use; a sensitivity analysis of α is provided in Appendix A.3. We set a small auxiliary reward weight λ = 0 .1, so that the efficiency signal guides successful trajectories without overriding an-swer correctness. We optimize the policy with GRPO. During training, all methods use a 131 ,072 -token context, tempera-ture 1.0, and top-p 1.0. Official evaluations often allow large interaction budgets to probe model capability, but practical deployments must also account for user-facing latency and the cost of search calls and inference. We therefore use tighter budgets of 60 turns for BrowseComp and 100 turns for HLE-Verified. Additional training configurations are provided in Appendix A.4. 
+
+Evaluation Evaluation uses the same experimental configu-ration as training. For metrics, we report Acc , the final-answer accuracy scored by task-specific LLM judges (GLM-4.7 for BrowseComp and GPT-OSS-120B for HLE-Verified), and 
+
+Avg Turns , the average tool-interaction turns per question. These metrics measure task effectiveness and interaction efficiency, respectively. All results are averaged over three independent runs. 
+
+## Main Results 
+
+Overall Performance Table 2 presents the main results on BrowseComp and HLE-Verified. Starting from the same backbone, both Vanilla RL and CRISP substantially improve answer accuracy, confirming the effectiveness of reinforce-ment learning for deep search. More importantly, CRISP consistently improves interaction efficiency while preserving answer quality: accuracy remains comparable on BrowseC-omp and slightly higher on HLE-Verified, while the average number of turns drops by 15.1% and 33.2%, respectively. These results show that CRISP reduces redundant interactions without suppressing the interactions needed to gather evi-dence for correct answers. The open-source models provide additional reference points under the same agent scaffold, showing substantial variation in both answer accuracy and interaction cost. 
+
+Efficiency Trade-off OTC-GRPO compresses trajectories more aggressively, but loses answer accuracy on both bench-marks. Compared with it, CRISP keeps slightly longer tra-jectories, with 5.13 and 2.03 more turns on BrowseComp and HLE-Verified, but gains 6.29 and 1.54 accuracy points, respectively. It suggests that the preserved interactions of CRISP often carry necessary evidence rather than redun-dancy. The accuracy degradation of OTC-GRPO is also more pronounced on BrowseComp, where the trajectories are substantially longer, indicating that aggressive compres-sion can be particularly harmful in longer-horizon search. Overall, uniformly favoring fewer tool calls may suppress not only redundant interactions but also evidence-critical steps necessary for solving difficult questions. By distinguishing critical from redundant interactions, CRISP reaches a better accuracy-efficiency trade-off. 
+
+## Analysis 
+
+Functional Validation of Critical-Step Recognition We further use trajectory intervention to examine whether the critical steps identified by the recognizer are more important for recovering the final answer. To avoid policy-recognizer co-adaptation, we use trajectories from Vanilla RL rather than CRISP. We randomly sample 100 examples from the HLE-Verified test set. For each example, we remove the original final-response step to prevent answer leakage. We then let the same policy continue generation with tool access under three contexts: the full trajectory prefix, only the predicted critical steps, or only the predicted redundant steps. The full-context setting controls for the variance introduced by Table 3: Trajectory intervention results. ∆Acc. and ∆Turns denote differences relative to the Full Context setting.                     
+
+> Context Acc. (%) Avg. Turns ∆Acc. ∆Turns Original Rollout 36.00 10.53 +1 .00 −0.56
+> Full Context 35.00 11.09 ––Critical Only 33.00 8.14 −2.00 −2.95
+> Redundant Only 27.00 11.67 −8.00 +0 .58
+
+regeneration itself, while the key comparison is between the critical-only and redundant-only settings. We report final-answer accuracy and the average number of total interaction turns of the resulting trajectories. As shown in Table 3, the full context achieves accuracy and average turns close to the original rollout, indicating limited degradation from regeneration. Retaining only the predicted critical steps preserves accuracy close to the full context while completing trajectories with markedly fewer turns, whereas retaining only the predicted redundant steps yields the lowest accuracy despite consuming the most turns. This asymmetric effect shows that the recognizer’s critical-step partition has functional meaning: the predicted critical steps carry information more relevant to the final answer, whereas the redundant steps lack this information, forcing the policy to spend additional turns searching to recover it. 
+
+Evidence Density Since critical steps are defined with respect to the evidence supporting the final answer, we analyze correctly answered evaluation trajectories and compute the proportion of tool-interaction steps predicted as critical by the recognizer. Compared with Vanilla RL, CRISP increases the average critical-step ratio from 34.06% to 41.09% on BrowseComp and from 42.06% to 53.09% on HLE-Verified, corresponding to relative improvements of 20.6% and 26.2%, respectively. These consistent gains indicate that CRISP produces trajectories with higher evidence density. Together with the reductions in average turns reported in Table 2, they show that CRISP improves efficiency by selectively reducing redundant interactions while preserving critical steps, rather than by indiscriminately shortening successful search trajectories. 
+
+Tool-Use Behavior To examine whether CRISP merely suppresses tool use or instead reshapes the interaction pattern, we report the average number of calls by tool type in Table 4. On BrowseComp, CRISP reduces search calls while increas-ing browsing calls, suggesting a shift from repeated broad querying toward more focused access to retrieved documents. This increase in browsing calls is particularly informative: CRISP does not simply learn to call tools less often, but reallo-cates interactions toward tools that are more likely to provide evidence once candidate documents have been retrieved. On HLE-Verified, CRISP reduces search, browsing, and code calls simultaneously, indicating that it removes unnecessary interactions more broadly across both information seeking and computation. This opposite trend reflects the different search demands of the two benchmarks. BrowseComp of-ten requires long-horizon web exploration over diverse and Table 4: Average number of tool calls per question by tool type. ∆ denotes the change from Vanilla RL to CRISP.                         
+
+> Benchmark Tool Vanilla RL CRISP ∆
+> BrowseComp Search 28.98 23.46 -5.52 BrowseComp Browsing 1.15 1.95 +0.80 HLE-Verified Search 4.01 2.64 -1.37 HLE-Verified Browsing 1.48 1.13 -0.35 HLE-Verified Code 3.40 1.82 -1.58
+
+noisy evidence sources, so after reducing repeated search calls, CRISP allocates more interactions to browsing candi-date documents and extracting useful evidence. In contrast, HLE-Verified involves shorter trajectories with more concen-trated information needs, where CRISP can reduce redundant follow-up browsing together with search and code calls. Over-all, these benchmark-specific changes suggest that CRISP reshapes the model’s tool-use pattern, preserving interactions that are likely to support evidence acquisition while reducing those that mainly contribute redundant exploration. 
+
+Exploration after Reward Removal A potential concern is that the efficiency-aware reward may reduce interaction cost by suppressing policy exploration. To examine this possibility, we remove the efficiency-aware reward from CRISP and continue training both the Vanilla RL and CRISP policies on HLE-Verified under the same outcome-only objective. After reward removal, the CRISP policy retains a substantially higher policy entropy of 0.672, compared with 0.405 for Vanilla RL. Higher entropy indicates that CRISP maintains a broader action distribution rather than converging to a narrowly deterministic strategy. At the same time, CRISP achieves an answer accuracy of 33.71%, which is comparable to the 33.56% obtained by Vanilla RL. Its average number of interaction turns also remains markedly lower, decreasing from 10.18 for Vanilla RL to 6.43 for CRISP. The coexistence of higher entropy, comparable accuracy, and shorter trajectories suggests that CRISP does not obtain efficiency through low-entropy policy collapse. Instead, the learned policy preserves diverse action choices while becoming more selective about when additional interactions are useful. The persistence of this behavior after removing the efficiency-aware reward further demonstrates that CRISP induces a lasting change in the policy rather than a temporary response to the auxiliary reward signal. 
+
+Failure Diagnostics To examine whether CRISP’s effi-ciency gains also improve execution reliability, we compute the failure rate, defined as the percentage of evaluation queries where the agent produces no valid final response due to in-terrupted execution or unparsable actions; incorrect but valid final answers are not counted. As shown in Figure 3, CRISP lowers the failure rate, with relative reductions of 21.6% on BrowseComp and 21.8% on HLE-Verified. Figure 3 further decomposes these failed trajectories by di-agnostic cause. Max-turn exceeded means that the interaction budget is exhausted before a final response is produced, while 
+
+prompt overflow indicates that the accumulated trajectory exceeds the context window. Malformed tool-call JSON and 
+
+Figure 3: Composition of diagnostic failure modes on BrowseComp and HLE-Verified. Each stacked segment shows one failure cause, and the number at the right of each bar is the total failure rate; causes below 0.5% are grouped as Other. 
+
+malformed tool-call tag denote invalid tool-call content and invalid enclosing tag structure, respectively. No valid action parsed refers to cases in which the model attempts no tool call at all and commits to no final answer. This breakdown suggests that CRISP mainly reduces fail-ures caused by excessive trajectory growth and redundant interactions. On BrowseComp, the dominant max-turn failure becomes less frequent, consistent with the reduction in re-peated search calls observed above. On HLE-Verified, prompt overflow and tool-formatting failures both decline, indicating that shorter and more selective trajectories reduce context accumulation while also limiting the number of tool-call gen-eration points where formatting errors can occur. Although no valid action parsed accounts for a substantial share of the remaining failures, CRISP still achieves a lower overall failure rate, indicating that its selective reduction of redundant interactions improves end-to-end reliability. Overall, by re-ducing redundant tool interactions, CRISP not only improves efficiency but also makes execution more reliable. 
+
+# 5 Conclusion 
+
+In this work, we present CRISP, a framework for training efficient deep search agents through critical-step perception. CRISP uses Backward Evidence Induction to annotate search trajectories by tracing backward from the final answer and judging whether each tool-interaction step provides critical evidence. It then distills these step-wise judgments into a generative recognizer that analyzes full trajectories and sum-marizes their critical steps. During policy optimization, the recognizer guides the agent toward successful trajectories with a higher proportion of evidence-critical interactions and fewer redundant tool calls. Experiments on BrowseComp and HLE-Verified show that CRISP maintains competitive accuracy while reducing average interaction turns by 15.1% and 33.2%, respectively. These results suggest that critical-step perception provides a practical path toward deep search agents with effective tool use and reduced redundancy. References 
+
+Agarwal, S.; Ahmad, L.; Ai, J.; Altman, S.; Applebaum, A.; Arbus, E.; Arora, R. K.; Bai, Y.; Baker, B.; Bao, H.; et al. 2025. gpt-oss-120b & gpt-oss-20b model card. arXiv preprint arXiv:2508.10925 .Chen, D.; Zong, Z.; Ma, Z.; Luo, L.; Li, Y.; Li, C.; Chen, P.; and Jiang, J. 2026a. Efficient Agentic Reinforcement Learning with On-Policy Intrinsic Knowledge Boundary Enhancement. 
+
+arXiv preprint arXiv:2605.26952 .Chen, M.; Sun, L.; Li, T.; Sun, H.; Zhou, Y.; Zhu, C.; Wang, H.; Pan, J.; Zhang, W.; Chen, H.; et al. 2025a. ReSearch: Learning to Reason with Search for LLMs via Reinforcement Learning. arXiv preprint arXiv:2503.19470 .Chen, Y.; Dong, G.; Dou, Z.; et al. 2026b. ET-Agent: In-centivizing Effective Tool-Integrated Reasoning Agent via Behavior Calibration. arXiv preprint arXiv:2601.06860 .Chen, Z.; Li, M.; Huang, Y.; Du, Y.; Fang, M.; and Zhou, T. 2025b. ATLAS: Agent Tuning via Learning Critical Steps. In Che, W.; Nabende, J.; Shutova, E.; and Pilehvar, M. T., eds., 
+
+Findings of the Association for Computational Linguistics: ACL 2025 , 25334–25349. Vienna, Austria: Association for Computational Linguistics. ISBN 979-8-89176-256-5. Chen, Z.; Ma, X.; Zhuang, S.; Nie, P.; Zou, K.; Sharifymoghad-dam, S.; Liu, A.; Green, J.; Patel, K.; Meng, R.; Su, M.; Li, Y.; Hong, H.; Shi, X.; Liu, X.; Oyarhoseini, H.; Thakur, N.; Zhang, C.; Gao, L.; Chen, W.; and Lin, J. 2026c. BrowseComp-Plus: A Fair and Disentangled Evaluation Benchmark for Deep Search Agents. In Liakata, M.; Moreira, V. P.; Zhang, J.; and Jurgens, D., eds., Proceedings of the 64th Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers) , 22349–22370. San Diego, California, United States: Association for Computational Linguistics. ISBN 979-8-89176-390-6. Dong, G.; Chen, Y.; Li, X.; Jin, J.; Qian, H.; Zhu, Y.; Mao, H.; Zhou, G.; Dou, Z.; and Wen, J.-R. 2025. Tool-star: Em-powering llm-brained multi-tool reasoner via reinforcement learning. arXiv preprint arXiv:2505.16410 .Dong, Y.; Xiao, X.; Dong, L.; Jin, X.; Li, Z.; Zhang, H.; Wang, D.; and Xu, N. 2026. S1-DeepResearch: Beyond Search, Toward Real-World Long-Horizon Research Agents. 
+
+arXiv preprint arXiv:2606.15367 .Guo, D.; Yang, D.; Zhang, H.; Song, J.; Wang, P.; Zhu, Q.; Xu, R.; Zhang, R.; Ma, S.; Bi, X.; et al. 2025. DeepSeek-R1 incentivizes reasoning in LLMs through reinforcement learning. Nature , 645(8081): 633–638. Gupta, N.; Chatterjee, R.; Haas, L.; Tao, C.; Wang, A.; Liu, C.; Oiwa, H.; Gribovskaya, E.; Ackermann, J.; Blitzer, J.; et al. 2026. DeepSearchQA: Bridging the Comprehensiveness Gap for Deep Research Agents. arXiv preprint arXiv:2601.20975 .Huang, L.; Liu, Y.; Jiang, J.; Zhang, R.; Yan, J.; Li, J.; and Zhao, W. X. 2025a. ManuSearch: Democratizing Deep Search in Large Language Models with a Transparent and Open Multi-Agent Framework. In Christodoulopoulos, C.; Chakraborty, T.; Rose, C.; and Peng, V., eds., Findings of the Association for Computational Linguistics: EMNLP 2025 ,2403–2417. Suzhou, China: Association for Computational Linguistics. ISBN 979-8-89176-335-7. Huang, Y.; Chen, Y.; Zhang, H.; Li, K.; Zhou, H.; Fang, M.; Yang, L.; Li, X.; Shang, L.; Xu, S.; et al. 2025b. Deep research agents: A systematic examination and roadmap. 
+
+arXiv preprint arXiv:2506.18096 .Huang, Z.; Yuan, X.; Ju, Y.; Zhao, J.; and Liu, K. 2025c. Reinforced internal-external knowledge synergistic reason-ing for efficient adaptive search agent. arXiv preprint arXiv:2505.07596 .Jin, B.; Zeng, H.; Yue, Z.; Yoon, J.; Arik, S. O.; Wang, D.; Zamani, H.; and Han, J. 2025. Search-R1: Training LLMs to Reason and Leverage Search Engines with Reinforcement Learning. In Second Conference on Language Modeling .Lan, T.; Zhu, B.; Jia, Q.; Ren, J.; Li, H.; Wang, L.; Xu, Z.; Luo, W.; and Zhang, K. 2025. Deepwidesearch: Benchmarking depth and width in agentic information seeking. arXiv preprint arXiv:2510.20168 .Li, D.; Yao, Y.; Tan, Z.; Liu, H.; and Guo, R. 2026a. ToolPRM-Bench: Evaluating and Advancing Process Reward Models for Tool-using Agents. arXiv preprint arXiv:2601.12294 .Li, K.; Zhang, Z.; Yin, H.; Ye, R.; Zhao, Y.; Zhang, L.; Ou, L.; Zhang, D.; Wu, X.; Wu, J.; et al. 2025. Websailor-v2: Bridging the chasm to proprietary agents via synthetic data and scalable reinforcement learning. arXiv preprint arXiv:2509.13305 .Li, M.; Zeng, Q.; Fang, T.; Liang, Z.; Song, L.; Liu, Q.; Mi, H.; and Yu, D. 2026b. Verified Critical Step Optimization for LLM Agents. arXiv preprint arXiv:2602.03412 .Li, X.; Jin, J.; Dong, G.; Qian, H.; Wu, Y.; Wen, J.-R.; Zhu, Y.; and Dou, Z. 2026c. Webthinker: Empowering large reasoning models with deep research capability. Advances in Neural Information Processing Systems , 38: 120091–120131. Lin, T.-H.; Chen, W.-L.; Li, C.-A.; Lee, H.-y.; Chen, Y.-N.; and Meng, Y. 2025. AdaSearch: Balancing Parametric Knowledge and Search in Large Language Models via Reinforcement Learning. arXiv preprint arXiv:2512.16883 .Nguyen, X.-P.; Pandit, S.; Reddy, R. G.; Xu, A.; Savarese, S.; Xiong, C.; and Joty, S. 2025. Sfr-deepresearch: Towards effective reinforcement learning for autonomously reasoning single agents. arXiv preprint arXiv:2509.06283 .Phan, L.; Gatti, A.; Han, Z.; Li, N.; Hu, J.; Zhang, H.; Zhang, C. B. C.; Shaaban, M.; Ling, J.; Shi, S.; et al. 2025. Humanity’s last exam. arXiv preprint arXiv:2501.14249 .Qian, C.; Acikgoz, E. C.; Wang, H.; Chen, X.; Sil, A.; Hakkani-Tür, D.; Tur, G.; and Ji, H. 2025. SMART: Self-Aware Agent for Tool Overuse Mitigation. In Che, W.; Nabende, J.; Shutova, E.; and Pilehvar, M. T., eds., Findings of the Association for Computational Linguistics: ACL 2025 , 4604–4621. Vienna, Austria: Association for Computational Linguistics. ISBN 979-8-89176-256-5. Qin, T.; Chen, Q.; Wang, S.; Xing, H.; Zhu, K.; Zhu, H.; Shi, D.; Liu, X.; Zhang, G.; Liu, J.; et al. 2025. Flash-searcher: Fast and effective web agents via dag-based parallel execution. 
+
+arXiv preprint arXiv:2509.25301 .Qiu, Z.; Qiao, S.; Xu, K.; Zhu, Y.; Du, L.; Zhang, N.; and Chen, H. 2026. Rewarding the scientific process: Process-level reward modeling for agentic data analysis. arXiv preprint arXiv:2604.24198 .Qu, C.; Dai, S.; Cai, H.; Xu, J.; Wang, S.; and Yin, D. 2026. MatchTIR: Fine-Grained Supervision for Tool-Integrated Reasoning via Bipartite Matching. arXiv preprint arXiv:2601.10712 .Qwen Team. 2026. Qwen3.5: Towards Native Multimodal Agents. Shao, Z.; Wang, P.; Zhu, Q.; Xu, R.; Song, J.; Bi, X.; Zhang, H.; Zhang, M.; Li, Y.; Wu, Y.; et al. 2024. Deepseekmath: Pushing the limits of mathematical reasoning in open language models. arXiv preprint arXiv:2402.03300 .Song, H.; Jiang, J.; Min, Y.; Chen, J.; Chen, Z.; Zhao, W. X.; Fang, L.; and Wen, J.-R. 2025. R1-searcher: Incentivizing the search capability in llms via reinforcement learning. arXiv preprint arXiv:2503.05592 .Sun, H.; Qiao, Z.; Guo, J.; Fan, X.; Hou, Y.; Jiang, Y.; Xie, P.; Zhang, Y.; Huang, F.; and Zhou, J. 2025. Zerosearch: Incentivize the search capability of llms without searching. 
+
+arXiv preprint arXiv:2505.04588 .Tang, Q.; Xiang, H.; Yu, L.; Yu, B.; Lu, Y.; Han, X.; Sun, L.; Zhang, W.; Wang, P.; Liu, S.; et al. 2025. Beyond turn limits: Training deep search agents with dynamic context window. 
+
+arXiv preprint arXiv:2510.08276 .Team, T. D.; Li, B.; Zhang, B.; Zhang, D.; Huang, F.; Li, G.; Chen, G.; Yin, H.; Wu, J.; Zhou, J.; et al. 2025. Tongyi deep-research technical report. arXiv preprint arXiv:2510.24701 .Wang, H.; Qian, C.; Zhong, W.; Chen, X.; Qiu, J.; Huang, S.; Jin, B.; Wang, M.; Wong, K.-F.; and Ji, H. 2025. Acting Less is Reasoning More! Teaching Language Model to Act Efficiently. In NeurIPS 2025 Workshop on Bridging Language, Agent, and World Models for Reasoning and Planning .Wei, J.; Sun, Z.; Papay, S.; McKinney, S.; Han, J.; Fulford, I.; Chung, H. W.; Passos, A. T.; Fedus, W.; and Glaese, A. 2025. Browsecomp: A simple yet challenging benchmark for browsing agents. arXiv preprint arXiv:2504.12516 .Wu, F.; Xuan, W.; Qi, H.; Lu, X.; Tu, A.; Li, L. E.; and Choi, Y. 2025a. DeepSearch: Overcome the Bottleneck of Reinforcement Learning with Verifiable Rewards via Monte Carlo Tree Search. arXiv preprint arXiv:2509.25454 .Wu, X.; Li, K.; Zhao, Y.; Zhang, L.; Ou, L.; Yin, H.; Zhang, Z.; Yu, X.; Zhang, D.; Jiang, Y.; et al. 2025b. Resum: Unlocking long-horizon search intelligence via context summarization. 
+
+arXiv preprint arXiv:2509.13313 .Xi, Y.; Lin, J.; Xiao, Y.; Zhou, Z.; Shan, R.; Gao, T.; Zhu, J.; Liu, W.; Yu, Y.; and Zhang, W. 2025. A survey of llm-based deep search agents: Paradigm, optimization, evaluation, and challenges. arXiv preprint arXiv:2508.05668 .Xu, A.; Lin, B.; Xue, B.; Wang, B.; Xu, B.; Wu, B.; Zhang, B.; Lin, C.; Dong, C.; Ling, C.; et al. 2026. Deepseek-v4: Towards highly efficient million-token context intelligence. 
+
+arXiv preprint arXiv:2606.19348 .Yan, S.; Tong, J.; Xue, H.; Tang, X.; Wang, Y.; Shi, K.; Zhang, G.; Li, R.; and Zou, Y. 2026. Act wisely: Cultivating meta-cognitive tool use in agentic multimodal models. arXiv preprint arXiv:2604.08545 .Zeng, A.; Lv, X.; Zheng, Q.; Hou, Z.; Chen, B.; Xie, C.; Wang, C.; Yin, D.; Zeng, H.; Zhang, J.; et al. 2025. Glm-4.5: Agentic, reasoning, and coding (arc) foundation models. 
+
+arXiv preprint arXiv:2508.06471 .Zhai, W.; Wang, Z.; Wang, J.; Yang, B.; Li, X.; Xu, X.; Wang, B.; Wang, P.; Wu, X.; Li, A.; et al. 2026. HLE-Verified: A Systematic Verification and Structured Revision of Humanity’s Last Exam. arXiv preprint arXiv:2602.13964 .Zheng, Y.; Fu, D.; Hu, X.; Cai, X.; Ye, L.; Lu, P.; and Liu, P. 2025. Deepresearcher: Scaling deep research via reinforce-ment learning in real-world environments. In Proceedings of the 2025 Conference on Empirical Methods in Natural Language Processing , 414–431. Zhipu AI. 2025. GLM-4.7: Advancing the Coding Capability. Zhu, K.; Li, H.; Wu, S.; Xing, T.; Ma, D.; Tang, X.; Liu, M.; Yang, J.; Liu, J.; Jiang, Y. E.; et al. 2025. Scaling test-time compute for llm agents. arXiv preprint arXiv:2506.12928 .A.1 Prompts 
+
+We provide the full prompt templates used in our pipeline. In Stage 1 (Backward Evidence Induction), the teacher critic (Prompt 1) is queried once per candidate step: starting from the final answer and tracing the trajectory backward, it judges whether a single 
+
+current step is evidence-critical, conditioned on the confirmed valid future steps retained so far, and emits a compact JSON verdict. Since per-step querying is accurate but costly, Stage 2 (Critical-Step Recognizer Distillation) distills the teacher into a student recognizer (Prompt 2) that ingests the entire trajectory at once and reproduces the same backward judgement as a single chain of thought terminating in a critical-step list. Both prompts serialize trajectory content through a shared step schema (Figure 6): the teacher’s {Valid_Future_Steps_String} and the student’s {Full_Trajectory} are instantiated from the same 
+
+[Step N] / Thought / Action / Observation template. Runtime placeholders (e.g., {Question} , {Final_Answer} ) are filled per instance. Here {Last_Step_Num} is the final-answer step index, where backward evaluation begins. 
+
+Prompt 1 — Teacher Critic (per-step backward evaluation, Stage 1) 
+
+You are an expert in AI trajectory analysis and reward modeling. Your task is to evaluate whether the "Current Step" is a critical and non-redundant part of the minimal evidence chain that preserves the necessary evidence for the final answer. 
+
+[Input Information] 
+
+1. Target Question: {Question} 2. Final Answer (Step {Last_Step_Num}): {Final_Answer} 3. Current Step to Evaluate (Step {Current_Step_Num}): Thought: {Current_Thought} Action: {Current_Action} Observation: {Current_Observation} 4. Thought From Next Step (Step {Next_Step_Num}): {Next_Thought} 5. Confirmed Valid Future Steps (already extracted critical steps, back to front): {Valid_Future_Steps_String} # see Figure 3 for the step format 
+
+[Evaluation Criteria] 
+
+To be marked as critical (`true `), the Current Step MUST satisfy BOTH [Condition A] AND [Condition B]. 
+
+[Condition A]: Evidence Value 
+
+The step must satisfy at least ONE of the following: 1. Direct Evidence Contribution: Its `Observation ` directly contains facts, data, document content, or document IDs that are necessary for supporting the Final Answer. 2. Evidence-Enabling Contribution: Its `Observation ` provides a document identifier, URL, entity anchor, or other specific pointer that directly enables later steps to access, open, or identify necessary evidence. Mere help for search planning, query writing, or reasoning is NOT sufficient. When judging whether the Current Step provides useful information, you may use the Thought From Next Step as an auxiliary hint for what information from the Current Step was actually noticed and used downstream. However, the Thought From Next Step is only supporting evidence and does NOT by itself make the Current Step critical. 
+
+[Condition B]: Non-Redundant Marginal Evidence Gain 
+
+Because we are evaluating backward, the Current Step is redundant if its necessary evidence, or its evidence-enabling contribution, is already contained more directly or more completely in the [Confirmed Valid Future Steps]. Use the following redundancy rules: - If a later confirmed valid step already contains the same necessary evidence more directly or more completely, prefer the later step. - If the Current Step only provides a weaker clue, but a later step provides the actual necessary evidence, mark the Current Step as false. - If the later steps only partially overlap, or do not clearly replace the Current Step's evidence value, keep the Current Step. 
+
+[Tool-Specific Guidance] 
+
+- Content-access steps are stronger evidence carriers than broad search-result steps. - If a content-access step contains necessary evidence, prefer keeping it unless later valid steps clearly contain the same evidence. - A search-result step should be kept only if: (a) it already contains necessary evidence that is not clearly recovered later, OR (b) it uniquely and directly points to necessary evidence later valid steps rely on. - Do NOT keep a search step merely because it suggested a direction, keyword, or candidate. 
+
+[Strict Exclusions] (Must be `false `)
+
+- Mine-sweeping or negative results: steps that only rule out an incorrect option or confirm what is NOT the answer. - Trial-and-error, API errors, 404 pages, or hallucinations. - Steps that only help later Thought formulation, but do not carry or directly enable necessary evidence. 
+
+[Output Format] 
+
+Output your analysis strictly in the following JSON format: {"brief_reasoning": "Briefly explain: 1) whether this step provides direct evidence or evidence-enabling value; 2) what necessary evidence it supports; 3) whether later valid steps clearly replace it.", "is_critical": true/false }
+
+Figure 4: Teacher critic prompt (Stage 1). The teacher evaluates one candidate step at a time, conditioned on the confirmed valid future steps, and emits a JSON criticality verdict. 
+
+Prompt 2 — Student Recognition Model (full-trajectory backward labeling, Stage 2) 
+
+You are an expert in AI trajectory analysis and reward modeling. Your task is to label which steps in a full agent trajectory are critical, non-redundant parts of the minimal evidence chain that preserves the necessary evidence for the final answer. 
+
+[Input Information] 
+
+1. Target Question: {Question} 2. Final Answer (Step {Last_Step_Num}): {Final_Answer} 3. Full Trajectory: {Full_Trajectory} # see Figure 3 for the step format 
+
+[Goal] 
+
+Identify the minimal set of trajectory steps that are necessary to preserve the evidence used to support the Final Answer. 
+
+[Evaluation Criteria] 
+
+A step is `critical ` if it satisfies BOTH [Condition A] and [Condition B]. 
+
+[Condition A]: Evidence Value 
+
+The step must satisfy at least ONE of the following: 1. Direct Evidence Contribution: Its `Observation ` directly contains facts, data, document content, or document IDs that are necessary for supporting the Final Answer. 2. Evidence-Enabling Contribution: Its `Observation ` provides a document identifier, URL, entity anchor, or other specific pointer that directly enables later steps to access, open, or identify necessary evidence. Mere help for search planning, query writing, or reasoning is NOT sufficient. Later steps may be used as auxiliary evidence to infer what information from an earlier step was actually noticed and used downstream. However, being noticed or used later does NOT by itself make an earlier step critical. An earlier step is critical only if it is necessary for preserving the minimal evidence chain. 
+
+[Condition B]: Non-Redundant Marginal Evidence Gain 
+
+A step is redundant if its necessary evidence, or its evidence-enabling contribution, is already provided more directly or more completely by other retained steps. Use the following redundancy rules: - If a later step already contains the same necessary evidence more directly or more completely, prefer the later step. - If a step only provides a weaker clue, but another retained step provides the actual necessary evidence, mark the weaker step as non-critical. - If later steps only partially overlap, or do not clearly replace the step's evidence value, keep the step. 
+
+[Tool-Specific Guidance] 
+
+- Content-access steps are stronger evidence carriers than broad search-result steps. - If a content-access step contains necessary evidence, prefer keeping it unless another retained step clearly contains the same evidence. - A search-result step should be kept only if: (a) it already contains necessary evidence that is not clearly recovered later, OR (b) it uniquely and directly points to a necessary evidence document that later retained steps rely on. - Do NOT keep a search step merely because it suggested a direction, keyword, or candidate. 
+
+[Strict Exclusions] (Must be `non_critical `)
+
+- Mine-sweeping or negative results: steps that only rule out an incorrect option or confirm what is NOT the answer. - Trial-and-error, API errors, 404 pages, or hallucinations. - Steps that only help later thought formulation, but do not carry or directly enable necessary evidence. 
+
+[Output Format] 
+
+Please output the analysis in a step-by-step thinking chain, from the last step to the first step. For each step, include: [Step N] Thought: Describe your reasoning for whether this step is critical. Critical: True/False After all steps, provide a [Step Summary] section listing all critical step numbers: [Step Summary] Critical Steps: [Critical_Steps_List] 
+
+Figure 5: Student recognizer prompt (Stage 2). The distilled recognizer reads the entire trajectory at once and reproduces the backward judgement as a single chain of thought. 
+
+Shared Trajectory Step Format (used by both prompts) 
+
+Both the teacher's {Valid_Future_Steps_String} and the student's {Full_Trajectory} are serialized in the following unified step format (steps are listed back to front for the teacher, and front to back for the student): [Step N] Thought: <the agent's reasoning at this step> Action: <the tool call issued at this step> Observation: <the raw content returned by the tool> [Step N-1] Thought: ... Action: ... Observation: ... ... 
+
+Figure 6: The shared trajectory step schema used by both prompts. The teacher’s confirmed valid future steps and the student’s full trajectory are both serialized through this template. 
+
+## A.2 Evaluation of the Critical-Step Recognizer 
+
+In this section, we evaluate whether the critical-step recognizer can perceive evidence-critical steps in deep search trajectories. The evaluation is conducted on BrowseComp-Plus (BCP), which provides gold evidence document IDs for each question. We treat a trajectory step as evidence-critical if its observation contains a gold evidence document ID, and use these gold-bearing steps as ground truth to assess the steps extracted by each method. Since critical-step perception is defined with respect to the evidence chain supporting the final answer, we only evaluate trajectories with correct final answers. 
+
+Evaluation protocol We evaluate under two settings. On the full BCP set, we analyze different critical-step extraction strategies on correct GLM-4.7 trajectories, comparing annotation strategies and extraction feasibility (Table 5). This comparison does not involve the trained recognizer, so it can use all correct trajectories. To evaluate the distilled recognizer itself, we use a held-out 
+
+BCP split: because the teacher-labeled SFT data for the recognizer are built from collected search trajectories together with a subset of BCP trajectories, the recognizer must be tested on trajectories that are not included in its SFT data to avoid leakage (Table 6). 
+
+Evaluation metrics We evaluate extracted critical steps by matching them against the gold evidence document IDs provided by BCP. Throughout this evaluation, we operationalize evidence as the gold evidence document IDs provided by BCP: a trajectory step is said to bear evidence if and only if its observation contains at least one gold evidence document ID. All metrics below are therefore computed by matching document IDs rather than by judging semantic content. Let M denote the number of evaluated trajectories, indexed by j. Each trajectory answers a question of BCP. For each trajectory j, let Gj denote the gold evidence document IDs set of the question, and let Dtraj  
+
+> j
+
+denote all document IDs that appear in the original full trajectory. Given an extraction method, we parse the predicted critical steps and collect the document IDs appearing in their observations, denoted as 
+
+Dext  
+
+> j
+
+. If the method fails to produce a valid and parsable critical-step list, we set Dext  
+
+> j
+
+= ∅ for recall and coverage computation. 
+
+Success rate measures the percentage of trajectories for which a valid critical-step list can be successfully parsed. Failures may be caused by output truncation, invalid formatting, or the model being distracted by long noisy trajectories. 
+
+Origin recall measures the evidence coverage of the original trajectory before extraction: 
+
+OriginRecall = 1
+
+M
+
+> M
+
+X
+
+> j=1
+
+|D traj  
+
+> j
+
+∩ G j ||G j | . (8) This metric reflects the upper bound imposed by whether the gold evidence documents appear in the trajectory. 
+
+Extract recall measures the fraction of gold evidence documents covered by the extracted critical steps: 
+
+ExtractRecall = 1
+
+M
+
+> M
+
+X
+
+> j=1
+
+|D ext  
+
+> j
+
+∩ G j ||G j | . (9) 
+
+Evidence coverage accuracy is a stricter case-level metric that measures whether all gold evidence documents are covered: 
+
+CoverageAcc = 1
+
+M
+
+> M
+
+X
+
+> j=1
+
+I Gj ⊆ D ext 
+
+> j
+
+ . (10) 
+
+Step hit measures what fraction of the steps our method extracts as critical are genuinely critical, i.e., the precision of the perceived critical steps. Since we operationalize a genuinely critical step as one that bears evidence, we count an extracted step as a hit if its observation contains at least one gold evidence document ID. Let Cj be the set of extracted critical steps for trajectory 
+
+j, and let D(s) denote the document IDs appearing in step s. We compute step hit as: 
+
+StepHit = 
+
+PMj=1 
+
+P 
+
+> s∈C j
+
+I [D(s) ∩ G j̸ = ∅]
+
+PMj=1 |C j | . (11) Together, these metrics capture what a good critical-step recognizer needs: completeness and precision. Origin recall is the upper bound fixed by the trajectory, so the completeness metrics, extract recall and coverage accuracy (the latter being the stricter all-or-nothing version), are read against it to show how much recoverable evidence is actually perceived. Step hit measures precision: what fraction of the extracted steps are genuinely critical rather than redundant. A recognizer is effective when recall and coverage stay close to the origin-recall ceiling at a high step hit, perceiving the evidence chain completely without inflating it. Success rate is a prerequisite, since an unparsable output perceives nothing. 
+
+Annotation strategy analysis We first compare different critical-step extraction strategies. Teacher Direct asks the teacher model (Qwen3.5-397B-A17B) to read the full trajectory and extract all critical steps in one pass. Teacher Backward applies the same teacher model with our proposed Backward Evidence Induction (BEI, Stage 1), judging one candidate step at a time from the final response backward. Student Direct uses the untrained student backbone (Qwen3.5-9B), the same model later distilled into our recognizer, to perform direct full-trajectory extraction. It serves as a before-distillation reference for whether a smaller model can perform this task on its own. The results show that backward step-wise annotation provides more reliable teacher supervision. Compared with direct extraction using the same teacher, backward extraction improves both extract recall and evidence coverage accuracy while maintaining a Method Success Extract Recall Coverage Acc. Step Hit Complexity Teacher Direct 100.0% 0.7780 72.94% 0.9712 O(1)           
+
+> Teacher Backward 100.0% 0.7995 80.30% 0.9803 O(n)
+> Student Direct 38.7% 0.2746 24.24% 0.9361 O(1)
+
+Table 5: Annotation strategy analysis on correct BCP trajectories generated by GLM-4.7. The original full trajectories have an origin recall of 0.8422. Backward annotation provides better evidence coverage than direct extraction with the same teacher. Method Extract Recall Coverage Acc. Step Hit Teacher Backward 0.7891 83.51% 0.9791 Student Recognizer 0.7975 85.57% 0.9847 
+
+Table 6: Held-out evaluation of the distilled critical-step recognizer on correct GLM-4.7 trajectories from the BCP held-out split. The original full trajectories have an origin recall of 0.8229. The student recognizer achieves teacher-level performance with a single full-trajectory inference pass. perfect extraction success rate. This suggests that decomposing trajectory annotation into local backward decisions helps the teacher perceive evidence-critical steps more accurately from long and noisy trajectories. The comparison with the untrained smaller model further motivates the need for distillation. Although direct extraction only requires a single model call, the untrained smaller model succeeds on only a minority of trajectories and obtains substantially lower evidence coverage. This indicates that critical-step extraction is not a trivial formatting task for smaller models, especially under long full-trajectory inputs. 
+
+Held-out recognizer evaluation We then evaluate the distilled student recognizer on the held-out BCP split. The student recognizer performs single-pass full-trajectory critical-step analysis, while the backward teacher uses step-wise annotation. This comparison tests whether the student can absorb the teacher’s backward evidence judgment behavior while avoiding the O(n)
+
+cost of teacher annotation. Note that this table and the annotation strategy analysis in Table 5 are computed on different BCP subsets, so the teacher numbers are not directly comparable across the two tables; each table should be read as an internally consistent comparison. As shown in Table 6, the distilled recognizer matches the backward teacher on held-out trajectories, slightly surpassing the teacher reference on extract recall, evidence coverage accuracy, and step hit. This indicates that the student can reliably perceive evidence-critical steps from unseen BCP trajectories with a single inference pass. Together with the annotation strategy analysis in Table 5, these results support our design of using backward teacher annotation for offline supervision construction and distilling it into an efficient single-pass critical-step recognizer. 
+
+## A.3 Sensitivity Analysis of α
+
+The coefficient α in the efficiency-aware reward Rcrit  
+
+> i
+
+= Ki/(Ki + αT i) controls how strongly redundant interaction steps are penalized relative to evidence-critical ones. A larger α shrinks the reward whenever redundant steps Ti dominate, pushing the policy toward trajectories with a higher critical-step ratio, whereas a small α leaves redundant exploration almost unpenalized. Since this single coefficient governs the accuracy–efficiency balance that is central to CRISP, we study how it shapes the learned search behavior. We vary α ∈ { 0.5, 0.7, 1.0} and evaluate on HLE-Verified, comparing all variants at the same number of optimization steps for a fair comparison. Table 7 reports answer accuracy, failure rate, and average interaction turns; the α = 0 .7
+
+setting corresponds to the CRISP configuration used throughout the main experiments. The results reveal a non-monotonic trade-off rather than a “smaller-is-always-shorter” trend. With a weak penalty ( α = 0 .5), redundant exploration is largely left unpruned: the policy still takes many interaction turns on average, yet attains the lowest accuracy and the highest failure rate. Because redundant steps are barely discouraged, the reward provides little pressure to reallocate interactions toward evidence-critical ones, so the policy retains noisy trajectories that inflate both cost and failures. With a strong penalty ( α = 1 .0), interaction cost is minimized and the failure rate is lowest, but accuracy drops: penalizing redundancy too aggressively begins to suppress steps that gather necessary evidence, trading answer quality for brevity. Setting 
+
+α = 0 .7 attains the best accuracy while already reducing mean turns to nearly the level of the α = 1 .0 setting. In other words, most of the efficiency gain is realized once redundant steps are moderately penalized, and pushing α higher buys only a marginal turn reduction at a clear accuracy cost. This pattern is consistent with the central claim of the main paper: the goal is not to act less, but to preserve evidence-critical interactions while pruning redundant ones. A moderate α removes redundancy without eroding the evidence chain, which is exactly why the α = 0 .7 CRISP policy in our main experiments reduces average turns without sacrificing final-answer accuracy. We therefore adopt α = 0 .7 in all main experiments, and note that CRISP is robust to this choice: all three settings improve efficiency over Vanilla RL, and the accuracy varies within a narrow range across the studied settings. α Acc ↑ Fail Rate ↓ Avg. Turns ↓         
+
+> 0.531 .49 14 .25 9.18
+> 0.733 .41 12 .10 6.58 1.032 .18 11 .49 6.21
+
+Table 7: Sensitivity of the redundancy penalty α on HLE-Verified. All variants are trained from the same backbone and compared at the same number of optimization steps. Acc is final-answer accuracy, Fail Rate is the percentage of queries with no valid final response, and Avg. Turns is the mean number of tool-interaction turns per query. α = 0 .7 (used in main experiments) achieves the best accuracy while retaining most of the efficiency gain. 
+
+## A.4 Training Details 
+
+We provide the training hyperparameters used for the critical-step recognizer and policy optimization. The critical-step recognizer is trained for 3 epochs with a peak learning rate of 2 × 10 −5, 5% warmup, weight decay 0.1, global batch size 64 , and maximum sequence length 131 ,072 . For policy optimization, we use GRPO with rollout group size G = 8 , global batch size 128 , and a constant learning rate of 1 × 10 −6. The answer reward is binary, Rans  
+
+> i
+
+∈ { 0, 1}. For reproducibility, we fix the random seed to 42 in all experiments involving randomness. All experiments are run on 8 nodes with a total of 64 NVIDIA H800 80GB GPUs (8 per node). 
+
+OTC-GRPO baseline The OTC-GRPO baseline follows the original OTC setting. It is trained from the same GLM-4.5-Air-Midtrain backbone and uses the same GRPO configuration as Vanilla RL and CRISP, differing only in the reward: it multiplies the answer-correctness reward by a tool-efficiency term rather than adding an efficiency-aware signal. Following the original OTC setting, we set the tool-reward coefficient α = 1 and the smoothing constant c to the corresponding maximum number of turns (i.e., 60 for BrowseComp and 100 for HLE-Verified, matching our interaction budgets).
