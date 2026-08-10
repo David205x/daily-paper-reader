@@ -6,41 +6,49 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-08-09
-- 运行时间：2026-08-09 20:39:58 UTC
+- 最新运行日期：2026-08-10
+- 运行时间：2026-08-10 21:10:17 UTC
 - 运行状态：成功
-- 本次总论文数：7
-- 精读区：4
+- 本次总论文数：9
+- 精读区：6
 - 速读区：3
 
 ### 今日简报（AI）
-今日精读聚焦两项高分研究：ACE-GraphRAG与CRISP，分别从层级图检索增强与关键步骤感知切入，推动智能Agent效率提升。最值得关注的方向是Agentic上下文工程与高效深度搜索训练，两篇均获9.0/10高评。建议普通读者优先跟进这两项核心技术，并留意速读中Agent训练与评估的补充进展。
-- 详情：[/202608/09/README](/202608/09/README)
+今日精读6篇、速读3篇，核心围绕Agent与RAG技术迭代。  
+最值得关注ACE-GraphRAG的分层知识图谱增强与ReflectRL的负面轨迹反思推理。  
+建议优先上手GraphRAG类工具，并用反思式推理修正你的Agent提示策略。
+- 详情：[/202608/10/README](/202608/10/README)
 
 ### 精读区论文标签
-1. [ACE-GraphRAG: Agentic Context Engineering for Hierarchical GraphRAG](/202608/09/2608.01269v2-ace-graphrag-agentic-context-engineering-for-hierarchical-graphrag)  
+1. [ACE-GraphRAG: Agentic Context Engineering for Hierarchical GraphRAG](/202608/10/2608.01269v1-ace-graphrag-agentic-context-engineering-for-hierarchical-graphrag)  
    标签：评分：9.0/10、query:rl
-   evidence：面向分层图RAG的智能体上下文策略，直接面向检索增强生成
-2. [CRISP: Critical Step Perception for Training Efficient Deep Search Agents](/202608/09/2608.01867v1-crisp-critical-step-perception-for-training-efficient-deep-search-agents)  
+   evidence：面向层级GraphRAG的智能体上下文工程，优化检索增强生成
+2. [ReflectRL: Learning from Golden Negative Trajectories via Reflective-to-Direct Reasoning](/202608/10/2608.03972v1-reflectrl-learning-from-golden-negative-trajectories-via-reflective-to-direct-reasoning)  
    标签：评分：9.0/10、query:rl
-   evidence：通过关键步骤感知训练高效深度搜索LLM代理
-3. [CRISP: Critical Step Perception for Training Efficient Deep Search Agents](/202608/09/2608.01867v2-crisp-critical-step-perception-for-training-efficient-deep-search-agents)  
+   evidence：利用反思失败轨迹的在线强化学习提升大模型推理
+3. [Contextual Information Policy Optimization for Search Agents](/202608/10/2608.06128v2-contextual-information-policy-optimization-for-search-agents)  
    标签：评分：9.0/10、query:rl
-   evidence：通过关键步骤感知训练高效深度搜索LLM代理
-4. [D$^2$F-ReAG: Dynamic Decomposition and Filtering for Multi-Hop Reasoning-Augmented Generation](/202608/09/2608.04444v1-d2f-reag-dynamic-decomposition-and-filtering-for-multi-hop-reasoning-augmented-generation)  
+   evidence：面向多步推理搜索智能体的上下文信息策略优化，强调证据扎根。
+4. [DASH: Divergence-Adaptive Supervision Horizons for On-Policy Self-Distillation of Reasoning Models](/202608/10/2608.06243v2-dash-divergence-adaptive-supervision-horizons-for-on-policy-self-distillation-of-reasoning-models)  
    标签：评分：9.0/10、query:rl
-   evidence：面向多跳知识密集型问答的检索增强生成
+   evidence：可验证奖励强化学习用于语言模型推理；散度自适应监督视野
+5. [IB-RL: Isolated Bilateral Reinforcement Learning for Strategic Dialogue Agents](/202608/10/2608.06735v1-ib-rl-isolated-bilateral-reinforcement-learning-for-strategic-dialogue-agents)  
+   标签：评分：9.0/10、query:rl
+   evidence：面向策略性多轮对话智能体的隔离双边强化学习。
+6. [SkillProx: Self-Evolving Agent Skills via Proximal Textual Gradient Descent](/202608/10/2608.07449v1-skillprox-self-evolving-agent-skills-via-proximal-textual-gradient-descent)  
+   标签：评分：9.0/10、query:rl
+   evidence：面向任务自动化的LLM智能体技能自演化
 
 ### 速读区论文标签
-1. [EvoHIL: Self-Evolving Reward and Flow-Matched Policy Optimization for Robust Human-in-the-Loop Reinforcement Learning](/202608/09/2608.03872v1-evohil-self-evolving-reward-and-flow-matched-policy-optimization-for-robust-human-in-the-loop-reinforcement-learning)  
+1. [The Optimizer Is the Agent: Reasoning-Driven Search across Prompts, Programs, and ML Workflows](/202608/10/2608.06714v1-the-optimizer-is-the-agent-reasoning-driven-search-across-prompts-programs-and-ml-workflows)  
+   标签：评分：8.0/10、query:rl
+   evidence：自主使用工具进行推理驱动优化的智能体，实现提示词与工作流自动化
+2. [SkillAligner: Treating Retrieved Skills as Adaptable Drafts at Execution Time](/202608/10/2608.06880v1-skillaligner-treating-retrieved-skills-as-adaptable-drafts-at-execution-time)  
+   标签：评分：8.0/10、query:rl
+   evidence：执行期技能适配，帮助语言智能体自动完成任务。
+3. [Agent Memory Distillation: Empowering Small LLM Agents with Hierarchical Teacher Memory](/202608/10/2608.07169v1-agent-memory-distillation-empowering-small-llm-agents-with-hierarchical-teacher-memory)  
    标签：评分：7.0/10、query:rl
-   evidence：人在回路强化学习中的奖励模型自适应与策略优化
-2. [State2State: Environment-Derived Mid-Training for LLM Agents](/202608/09/2608.04934v1-state2state-environment-derived-mid-training-for-llm-agents)  
-   标签：评分：7.0/10、query:rl
-   evidence：无需外部任务规范的环境交互式智能体训练
-3. [PATH-Bench: Path-Dependent Evaluation of Lifelong Agents](/202608/09/2608.01149v1-path-bench-path-dependent-evaluation-of-lifelong-agents)  
-   标签：评分：6.0/10、query:rl
-   evidence：面向终身LLM智能体的多轮工具使用任务基准
+   evidence：从大教师智能体向小模型学生智能体蒸馏分层记忆，免训练强化智能体
 
 
 <div class="dpr-home-promo-card">
