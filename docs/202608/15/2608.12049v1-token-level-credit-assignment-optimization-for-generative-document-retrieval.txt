@@ -1,0 +1,884 @@
+Title: Token-Level Credit Assignment Optimization for Generative Document Retrieval
+
+URL Source: https://arxiv.org/pdf/2608.12049v1
+
+Published Time: Thu, 13 Aug 2026 00:55:10 GMT
+
+Number of Pages: 12
+
+Markdown Content:
+# Token-Level Credit Assignment Optimization for Generative Document Retrieval 
+
+# Xinpeng Zhao ∗
+
+zhaoxp1001@gmail.com Shandong University Shandong, China 
+
+# Yang Liu ∗
+
+202535775@mail.sdu.edu.cn Shandong University Shandong, China 
+
+# Ran Chen 
+
+chenran@stu.pku.edu.cn Peking University Beijing, China 
+
+# Xinyu Ma 
+
+xinyuma2016@gmail.com Baidu Inc. Beijing, China 
+
+# Daiting Shi 
+
+shidaiting01@baidu.com Baidu Inc. Beijing, China 
+
+# Pengjie Ren 
+
+jay.ren@outlook.com Shandong University Shandong, China 
+
+# Zhumin Chen 
+
+chenzhumin@sdu.edu.cn Shandong University Shandong, China 
+
+# Zhaochun Ren †
+
+z.ren@liacs.leidenuniv.nl Leiden University Leiden, Netherlands 
+
+# Xin Xin †
+
+xinxin@sdu.edu.cn Shandong University Shandong, China 
+
+## Abstract 
+
+Generative retrieval models perform document retrieval by autore-gressively generating document identifiers (DocIDs). This process naturally forms a sequential decision problem, where each decoding step selects a DocID token and the complete token sequence deter-mines the retrieved document. However, retrieval effectiveness is typically evaluated only after the full DocID is generated, creating a mismatch between token-level generation and document-level relevance supervision. As a result, existing reinforcement learning methods for generative retrieval mostly rely on sequence-level re-wards, where the same document-level feedback is propagated to all decoding steps. Such coarse-grained feedback makes it difficult to identify which token decisions are responsible for successful or failed retrieval. In this work, we propose a fine-grained reinforcement learning framework for generative retrieval with token-level relevance re-wards. Instead of assigning a single reward to the entire generated DocID, we estimate step-wise rewards by measuring how each token decision changes the expected retrieval quality of the corre-sponding generation trajectory. This enables more precise credit assignment and encourages the policy to favor token decisions that contribute more directly to document-level relevance. We further develop practical reward estimation strategies tailored to the DocID generation process and incorporate them into a policy optimization framework. Experiments on retrieval benchmarks show that our 
+
+> ∗Equal contribution.
+> †Corresponding author. Permission to make digital or hard copies of all or part of this work for personal or classroom use is granted without fee provided that copies are not made or distributed for profit or commercial advantage and that copies bear this notice and the full citation on the first page. Copyrights for components of this work owned by others than the author(s) must be honored. Abstracting with credit is permitted. To copy otherwise, or republish, to post on servers or to redistribute to lists, requires prior specific permission and/or a fee. Request permissions from permissions@acm.org.
+> CIKM ’26, Rome, Italy
+> © 2018 Copyright held by the owner/author(s). Publication rights licensed to ACM. ACM ISBN 978-1-4503-XXXX-X/2018/06 https://doi.org/XXXXXXX.XXXXXXX
+
+method consistently outperforms sequence-level reward baselines, demonstrating the effectiveness of fine-grained supervision for aligning autoregressive DocID generation with retrieval objectives. 
+
+## CCS Concepts 
+
+• Information systems → Information retrieval ; Retrieval models and ranking ; Learning to rank ; Language models .
+
+## Keywords 
+
+Generative Retrieval, Token-level Credit Assignment, Reinforce-ment Learning 
+
+ACM Reference Format: 
+
+Xinpeng Zhao, Yang Liu, Ran Chen, Xinyu Ma, Daiting Shi, Pengjie Ren, Zhumin Chen, Zhaochun Ren, and Xin Xin. 2018. Token-Level Credit As-signment Optimization for Generative Document Retrieval. In Proceed-ings of The 35th ACM International Conference on Information and Knowl-edge Management (CIKM ’26). ACM, New York, NY, USA, 12 pages. https: //doi.org/XXXXXXX.XXXXXXX 
+
+## 1 Introduction 
+
+Information retrieval is a fundamental component of modern in-formation systems, supporting applications such as Web search, open-domain question answering, and retrieval-augmented genera-tion [16, 55]. Recent neural retrievers typically encode queries and documents as dense vectors, retrieve candidates through maximum inner-product search [8, 9], and often apply a separate reranking stage [10]. Although effective, this paradigm depends on an ex-ternal index, fixed-dimensional representations, and multi-stage objectives that do not directly optimize the whole retrieval process toward final relevance [2, 23, 33]. Generative retrieval provides an alternative by directly producing the identifier of a relevant document conditioned on the query [22, 31, 33, 35, 49, 52]. The generated document identifiers (DocIDs) are decoded into retrieved documents, converting retrieval into a sequence generation prob-lem that can represent corpus indexing and query-time retrieval within a unified model. With suitable identifier design, constrained decoding, and sequence-to-sequence training, this framework has arXiv:2608.12049v1 [cs.IR] 12 Aug 2026 CIKM ’26, November 7–11, 2026, Rome, Italy Zhao et al. Sequence-level Reward for Generative Retrieval           
+
+> Token-level Reward for Generative Retrieval
+> Document Query
+> Generative
+> Retrieval Token 1 Token 2 Token 3
+> reward
+> Each token receives an equal reward.
+> Document Query
+> Generative
+> Retrieval Token 1 Token 2 Token 3
+> reward reward reward
+> Each t oken receives its own reward .
+
+Figure 1: Comparison of sequence-level and token-level re-wards in generative retrieval. Sequence-level rewards assign one document-level signal to all generated DocID tokens, whereas token-level rewards provide step-wise feedback for individual token decisions. 
+
+shown promising effectiveness and has become an active direction in neural information retrieval. Despite this progress, the training objective of generative re-trieval remains imperfectly aligned with the goal of document retrieval [22, 52]. Most existing methods rely on autoregressive supervised fine-tuning, which maximizes the likelihood of each tar-get DocID token [33, 35, 54]. This objective is natural for sequence generation, but retrieval quality is evaluated only after the com-plete DocID sequence is generated and mapped to a document. The model is therefore optimized at the token level while being judged at the document level. A generated DocID may contain several locally plausible tokens but still refer to an irrelevant document; conversely, some intermediate token decisions may be important because they route the generation process toward a semantically appropriate region of the identifier space. The standard next-token likelihood does not explicitly distinguish these cases, since it treats DocID generation as imitation of observed identifiers rather than direct optimization of document-level relevance. Reinforcement learning provides a principled way to bridge this gap by treating DocID generation as a decision-making process and optimizing the model with relevance feedback [25]. Recent work has explored reinforcement learning from relevance feedback for generative retrieval [52], as well as preference-based optimization methods inspired by direct preference optimization [22]. These approaches move beyond pure teacher forcing and seek to align generated DocIDs with document-level relevance. However, they typically use sequence-level rewards: once a complete DocID is generated, the resulting document receives a relevance score, and the same feedback is assigned to all tokens in the sequence. This coarse supervision leaves a critical credit assignment problem un-resolved [7]. In an autoregressive DocID, different tokens play dif-ferent roles. Early tokens may constrain the candidate subspace, middle tokens may refine semantic or structural choices, and later tokens may determine the exact document. Assigning an identi-cal reward to every decoding step obscures which token decisions actually improve or harm retrieval quality. In this paper, we argue that effective reinforcement learning for generative retrieval requires token-level credit assignment. We for-mulate DocID generation as a sequential decision problem, where the state is the query together with the partially generated DocID, the action is the next DocID token, and the final outcome is the retrieved document. From this perspective, the key challenge is not only whether the generated document is relevant, but also how each token decision changes the expected quality of the generation trajectory. A fine-grained reward should encourage tokens that move the policy toward relevant documents and penalize tokens that divert decoding toward irrelevant regions, even when the final sequence-level outcome alone is ambiguous. To address this challenge, we propose Token-Level Credit Assign-ment for Generative Retrieval (TCA), a fine-grained reinforcement learning framework that separates token-level reward design from the choice of policy optimization algorithm. Our training pipeline follows two stages. First, we perform supervised fine-tuning to endow the model with basic query-to-DocID generation ability. Second, we refine the model with reinforcement learning under token-level credit assignment. Instead of assigning one reward to the entire generated sequence, TCA provides step-wise feed-back for intermediate DocID tokens by comparing the generated hidden-state trajectory with the gold DocID trajectory from a frozen reference model. This trajectory-based reward gives the policy a dense signal for distinguishing helpful and harmful token decisions without requiring an additional reward model. As an optimizer-agnostic credit assignment framework, TCA as-signs fine-grained credit to individual DocID tokens while remain-ing compatible with different reinforcement learning algorithms. In this work, we consider two representative implementations: TCA-GRPO, which uses group-relative advantage estimation to compare multiple candidate DocIDs for the same query, and TCA-PPO, which uses value-function-based advantage estimation under the same token-level reward design. Both implementations are com-patible with different forms of DocIDs and can be combined with constrained decoding over the legal DocID space. We conducted experiments on widely used retrieval benchmarks to evaluate the effectiveness and generality of token-level credit assignment. On two representative settings, MS MARCO docu-ment dataset and Natural Question dataset, both TCA-GRPO and TCA-PPO improve 𝑅 @1 and 𝑀𝑅𝑅 @10. Compared with the base-line, TCA-GRPO achieves relative improvements of 3.56%/1.53% on MS-TU and 3.99%/3.28% on NQ-PQ in 𝑅 @1/ 𝑀𝑅𝑅 @10, respectively. The results show that TCA consistently improves generative re-trieval performance over supervised fine-tuning and sequence-level reinforcement learning baselines, while the comparison between GRPO and PPO further shows how different advantage estimation strategies affect token-level reinforcement learning for DocID gen-eration. We further analyze different reward designs and training components, demonstrating that fine-grained token rewards pro-vide a robust signal for aligning autoregressive DocID generation with document-level relevance. The main contributions of this work are summarized as follows: 
+
+• We formulate generative document retrieval as a sequential decision problem and identify token-level credit assignment Token-Level Credit Assignment Optimization for Generative Document Retrieval CIKM ’26, November 7–11, 2026, Rome, Italy 
+
+as a central limitation of existing reinforcement learning methods based on sequence-level rewards. 
+
+• We propose TCA, a fine-grained reinforcement learning framework that assigns relevance-aware rewards to individ-ual DocID tokens and can be instantiated with both GRPO and PPO for policy optimization. 
+
+• We conduct extensive experiments and analyses on standard retrieval benchmarks, showing that token-level credit assign-ment improves retrieval effectiveness over strong supervised and reinforcement learning baselines. 
+
+## 2 Related Work 2.1 Document Retrieval 
+
+Document retrieval is a fundamental task in information retrieval, where the goal is to find relevant documents from a large corpus given a user query. Traditional approaches to document retrieval include term-based methods such as TF-IDF and BM25 [27], which rely on exact term matching and heuristic scoring functions. More recently, neural retrieval methods have gained popularity, leverag-ing deep learning techniques to learn dense vector representations of queries and documents [10–12, 40, 46]. These methods typically involve encoding queries and documents into a shared vector space and using similarity measures to retrieve relevant documents. How-ever, they often require separate stages for indexing and retrieval, which can be computationally expensive and may not fully capture the complex relationships between queries and documents. 
+
+## 2.2 Generative Retrieval 
+
+Generative retrieval formulates document retrieval as an autore-gressive generation problem, where a model directly generates document identifiers (DocIDs) for a given query. Existing studies have mainly improved this paradigm from four aspects: (i) Iden-tifier construction : Existing DocIDs can be broadly divided into lexical and numerical identifiers. Lexical identifiers, such as titles, URLs [2, 5, 54], representative n-grams, or summaries [1, 14], are human-readable and easy to interpret. Numerical identifiers instead encode documents as discrete semantic codes, including clustering-based semantic codes [33] and RQ-VAE-based quantized identi-fiers [36, 37, 43]. (ii) Index construction : Existing methods enrich indexing through document chunking [33], pseudo-query gener-ation [56], and rehearsal-based augmentation [32]. Other studies further investigate multi-granular indexing [38] and continual in-dexing for dynamic corpora [4, 21, 48, 49]. (iii) Decoding strategy :Existing methods can be broadly divided into autoregressive and non-autoregressive paradigms. Autoregressive decoding generates DocIDs token by token, typically using constrained beam search to restrict the output space to valid DocIDs [2, 17, 26, 33, 44]. Recent studies further explore non-autoregressive DocID generation to improve efficiency and global control [34, 50]. These methods gen-erate multiple DocID tokens in parallel or refine identifiers through iterative procedures, such as diffusion-based language models and parallel generation frameworks. (iv) Training objective : Early gen-erative retrieval models are mainly optimized by supervised likeli-hood training [2, 33, 35]. Later work incorporates ranking-oriented supervision, including marginal ranking loss [18], knowledge dis-tillation [19], and contrastive learning [6, 20]. Recent RL-based methods further optimize retrieval feedback: GenRRL [52] adopts RLHF with an external reward model, while DDRO [22] leverages pairwise relevance feedback without explicit reward modeling. In contrast, our work studies generative retrieval from a sequential decision-making perspective and views DocID generation as a tra-jectory of token-level decisions, where each generated token affects the final document-level retrieval quality. 
+
+## 2.3 Credit Assignment Problem 
+
+Credit assignment concerns how a training signal should be dis-tributed to the individual decisions that produced it. In LLM re-inforcement learning, the central challenge is often token-level: although generation proceeds autoregressively token by token, su-pervision in RLHF is typically provided only as a sequence-level reward on the final response [25]. Some methods introduce denser supervision directly, such as sentence-level human feedback [39], while a larger line of work infers token-level rewards from response-level preference signals through reward densification [3], reward redistribution [15], continuous token-level reward modeling [42], and token-wise preference optimization objectives [41, 45, 51]. Al-though these studies demonstrate the importance of fine-grained credit assignment, they are not directly tailored to generative re-trieval. Unlike open-ended text generation, generative retrieval produces a document identifier as a constrained token sequence, where each token can be viewed as a routing decision over the document space. An incorrect token may lead the decoding trajec-tory to a wrong branch and make the target document unreachable, even if the remaining tokens are locally plausible. Therefore, credit assignment in generative retrieval is more structurally sensitive: the model needs to understand how each token decision contributes to identifying the correct document, rather than simply improving the overall quality of a generated response. This motivates our token-level reinforcement learning framework, which explicitly assigns fine-grained retrieval-oriented rewards to intermediate DocID gen-eration steps and optimizes generative retrieval from a sequential decision-making perspective. 
+
+## 3 Preliminary 3.1 Generative Retrieval 
+
+Generative information retrieval formulates document retrieval as a sequence generation problem. Given a query 𝑞 , a generative retriever directly generates a document identifier (DocID) sequence: 
+
+𝑦 = (𝑦 1, 𝑦 2, . . . , 𝑦 𝑛 ), where each token 𝑦 𝑡 is a part of the document identifier. Here 𝑛 denotes the length of the current DocID sequence only for notational convenience; different documents may have DocIDs with different lengths. The autoregressive generation prob-ability is factorized as: 
+
+𝜋 𝜃 (𝑦 |𝑞 ) =
+
+> 𝑛
+
+Ö
+
+> 𝑡 =1
+
+𝜋 𝜃 (𝑦 𝑡 |𝑞, 𝑦 <𝑡 ), (1) where 𝜋 𝜃 denotes the generative retrieval model parameterized by 
+
+𝜃 , and 𝑦 <𝑡 = (𝑦 1, . . . , 𝑦 𝑡 −1) denotes the prefix generated before step 
+
+𝑡 .During retrieval, the model generates a set of candidate DocIDs and ranks them according to their generation probabilities. The CIKM ’26, November 7–11, 2026, Rome, Italy Zhao et al. Main contribution: 
+
+Credit is assigned at the  same 
+
+granularity as generation decisions. 
+
+Clipped GRPO 
+
+update 
+
+> (per-token objective)
+
+Frozen reference 
+
+model  𝝅 𝒓𝒆𝒇 
+
+SFT policy model  𝝅 𝜽 
+
+# Token-Level Credit Assignment for Generative Retrieval 
+
+Stage 2: Reinforcement Learning with Token-Level Credit Assignment Stage 1: Supervised Fine-Tuning  TCA-GRPO Optimization 
+
+𝐻 ∗(𝑞) = {ℎ 1
+
+> ∗
+
+, ℎ 2∗ , … , ℎ 𝑇  
+
+> ∗
+
+}∗
+
+Gold hidden-state trajectory 
+
+Token-level credit assignment 
+
+cos  ℎ𝑡  
+
+> 𝑖
+
+, ℎ 𝑡 
+
+> ∗
+
+Legal DocID Trie 
+
+Teacher forcing  on gold DoclD y* 
+
+Constrained 
+
+Beam Search 
+
+Query q  
+
+> update 𝝅 𝜽
+
+𝑦 𝐺 
+
+𝑦 2
+
+𝑦 1
+
+1 2
+
+Relevant document  𝑑 ∗ ∈ 𝐷 
+
+Gold DocID  𝑦 ∗ = (𝑦 1
+
+> ∗
+
+, 𝑦 2
+
+> ∗
+
+, . . . , 𝑦 𝑇 ∗ )
+
+Training Dataset 
+
+ℎ1 
+
+> ∗
+
+ℎ2 
+
+> ∗
+
+ℎ3 
+
+> ∗
+
+ℎ𝑇 ∗
+
+⋯                              
+
+> neural ir intro bert search
+> ℎ1
+> 1ℎ2
+> 1ℎ3
+> 1ℎ4
+> 1ℎ5
+> 1
+> +0.82 +0.65 +0.91 +0.74 +0.87
+> sparse
+> -0.15
+> ℎ6
+> 2
+> neural ml nlp dense rank
+> ℎ1
+> 2ℎ22ℎ32ℎ42ℎ52
+> +0.82 +0.55 -0.68 +0.71 +0.43
+> ⋯
+> ⋯
+> neural ir search
+> ℎ1𝐺 ℎ2
+> 𝐺 ℎ3
+> 𝐺
+> +0.82 +0.65 +0.76
+> X
+
+x
+
+> X
+
+x
+
+> X
+
+x
+
+> X
+
+x       
+
+> Group by Decoding Position
+> 𝑡 = 1 𝑡 = 2 𝑡 = 3 𝑡 = 𝑇 ⋯
+> 𝑟 1,1
+> 𝑟 2,1
+> ⋯
+> 𝑟 𝐺,1
+> 𝑟 1,2
+> 𝑟 2,2
+> ⋯
+> 𝑟 𝐺,2
+> 𝑟 1,3
+> 𝑟 2,3
+> ⋯
+> 𝑟 𝐺,3
+> 𝑟 1,𝑇
+> 𝑟 2,𝑇
+> ⋯
+> 𝑟 𝐺,𝑇
+> Token-level Advantages 𝑨 𝒊,𝒕
+> 𝑡 = 1 𝑡 = 2 𝑡 = 3 𝑡 = 𝑇 ⋯
+> 𝐴 1,1
+> 𝐴 2,1
+> ⋯
+> 𝐴 𝐺,1
+> 𝐴 1,2
+> 𝐴 2,2
+> ⋯
+> 𝐴 𝐺,2
+> 𝐴 1,3
+> 𝐴 2,3
+> ⋯
+> 𝐴 𝐺,3
+> 𝐴 1,𝑇
+> 𝐴 2,𝑇
+> ⋯
+> 𝐴 𝐺,𝑇
+
+KL to  𝜋 𝑟𝑒𝑓 
+
+SFT policy 
+
+model  𝝅 𝜽 
+
+Trainable 
+
+Frozen 
+
+> Normalize within Group
+
+𝜇 𝑡 = 𝑚𝑒𝑎𝑛  𝑟 1,𝑡 , 𝑟 2,𝑡 , ⋯ , 𝑟 𝐺,𝑡 
+
+𝜎 𝑡 = 𝑠𝑡𝑑  𝑟 1,𝑡 , 𝑟 2,𝑡 , ⋯ , 𝑟 𝐺,𝑡 
+
+𝐴 𝑖,𝑡 = 𝑟 𝑖,𝑡 − 𝜇 𝑡 
+
+𝜎 𝑡 + 𝜀 
+
+𝑟 1,𝑡 
+
+𝑟 2,𝑡 
+
+𝑟 𝐺,𝑡 
+
+Rollout 
+
+Group 
+
+reward 
+
+Normalize 
+
+reward 
+
+Calculate 
+
+advantages 
+
+Gradient 
+
+update 
+
+Generative retriever 
+
+Query + DocID 
+
+teacher forcing 
+
+(cross-entropy loss on DocID) 
+
+Learns mapping 
+
+𝑞 → 𝑦 ∗
+
+Minimize cross-entropy between predicted DocID and  𝒚 ∗.
+
+> Gradient update
+
+PQ-code DocID (example)   
+
+> 17 396
+
+⋯156  289 
+
+Title/URL DocID (example)   
+
+> neural bert
+
+⋯ir  intro 
+
+DocID Construction 
+
+Supervised Fine-Tuning 
+
+Token-level Reinforcement Learning Pipeline 
+
+Figure 2: Overview of the proposed Token-Level Credit Assignment for Generative Retrieval with GRPO (TCA-GRPO). 
+
+ranking score of a candidate DocID can be written as: 
+
+𝑆 𝜃 (𝑦 |𝑞 ) = log 𝜋 𝜃 (𝑦 |𝑞 ) =
+
+𝑛 ∑︁ 
+
+𝑡 =1
+
+log 𝜋 𝜃 (𝑦 𝑡 |𝑞, 𝑦 <𝑡 ). (2) Thus, unlike dense retrieval where the ranking score is usually com-puted by a single query-document similarity function, the ranking score in generative retrieval is composed of multiple token-level generation probabilities. Each token decision can affect the proba-bility of the complete DocID and consequently its position in the final ranked list. 
+
+## 3.2 Generative Retrieval as Sequential Decision Problem 
+
+The autoregressive nature of DocID generation makes generative retrieval a natural multi-step decision-making problem. At decoding step 𝑡 , the state can be defined as: 
+
+𝑠 𝑡 = (𝑞, 𝑦 <𝑡 ), (3) and the action is the next DocID token: 
+
+𝑎 𝑡 = 𝑦 𝑡 . (4) The state transition is: 
+
+𝑠 𝑡 +1 = (𝑞, 𝑦 ≤𝑡 ). (5) where 𝑦 ≤𝑡 = (𝑦 1, . . . , 𝑦 𝑡 ) denotes the prefix after taking action 𝑎 𝑡 .In practice, DocID generation is usually restricted to valid iden-tifiers in the corpus. Let Y𝑑𝑜𝑐 denote the set of valid DocIDs and Prefix (Y 𝑑𝑜𝑐 ) denote their valid prefixes. Given the current prefix 
+
+𝑦 <𝑡 , the available action set can be written as 
+
+A ( 𝑦 <𝑡 ) = {𝑦 𝑡 | ( 𝑦 1, . . . , 𝑦 𝑡 −1, 𝑦 𝑡 ) ∈ Prefix (Y 𝑑𝑜𝑐 )} . (6) where 𝑦 𝑡 denotes a candidate next DocID token. This set only serves as the legal next-token space for the sequential decision process and prevents the generated sequence from leaving the corpus-level DocID space. This formulation highlights a key credit assignment issue in generative retrieval. The final retrieval outcome is determined by a complete DocID sequence, but each intermediate token decision affects the future prefix space and the final ranking score. Exist-ing document-level or sequence-level objectives provide limited feedback for these intermediate decisions. This motivates the token-level reinforcement learning objective developed next. 
+
+## 4 Method 4.1 Overview 
+
+We propose Token-Level Credit Assignment for Generative Retrieval 
+
+(TCA), a reinforcement learning framework that assigns credit to individual DocID tokens in generative document retrieval. Given a query, a generative retriever autoregressively produces a document Token-Level Credit Assignment Optimization for Generative Document Retrieval CIKM ’26, November 7–11, 2026, Rome, Italy 
+
+identifier, and the generated identifier is mapped back to a document in the corpus. The key idea of our method is to optimize this process at the same granularity at which decisions are made: instead of assigning one sequence-level reward to the complete DocID, we estimate token-level rewards for intermediate decoding steps and use them to update the generation policy. The training pipeline contains two stages. First, we perform su-pervised fine-tuning (SFT) to initialize the model with basic query-to-DocID generation ability. Second, we run reinforcement learning post-training with token-level credit assignment. In this stage, an SFT model is frozen as a reference model, gold DocID trajectories are cached under teacher forcing, and the current policy gener-ates candidate DocIDs under constrained decoding. Token-level rewards are then computed by comparing the generated hidden-state trajectory with the gold trajectory, and group relative policy optimization is used to update the policy. This design combines token-level credit assignment with the stability of group-relative advantage estimation. 
+
+## 4.2 Training Problem Formulation 
+
+We now specify the training problem under the sequential decision view introduced in Section 3.2. Let D denote the document corpus. For each training example, we are given a query 𝑞 , a ground-truth relevant document 𝑑 ∗ ∈ D , and its corresponding gold DocID 𝑦 ∗,where the superscript ∗ denotes the ground truth: 
+
+𝑦 ∗ = (𝑦 ∗
+
+> 1
+
+, 𝑦 ∗
+
+> 2
+
+, . . . , 𝑦 ∗ 
+
+> 𝑇
+
+), (7) where the 𝑇 is the length of the gold DocID tokens. The policy 𝜋 𝜃 
+
+generates DocID tokens autoregressively. During rollout, it pro-duces a candidate DocID: 
+
+𝑦 𝑖 = (𝑦 𝑖 
+
+> 1
+
+, 𝑦 𝑖 
+
+> 2
+
+, . . . , 𝑦 𝑖 𝑇 𝑖 ), (8) where the superscript 𝑖 denotes the 𝑖 -th sampled candidate and 𝑇 𝑖 
+
+denotes its length. A complete generated DocID is mapped to a document 𝑑 𝑦 𝑖 through the corpus DocID table. Retrieval quality is therefore determined by the relevance of 𝑑 𝑦 𝑖 to 𝑞 , while the model is updated through the token-level probabilities 𝜋 𝜃 (𝑦 𝑖 𝑡 | 𝑞, 𝑦 𝑖  
+
+> <𝑡
+
+).The central problem is to bridge this granularity mismatch. The supervision available in training identifies the relevant document and its gold DocID, but the policy decisions are made one token at a time along a generated trajectory. Our goal is to convert the document-level target and the gold generation trajectory into token-level rewards {𝑟 𝑖,𝑡 }𝑇 𝑖  
+
+> 𝑡 =1
+
+and token-level advantages {𝐴 𝑖,𝑡 }𝑇 𝑖  
+
+> 𝑡 =1
+
+. These signals should distinguish helpful and harmful intermediate de-cisions within the same DocID trajectory, so that reinforcement learning can improve retrieval behavior at the granularity of the actual generation process. 
+
+## 4.3 Supervised Fine-tuning for Generative Retrieval 
+
+We first train a base generative retriever with standard supervised fine-tuning. In this work, we consider two representative DocID de-signs. The first uses document titles and URLs as identifiers, termed TU, which preserve lexical and self-descriptive document signals. The second uses product quantization codes, termed PQ, which discretize document representations into semantic code tokens through vector quantization. These two identifier types represent different retrieval regimes: TU DocIDs are more interpretable and lexical, while PQ DocIDs provide compact semantic identifiers. Given a query–DocID pair (𝑞, 𝑦 ∗), the SFT objective maximizes the likelihood of the gold DocID under teacher forcing: 
+
+LSFT = −
+
+> 𝑇
+
+∑︁ 
+
+> 𝑡 =1
+
+log 𝜋 𝜃 (𝑦 ∗ 
+
+> 𝑡
+
+| 𝑞, 𝑦 ∗ 
+
+> <𝑡
+
+). (9) This objective teaches the model the syntax of the DocID space and the basic alignment between queries and document identifiers. It also provides a stable initialization for reinforcement learning, which is important because unconstrained exploration over the full vocabulary can easily produce invalid or low-quality DocID sequences. However, SFT only imitates the observed gold tokens and does not directly optimize document-level retrieval relevance. A token that receives high likelihood under teacher forcing may still lead to an irrelevant document when generated under the model’s own prefix. Conversely, an early token decision may be valuable because it routes the trajectory toward a promising region of the DocID space, even though its contribution is not visible from the local likelihood term. This limitation motivates the second training stage, where we use relevance-aware token-level rewards to refine the policy. 
+
+## 4.4 Token-level Credit Assignment 
+
+The goal of token-level credit assignment is to provide dense feed-back for each DocID generation decision. Instead of assigning a single scalar reward to the whole generated identifier, we compare the hidden-state trajectory of a generated DocID with that of the gold DocID. For each training example (𝑞, 𝑦 ∗), we first build a gold trajectory cache using the SFT-initialized model. Under teacher forcing, the model receives the gold DocID prefix and produces last-layer de-coder hidden states. We denote by ℎ∗ 
+
+> 𝑡
+
+the pre-action hidden state used to predict the 𝑡 -th gold token 𝑦 ∗ 
+
+> 𝑡
+
+, where 𝑇 is the length of the gold DocID. This cache is computed once before reinforcement learning and kept fixed. During policy training, the current policy generates a candi-date DocID 𝑦 𝑖 = (𝑦 𝑖 
+
+> 1
+
+, . . . , 𝑦 𝑖 𝑇 𝑖 ) under trie-constrained decoding. We record the corresponding decoder hidden states and denote by ℎ𝑖 𝑡 
+
+the pre-action hidden state associated with the 𝑡 -th generated Do-cID token. Padding positions are masked out and do not contribute to the reward or policy update. For each valid generated token position, we compute a trajectory reward by comparing the generated hidden state with the gold hidden state at the same token position: 
+
+𝑟 traj  
+
+> 𝑖,𝑡
+
+= 1[𝑡 ≤ 𝑇 ] cos (ℎ𝑖 𝑡 , ℎ ∗ 
+
+> 𝑡
+
+) = 1[𝑡 ≤ 𝑇 ] (ℎ𝑖 𝑡 )⊤ℎ∗
+
+> 𝑡
+
+∥ℎ𝑖 𝑡 ∥∥ ℎ∗ 
+
+> 𝑡
+
+∥ , (10) where 1[·] is the indicator function. If the generated DocID becomes longer than the gold DocID, we add an overflow length penalty: 
+
+𝑟 len  
+
+> 𝑖,𝑡
+
+= 𝜆 len 1[𝑡 > 𝑇 ], 𝜆 len = −0.5. (11) To connect dense trajectory feedback with the final retrieval target, we further add an exact-match bonus. In our main reward variant, if the generated DocID exactly matches the gold DocID, CIKM ’26, November 7–11, 2026, Rome, Italy Zhao et al. 
+
+a global hit bonus is added to every valid generated position. The final token-level reward is 
+
+𝑟 𝑖,𝑡 = 𝑟 traj  
+
+> 𝑖,𝑡
+
++ 𝑟 len  
+
+> 𝑖,𝑡
+
++ 𝑃 𝑖,𝑡 1[𝑦 𝑖 = 𝑦 ∗]𝑅 hit , (12) where 𝑃 𝑖,𝑡 indicates whether position 𝑡 is a valid non-padding gener-ated position. The exact-match bonus is applied to all valid positions of an exactly matched DocID rather than only to the final token. This reward design encourages each generated prefix state to remain close to the gold trajectory, discourages over-generation beyond the target DocID length, and preserves a direct document-level exact-match signal. It does not require training an additional reward model and is applicable to both title–URL DocIDs and PQ-code DocIDs. 
+
+## 4.5 TCA-GRPO Optimization 
+
+TCA-GRPO converts token-level rewards into group-relative token-level advantages [30]. For each query 𝑞 , the policy generates a group of 𝐺 candidate DocIDs under trie-constrained decoding: 
+
+G( 𝑞 ) = {𝑦 1, 𝑦 2, . . . , 𝑦 𝐺 }. (13) In our implementation, GRPO candidates are generated with con-strained beam search. For each generated candidate, token rewards are computed at valid generated positions. Let 𝑚 𝑖,𝑡 denote whether position 𝑡 of candidate 𝑦 𝑖 is a valid non-padding token position: 
+
+𝑚 𝑖,𝑡 =
+
+(
+
+1, if position 𝑡 < the length of target DocID ,
+
+0, otherwise . (14) At each decoding position, rewards are normalized across the candidate group: 
+
+𝜇 𝑡 =
+
+Í𝐺 𝑖 =1 𝑚 𝑖,𝑡 𝑟 𝑖,𝑡 
+
+Í𝐺 𝑖 =1 𝑚 𝑖,𝑡 
+
+, 𝜎 2 
+
+> 𝑡
+
+=
+
+Í𝐺 𝑖 =1 𝑚 𝑖,𝑡 (𝑟 𝑖,𝑡 − 𝜇 𝑡 )2
+
+Í𝐺 𝑖 =1 𝑚 𝑖,𝑡 
+
+. (15) The token-level GRPO advantage is 
+
+𝐴 GRPO  
+
+> 𝑖,𝑡
+
+= 𝑟 𝑖,𝑡 − 𝜇 𝑡 
+
+𝜎 𝑡 + 𝜖 , (16) where 𝜖 is a small positive constant added for numerical stability. This position-wise normalization compares candidates at the same decoding depth and avoids learning a value function over discrete DocID prefix states. Let 
+
+𝜌 𝑖,𝑡 = 𝜋 𝜃 (𝑦 𝑖 𝑡 | 𝑞, 𝑦 𝑖  
+
+> <𝑡
+
+)
+
+𝜋 𝜃 old (𝑦 𝑖 𝑡 | 𝑞, 𝑦 𝑖  
+
+> <𝑡
+
+) (17) be the policy probability ratio. The clipped token-level objective is 
+
+LTCA -GRPO = − E𝑖,𝑡 
+
+h
+
+𝑚 𝑖,𝑡 min 
+
+
+
+𝜌 𝑖,𝑡 𝐴 GRPO  
+
+> 𝑖,𝑡
+
+,
+
+clip (𝜌 𝑖,𝑡 , 1 − 𝜖 clip , 1 + 𝜖 clip )𝐴 GRPO 
+
+> 𝑖,𝑡
+
+i 
+
++ 𝛽 LKL .
+
+(18) The KL term regularizes the updated policy toward the SFT reference model: 
+
+LKL = E𝑖,𝑡 
+
+𝑚 𝑖,𝑡 𝐾𝐿  𝜋 𝜃 (· | 𝑞, 𝑦 𝑖  
+
+> <𝑡
+
+)∥ 𝜋 ref (· | 𝑞, 𝑦 𝑖  
+
+> <𝑡
+
+) . (19) In implementation, this KL is estimated on generated tokens and is active only when 𝛽 > 0. The main difference from sequence-level reinforcement learn-ing is the granularity of the advantage signal. Sequence-level RL assigns the same advantage to all tokens in a generated DocID, whereas TCA-GRPO computes a separate advantage for each token position. This allows the policy update to reinforce helpful interme-diate decisions and weaken harmful ones within the same DocID trajectory. 
+
+## 4.6 TCA-PPO Optimization 
+
+For comparison, we implement a PPO-style actor-critic variant [29], denoted TCA-PPO. It uses the same token-level reward 𝑟 𝑖,𝑡 as TCA-GRPO, but replaces group-relative advantage estimation with a learned value baseline. A linear value head is attached to the pre-action decoder hidden state ℎ𝑖 𝑡 (corresponding to state 𝑠 𝑖 𝑡 = (𝑞, 𝑦 𝑖  
+
+> <𝑡
+
+)): 
+
+𝑉 𝜓 (𝑠 𝑖 𝑡 ) = 𝑉 𝜓 (ℎ𝑖 𝑡 ), (20) which estimates the expected future token-level return from the current DocID prefix. When KL regularization is enabled, we apply it as reward shaping against the frozen SFT reference policy 𝜋 ref :˜𝑟 𝑖,𝑡 = 𝑟 𝑖,𝑡 − 𝛽  log 𝜋 𝜃 old (𝑦 𝑖 𝑡 | 𝑞, 𝑦 𝑖  
+
+> <𝑡
+
+) − log 𝜋 ref (𝑦 𝑖 𝑡 | 𝑞, 𝑦 𝑖  
+
+> <𝑡
+
+). (21) When 𝛽 = 0, we simply have ˜ 𝑟 𝑖,𝑡 = 𝑟 𝑖,𝑡 . Token-level advantages are then computed from ˜ 𝑟 𝑖,𝑡 using standard generalized advantage estimation (GAE) [28] with discount 𝛾 = 1.0 and trace-decay 𝜆 .Advantages are normalized to zero mean and unit variance over all valid positions in the mini-batch. The clipped policy loss follows standard PPO: 
+
+Lpolicy = −E𝑖,𝑡 
+
+h
+
+𝑚 𝑖,𝑡 min 
+
+
+
+𝜌 𝑖,𝑡 𝐴 PPO  
+
+> 𝑖,𝑡
+
+,
+
+clip (𝜌 𝑖,𝑡 , 1 − 𝜖 clip , 1 + 𝜖 clip )𝐴 PPO 
+
+> 𝑖,𝑡
+
+i 
+
+,
+
+(22) where 𝜌 𝑖,𝑡 = 𝜋 𝜃 (𝑦 𝑖 𝑡 | 𝑞, 𝑦 𝑖  
+
+> <𝑡
+
+)/ 𝜋 𝜃 old (𝑦 𝑖 𝑡 | 𝑞, 𝑦 𝑖  
+
+> <𝑡
+
+) is the probability ratio and 𝑚 𝑖,𝑡 masks out padding positions. The value head is trained with a mean-squared-error loss against GAE return targets 𝑅 𝑖,𝑡 :
+
+Lvalue = 12 E𝑖,𝑡 
+
+h
+
+𝑚 𝑖,𝑡 (𝑉 𝜓 (𝑠 𝑖 𝑡 ) − 𝑟 𝑖,𝑡 )2 i
+
+. (23) The final objective is 
+
+LTCA -PPO = Lpolicy + 𝑐 𝑣 Lvalue , (24) where 𝑐 𝑣 = 0.1 is the value-loss coefficient. We omit the entropy bonus because the trie-constrained action space and KL reward shaping already prevent policy collapse. This actor-critic variant provides a value-based counterpart to TCA-GRPO: TCA-PPO es-timates token-level advantages from a learned prefix-state value function, whereas TCA-GRPO obtains them through group-relative normalization at each decoding position. 
+
+## 5 Experimental Settings 5.1 Datasets and Preprocessing 
+
+Natural Questions Natural Questions(NQ) [13] is a widely applied benchmark for evaluating retrieval models [33, 35]. We use a subset NQ320k that consists of about 320k query-document pairs, where the documents are gathered from Wikipedia pages, and the queries are natural language questions. Note that our study follows the data processing pipeline as described in prior works [22], and obtained approximately 100k documents. 
+
+MS MARCO MS MARCO document dataset is a collection of queries and web pages from Bing search. Similarly to NQ320k dataset, we rank the documents of the MS MARCO dataset by Token-Level Credit Assignment Optimization for Generative Document Retrieval CIKM ’26, November 7–11, 2026, Rome, Italy 
+
+the number of associated queries and keep the top about 320K documents and use their corresponding queries for training as described in prior works [22, 54]. We evaluate the models on the queries of the MS MARCO document dev set and retrieval on the sampled document subset as described in prior works [22]. 
+
+## 5.2 Baselines and Metrics 
+
+We compare our method with representative term-based, dense, and generative retrieval baselines. For term-based retrieval, we include BM25 and DocT5Query. For dense retrieval methods, we include DPR [10], ANCE [40], RepBERT [47], and Sentence-T5 [24]. For generative retrieval, we include DSI [33], DSI-QG [56], NCI [35], SEAL [1], Ultron [54], ROGER [53], MINDER [17], and LTRGR[19]. We also compare with GenRRL [52], a reinforcement learning based generative retrieval method. Following prior works, we evaluate retrieval performance using Recall@{1,5,10}, and Mean Reciprocal Rank at 10 (MRR@10), which jointly measure top-ranked retrieval accuracy and ranking quality within the top 10 results. Statistical significance is determined using paired t-tests with a threshold of 
+
+𝑝 < 0.05. 
+
+Note on result sourcing. Since the source code of GenRRL[52] and ROGER [53] is not publicly accessible, their baseline perfor-mance is cited directly from the corresponding original papers. To enable a controlled evaluation against the most relevant prior method, we independently reproduce other baseline methods un-der the same experimental setup and report the reproduced results by reproducing the released code using the dataset configurations adopted in this work. 
+
+## 5.3 DocID settings. 
+
+We evaluate two types of DocIDs: Title+URL (TU) and Product Quantization (PQ) following DDRO [22]. TU uses document titles and URLs as identifiers, preserving lexical information that is useful for web search scenarios. PQ represents documents with discrete semantic codes obtained from quantized document representations, which can better capture semantic information. 
+
+## 5.4 Implementation details 
+
+The SFT model is based on the T5-base pretrained model follow-ing DDRO [22], and we initialize the policy model from the SFT model and use an identical frozen copy as the reference model. Gold hidden-state trajectories are precomputed offline under teacher forc-ing. During reinforcement learning, candidate DocIDs are sampled with trie-based constrained decoding to ensure that generated se-quences remain within the valid DocID space. We train the policy model for 4 epochs with a learning rate of 1 × 10 −6 and a batch size of 256. For TCA-GRPO, unless otherwise specified, the group size is set to 𝐺 = 8. The KL coefficient is set to 𝛽 = 0 for PQ-based DocIDs and 𝛽 = 0.01 for TU-based DocIDs. During evaluation, we use constrained beam search to generate ranked DocID lists. All experiments were conducted on 8 NVIDIA A100 GPUs. 
+
+Table 1: Main results on MS MARCO document ranking. ‡
+
+indicates a statistically significant improvement over the baseline under the same DocID type, as determined by a paired 𝑡 -test at the 𝑝 < 0.05 level. The best results are shown in bold, and the second-best results are underlined.                                                                                             
+
+> Model R@1 R@5 R@10 MRR@10
+> Term-based & Dense retrieval
+> BM25 18.94 42.82 55.07 29.24 DocT5Query 23.27 49.38 63.61 34.81 DPR 29.08 62.75 73.13 43.41 ANCE 29.65 63.43 74.28 44.09 RepBERT 25.25 58.41 69.18 38.48 Sentence-T5 27.27 58.91 72.15 40.69
+> Generative retrieval
+> DSI (SI) 25.74 43.58 53.84 33.92 DSI-QG (SI) 28.82 50.74 62.26 38.45 NCI (SI) 29.54 57.99 67.28 40.46 SEAL (NG) 27.58 52.47 61.01 37.68 Ultron (TU) 29.82 60.39 68.31 42.53 Ultron (PQ) 31.55 63.98 73.14 45.35 ROGER-NCI (SI) 30.61 59.02 68.78 42.02 ROGER-Ultron (TU) 33.07 63.93 75.13 46.35 MINDER (SI) 29.98 58.37 71.92 42.51 LTRGR (SI) 32.69 64.37 72.43 47.85
+> RL-based Generative retrieval
+> GenRRL (TU) 33.01 63.62 74.91 45.93 GenRRL (Sum) 33.23 64.48 75.80 46.62 DDRO (PQ) 31.19 63.00 71.91 44.41 DDRO (TU) 38.24 67.33 74.26 50.33
+> Ours
+> TCA-GRPO (PQ) 32.42 ‡61.88 71.16 44.85 TCA-GRPO (TU) 39.60 ‡68.19 ‡75.37 51.10 ‡
+
+## 6 Experimental Results and Analysis 6.1 Research Questions 
+
+In this section, we present the experimental results to systematically evaluate the performance of TCA and analyze the contribution of its core components. We list the following research questions to guide our experiments: 
+
+Q1 How does our method perform compared with baseline meth-ods? 
+
+Q2 Can the proposed TCA be integrated with different policy optimization algorithms, and how does TCA-GRPO compare with TCA-PPO for generative retrieval? 
+
+Q3 Does token-level credit assignment provide additional bene-fits over sequence-level reward optimization? 
+
+Q4 How do training dynamics and key optimization choices affect retrieval performance? 
+
+Q5 How does TCA-GRPO improve DocID generation at the token level in representative retrieval cases? CIKM ’26, November 7–11, 2026, Rome, Italy Zhao et al. 
+
+Table 2: Main results on Natural Questions document ranking. 
+
+‡ indicates a statistically significant improvement over the baseline under the same DocID type, as determined by a paired 𝑡 -test at the 𝑝 < 0.05 level. The best results are shown in bold, and the second-best results are underlined. 
+
+Model R@1 R@5 R@10 MRR@10 
+
+Term-based & Dense retrieval 
+
+BM25 14.06 36.91 47.93 23.60 DocT5Query 19.07 43.88 55.83 29.55 DPR 22.78 53.44 68.58 35.92 ANCE 24.54 54.21 69.08 36.88 RepBERT 22.57 52.20 65.65 35.13 Sentence-T5 22.51 52.00 65.12 34.95 
+
+Generative retrieval 
+
+DSI (SI) 27.42 47.26 56.58 34.31 DSI-QG (SI) 30.17 53.20 66.37 38.85 NCI (SI) 32.69 55.82 69.20 42.84 SEAL (NG) 29.30 54.12 68.53 40.34 Ultron (TU) 33.78 54.20 67.05 42.51 Ultron (PQ) 25.64 53.09 65.75 37.12 ROGER-NCI (SI) 33.20 56.34 69.80 43.45 ROGER-Ultron (TU) 35.90 55.59 69.86 44.92 MINDER (SI) 31.00 55.50 65.79 43.50 LTRGR (SI) 32.80 56.20 68.74 44.80 
+
+RL-based Generative retrieval 
+
+GenRRL (TU) 35.79 56.49 70.96 45.73 GenRRL (Sum) 36.32 57.42 71.49 46.31 DDRO (TU) 39.70 51.96 54.17 44.72 DDRO (PQ) 48.10 62.64 66.84 54.32 
+
+Ours 
+
+TCA-GRPO (TU) 40.63 ‡ 52.42 55.39 45.53 ‡
+
+TCA-GRPO (PQ) 50.02 ‡ 64.09 ‡ 67.36 56.10 ‡
+
+## 6.2 Performance Comparison (Q1) 
+
+Tables 1 and 2 report the overall retrieval results on MS MARCO and Natural Questions datasets. Across the two benchmarks, our TCA-based methods show clear gains in Recall performance, with TCA-GRPO delivering the most consistent improvements. On MS MARCO dataset, TCA-GRPO with TU DocID obtains the best R@1, R@5, and MRR@10 among all compared methods, reaching 39.60, 68.19, and 51.10, respectively. Compared with the reproduced DDRO model under the same TU type DocID setting, it improves R@1 from 38.24 to 39.60 and MRR@10 from 50.33 to 51.10. On Natural Questions, TCA-GRPO with PQ DocID achieves the best R@1 and MRR@10, improving DDRO from 48.10 to 50.02 in R@1 and from 54.32 to 56.10 in MRR@10. These results show that token-level credit assignment is effec-tive for improving generative retrieval. Compared with prior gen-erative retrievers methods, TCA further improves the alignment between autoregressive token generation and document-level rele-vance. Rather than assigning the same relevance signal to the entire 
+
+Table 3: Performance comparison between TCA-GRPO and TCA-PPO. The best results are shown in bold, and the second-best results are underlined. 
+
+Setting Method R@1 R@5 R@10 MRR@10 MS-TU baseline-sft 38.11 65.71 73.39 49.51 TCA-PPO 39.35 66.58 74.87 50.63 TCA-GRPO 39.60 68.19 75.37 51.10 
+
+MS-PQ baseline-sft 30.19 62.50 71.16 43.57 TCA-PPO 31.68 62.87 72.02 44.63 TCA-GRPO 32.05 62.99 71.28 44.80 
+
+NQ-TU baseline-sft 38.99 50.84 53.59 44.05 TCA-PPO 39.17 50.05 53.35 44.07 TCA-GRPO 40.63 52.42 55.39 45.53 
+
+NQ-PQ baseline-sft 42.26 56.85 61.12 48.45 TCA-PPO 49.27 64.15 67.48 55.80 TCA-GRPO 50.02 64.09 67.36 56.10 
+
+DocID sequence tokens, TCA provides differentiated feedback to intermediate token decisions, which helps the model assign higher probability to trajectories leading to relevant documents. We also observe that the improvements are more pronounced on R@1 and MRR@10 than on R@5 and R@10. For example, on MS MARCO dataset, TCA-GRPO achieves the best R@1 and MRR@10, while GenRRL obtains the highest R@10. A similar trend appears on Natural Questions dataset, where GenRRL remains strong on R@10. This suggests that TCA mainly improves early precision and top-ranking quality, while broader recall may still benefit from document-level or list-level relevance optimization. This observa-tion is consistent with our motivation: token-level credit assign-ment is designed to refine the generation trajectory and improve the ranking of highly relevant DocIDs at the top positions. 
+
+## 6.3 Impact of Policy Optimization Methods (Q2) 
+
+To examine whether the proposed TCA reward design is tied to a particular policy optimizer, we compare two instantiations of TCA: TCA-PPO and TCA-GRPO. As described in Section 4.6, TCA-PPO uses the same token-level reward design as TCA-GRPO but replaces group-relative advantage estimation with value-function-based advantage estimation. This comparison therefore tests the optimizer-level generality of TCA. As shown in Table 3, TCA-PPO improves over baseline-sft in most settings, especially on the recall metrics. For example, on NQ-PQ, TCA-PPO improves R@1 from 42.26 to 49.27 and MRR@10 from 48.45 to 55.80. However, its gains are less consistent than those of TCA-GRPO; on NQ-TU, for instance, the improvements in R@1 and MRR@10 are marginal, while R@5 and R@10 slightly decrease. In contrast, TCA-GRPO consistently improves over baseline-sft 
+
+across all settings and achieves the best R@1 and MRR@10 in every setting. We hypothesize that PPO is less stable because it must learn a value function over DocID prefix states, where future actions are highly discrete and constrained by the DocID trie. GRPO instead Token-Level Credit Assignment Optimization for Generative Document Retrieval CIKM ’26, November 7–11, 2026, Rome, Italy 
+
+Table 4: Comparison between sequence-level and token-level rewards under TCA-GRPO on MS MARCO-TU and NQ-PQ. All variants are initialized from baseline-sft . All variants are initialized from baseline-sft model. † denotes our re-produced results. The best results are shown in bold, and the second-best results are underlined. 
+
+Method R@1 R@5 R@10 MRR@10 MS MARCO-TU 
+
+baseline-sft 38.11 65.71 73.39 49.51 DDRO † 38.24 67.33 74.26 50.33 TCA-GRPO seq 39.10 68.19 74.87 50.86 TCA-GRPO 39.60 68.19 75.37 51.10 
+
+NQ-PQ baseline-sft 42.26 56.85 61.12 48.45 DDRO † 48.10 62.64 66.84 54.32 TCA-GRPO seq 48.80 63.57 66.93 55.24 TCA-GRPO 50.02 64.09 67.36 56.10 
+
+estimates advantages through relative comparisons among candi-date DocIDs sampled for the same query, which better matches the ranking-oriented nature of retrieval. These results suggest that TCA is not restricted to a single optimizer, while group-relative advantage estimation is better suited to generative retrieval. 
+
+## 6.4 Token-Level vs. Sequence-Level Reward (Q3) 
+
+To isolate the effect of reward granularity, we compare the pro-posed token-level trajectory reward with a standard sequence-level reward while keeping the optimizer fixed to GRPO. As shown in Ta-ble 4, the sequence-level reward already improves over baseline-sft ,indicating that reinforcement learning post-training itself is benefi-cial for generative retrieval. However, replacing this coarse sequence-level feedback with token-level credit assignment yields consistent additional gains. On MS MARCO-TU, the token-level reward im-proves R@1 from 39.10 to 39.60 and MRR@10 from 50.86 to 51.10 compared with the sequence-level reward. On NQ-PQ, the gains are larger, with R@1 increasing from 48.80 to 50.02 and MRR@10 from 55.24 to 56.10. These results suggest that assigning the same ter-minal reward to every generated DocID token provides useful but insufficient supervision. By providing position-wise feedback, the token-level reward more precisely reinforces decisions that keep the generation trajectory close to the gold DocID and penalizes deviations from it. 
+
+## 6.5 Rewards during TCA-GRPO Training (Q4) 
+
+Figure 3 illustrates the evolution of reward values during the train-ing process using TCA-GRPO. We plot reward trajectories for two representative settings, MS MARCO-TU and NQ-PQ. Because per-step rewards fluctuate substantially during policy optimization, we group training steps into equal-width progress bins and report both the mean reward and the 10th–90th percentile range within each bin. The mean reward increases consistently in both settings, indi-cating that TCA-GRPO can progressively achieve higher rewards 0 20 40 60 80 100 0.55 0.60 0.65 0.70 0.75 0.80 0.85 0.90 
+
+> Training progress (%) Mean reward
+> MSMARCO-TU NQ-PQ
+
+Figure 3: Reward dynamics of TCA-GRPO on MS MARCO-TU and NQ-PQ. Training steps are grouped into equal-width progress bins. Bold curves show the mean per-step reward in each bin, and shaded bands indicate the 10th–90th percentile range. Table 5: Effect of constrained decoding during TCA-GRPO rollout on NQ-PQ and MSMARCO-TU. The best results are shown in bold. 
+
+Method R@1 R@5 R@10 MRR@10 NQ-PQ w/o constraints 45.18 59.77 63.28 51.40 w/ constraints 50.02 64.09 67.36 56.10 
+
+MSMARCO-TU w/o constraints 37.74 65.96 75.12 49.60 w/ constraints 39.60 68.19 75.37 51.10 
+
+under different datasets and DocID forms. However, the pace of improvement differs across settings. On NQ-PQ, the reward rises quickly during approximately the first 40% of training, followed by a slower but steady increase thereafter, whereas on MS MARCO-TU the reward improves more gradually throughout training. We attribute this difference to the data and identifier characteristics of the two settings: NQ-PQ is built on a smaller and relatively cleaner benchmark with compact semantic-code identifiers, which may make reward-driven trajectory refinement easier; in contrast, MS MARCO-TU contains noisier web documents and lexical title-URL identifiers, leading to a larger and more heterogeneous generation space. Despite these different convergence patterns, the rewards in both settings maintain a stable upward trend, suggesting that TCA-GRPO provides a robust training signal for model optimization. 
+
+## 6.6 Training Strategy and Hyperparameter (Q4) 
+
+Constrained decoding. Constrained decoding during rollout is important for stable RL training. As shown in Table 5, removing con-straints substantially hurts performance. On NQ-PQ, constrained rollout improves R@1 from 45.18 to 50.02 and MRR@10 from 51.40 to 56.10. This indicates that unconstrained sampling often produces CIKM ’26, November 7–11, 2026, Rome, Italy Zhao et al. 
+
+invalid or low-quality DocID trajectories, making the trajectory reward noisy. Restricting rollouts to the legal DocID space makes sampled candidates more meaningful and improves token-level credit assignment. 2 4 6 8 10 12      
+
+> Group size G
+> 40.0 45.0 50.0 55.0
+> Performance (%)
+> G= 8
+> MS R@1 MS MRR@10 NQ R@1 NQ MRR@10
+> 39.60 51.12 50.02 56.10
+
+Figure 4: Effect of group size in TCA-GRPO on MS MARCO-TU and NQ-PQ. 0 0.01 0.05 0.10    
+
+> KL coefficient beta
+> 38.0 42.0 46.0 50.0 54.0
+> Performance (%)
+> MS R@1 MS MRR@10 NQ R@1 NQ MRR@10
+
+Figure 5: Effect of the KL regularization coefficient 𝛽 on R@1 and MRR@10 for MS-TU and NQ-PQ under TCA-GRPO. Group size. Figure 4 shows that increasing the group size from 
+
+𝐺 = 2 to moderate values consistently improves R@1 and MRR@10 on both MS MARCO-TU and NQ-PQ. The performance stabilizes when 𝐺 ranges from 4 to 8, with 𝐺 = 8 achieving the best or near-best results in terms of R@1 and MRR@10. Further increasing the group size does not yield consistent gains, suggesting that a moderate number of sampled candidates is sufficient for reliable group-relative advantage estimation. 
+
+KL coefficient. Figure 5 shows the effect of the KL regularization coefficient on two representative metrics, R@1 and MRR@10. The preferred KL strength differs between the TU and PQ settings. For MS-TU, a small KL coefficient, 𝛽 = 0.01, yields the best performance on both R@1 and MRR@10, suggesting that a mild constraint to the SFT reference policy helps preserve the lexical generation patterns of title- and URL-based identifiers. In contrast, for NQ-PQ, remov-ing KL regularization performs best: 𝛽 = 0 achieves the highest 0.0 0.2 0.4 0.6 0.8 1.0 
+
+> Probability(target token)
+
+MS MARCO QID 310853          
+
+> SFT TCA-GRPO
+> 12345678910
+
+Token position  
+
+> 0.0 0.1 0.2 0.3
+> Δ(RL - SFT)
+> Δ(RL - SFT) Valid candidates num
+> 10 1
+> 10 3
+> Candidates(log scale)
+
+Figure 6: Case study on MS MARCO for the query “how much does a pharmacy tech make?”. The upper panel compares the probabilities assigned by the SFT model and TCA-GRPO to the gold next token under the gold DocID prefix. The lower panel shows the probability differences after TCA-GRPO and the number of valid DocID candidates compatible with the gold prefix at each decoding position. 
+
+R@1 and MRR@10, whereas non-zero KL coefficients lead to clear performance degradation. This result suggests that PQ DocIDs, which consist of discrete semantic code tokens, are more sensitive to KL constraints during reward-driven policy optimization than lexical TU identifiers. Based on these observations, we set 𝛽 = 0.01 for TU DocIDs and 𝛽 = 0 for PQ DocIDs in the main experiments. 
+
+## 6.7 Case Study (Q5) 
+
+To qualitatively examine how TCA improves DocID generation, we analyze a representative MS MARCO-TU query: “how much does a pharmacy tech make?” The gold document is D702099 , whose TU DocID is “pharmacy technician salaries www.glassdoor.com”. With constrained beam-search inference using 10 beams, the SFT model ranks the DocID only at the 9th position, whereas TCA-GRPO promotes it to rank 1. This result shows that token-level credit assignment can translate into a direct improvement in the final retrieval ranking. Figure 6 explains this improvement from the token-generation perspective. Under the target DocID prefix, TCA-GRPO assigns higher probabilities to the correct next token at Token-Level Credit Assignment Optimization for Generative Document Retrieval CIKM ’26, November 7–11, 2026, Rome, Italy 
+
+9 out of 10 decoding positions, increasing the average gold-token probability from 0.829 to 0.906. The gains are especially pronounced at early and middle positions: the probability of “pharmacy” at the first position increases from 0.523 to 0.855, “salaries” at the third position increases from 0.580 to 0.686, and “www” at the fourth position increases from 0.456 to 0.667. These improvements are particularly important because early decoding steps correspond to a much larger candidate space. At the first token position, the gold prefix is compatible with 8,980 valid DocID continuations. After generating the first token, the number of compatible candidates rapidly drops to 8, and further decreases to 3 after the second token. Once the path becomes nearly determined, later gold tokens already receive probabilities close to 1.0 under SFT, leaving limited room for further improvement. Therefore, TCA mainly strengthens the gold trajectory at the more uncertain and influential decoding positions, which increases the sequence score of the relevant DocID and helps move it from rank 9 to rank 1. 
+
+## 7 Conclusion 
+
+Generative retrieval generates DocIDs token by token, but existing RL feedback is usually document-level. This paper addresses the mismatch with TCA, which compares generated hidden states with gold DocID trajectories from a frozen reference model to assign token-level trajectory rewards. TCA improves generative retrieval by turning document-level supervision into dense feedback over the actual decoding trajectory. Across MS MARCO and NQ, TCA-GRPO consistently improves top-ranking metrics over supervised fine-tuning and sequence-level reinforcement learning baselines, while TCA-PPO shows that the reward design is not tied to a single optimizer. The reward ablations further indicate that the gains come from token-level credit assignment rather than reinforcement learn-ing alone, and the training analyses show that constrained rollout, moderate group size, and DocID-dependent KL regularization are important for stable and effective optimization. These results also highlight two practical limitations. First, TCA introduces a more complex training pipeline because it relies on a supervised refer-ence model before reinforcement learning optimization. Second, the reinforcement learning stage adds nontrivial training overhead due to rollout generation and token-level reward computation. Sim-plifying this two-stage procedure and improving the efficiency of RL-based optimization remain important directions for future work. More broadly, our findings suggest that assigning credit at the same granularity as autoregressive retrieval decisions is a promising route toward better aligning generative retrievers with retrieval objectives. 
+
+## 8 GenAI Usage Disclosure 
+
+This work involved the use of generative AI tools in limited and supervised ways. Specifically, docT5query was used to assist with generating pseudo-queries following prior works, during the data preparation stage. In addition, OpenAI’s ChatGPT was employed solely for minor language polishing, such as grammar correction and wording improvements. All uses of GenAI tools were conducted under the full supervision of the authors, who are solely responsible for the final content. 
+
+## 9 Acknowledgments 
+
+All content represents the opinion of the authors, which is not necessarily shared or endorsed by their respective employers and/or sponsors. 
+
+## References 
+
+[1] Michele Bevilacqua, Giuseppe Ottaviano, Patrick Lewis, Scott Yih, Sebastian Riedel, and Fabio Petroni. 2022. Autoregressive search engines: Generating substrings as document identifiers. Advances in Neural Information Processing Systems 35 (2022), 31668–31683. [2] Nicola De Cao, Gautier Izacard, Sebastian Riedel, and Fabio Petroni. 2021. Au-toregressive Entity Retrieval. In ICLR .[3] Alex J Chan, Hao Sun, Samuel Holt, and Mihaela Van Der Schaar. 2024. Dense reward for free in reinforcement learning from human feedback. arXiv preprint arXiv:2402.00782 (2024). [4] Jiangui Chen, Ruqing Zhang, Jiafeng Guo, Maarten de Rijke, Wei Chen, Yixing Fan, and Xueqi Cheng. 2023. Continual learning for generative retrieval over dynamic corpora. In Proceedings of the 32nd ACM international conference on information and knowledge management . 306–315. [5] Jiangui Chen, Ruqing Zhang, Jiafeng Guo, Yiqun Liu, Yixing Fan, and Xueqi Cheng. 2022. Corpusbrain: Pre-train a generative retrieval model for knowledge-intensive language tasks. In Proceedings of the 31st ACM International Conference on Information & Knowledge Management . 191–200. [6] Jiehan Cheng, Zhicheng Dou, Yutao Zhu, and Xiaoxi Li. 2025. Descriptive and Discriminative Document Identifiers for Generative Retrieval. In Proceedings of the AAAI Conference on Artificial Intelligence , Vol. 39. 11518–11526. [7] Anna Harutyunyan, Will Dabney, Thomas Mesnard, Mohammad Ghesh-laghi Azar, Bilal Piot, Nicolas Heess, Hado P van Hasselt, Gregory Wayne, Satinder Singh, Doina Precup, et al. 2019. Hindsight credit assignment. Advances in neural information processing systems 32 (2019). [8] Sebastian Hofstätter, Sheng-Chieh Lin, Jheng-Hong Yang, Jimmy Lin, and Allan Hanbury. 2021. Efficiently teaching an effective dense retriever with balanced topic aware sampling. In Proceedings of the 44th international ACM SIGIR confer-ence on research and development in information retrieval . 113–122. [9] Gautier Izacard, Mathilde Caron, Lucas Hosseini, Sebastian Riedel, Piotr Bo-janowski, Armand Joulin, and Edouard Grave. 2021. Unsupervised dense in-formation retrieval with contrastive learning. arXiv preprint arXiv:2112.09118 
+
+(2021). [10] Vladimir Karpukhin, Barlas Oguz, Sewon Min, Patrick Lewis, Ledell Wu, Sergey Edunov, Danqi Chen, and Wen-tau Yih. 2020. Dense passage retrieval for open-domain question answering. In Proceedings of the 2020 conference on empirical methods in natural language processing (EMNLP) . 6769–6781. [11] Omar Khattab and Matei Zaharia. 2020. Colbert: Efficient and effective passage search via contextualized late interaction over bert. In Proceedings of the 43rd International ACM SIGIR conference on research and development in Information Retrieval . 39–48. [12] Saar Kuzi, Mingyang Zhang, Cheng Li, Michael Bendersky, and Marc Najork. 2020. Leveraging semantic and lexical matching to improve the recall of document retrieval systems: A hybrid approach. arXiv preprint arXiv:2010.01195 (2020). [13] Tom Kwiatkowski, Jennimaria Palomaki, Olivia Redfield, Michael Collins, Ankur P. Parikh, Chris Alberti, Danielle Epstein, Illia Polosukhin, Jacob De-vlin, Kenton Lee, Kristina Toutanova, Llion Jones, Matthew Kelcey, Ming-Wei Chang, Andrew M. Dai, Jakob Uszkoreit, Quoc V. Le, and Slav Petrov. 2019. Nat-ural Questions: A Benchmark for Question Answering Research. TACL 7 (2019), 453–466. [14] Alan Li, Daniel Cheng, Phillip Keung, Jungo Kasai, and Noah A Smith. 2024. Summarization-Based Document IDs for Generative Retrieval with Language Models. In Proceedings of the First Workshop on Advancing Natural Language Processing for Wikipedia . 126–135. [15] Jiahui Li, Lin Li, Tai-Wei Chang, Kun Kuang, Long Chen, Jun Zhou, and Cheng Yang. 2025. RED: Unleashing Token-Level Rewards from Holistic Feedback via Reward Redistribution. In Proceedings of the 2025 Conference on Empirical Methods in Natural Language Processing . 4993–5022. [16] Xiaoxi Li, Jiajie Jin, Yujia Zhou, Yuyao Zhang, Peitian Zhang, Yutao Zhu, and Zhicheng Dou. 2025. From matching to generation: A survey on generative information retrieval. ACM Transactions on Information Systems 43, 3 (2025), 1–62. [17] Yongqi Li, Nan Yang, Liang Wang, Furu Wei, and Wenjie Li. 2023. Multiview identifiers enhanced generative retrieval. In Proceedings of the 61st Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers) . 6636– 6648. [18] Yongqi Li, Nan Yang, Liang Wang, Furu Wei, and Wenjie Li. 2024. Learning to rank in generative retrieval. In Proceedings of the AAAI Conference on Artificial Intelligence , Vol. 38. 8716–8723. CIKM ’26, November 7–11, 2026, Rome, Italy Zhao et al. 
+
+[19] Yongqi Li, Zhen Zhang, Wenjie Wang, Liqiang Nie, Wenjie Li, and Tat-Seng Chua. 2024. Distillation enhanced generative retrieval. In Findings of the Association for Computational Linguistics: ACL 2024 . 11119–11129. [20] Penghao Lu, Xin Dong, Yuansheng Zhou, Lei Cheng, Chuan Yuan, and Linjian Mo. 2025. DOGR: Leveraging Document-Oriented Contrastive Learning in Generative Retrieval. In Proceedings of the AAAI Conference on Artificial Intelligence , Vol. 39. 24732–24740. [21] Sanket Vaibhav Mehta, Jai Gupta, Yi Tay, Mostafa Dehghani, Vinh Q Tran, Jinfeng Rao, Marc Najork, Emma Strubell, and Donald Metzler. 2023. DSI++: Updating transformer memory with new documents. In Proceedings of the 2023 conference on empirical methods in natural language processing . 8198–8213. [22] Kidist Amde Mekonnen, Yubao Tang, and Maarten de Rijke. 2025. Lightweight and Direct Document Relevance Optimization for Generative Information Retrieval. In Proceedings of the 48th International ACM SIGIR Conference on Research and Development in Information Retrieval . 1327–1338. [23] Donald Metzler, Yi Tay, Dara Bahri, and Marc Najork. 2021. Rethinking search: making domain experts out of dilettantes. In Acm sigir forum , Vol. 55. ACM New York, NY, USA, 1–27. [24] Jianmo Ni, Gustavo Hernandez Abrego, Noah Constant, Ji Ma, Keith Hall, Daniel Cer, and Yinfei Yang. 2022. Sentence-t5: Scalable sentence encoders from pre-trained text-to-text models. In Findings of the association for computational lin-guistics: ACL 2022 . 1864–1874. [25] Long Ouyang, Jeffrey Wu, Xu Jiang, Diogo Almeida, Carroll Wainwright, Pamela Mishkin, Chong Zhang, Sandhini Agarwal, Katarina Slama, Alex Ray, et al. 2022. Training language models to follow instructions with human feedback. Advances in neural information processing systems 35 (2022), 27730–27744. [26] Ruiyang Ren, Wayne Xin Zhao, Jing Liu, Hua Wu, Ji-Rong Wen, and Haifeng Wang. 2023. TOME: A two-stage approach for model-based retrieval. In Proceed-ings of the 61st Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers) . 6102–6114. [27] Stephen Robertson and Hugo Zaragoza. 2009. The probabilistic relevance frame-work: BM25 and beyond . Vol. 4. Now Publishers Inc. [28] John Schulman, Philipp Moritz, Sergey Levine, Michael Jordan, and Pieter Abbeel. 2015. High-dimensional continuous control using generalized advantage estima-tion. arXiv preprint arXiv:1506.02438 (2015). [29] John Schulman, Filip Wolski, Prafulla Dhariwal, Alec Radford, and Oleg Klimov. 2017. Proximal policy optimization algorithms. arXiv preprint arXiv:1707.06347 
+
+(2017). [30] Zhihong Shao, Peiyi Wang, Qihao Zhu, Runxin Xu, Junxiao Song, Xiao Bi, Haowei Zhang, Mingchuan Zhang, YK Li, Yang Wu, et al. 2024. Deepseekmath: Push-ing the limits of mathematical reasoning in open language models, 2024. URL https://arxiv. org/abs/2402.03300 2, 3 (2024), 5. [31] Weiwei Sun, Keyi Kong, Xinyu Ma, Shuaiqiang Wang, Dawei Yin, Maarten de Rijke, Zhaochun Ren, and Yiming Yang. 2026. ZeroGR: A Generalizable and Scalable Framework for Zero-Shot Generative Retrieval. In The Fourteenth Inter-national Conference on Learning Representations . https://openreview.net/forum? id=RBoAwiQl5L [32] Yubao Tang, Ruqing Zhang, Jiafeng Guo, Jiangui Chen, Zuowei Zhu, Shuaiqiang Wang, Dawei Yin, and Xueqi Cheng. 2023. Semantic-enhanced differentiable search index inspired by learning strategies. In Proceedings of the 29th ACM SIGKDD Conference on Knowledge Discovery and Data Mining . 4904–4913. [33] Yi Tay, Vinh Tran, Mostafa Dehghani, Jianmo Ni, Dara Bahri, Harsh Mehta, Zhen Qin, Kai Hui, Zhe Zhao, Jai Gupta, et al. 2022. Transformer memory as a differentiable search index. Advances in neural information processing systems 35, 21831–21843. [34] Ravisri Valluri, Akash Kumar Mohankumar, Kushal Dave, Amit Singh, Jian Jiao, Manik Varma, and Gaurav Sinha. 2024. Scaling the vocabulary of non-autoregressive models for efficient generative retrieval. arXiv preprint arXiv:2406.06739 (2024). [35] Yujing Wang, Yingyan Hou, Haonan Wang, Ziming Miao, Shibin Wu, Qi Chen, Yuqing Xia, Chengmin Chi, Guoshuai Zhao, Zheng Liu, et al. 2022. A neural corpus indexer for document retrieval. Advances in Neural Information Processing Systems 35, 25600–25614. [36] Yidan Wang, Zhaochun Ren, Weiwei Sun, Jiyuan Yang, Zhixiang Liang, Xin Chen, Ruobing Xie, Su Yan, Xu Zhang, Pengjie Ren, et al. 2024. Content-based collaborative generation for recommender systems. In Proceedings of the 33rd ACM International Conference on Information and Knowledge Management . 2420– 2430. [37] Zihan Wang, Yujia Zhou, Yiteng Tu, and Zhicheng Dou. 2023. NOVO: learnable and interpretable document identifiers for model-based IR. In Proceedings of the 32nd ACM International Conference on Information and Knowledge Management .2656–2665. [38] Haoyang Wen, Jiang Guo, Yi Zhang, Jiarong Jiang, and Zhiguo Wang. 2025. On synthetic data strategies for domain-specific generative retrieval. In Proceedings of the 63rd Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers) . 7961–7976. [39] Zeqiu Wu, Yushi Hu, Weijia Shi, Nouha Dziri, Alane Suhr, Prithviraj Am-manabrolu, Noah A Smith, Mari Ostendorf, and Hannaneh Hajishirzi. 2023. Fine-grained human feedback gives better rewards for language model training. 
+
+Advances in Neural Information Processing Systems 36 (2023), 59008–59033. [40] Lee Xiong, Chenyan Xiong, Ye Li, Kwok-Fung Tang, Jialin Liu, Paul Bennett, Junaid Ahmed, and Arnold Overwijk. 2021. Approximate Nearest Neighbor Negative Contrastive Learning for Dense Text Retrieval. In ICLR .[41] Kailai Yang, Zhiwei Liu, Qianqian Xie, Jimin Huang, Erxue Min, and Sophia Ana-niadou. 2025. Selective preference optimization via token-level reward function estimation. In Proceedings of the 2025 Conference on Empirical Methods in Natural Language Processing . 7043–7067. [42] Eunseop Yoon, Hee Suk Yoon, SooHwan Eom, Gunsoo Han, Daniel Nam, Daejin Jo, Kyoung-Woon On, Mark Hasegawa-Johnson, Sungwoong Kim, and Chang Yoo. 2024. Tlcr: Token-level continuous reward for fine-grained reinforcement learning from human feedback. In Findings of the Association for Computational Linguistics: ACL 2024 . 14969–14981. [43] Hansi Zeng, Chen Luo, Bowen Jin, Sheikh Muhammad Sarwar, Tianxin Wei, and Hamed Zamani. 2024. Scalable and effective generative information retrieval. In 
+
+Proceedings of the ACM Web Conference 2024 . 1441–1452. [44] Hansi Zeng, Chen Luo, and Hamed Zamani. 2024. Planning ahead in generative retrieval: Guiding autoregressive generation through simultaneous decoding. In Proceedings of the 47th International ACM SIGIR Conference on Research and Development in Information Retrieval . 469–480. [45] Yongcheng Zeng, Guoqing Liu, Weiyu Ma, Ning Yang, Haifeng Zhang, and Jun Wang. 2024. Token-level direct preference optimization. arXiv preprint arXiv:2404.11999 (2024). [46] Jingtao Zhan, Jiaxin Mao, Yiqun Liu, Jiafeng Guo, Min Zhang, and Shaoping Ma. 2021. Optimizing dense retrieval model training with hard negatives. In Proceed-ings of the 44th international ACM SIGIR conference on research and development in information retrieval . 1503–1512. [47] Jingtao Zhan, Jiaxin Mao, Yiqun Liu, Min Zhang, and Shaoping Ma. 2020. Rep-bert: Contextualized text embeddings for first-stage retrieval. arXiv preprint arXiv:2006.15498 (2020). [48] Zhen Zhang, Xinyu Ma, Weiwei Sun, Pengjie Ren, Zhumin Chen, Shuaiqiang Wang, Dawei Yin, Maarten de Rijke, and Zhaochun Ren. 2025. Replication and Exploration of Generative Retrieval over Dynamic Corpora. In Proceedings of the 48th International ACM SIGIR Conference on Research and Development in Information Retrieval . 3325–3334. [49] Zhen Zhang, Zihan Wang, Xinyu Ma, Shuaiqiang Wang, Dawei Yin, Xin Xin, Pengjie Ren, Maarten de Rijke, and Zhaochun Ren. 2026. Model Editing for New Document Integration in Generative Information Retrieval. In Proceedings of the ACM Web Conference 2026 . 1993–2003. [50] Xinpeng Zhao, Zhaochun Ren, Yukun Zhao, Zhenyang Li, Mengqi Zhang, Jun Feng, Ran Chen, Ying Zhou, Zhumin Chen, Shuaiqiang Wang, et al. 2025. DiffuGR: Generative Document Retrieval with Diffusion Language Models. arXiv preprint arXiv:2511.08150 (2025). [51] Han Zhong, Zikang Shan, Guhao Feng, Wei Xiong, Xinle Cheng, Li Zhao, Di He, Jiang Bian, and Liwei Wang. 2024. Dpo meets ppo: Reinforced token optimization for rlhf. arXiv preprint arXiv:2404.18922 (2024). [52] Yujia Zhou, Zhicheng Dou, and Ji-Rong Wen. 2023. Enhancing generative retrieval with reinforcement learning from relevance feedback. In Proceedings of the 2023 Conference on Empirical Methods in Natural Language Processing . 12481–12490. [53] Yujia Zhou, Jing Yao, Zhicheng Dou, Yiteng Tu, Ledell Wu, Tat-Seng Chua, and Ji-Rong Wen. 2024. ROGER: Ranking-Oriented Generative Retrieval. ACM Trans. Inf. Syst. 42, 6, Article 155 (Oct. 2024), 25 pages. doi:10.1145/3603167 [54] Yujia Zhou, Jing Yao, Zhicheng Dou, Ledell Yu Wu, Peitian Zhang, and Ji rong Wen. 2022. Ultron: An Ultimate Retriever on Corpus with a Model-based Indexer. 
+
+ArXiv abs/2208.09257 (2022). [55] Yutao Zhu, Huaying Yuan, Shuting Wang, Jiongnan Liu, Wenhan Liu, Chenlong Deng, Haonan Chen, Zheng Liu, Zhicheng Dou, and Ji-Rong Wen. 2025. Large language models for information retrieval: A survey. ACM Transactions on Information Systems 44, 1 (2025), 1–54. [56] Shengyao Zhuang, Houxing Ren, Linjun Shou, Jian Pei, Ming Gong, G. Zuccon, and Daxin Jiang. 2022. Bridging the Gap Between Indexing and Retrieval for Differentiable Search Index with Query Generation. ArXiv abs/2206.10128 (2022).

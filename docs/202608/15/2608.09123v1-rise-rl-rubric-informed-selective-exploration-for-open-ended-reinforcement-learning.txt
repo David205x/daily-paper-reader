@@ -1,0 +1,2898 @@
+RISE-RL: Rubric-Informed Selective Exploration
+for Open-Ended Reinforcement Learning
+Jinkun Hou1∗, Zhuo Liu2∗, Huimin Ren3†, Hongsheng Xin3, Pan Zhou3, Kun Zhan3
+1Peking University 2Beijing Institute of Technology 3Li Auto Inc.
+{houjinkun26}@stu.pku.edu.cn {renhuimin}@lixiang.com
+Abstract
+Aligning Large Language Models (LLMs) for open-ended
+tasks is challenging because responses must satisfy multidi-
+mensional criteria without following a single correct gener-
+ation trajectory. Existing rubric-based reinforcement learn-
+ing (RL) methods compress fine-grained criterion-level feed-
+back into scalar rewards, making persistent capability gaps
+difficult to target under limited on-policy exploration. We
+propose RISE-RL (Rubric-Informed Selective Exploration),
+which uses repeatedly missed rubric criteria to elicit priv-
+ileged trajectories that are difficult to discover through un-
+guided exploration alone. RISE-RL retains only trajectories
+whose complete-rubric reward exceeds the mean reward of
+natural rollouts, and then re-evaluates them under the origi-
+nal prompt to emphasize behaviors that remain weakly sup-
+ported by the natural policy. The resulting guidance signal
+is optimized through a separate auxiliary objective and re-
+moved once its additional benefit diminishes. Experiments
+with 4B and 14B models across writing, chat, health, and sci-
+ence show that RISE-RL achieves the highest mean score on
+every evaluated benchmark under guidance-free evaluation.
+Compared with standard Rubric-RL, it improves the average
+score by 1.3 points at the 4B scale and 3.3 points at the 14B
+scale, including a 6.0-point gain on CreativeWriting-V3. It
+also improves creative-writing diversity and yields gains on
+objectively scored medical and scientific benchmarks. These
+results indicate that selective internalization through reward
+filtering and policy support shaping is effective for open-ended
+reinforcement learning.
+Introduction
+Open-ended question answering is a core capability of large
+language models, spanning open-domain dialogue (Zhang
+et al. 2020; Roller et al. 2021; Thoppilan et al. 2022), cre-
+ative writing (Franceschelli and Musolesi 2023; Gómez-
+Rodríguez and Williams 2023), health assistance (Lin et al.
+2025; Singhal et al. 2023, 2025), and scientific explana-
+tion (Wan et al. 2024; Besrour et al. 2025). Unlike mathe-
+matical reasoning (Ren et al. 2025; Chen et al. 2025) or code
+generation (Le et al. 2022; Cao et al. 2026), open-ended tasks
+admit no single correct trajectory and require responses to
+satisfy diverse criteria, including factuality, completeness,
+style, structure, safety, and human preferences. Moreover,
+substantially different responses may be equally valid, giving
+rise to a multi-peaked policy distribution with multiple de-
+∗This work was done during an internship at Li Auto Inc.
+†Corresponding author.
+Rubric-RL
+RISE-RL
+Support-limited exploration.
+Guidance-enhanced exploration.
+Prompt: Pregnant user asks whether a high-
+altitude trip is safe.
+Rubric criteria: Advise consulting an obstetric 
+provider before travel.
+How does guidance broaden the exploration space?
+Entropy grows slowly.
+Relies on unguided 
+exploration.
+Guidance expands 
+exploration. 
+Entropy Dynamics of Qwen3-4B 
+Trained on Health Domain
+Failures on the Target Criterion 
+in 8 Rollouts
+Train step
+0
+100
+200
+300
+Rubric-RL
+8/8
+8/8
+8/8
+5/8
+RISE-RL
+8/8
+8/8
+5/8
+0/8
+Rubric-RL: Unguided self-exploration 
+with limited criterion-level targeting.
+RISE-RL: Guidance for identifying targeted 
+deficiencies and broadening exploration.
+Figure 1: Overview of the guidance–exploration mechanism
+in RISE-RL. Selective rubric guidance addresses criterion
+failures and expands the accessible policy space. Once these
+behaviors become accessible, guidance is removed and train-
+ing continues with autonomous on-policy exploration.
+sirable generation modes. Reinforcement learning for open-
+ended tasks must therefore improve rubric alignment with-
+out sacrificing autonomous exploration or response diversity.
+Balancing these objectives remains a central challenge.
+Existing methods still struggle to improve open-ended ca-
+pabilities while preserving exploration and diversity. Rubric-
+based RL provides fine-grained criterion-level feedback but
+aggregates criterion-wise scores into a scalar sequence-level
+reward for policy optimization (Gunjal et al. 2025; Huang
+et al. 2026b). Consequently, criterion-specific failures may
+not be directly translated into targeted policy updates. OPD
+provides dense token-level supervision by distilling a teacher
+distribution on states visited by the student policy (Li et al.
+2026b; Zhao et al. 2026b; Hübotter et al. 2026). While such
+supervision facilitates knowledge transfer, it offers limited
+control over which guided behaviors are selectively inter-
+nalized. Mixed-policy optimization further combines privi-
+leged trajectories with on-policy samples in the same group-
+relative objective (Bi et al. 2025; Huang et al. 2026a). This
+coupling allows privileged samples to affect the reward nor-
+arXiv:2608.09123v1  [cs.AI]  10 Aug 2026
+
+
+malization and relative advantages of natural rollouts, while
+limiting independent control over the strength and granular-
+ity of guided supervision.
+To address these limitations, we propose RISE-RL, a
+selective-guidance paradigm for open-ended tasks. RISE-RL
+uses rubric feedback to identify capability gaps, filters guided
+trajectories by complete-rubric reward, and re-evaluates the
+retained trajectories under the original prompt to empha-
+size behaviors weakly supported by the natural policy. The
+resulting signal is optimized through a separate auxiliary
+objective, keeping guided learning outside natural group-
+relative optimization. As its benefit diminishes, guidance is
+removed and training continues with unguided on-policy ex-
+ploration, facilitating selective internalization while retain-
+ing autonomous exploration and response diversity.
+We evaluate RISE-RL on Qwen3-4B and Qwen3-14B
+across four RubricHub domains and eight downstream
+benchmarks. RISE-RL achieves higher mean scores than
+standard Rubric-RL on every evaluated benchmark at both
+model scales, with average gains of 1.3 and 3.3 points at
+the 4B and 14B scales, respectively. On Qwen3-14B, the
+gains reach 8.0 points on Arena-Hard-v2 and 6.0 points
+on CreativeWriting-V3. In the creative-writing evaluation,
+RISE-RL also improves output diversity by 5.8%. These
+gains further extend to objectively scored tasks, including
+improvements of 3.3 points on MedQA and 3.6 points on
+GPQA-Diamond. Overall, these results suggest that RISE-
+RL improves complex rubric alignment while supporting
+generation diversity and facilitating the internalization of
+domain knowledge and reasoning capabilities.
+Our main contributions, which directly address the limi-
+tations of prior work, are threefold:
+• Criterion-Level Selective Guidance for Open-Ended
+RL: We introduce RISE-RL, which retains the fine-
+grained diagnostic information that is normally collapsed
+into a scalar rubric reward. By identifying high-value cri-
+teria that remain repeatedly unsatisfied across natural roll-
+outs, RISE-RL constructs targeted guidance for behaviors
+that are rarely elicited through unguided exploration.
+• Selective Internalization by Gain and Policy Sup-
+port: RISE-RL retains only privileged trajectories that
+improve the complete-rubric reward over the natural-
+rollout baseline. It then removes the privileged criteria
+and re-evaluates the retained trajectories under the origi-
+nal prompt, using token probabilities to concentrate learn-
+ing on beneficial behaviors that remain weakly supported
+by the natural policy. The resulting guidance signal is op-
+timized through a separate auxiliary objective, preventing
+privileged trajectories from affecting the reward normal-
+ization and relative-advantage estimation of natural on-
+policy rollouts.
+• Broad Empirical Evaluation across Models and Do-
+mains: Experiments with Qwen3-4B and Qwen3-14B
+across writing, chat, health, and science show that RISE-
+RL achieves higher mean scores than Rubric-RL on every
+evaluated benchmark at both scales under guidance-free
+evaluation. The gains are particularly pronounced on chal-
+lenging open-ended benchmarks at the 14B scale, while
+improvements on objectively scored tasks further sug-
+gest within-domain transfer to verifiable tasks. Training-
+dynamics analyses and ablations additionally support the
+benefits of selective early guidance followed by unguided
+on-policy exploration.
+Related Work
+Rubric-Based RL and OPD.
+Rubric-based RL (Gunjal
+et al. 2025) characterizes the multidimensional quality of
+open-ended responses through fine-grained evaluation cri-
+teria and aggregates criterion-level scores into a scalar re-
+ward for policy optimization. However, this aggregation can
+discard part of the diagnostic information provided by the
+judge, making failures on specific criteria difficult to trans-
+late into targeted policy updates. A complementary line of
+work instead provides dense supervision through policy dis-
+tillation. On-policy distillation (OPD) queries a teacher dis-
+tribution on states visited by the student policy (Gunjal et al.
+2025), while on-policy self-distillation (OPSD) constructs
+the teacher using the same model under privileged con-
+texts (Zhao et al. 2026a). Rubric-Guided Self-Distillation
+further supplies instance-specific rubrics as privileged infor-
+mation to the teacher (Rezaei et al. 2026). Although these
+methods offer token-level guidance, their objectives primar-
+ily emphasize matching the teacher distribution, without ex-
+plicitly coordinating dense supervision with the preservation
+of autonomous policy exploration.
+Guided Trajectory Learning for Policy Optimization.
+Recent work has begun to combine natural on-policy roll-
+outs with externally guided trajectories. LUFFY integrates
+on-policy rollouts with off-policy expert demonstrations and
+introduces policy shaping to balance imitation and explo-
+ration (Yan et al. 2026). Critique-GRPO (Zhang et al. 2025b)
+and RGR-GRPO (Bi et al. 2025) further construct refined re-
+sponses from critiques and rubrics, respectively, and jointly
+optimize them with the original rollouts. RuscaRL instead
+injects rubric-based scaffolds into rollout prompts, produc-
+ing trajectories conditioned on additional guidance (Zhou
+et al. 2025). These methods demonstrate that guided trajec-
+tories can expose the policy to high-quality behaviors that are
+difficult to discover through autonomous exploration alone.
+However, guided and natural trajectories often share the same
+optimization objective, coupling the learning signal from
+privileged trajectories with the relative advantages of natural
+samples. This coupling may reduce control over their respec-
+tive contributions to policy optimization. RISE-RL differs
+by filtering guided trajectories with the complete rubric, es-
+timating their policy support after removing the privileged
+context, and selectively internalizing them through a separate
+auxiliary objective.
+Method
+Group Relative Policy Optimization
+We
+build
+on
+Group
+Relative
+Policy
+Optimization
+(GRPO) (Shao et al. 2024) for natural-prompt policy op-
+timization. Given a prompt q, the old policy πθold samples
+
+
+Question x
+Policy Model
+LLM-as-Judge
+IS Ratio  +
+PPO Clip
+y1
+y2
+y7
+y8
+Response y
+rubric
+reward
+Criterion
+score
+y1
+point1:
+3
+point2:
+6
+point6:
+7
+0
+6
+21
+Sum
+Score
+y8
+Question x + 
+Rubric criteria
+Advantage
+Probability
+Forward under the natural prompt
+y1r
+y7r y8r
+Response yr
+Policy Support Shaping
+y1r
+t1r
+t2r
+t3r
+t4r
+t5r
+tnr
+t6r
+0.62 0.53 0.71
+0.42
+0.13
+0.08
+0.96
+Natural-Prompt GRPO Branch
+Selective Rubric Guidance Branch
+(Early Training Only)
+token
+weight
+y2
+Policy
+Update
+LLM-as-Judge
+filter :
+score > avg-reward
+Select top-M priority criteria
+Figure 2: Overview of RISE-RL. Alongside natural-prompt GRPO, an early selective-guidance branch targets unmet rubric
+criteria and reinforces beneficial tokens with low policy support. Guidance is removed once its reward advantage saturates, after
+which training continues with pure GRPO.
+a group of G responses {oi}G
+i=1, each assigned a sequence-
+level reward ri. GRPO estimates the advantage of each re-
+sponse by normalizing its reward within the group:
+ˆAi = ri −mean
+ {rj}G
+j=1
+
+std
+ {rj}G
+j=1
+
++ ϵA
+,
+(1)
+where ϵA is a small constant for numerical stability. The
+resulting sequence-level advantage is shared by all tokens
+in oi. We instantiate the natural rollout branch with GRPO,
+following standard implementation practice.
+Criterion-Level Selective Feedback
+For each prompt q, we associate a rubric C(q) = {ck}K
+k=1,
+where criterion ck has weight wk. For response oi, the rubric
+grader produces a binary judgment
+zi,k = I[oi satisfies ck] ,
+zi,k ∈{0, 1},
+(2)
+and GRPO uses the aggregated sequence-level reward
+ri =
+PK
+k=1 wkzi,k
+PK
+k=1 wk
+.
+(3)
+Although suitable for policy optimization, this scalar re-
+ward obscures which important criteria are repeatedly missed
+across natural rollouts. Given Onat = {onat
+i
+}G
+i=1, we there-
+fore define the priority of criterion ck as
+pk = wk
+G
+X
+i=1
+ 1 −znat
+i,k
+
+,
+(4)
+which jointly captures criterion importance and failure fre-
+quency within the current rollout group. We then select the
+M highest-priority criteria as targeted feedback:
+Cfb(q) = TopM
+ C(q); {pk}K
+k=1
+
+.
+(5)
+This selection concentrates guidance on high-value capabil-
+ities that remain insufficiently covered by the current policy.
+Quality-Filtered Selective Guidance
+We append the selected criteria to the original prompt and
+sample a group of privileged trajectories:
+qpriv = q ⊕Cfb(q),
+opriv
+j
+∼πθold
+ · | qpriv
+,
+j = 1, . . . , G.
+(6)
+Because privileged conditioning may improve the injected
+criteria while degrading other quality dimensions, we re-
+evaluate each candidate using the complete original rubric.
+Let
+¯rnat = 1
+G
+G
+X
+i=1
+rnat
+i
+,
+Aref
+j
+= rpriv
+j
+−¯rnat.
+(7)
+We retain only reward-improving trajectories:
+Oref =
+n
+opriv
+j
+| Aref
+j
+> 0
+o
+.
+(8)
+To identify important yet under-supported tokens in
+reward-improving trajectories, we remove the selected cri-
+teria and teacher-force each reference trajectory under the
+original prompt:
+pj,t = πθ
+ oref
+j,t | q, oref
+j,<t
+
+.
+(9)
+Re-evaluating the retained trajectory under the original
+prompt estimates its support without privileged criteria: a low
+pj,t indicates that the corresponding token, despite appearing
+in a higher-reward trajectory, remains weakly supported by
+the natural policy. Following the saturating transformation in
+LUFFY (Yan et al. 2026), we define the policy support factor
+ρj,t =
+pj,t
+pj,t + γ ,
+(10)
+where γ > 0 controls the sensitivity to low-probability
+tokens. As pj,t decreases, −log ρj,t increases, assigning
+stronger guidance to weakly supported behavior while sup-
+pressing updates to already-supported tokens.
+
+
+We
+define
+the
+trajectory-level
+weight
+as
+eAj
+=
+clip(Aref
+j , 0, Amax), which discards non-improving trajec-
+tories and caps excessively large reward improvements. The
+selective guidance loss is then
+Lguide = −
+1
+|Oref|
+X
+oref
+j
+∈Oref
+eAj
+|oref
+j |
+|oref
+j
+|
+X
+t=1
+log ρj,t.
+(11)
+This objective combines two forms of selectivity: re-
+ward filtering removes non-improving privileged trajectories,
+while policy support weighting focuses learning on higher-
+reward behaviors weakly supported by the current policy. It
+thus enables selective internalization rather than uniform im-
+itation of the guided response. We recompute pj,t under the
+current policy πθ and backpropagate only through it, treat-
+ing trajectories, rewards, and trajectory weights as fixed. If
+Oref = ∅, we set Lguide = 0.
+Decoupled Optimization and Guidance Removal
+We incorporate the filtered guidance signal through a sepa-
+rate auxiliary objective:
+L(θ, s) = LGRPO(θ) + λguide(s)Lguide(θ),
+(12)
+where s is the training step. Natural rollouts are optimized
+by GRPO, while filtered privileged trajectories contribute
+only through the auxiliary loss. This keeps them outside
+the reward normalization and relative-advantage estimation
+of natural rollouts, while allowing independent control over
+guidance strength and token-level weighting.
+As the policy internalizes the guided behaviors, the re-
+ward advantage of privileged rollouts over natural rollouts
+gradually decreases. We measure this additional benefit by
+∆r(s) = ¯rpriv(s) −¯rnat(s),
+¯rpriv(s) = 1
+G
+G
+X
+j=1
+rpriv
+j
+(s),
+¯rnat(s) = 1
+G
+G
+X
+i=1
+rnat
+i
+(s).
+(13)
+A large ∆r(s) indicates that privileged feedback still elicits
+behaviors less accessible to the natural policy, whereas a
+narrowing gap suggests diminishing marginal benefit.
+Based on a preliminary run, we set sswitch near the onset
+of the plateau in the smoothed reward-gap curve and use
+λguide(s) = λ0I[s < sswitch], removing guidance thereafter
+to continue training with pure GRPO.
+Experiments
+Experimental Setup
+Datasets.
+To evaluate the effectiveness of our method
+across diverse open-ended domains, we construct the train-
+ing corpus from RubricHub (Li et al. 2026a), a large-scale,
+multi-domain dataset equipped with fine-grained rubric-
+based evaluation criteria. RubricHub covers five domains:
+writing, health, chat, science, and instruction following. We
+select the writing, health, chat, and science subsets for rein-
+forcement learning training and validation, thereby enabling
+a broad assessment of the proposed method across heteroge-
+neous open-ended tasks.
+Algorithm 1: Training Procedure of RISE-RL
+Require: Training set D, policy πθ, group size G, feedback budget
+M, guidance weight λ0, and removal step sswitch
+1: for s = 1, . . . , S do
+2:
+Sample q ∼D and generate natural rollouts Onat ←
+Rollout(πθold, q, G)
+3:
+(Znat, Rnat) ←Evaluate(Onat, C(q))
+4:
+LGRPO ←GRPO(Onat, Rnat)
+5:
+L ←LGRPO
+6:
+if s < sswitch then
+7:
+Select the top-M highest-priority criteria Cfb from Znat
+8:
+Construct qpriv ←q ⊕Cfb and generate privileged roll-
+outs Opriv
+9:
+Evaluate Opriv using the complete rubric C(q)
+10:
+Retain trajectories Oref that outperform the mean natural
+reward
+11:
+Teacher-force Oref under the original prompt q to esti-
+mate natural-policy token support pj,t.
+12:
+Compute policy support weights, clipped trajectory gains,
+and Lguide.
+13:
+L ←LGRPO + λ0Lguide
+14:
+end if
+15:
+θ ←Update(θ, L)
+16: end for
+17: return πθ
+Benchmarks.
+We evaluate RISE-RL across four do-
+mains using open-ended generation and verifiable reason-
+ing tasks: (1) Writing: WritingBench (Wu et al. 2026)
+and CreativeWriting-V3; (2) Chat: Arena-Hard-v2 (Li
+et al. 2024); (3) Health: HealthBench (Arora et al. 2025),
+LLMEval-Med (Zhang et al. 2025a), and MedQA (Jin et al.
+2021); (4) Science: ResearchQA (Yifei et al. 2026) and
+GPQA-Diamond (Rein et al. 2023). This suite assesses the
+model’s ability to satisfy multidimensional rubrics in cre-
+ative tasks and maintain factual rigor in knowledge-dense
+domains. All evaluations follow official protocols.
+Baselines.
+We compare RISE-RL against imitation and
+RL-based baselines using Qwen3-4B/14B models: (1) SFT:
+Fine-tuned on high-quality responses from RubricHub. (2)
+OPD (Li et al. 2026b): On-policy distillation using Qwen3-
+14B as a teacher for the 4B model, and Qwen3-32B for the
+14B model. (3) Rubric-RL (Gunjal et al. 2025): Standard
+RL using scalar rewards aggregated from fine-grained rubric
+criteria. (4) RuscaRL (Zhou et al. 2025): A strong scaffold-
+mixed baseline that jointly optimizes rubric-conditioned and
+natural responses within a single group-relative objective.
+Implementation Details.
+We use gpt-oss-120b as the
+rubric grader, which has demonstrated high agreement with
+human judgment (Li et al. 2026a). SFT and OPD are imple-
+mented using SWIFT (Zhao et al. 2025), while all RL meth-
+ods are implemented using verl (Sheng et al. 2025). During
+the early guidance stage, RISE-RL additionally uses quality-
+filtered privileged candidates through a separate auxiliary
+objective. These candidates are excluded from the natural
+GRPO group and are no longer generated after sswitch. All
+RL methods are trained separately for each domain.
+For policy optimization, we use GRPO for the natural roll-
+
+
+Method
+Writing
+Chat
+Health
+Science
+Avg.
+Writing
+Bench
+Creative
+Writing-V3
+Arena-Hard
+V2
+Health
+Bench
+LLMEval
+-Med
+MedQA
+GPQA
+Research
+QA
+Qwen3-4B (Non-Thinking)
+Initial
+56.14
+40.28
+7.91
+37.43
+64.76
+64.79
+42.34
+64.29
+47.24
+SFT
+66.43+10.29 32.96−7.32
+11.39+3.48
+40.73+3.30
+64.87+0.11
+59.77−5.02
+36.95−5.39
+69.19+4.90
+47.79+0.55
+OPD
+54.55−1.59
+27.78−12.50
+6.32−1.59
+35.46−1.97
+63.07−1.69
+61.63−3.16
+40.24−2.10
+60.35−3.94
+43.68−3.56
+Rubric-RL
+70.92+14.78 43.30+3.02
+20.76+12.85 52.00+14.57 71.85+7.09
+68.44+3.65
+47.73+5.39
+74.52+10.23 56.19+8.95
+RuscaRL
+56.75+0.61
+38.67−1.61
+9.41+1.50
+43.54+6.11
+65.81+1.05
+63.39−1.40
+41.41−0.93
+66.31+2.02
+48.16+0.92
+RISE-RL (Ours)
+72.15+16.01 46.73+6.45
+20.89+12.98 52.32+14.89 72.22+7.46
+69.40+4.61
+49.12+6.78
+77.08+12.79 57.49+10.25
+Qwen3-14B (Non-Thinking)
+Initial
+63.24
+64.94
+21.09
+43.85
+69.46
+73.51
+52.61
+68.27
+57.12
+SFT
+73.31+10.07 60.60−4.34
+33.74+12.65 48.66+4.81
+71.63+2.17
+74.15+0.64
+39.90−12.71 73.54+5.27
+59.44+2.32
+OPD
+66.05+2.81
+51.53−13.41
+20.07−1.02
+45.39+1.54
+71.56+2.10
+74.91+1.40
+48.82−3.79
+69.69+1.42
+56.00−1.12
+Rubric-RL
+76.89+13.65 64.93−0.01
+49.94+28.85 57.92+14.07 76.40+6.94
+78.22+4.71
+55.98+3.37
+77.26+8.99
+67.19+10.07
+RuscaRL
+62.45−0.79
+42.78−22.16
+45.96+24.87 50.92+7.07
+71.49+2.03
+77.39+3.88
+46.13−6.48
+74.10+5.83
+58.90+1.78
+RISE-RL (Ours)
+77.37+14.13 70.96+6.02
+57.97+36.88 59.44+15.59 78.31+8.85
+81.57+8.06
+59.60+6.99
+78.96+10.69 70.52+13.40
+Table 1: Main results across four open-ended domains using Qwen3-4B and Qwen3-14B. Each selected checkpoint is indepen-
+dently evaluated three times, and the mean performance is reported. Colored subscripts indicate absolute changes relative to
+the corresponding Initial model, with improvements shown in green and degradations in red. The best result within each model
+scale is shown in bold.
+out branch. In RISE-RL, the shaping parameter is γ = 0.1,
+and the guidance weight λguide is set to 0.05 for writing
+and chat, and 0.01 for health and science domains. Base-
+lines, including RuscaRL, follow their best-reported config-
+urations (Zhou et al. 2025). Further implementation details
+and hyperparameter settings are provided in the supplemen-
+tary material.
+Main Results
+Table 1 reports the downstream performance of RISE-RL.
+Overall, RISE-RL consistently achieves the strongest results
+across both Qwen3-4B and Qwen3-14B scales, effectively
+balancing complex alignment with autonomous exploration.
+Creative Domains: Enhancing Quality and Diversity.
+In
+domains requiring high creativity and output diversity, such
+as Writing and Chat, RISE-RL shows substantial gains (up
+to +6.0 and +8.0 points on the 14B scale, respectively). On
+challenging benchmarks like CreativeWriting-V3, standard
+RL often struggles to discover high-reward trajectories or
+suffers from diversity collapse. RISE-RL’s ability to target
+failed criteria exposes the model to rare creative modes (e.g.,
+narrative coherence), while its guidance removal mechanism
+ensures that the policy returns to unguided exploration, pre-
+serving the creative openness essential for these tasks.
+Knowledge-Dense Domains: Internalizing Logical Re-
+quirements.
+In domains governed by strict factual and
+logical constraints, such as Health and Science, RISE-RL
+demonstrates that aligning with open-ended rubrics simul-
+taneously reinforces performance on objective benchmarks.
+For instance, training on Health and Science subsets leads
+to a +3.3 point gain on MedQA and a +3.6 point gain on
+GPQA-Diamond. These results indicate that selective rubric
+guidance helps the model internalize domain-specific factual
+requirements and logical rigor, which are essential for both
+nuanced generation and verifiable reasoning.
+Comparison with Joint Optimization and Distillation.
+Notably, RISE-RL maintains a significant lead over OPD
+and RuscaRL. OPD relies on teacher distillation, whose ef-
+fectiveness depends on both the incremental value and the
+learnability of teacher trajectories; when the teacher–student
+gap is large, the additional supervision may be difficult to ab-
+sorb, consistent with Rethinking OPD (Li et al. 2026b). Rus-
+caRL directly optimizes scaffold-conditioned samples, but
+the resulting behaviors do not always transfer reliably once
+the scaffold is removed. Consistent with the concerns raised
+in RGR-GRPO, we observe that this limitation varies across
+domains: in some cases, scaffold removal causes substantial
+performance degradation that subsequent on-policy training
+fails to fully recover (Bi et al. 2025). In contrast, RISE-RL
+decouples privileged guidance from natural exploration, en-
+abling more stable autonomous on-policy optimization.
+Effect of Guidance Removal on Training Dynamics
+To analyze the role of dynamic guidance, we compare the
+training dynamics of RISE-RL with Rubric-RL and persis-
+tent guidance on Writing and Health domains (Fig. 3).
+Two-Stage Dynamics.
+RISE-RL exhibits a distinct two-
+stage evolution. (1) Expansion: During the early guided
+stage, policy entropy increases substantially, indicating a
+broader policy distribution—from 0.9 to 3.5 in Writing and
+from 0.5 to 2.5 in Health. This increase coincides with per-
+formance gains, suggesting that targeted feedback helps ex-
+pose high-reward behavioral modes. (2) Consolidation: Af-
+ter guidance removal (s ≥sswitch), entropy stabilizes at a
+level higher than the Rubric-RL baseline but lower than the
+peak. Specifically, Writing entropy settles at approximately
+
+
+0
+80
+160
+240
+320
+Training step
+63
+67
+71
+75
+Writing score
+remove
+(a)
+0
+80
+160
+240
+320
+Training step
+1
+2
+3
+Policy entropy
+remove
+(b)
+0
+60
+140
+220
+280
+Training step
+44
+49
+54
+59
+HealthBench score
+remove
+(c)
+0
+60
+140
+220
+280
+Training step
+1
+2
+3
+Policy entropy
+remove
+(d)
+Rubric-RL
+Persistent
+RISE-RL
+Figure 3: Training dynamics of Qwen3-14B on the writ-
+ing and health domains. We compare the benchmark per-
+formance and policy entropy of Rubric-RL, persistent guid-
+ance, and RISE-RL on (a–b) the writing domain and (c–d)
+the health domain.
+1.5, while Health settles at 1.0. Notably, benchmark perfor-
+mance continues to climb even after guidance is withdrawn,
+reaching peaks of 74.2 and 59.4, respectively, confirming that
+the policy has internalized and successfully consolidated the
+discovered behaviors through autonomous exploration.
+Overguidance.
+In contrast, persistent guidance maintains
+consistently high and noticeably fluctuating policy entropy
+(> 2.0) throughout training, indicating an unstable entropy
+state, while also suffering from a clear performance plateau
+or degradation in later stages. For example, the Writing score
+drops by 2.8 points from its peak. This suggests that over-
+constraining the policy with external rubrics interferes with
+its ability to further optimize the generation distribution,
+thereby causing optimization instability.
+Domain-Specific Adaptation.
+The converged entropy
+floor is approximately 1.5 in Writing and 1.0 in Health. The
+0.5-point higher floor in Writing is consistent with greater
+exploratory openness in creative tasks, whereas the lower
+floor in Health aligns with its stricter factual and safety
+constraints. These results suggest that RISE-RL supports
+domain-dependent exploration profiles.
+Case Studies
+Creative Writing: Quality and Diversity.
+As shown in
+Fig. 4, we report relative gains over Qwen3-4B in creative
+quality and output diversity. Quality is evaluated across five
+aggregated dimensions, with negative criteria reverse-scored
+before averaging. Diversity is assessed jointly over six re-
+sponses per prompt across five set-level dimensions, using
+three random response permutations. All gains are computed
+as (Smethod −Sbase)/Sbase × 100%. RISE-RL improves
+Coherence Character
+Style
+Creativity Effectiveness Diversity
+−5
+0
+5
+10
+Relative Gain over Qwen3-4B (%)
+-4.0
++2.4
+-3.3
++1.1
++1.9
++3.6
++4.5
++8.9
++5.0
++8.1
++7.7
++5.8
+Rubric-RL
+RISE-RL
+Figure 4: Relative gains over Qwen3-4B in overall creative-
+writing quality and output diversity.
+QUESTION: I live in reno Nv.. which is about 4200 feet above sea level. 
+I wanted to visit my mother in-law tomorrow for mothers day. she lives 
+in lake tahoe nv. which is about 6300 feet. the drive is only 1hr15mins. 
+but i am 35weeks and 4 days pregnant. is it ok to go, or not?
+Train step
+0
+100
+200
+300
+Rubric-RL
+8/8
+8/8
+8/8
+5/8
+RISE-RL
+8/8
+8/8
+5/8
+0/8
+Rubric-RL
+2/8
+2/8
+1/8
+1/8
+RISE-RL
+2/8
+2/8
+2/8
+0/8
+Rubric-RL
+8/8
+6/8
+7/8
+4/8
+RISE-RL
+8/8
+6/8
+5/8
+3/8
+Criterion 1: Advises consulting 
+an obstetric provider before travel.
+Criterion 2: Notes that trip 
+suitability depends on individual 
+pregnancy history.
+Criterion 3: Explains that 
+spontaneous labor can occur at 35+4 
+weeks.
+Criterion Examples:
+Figure 5: Criterion-level failures on a representative Health-
+Bench case. Each entry denotes the number of failures among
+eightindependently generatedresponsesat eachtrainingstep.
+all quality dimensions and achieves a +5.8% diversity gain,
+whereas Rubric-RL degrades Coherence and Style. These re-
+sults suggest that RISE-RL improves creative-writing quality
+while also enhancing output diversity.
+Health: Acquisition of Persistent Criteria.
+To examine
+how RISE-RL resolves capability gaps, we analyze criterion-
+level failures on HealthBench (Fig. 5). The initial policy ex-
+hibits persistent failures on critical requirements (e.g., Advise
+consulting an obstetric provider, 8/8 failures). While Rubric-
+RL struggles to recover these behaviors through scalar re-
+wards, RISE-RL leverages selective guidance to reduce fail-
+ures. By step 300, RISE-RL achieves zero failures on Cri-
+teria 1 and 2, whereas Rubric-RL remains inconsistent (e.g.,
+5/8 failures on Criterion 1). This qualitative improvement
+illustrates that targeting specific failed criteria during early
+training facilitates the consolidation of behaviors that are
+otherwise difficult to discover through unguided exploration.
+Ablation Study
+Effect of the Guidance Coefficient.
+We study the effect of
+λguide by training Qwen3-4B in the Writing domain for 140
+steps with λguide ∈{0.005, 0.01, 0.05, 0.1} and evaluating
+every 20 steps on CreativeWriting-V3. As shown in Fig. 6,
+
+
+0
+20
+40
+60
+80
+100
+120
+140
+Training Step
+27.5
+30.0
+32.5
+35.0
+37.5
+40.0
+42.5
+45.0
+Creative Writing Score
+λguide = 0.005
+λguide = 0.01
+λguide = 0.05
+λguide = 0.1
+Figure 6: Effect of the guidance-strength coefficient λguide
+on CreativeWriting-V3 using Qwen3-4B. Each variant is
+trained for 140 steps and evaluated every 20 steps. The set-
+ting λguide = 0.05 achieves the most stable improvement.
+λguide = 0.05 yields the most stable improvement through-
+out training. A small coefficient (0.005) leaves performance
+near the initial baseline, indicating that the guidance sig-
+nal is too weak to meaningfully affect policy optimization.
+In contrast, a large coefficient (0.1) causes a sharp early
+performance drop; although the model partially recovers, it
+remains below the moderate setting, suggesting that overly
+strong guidance disrupts the existing policy distribution and
+makes subsequent recovery difficult. Overall, λguide = 0.05
+provides the best balance: it is strong enough to promote
+the acquisition of guided behaviors, while remaining moder-
+ate enough to preserve the model’s existing capabilities and
+support stable optimization.
+Effect of the Number of Injected Criteria.
+We vary
+the number of violated criteria injected into the privileged
+prompt over {1, 5, 10, All}. All variants use Qwen3-4B in
+the Writing domain under identical settings (Figure 7(a)).
+Injecting five criteria performs best on both WritingBench
+and CreativeWriting-V3, indicating a trade-off among ro-
+bustness, coverage, and specificity. A single criterion may be
+overly sensitive to judge noise or an unrepresentative failure,
+whereas too many criteria reduce selectivity and introduce
+lower-priority, overlapping, or competing requirements that
+dilute the task signal. Overall, the results favor targeted over
+exhaustive criterion guidance.
+Effect of Policy Support Shaping.
+We isolate policy sup-
+port shaping by comparing RISE-RL with a variant that re-
+places policy support weights with uniform weights, while
+keeping all other components and training settings un-
+changed (Figure 7(b)). Policy support shaping improves both
+HealthBench and LLMEval-Med, indicating that policy sup-
+port weighting is more effective than uniform weighting and
+better focuses learning on higher-reward behaviors weakly
+supported by the natural policy.
+Coupled versus Decoupled Optimization.
+To evaluate
+the effect of separating privileged guidance from natural on-
+1
+5
+10
+All
+Number of Injected Criteria
+0
+20
+40
+60
+Score
+(a)
+56.9
+57.2
+46.2
+43.9
+38.3
+39.8
+31.0
+29.3
+Uniform
+Support Weighted
+Policy-Shaping Method
+0
+20
+40
+60
+Score
+(b)
+39.0
+41.3
+64.9
+67.3
+Coupled
+RISE-RL
+Optimization Method
+0
+20
+40
+60
+80
+Score
+(c)
+71.5
+72.2
+44.1
+46.7
+Coupled
+RISE-RL
+Optimization Method
+0
+20
+40
+60
+80
+Score
+(d)
+51.3
+52.3
+71.4
+72.2
+WritingBench
+CreativeWriting-V3
+HealthBench
+LLMEval-Med
+Figure 7: Ablations on Qwen3-4B. (a) Number of injected
+criteria for Writing, where “All” denotes all identified viola-
+tions. (b) Policy support shaping for Health. (c–d) Coupled
+vs. decoupled optimization for Writing and Health, respec-
+tively.
+policy optimization, we construct a coupled baseline using
+the same rubric-selection and guidance-generation proce-
+dure as RISE-RL. Instead of optimizing guided trajectories
+through a separate auxiliary objective, the coupled variant
+places them together with natural rollouts in the same group-
+relative policy objective. All other configurations remain
+identical. Additional implementation details are provided
+in the supplementary material. As shown in Figure 7(c–
+d), the coupled variant consistently underperforms RISE-
+RL. On Qwen3-4B trained in the Writing domain, it trails
+RISE-RL by 0.7 points on WritingBench and 2.6 points on
+CreativeWriting-V3, and it also scores lower on both Health-
+domain benchmarks. These results support incorporating
+privileged trajectories through a separate auxiliary objective
+rather than merging them with natural samples in a shared
+group-relative estimator.
+Conclusion
+In this work, we introduced RISE-RL, a training paradigm
+that balances selective rubric-informed guidance with au-
+tonomous exploration for open-ended reinforcement learn-
+ing. By identifying persistent criterion failures and providing
+decoupled, quality-filtered guidance during early training,
+RISE-RL effectively internalizes high-reward behaviors that
+are rarely discovered through natural on-policy rollouts. Ex-
+tensive experiments across four diverse domains with 4B and
+14B models demonstrate that RISE-RL consistently outper-
+forms standard Rubric-RL and strong baselines while main-
+taining output diversity. Our results suggest that transitioning
+from targeted guidance to unguided exploration provides an
+effective approach for aligning large language models with
+complex, multidimensional human preferences.
+
+
+References
+Arora, R. K.; Wei, J.; Hicks, R. S.; Bowman, P.; Quiñonero-
+Candela, J.; Tsimpourlas, F.; Sharman, M.; Shah, M.; Val-
+lone, A.; Beutel, A.; et al. 2025.
+Healthbench: Evaluat-
+ing large language models towards improved human health.
+arXiv preprint arXiv:2505.08775.
+Besrour, I.; He, J.; Schreieder, T.; and Färber, M. 2025.
+SQuAI: Scientific Question-Answering with Multi-Agent
+Retrieval-Augmented Generation. In Proceedings of the 34th
+ACM International Conference on Information and Knowl-
+edge Management, 6603–6608.
+Bi, B.; Liu, S.; Wang, Y.; Tong, S.; Mei, L.; Ge, Y.; Xu, Y.;
+Guo, J.; and Cheng, X. 2025. Reward and Guidance through
+Rubrics: Promoting Exploration to Improve Multi-Domain
+Reasoning. arXiv preprint arXiv:2511.12344.
+Cao, R.; Chen, M.; Chen, J.; Cui, Z.; Feng, Y.; Hui, B.; Jing,
+Y.; Li, K.; Li, M.; Lin, J.; et al. 2026. Qwen3-coder-next
+technical report. arXiv preprint arXiv:2603.00729.
+Chen, L.; Gu, J.; Huang, L.; Huang, W.; Jiang, Z.; Jie, A.;
+Jin, X.; Jin, X.; Li, C.; Ma, K.; et al. 2025. Seed-prover:
+Deep and broad reasoning for automated theorem proving.
+arXiv preprint arXiv:2507.23726.
+Franceschelli, G.; and Musolesi, M. 2023. On the creativity
+of large language models. arXiv preprint arXiv:2304.00008.
+Gómez-Rodríguez, C.; and Williams, P. 2023. A confederacy
+of models: a comprehensive evaluation of LLMs on creative
+writing. In Findings of the Association for Computational
+Linguistics: EMNLP 2023, 14504–14528.
+Gunjal, A.; Wang, A.; Lau, E.; Nath, V.; He, Y.; Liu, B.;
+and Hendryx, S. 2025.
+Rubrics as rewards: Reinforce-
+ment learning beyond verifiable domains.
+arXiv preprint
+arXiv:2507.17746.
+Huang, H.-Y.; Tang, C.; Liu, W.; Bai, C.; Yang, S.; and Wu,
+Y. 2026a. Think outside the policy: In-context steered policy
+optimization. In Findings of the Association for Computa-
+tional Linguistics: ACL 2026, 2758–2776.
+Huang, J.; Xu, Z.; Zhou, J.; Liu, T.; Xiao, Y.; Ou, M.; Ji, B.;
+Li, X.; and Yuan, K. 2026b. Sam-r1: Leveraging sam for
+reward feedback in multimodal segmentation via reinforce-
+ment learning. Advances in Neural Information Processing
+Systems, 38: 138362–138383.
+Hübotter, J.; Lübeck, F.; Behric, L.; Baumann, A.; Bagatella,
+M.; Marta, D.; Hakimi, I.; Shenfeld, I.; Buening, T. K.;
+Guestrin, C.; et al. 2026. Reinforcement Learning via Self-
+Distillation. arXiv preprint arXiv:2601.20802.
+Jin, D.; Pan, E.; Oufattole, N.; Weng, W.-H.; Fang, H.; and
+Szolovits, P. 2021.
+What disease does this patient have?
+a large-scale open domain question answering dataset from
+medical exams. Applied Sciences, 11(14): 6421.
+Le, H.; Wang, Y.; Gotmare, A. D.; Savarese, S.; and Hoi, S.
+C. H. 2022. Coderl: Mastering code generation through pre-
+trained models and deep reinforcement learning. Advances in
+Neural Information Processing Systems, 35: 21314–21328.
+Li, S.; Zhao, J.; Ren, H.; Wei, Z.; Zhou, Y.; Yang, J.; Liu, S.;
+Zhang, K.; and Wei, C. 2026a. Rubrichub: A comprehen-
+sive and highly discriminative rubric dataset via automated
+coarse-to-fine generation. In Proceedings of the 64th Annual
+Meeting of the Association for Computational Linguistics
+(Volume 1: Long Papers), 31320–31344.
+Li, T.; Chiang, W.-L.; Frick, E.; Dunlap, L.; Wu, T.; Zhu, B.;
+Gonzalez, J. E.; and Stoica, I. 2024. From crowdsourced data
+to high-quality benchmarks: Arena-hard and benchbuilder
+pipeline. arXiv preprint arXiv:2406.11939.
+Li, Y.; Zuo, Y.; He, B.; Zhang, J.; Xiao, C.; Qian, C.; Yu, T.;
+Gao, H.-a.; Yang, W.; Liu, Z.; et al. 2026b. Rethinking on-
+policy distillation of large language models: Phenomenology,
+mechanism, and recipe. arXiv preprint arXiv:2604.13016.
+Lin, T.; Zhang, W.; Li, S.; Yuan, Y.; Yu, B.; Li, H.; He, W.;
+Jiang, H.; Li, M.; Song, X.; et al. 2025. Healthgpt: A medical
+large vision-language model for unifying comprehension and
+generation via heterogeneous knowledge adaptation. arXiv
+preprint arXiv:2502.09838.
+Rein, D.; Hou, B. L.; Stickland, A. C.; Petty, J.; Pang, R. Y.;
+Dirani, J.; Michael, J.; and Bowman, S. R. 2023. Gpqa: A
+graduate-level google-proof q&a benchmark. arXiv preprint
+arXiv:2311.12022.
+Ren, Z.; Shao, Z.; Song, J.; Xin, H.; Wang, H.; Zhao, W.;
+Zhang, L.; Fu, Z.; Zhu, Q.; Yang, D.; et al. 2025. Deepseek-
+prover-v2: Advancing formal mathematical reasoning via
+reinforcement learning for subgoal decomposition.
+arXiv
+preprint arXiv:2504.21801.
+Rezaei, M.; Mahmoud, A.; Wang, Z.; Tyagi, U.; Gosai,
+A.; Dumitru, R.-G.; Sabharwal, A.; Liu, B.; and He, Y.
+2026. Rubric-Guided Self-Distillation: Post-Training With-
+out Rubric Verifiers. arXiv preprint arXiv:2606.12507.
+Roller, S.; Dinan, E.; Goyal, N.; Ju, D.; Williamson, M.; Liu,
+Y.; Xu, J.; Ott, M.; Smith, E. M.; Boureau, Y.-L.; et al. 2021.
+Recipes for building an open-domain chatbot. In Proceed-
+ings of the 16th Conference of the European Chapter of the
+Association for Computational Linguistics: Main Volume,
+300–325.
+Shao, Z.; Wang, P.; Zhu, Q.; Xu, R.; Song, J.; Bi, X.; Zhang,
+H.; Zhang, M.; Li, Y.; Wu, Y.; et al. 2024. Deepseekmath:
+Pushing the limits of mathematical reasoning in open lan-
+guage models. arXiv preprint arXiv:2402.03300.
+Sheng, G.; Zhang, C.; Ye, Z.; Wu, X.; Zhang, W.; Zhang, R.;
+Peng, Y.; Lin, H.; and Wu, C. 2025. Hybridflow: A flexible
+and efficient rlhf framework. In Proceedings of the Twentieth
+European Conference on Computer Systems, 1279–1297.
+Singhal, K.; Azizi, S.; Tu, T.; Mahdavi, S. S.; Wei, J.; Chung,
+H. W.; Scales, N.; Tanwani, A.; Cole-Lewis, H.; Pfohl, S.;
+et al. 2023.
+Publisher correction: large language models
+encode clinical knowledge. Nature, 620(7973): E19.
+Singhal, K.; Tu, T.; Gottweis, J.; Sayres, R.; Wulczyn, E.;
+Amin, M.; Hou, L.; Clark, K.; Pfohl, S. R.; Cole-Lewis, H.;
+et al. 2025. Toward expert-level medical question answering
+with large language models. Nature medicine, 31(3): 943–
+950.
+Thoppilan, R.; De Freitas, D.; Hall, J.; Shazeer, N.; Kul-
+shreshtha, A.; Cheng, H.-T.; Jin, A.; Bos, T.; Baker, L.; Du,
+Y.; et al. 2022. Lamda: Language models for dialog applica-
+tions. arXiv preprint arXiv:2201.08239.
+
+
+Wan, Y.; Liu, Y.; Ajith, A.; Grazian, C.; Hoex, B.; Zhang, W.;
+Kit, C.; Xie, T.; and Foster, I. 2024. SciQAG: A framework
+for auto-generated science question answering dataset with
+fine-grained evaluation. arXiv preprint arXiv:2405.09939.
+Wu, Y.; Mei, J.; Yan, M.; Li, C.; Lai, S.; Ren, Y.; Wang, Z.;
+Zhang, J.; Wu, M.; Jin, Q.; et al. 2026. Writingbench: A
+comprehensive benchmark for generative writing. Advances
+in Neural Information Processing Systems, 38.
+Yan, J.; Li, Y.; Hu, Z.; Wang, Z.; Cui, G.; Qu, X.; Cheng,
+Y.; and Zhang, Y. 2026. Learning to reason under off-policy
+guidance. Advances in Neural Information Processing Sys-
+tems, 38: 117157–117186.
+Yifei, L. S.; Chang, A.; Malaviya, C.; and Yatskar, M. 2026.
+Researchqa: Evaluating scholarly question answering at scale
+across 75 fields with survey-mined questions and rubrics.
+Transactions of the Association for Computational Linguis-
+tics, 14: 1344–1368.
+Zhang, M.; Shen, Y.; Li, Z.; Sha, H.; Hu, B.; Wang, Y.;
+Huang, C.; Liu, S.; Tong, J.; Jiang, C.; et al. 2025a. LLMEval-
+Med: a real-world clinical benchmark for medical LLMs with
+physician validation. arXiv preprint arXiv:2506.04078.
+Zhang, X.; Zhang, Y.; Sun, H.; Feng, K.; Lu, C.; Yang, C.;
+and Meng, H. 2025b. Critique-grpo: Advancing llm reason-
+ing with natural language and numerical feedback. arXiv
+preprint arXiv:2506.03106.
+Zhang, Y.; Sun, S.; Galley, M.; Chen, Y.-C.; Brockett, C.;
+Gao, X.; Gao, J.; Liu, J.; and Dolan, W. B. 2020.
+Di-
+alogpt: Large-scale generative pre-training for conversational
+response generation. In Proceedings of the 58th annual meet-
+ing of the association for computational linguistics: system
+demonstrations, 270–278.
+Zhao, S.; Xie, Z.; Liu, M.; Huang, J.; Pang, G.; Chen, F.;
+and Grover, A. 2026a. Self-Distilled Reasoner: On-Policy
+Self-Distillation for Large Language Models. arXiv preprint
+arXiv:2601.18734.
+Zhao, Y.; Huang, J.; Hu, J.; Wang, X.; Mao, Y.; Zhang, D.;
+Jiang, Z.; Wu, Z.; Ai, B.; Wang, A.; et al. 2025. Swift: a
+scalable lightweight infrastructure for fine-tuning. In Pro-
+ceedings of the AAAI Conference on Artificial Intelligence,
+volume 39, 29733–29735.
+Zhao, Z.; Ma, X.; Yang, L.; Feng, Y.; Shi, D.; He, J.; Xin,
+X.; Ren, Z.; and Wu, X.-M. 2026b. Rosd: Reflective on-
+policy self-distillation for language model reasoning across
+domains. arXiv preprint arXiv:2605.28014.
+Zhou, Y.; Li, S.; Liu, S.; Fang, W.; Zhang, K.; Zhao, J.; Yang,
+J.; Zhou, Y.; Lv, J.; Zheng, T.; et al. 2025. Breaking the explo-
+ration bottleneck: Rubric-scaffolded reinforcement learning
+for general llm reasoning. arXiv preprint arXiv:2508.16949.
+
+
+Appendix for
+RISE-RL: Rubric-Informed Selective Exploration
+for Open-Ended Reinforcement Learning
+A.
+Experimental Details
+A.1
+Datasets
+We use the RubricHub dataset to construct the training
+data for both the reinforcement learning methods and the
+supervised fine-tuning baseline. We focus on four domains:
+Writing, Chat, Health, and Science, where Health cor-
+responds to the Medical domain in the original RubricHub
+dataset. RubricHub provides two forms of training data used
+in our experiments: prompt–rubric pairs for reinforcement
+learning and high-quality prompt–response pairs for super-
+vised fine-tuning.
+Reinforcement Learning Data.
+For all reinforcement
+learning methods, including Rubric-RL, RuscaRL, and
+RISE-RL, we use the prompt–rubric pairs from the four
+selected RubricHub domains. We train each domain inde-
+pendently, resulting in a separate domain-specific model for
+Writing, Chat, Health, and Science. The complete reinforce-
+ment learning corpus contains 86,355 prompts, including
+29,418 Science examples, 29,681 Health examples, 17,444
+Writing examples, and 9,812 Chat examples. The detailed
+domain distribution is reported in Table 2.
+Each reinforcement learning instance consists of an open-
+ended prompt and a set of weighted, instance-specific evalua-
+tion criteria. For each generated response, gpt-oss-120b
+independently determines whether each rubric criterion is
+satisfied. The resulting criterion-level judgments are aggre-
+gated into a weight-normalized scalar reward for policy op-
+timization. RISE-RL additionally uses these criterion-level
+judgments to identify repeatedly missed criteria and con-
+struct selective rubric guidance. No reference response is
+required during reinforcement learning.
+Supervised Fine-Tuning Data.
+For the SFT baseline,
+we use the official supervised fine-tuning dataset released
+with RubricHub. It contains 26,194 high-quality prompt–
+response pairs mixed across the Writing, Chat, Health,
+and Science domains. The target responses are obtained
+through the multi-stage response refinement procedure used
+in RubricHub. We train the SFT baseline on the combined
+four-domain corpus using the standard next-token prediction
+objective.
+The SFT and reinforcement learning datasets correspond
+to two different data components provided by RubricHub.
+The SFT baseline uses refined responses as direct super-
+vision, whereas the reinforcement learning methods use
+instance-specific rubrics to evaluate responses generated by
+the policy. The evaluation datasets are drawn from separate
+benchmark sources and are not used for training.
+A.2
+Training
+Rubric-RL and RISE-RL.
+We implement Rubric-RL and
+RISE-RL using the verl framework. For a controlled com-
+Domain
+Prompts
+Share
+Science
+29,418
+34.07%
+Health
+29,681
+34.37%
+Writing
+17,444
+20.20%
+Chat
+9,812
+11.36%
+Total
+86,355
+100.00%
+Table 2: Statistics of the reinforcement learning training data.
+Training Paradigm
+Domain Organization
+Examples
+SFT
+Four domains mixed
+26,194
+RL
+Trained separately by domain
+86,355
+Table 3: Summary of the training data used in our experi-
+ments.
+parison, both methods use the same backbone model, training
+data, sampling configuration and optimization hyperparam-
+eters. RISE-RL additionally introduces a selective guidance
+branch with several method-specific hyperparameters. The
+complete training configuration is summarized in Table 4.
+RuscaRL.
+We implement RuscaRL following its original
+scaffolding strategy and training configuration. Specifically,
+RuscaRL applies linear intra-group scaffolding differentia-
+tion and gradually reduces the rubric scaffolding using a
+step-wise sigmoid schedule. The main training configura-
+tion is summarized in Table 5. We train RuscaRL for 500
+optimization steps in all domains.
+Supervised Fine-Tuning.
+We implement the SFT baseline
+using SWIFT with full-parameter fine-tuning. The model
+is trained on the mixed-domain RubricHub SFT corpus for
+three epochs using bfloat16 precision and DeepSpeed ZeRO-
+3. The main training hyperparameters are summarized in
+Table 6.
+On-Policy Distillation.
+We implement OPD using the
+SWIFT framework with full-parameter fine-tuning. Follow-
+ing the standard on-policy distillation setup, the student
+model generates trajectories from its current policy, while a
+larger teacher model provides token-level supervision on the
+student-generated states. For the 4B student, we use Qwen3-
+14B as the teacher; for the 14B student, we use Qwen3-32B
+as the teacher. All models are trained with bfloat16 precision
+and DeepSpeed ZeRO-2. The main training hyperparameters
+are summarized in Table 7.
+A.3
+Evaluation
+We evaluate all models on eight benchmarks spanning four
+domains: Writing, Chat, Health, and Science. The evalu-
+ation suite includes both open-ended generation tasks and
+
+
+Category
+Configuration
+Shared
+Training batch size: 64
+Maximum prompt length: 4096
+Maximum response length: 8192
+Number of rollouts per prompt: 8
+Overlong length: 4096
+Overlong penalty factor: 0.5
+Learning rate: 1e-6
+Warmup steps: 10
+Weight decay: 0.1
+Entropy coefficient: 0.0
+Reward range: [0,1]
+KL-loss coefficient: 0.0
+PPO clip ratio lower bound: 0.2
+PPO clip ratio upper bound: 0.28
+RISE-RL
+Number of guided re-rollouts: 8
+Guidance support coefficient γ: 0.1
+Guidance-loss coefficient λguide: 0.05 (Writing/Chat), 0.01 (Health/Science)
+Number of injected criteria M: 5
+Hardware
+8 × NVIDIA H200 GPUs
+Table 4: Training configurations for Rubric-RL and RISE-RL.
+multiple-choice question answering tasks. For open-ended
+benchmarks, we follow the official rubric-based or pairwise-
+comparison protocols. For multiple-choice benchmarks, we
+report answer accuracy based on the extracted final choice.
+Unless otherwise specified, evaluation is performed without
+rubric guidance or any other privileged information.
+Each selected checkpoint is evaluated independently three
+times, and we report the mean and standard deviation across
+the three evaluation runs. The question types and evaluation
+metrics are summarized in Table 8.
+Writing.
+We evaluate writing ability using WritingBench
+and CreativeWriting-V3.
+WritingBench evaluates long-form responses to diverse
+real-world writing instructions using instance-specific crite-
+ria covering multiple dimensions of writing quality. We fol-
+low the official rubric-based evaluation protocol and report
+the aggregated rubric score.
+CreativeWriting-V3 evaluates open-ended creative writ-
+ing, including narrative coherence, characterization, style,
+originality, and overall effectiveness. We follow the official
+rubric-based evaluation protocol and report the aggregate
+rubric score.
+Chat.
+We use Arena-Hard-v2 to evaluate general open-
+ended instruction-following and conversational ability. Can-
+didate responses are compared against reference-model re-
+sponses under the official style-controlled pairwise evalua-
+tion protocol, and we report the resulting win rate.
+Health.
+We evaluate health-domain capabilities on Health-
+Bench, LLMEval-Med, and MedQA.
+HealthBench consists of open-ended healthcare con-
+versations evaluated using physician-written, conversation-
+specific rubric criteria with importance weights. The final
+score is computed from the weighted satisfaction of these
+criteria.
+LLMEval-Med evaluates open-ended responses to real-
+world clinical questions using expert-written reference an-
+swers and checklists. We follow the official checklist-based
+evaluation pipeline and report the overall usability score.
+MedQA is a multiple-choice medical question-answering
+benchmark. We report exact-match accuracy of the predicted
+answer choice.
+Science.
+We evaluate scientific knowledge and reasoning
+using ResearchQA and GPQA-Diamond.
+ResearchQA evaluates long-form scholarly question an-
+swering using query-specific rubric items. We report the nor-
+malized rubric-coverage score.
+GPQA-Diamond is a graduate-level multiple-choice
+benchmark covering biology, physics, and chemistry. We re-
+port exact-match accuracy of the predicted answer choice.
+B.
+Training Dynamics
+B.1
+Training Dynamics of RuscaRL
+We further examine the training dynamics of RuscaRL un-
+der two representative model–domain settings, as shown in
+Figure 8. The corresponding reproduction configuration is
+provided in Section . During the initial stage, both set-
+tings maintain relatively high mean rewards with rubric scaf-
+folding. However, their entropy dynamics differ: Qwen3-4B
+trained on Writing exhibits a sharp increase in policy entropy,
+whereas Qwen3-14B trained on Chat fluctuates around its
+initial entropy level. When the scaffolding is substantially re-
+moved after approximately 100 training steps, both settings
+experience an abrupt reward collapse. Although the reward
+gradually recovers during the subsequent unscaffolded train-
+ing stage, it remains below its initial scaffolded level by the
+
+
+Category
+Configuration
+RuscaRL
+RL algorithm: GRPO
+Inter-step scaffolding decay: step sigmoid (α = 125, t0 = 0.2)
+Intra-group scaffolding differentiation: linear
+Rubric grader: gpt-oss-120b
+Sampling
+Temperature: 0.7
+Top-p: 0.8; Top-k: 20
+Rollouts per prompt: 8
+Maximum response length: 8192
+Training
+Optimizer: Adam
+Learning rate: 1 × 10−6 (constant)
+Training batch size: 64
+Mini-batch size: 32
+KL-loss coefficient: 1 × 10−3
+Entropy coefficient: 0
+Total training steps: 500
+Hardware
+8 × NVIDIA H200 GPUs
+Table 5: Training configuration for RuscaRL.
+Hyperparameter
+Configuration
+Training framework
+SWIFT
+Fine-tuning type
+Full-parameter fine-tuning
+Training epochs
+3
+Learning rate
+1 × 10−5
+Per-device batch size
+2
+Gradient accumulation steps
+4
+Maximum sequence length
+20,000
+Warmup ratio
+0.05
+Validation split
+1%
+Precision
+bfloat16
+Distributed training
+DeepSpeed ZeRO-3
+Hardware
+8 × NVIDIA H200 GPUs
+Table 6: Training configuration for the SFT baseline.
+end of training.
+These observations suggest a potential mismatch between
+scaffold-conditioned and natural policy optimization. In the
+early stage, extensive rubric guidance makes high-reward
+responses easier to generate. Nevertheless, injecting many
+criteria into the prompt may dilute adherence to the original
+user instruction and induce trajectories that differ substan-
+tially from those sampled under the natural prompt. Jointly
+optimizing these heterogeneous trajectories within the same
+group-relative objective may therefore produce unstable pol-
+icy updates, as reflected by the abrupt or fluctuating en-
+tropy dynamics. Once the scaffolding is removed, the pol-
+icy must transition from rubric-conditioned generation to
+natural-prompt generation, causing a pronounced distribu-
+tion shift and the accompanying reward collapse. Later on-
+policy training can partially recover performance, but the
+instability introduced during this transition may constrain
+the final performance attainable by the model.
+C.
+Case Study
+We provide two complementary case studies. The creative-
+writing case compares complete responses and criterion-
+level quality, while the health case traces the acquisition of
+persistent safety-critical criteria across training checkpoints
+and supplements the aggregate results with a focused re-
+sponse comparison.
+C.1
+Creative-Writing Case Study
+We conduct a qualitative comparison on a representative
+creative-writing prompt that asks the model to portray a non-
+combat slice of a Roman gladiator’s daily life in first-person,
+past-tense narration, while incorporating sensory detail, in-
+ternal emotion, and the political and social context of the
+Roman Empire. The selected modifier further requires the
+response to describe the gladiator’s preferred weapon and
+explain its personal significance. We present one complete re-
+sponse from the Initial, SFT, Rubric-RL, and RISE-RL mod-
+els. Green highlights mark representative strengths, while
+
+
+Hyperparameter
+Configuration
+Training framework
+SWIFT
+Training objective
+On-policy distillation (GKD)
+Student–teacher pairs
+4B–14B; 14B–32B
+Fine-tuning type
+Full-parameter fine-tuning
+Training steps
+50
+Learning rate
+1 × 10−5
+Per-device batch size
+4
+Gradient accumulation steps
+16
+Maximum sequence length
+16,000
+Maximum completion length
+8,192
+Warmup ratio
+0.05
+Precision
+bfloat16
+Distributed training
+DeepSpeed ZeRO-2
+Hardware
+8 × NVIDIA H200 GPUs
+Table 7: Training configuration for the OPD baseline.
+Domain
+Benchmark
+Question Type
+Metric
+Writing
+WritingBench
+Open-ended writing
+Rubric score
+CreativeWriting-V3
+Creative writing
+Rubric score
+Chat
+Arena-Hard-v2
+Open-ended dialogue
+Style-controlled win rate
+Health
+HealthBench
+Open-ended healthcare
+Weighted rubric score
+LLMEval-Med
+Open-ended clinical QA
+Overall usability
+MedQA
+Multiple choice
+Exact-match accuracy
+Science
+ResearchQA
+Long-form scholarly QA
+Rubric coverage
+GPQA-Diamond
+Multiple choice
+Exact-match accuracy
+Table 8: Summary of the evaluation protocols.
+0
+100
+200
+300
+400
+500
+Training step
+0
+2
+4
+6
+8
+10
+Policy entropy
+0
+100
+200
+300
+400
+500
+Training step
+0.2
+0.3
+0.4
+0.5
+Mean reward
+0
+100
+200
+300
+400
+500
+Training step
+0.20
+0.25
+0.30
+0.35
+0.40
+Policy entropy
+0
+100
+200
+300
+400
+500
+Training step
+0.35
+0.40
+0.45
+0.50
+0.55
+Mean reward
+Qwen3-4B Writing-field
+Qwen3-14B Chat-field
+Figure 8: Representative training dynamics of RuscaRL un-
+der two model–domain settings: Qwen3-4B in the Writing
+domain (top) and Qwen3-14B in the Chat domain (bottom).
+The left column shows policy entropy, while the right col-
+umn shows the mean rubric reward over 500 training steps.
+red highlights mark representative failure modes discussed
+below.
+Qualitative comparison.
+On this representative example,
+RISE-RL achieves the strongest overall performance across
+the four models. It obtains the best score on 12 of the 13 pos-
+itive criteria, with particularly clear advantages in instruc-
+tion adherence, character plausibility, imagery, coherence,
+emotional engagement, and overall impression. These gains
+indicate that RISE-RL improves not only surface-level style,
+but also the narrative structure, thematic consistency, and
+emotional depth of the response.
+RISE-RL also performs strongly on the negative crite-
+ria, achieving the lowest score on Meandering, Amateurish,
+Purple Prose, and Overwrought, while tying for the best re-
+sult on Tell-Don’t-Show. Taken together, the results show
+that RISE-RL produces a more vivid, coherent, and engag-
+ing response while simultaneously reducing several common
+failure modes in creative writing. Although a small number
+of dimensions exhibit sample-level variation, the overall pat-
+tern consistently favors RISE-RL. The response is neverthe-
+less not flawless: it still includes a combat sequence despite
+the non-combat instruction and appends a brief meta-level
+summary after the story. These localized deviations coexist
+with broader gains in imagery, characterization, thematic in-
+tegration, and overall reader engagement. The corresponding
+
+
+criterion-level results are reported in Table 9.
+Creative-Writing Prompt
+Historical Fiction: Write a scene from a story set during the
+height of the Roman Empire, focusing on a slice of a day
+in the life of a gladiator. Do not write a combat scene. Use
+sensory details to capture the sights, sounds, and smells of
+ancient Rome. Explore the gladiator’s thoughts and emotions.
+The story should also touch on the larger political and social
+issues of the time period. The piece should feel like a slice of
+a larger story.
+Additional requirement: Describe the gladiator’s weapon of
+choice and its significance to them.
+Format: First person, past tense, approximately 1,000 words.
+Qwen3-14B-Initial
+Overall score: 12.095
+Title: The Weight of the Gladius
+The sun rose over the Colosseum’s towering arches, casting
+long shadows across the sand where I stood, my boots sinking
+slightly into the damp earth. The air was thick with the scent
+of sweat, blood, and the faint tang of salt from the nearby sea.
+It was the kind of morning that made my throat dry and my
+palms clammy, even before the roar of the crowd had begun.
+I adjusted the straps of my lorica segmentata, the segmented
+bronze armor that clung to my shoulders like a second skin.
+My gladius, the Roman spear I carried like an extension of
+my arm, rested against my hip, its blade dulled by years of
+use but still sharp enough to slice through flesh. It was my
+father’s weapon, passed down through generations of Varros,
+each one a warrior bound to the Empire’s legacy. I touched the
+hilt, feeling the cool metal beneath my fingers, and wondered
+if it would ever feel like anything but a burden.
+The arena was alive before the gates opened. Merchants
+shouted over one another, their voices rising like the tide as
+they hawked bread, wine, and garlands of myrtle to the specta-
+tors. The scent of roasted lamb and pine resin mingled with the
+acrid smoke of burning olive oil, which filled the air with a haze
+that made the sunlight shimmer like a mirage. I could hear the
+distant clang of metal against metal, the rhythmic pounding of
+drums, and the guttural chants of the crowd—“Veni, veni!”—a
+call to the gods, to the glory of Rome. My chest tightened. This
+was the rhythm of my life, the heartbeat of the Empire that had
+reduced my family to a name and a weapon.
+I moved through the crowd, my steps deliberate, my eyes scan-
+ning the faces of the onlookers. Some wore togas of rich purple,
+their faces adorned with gold rings and jewels that glittered
+like the stars above. Others were common folk, their clothes
+patched and their eyes hollow with hunger. The Emperor’s
+presence loomed over it all, a shadow that stretched across the
+arena like a curse. He had chosen me, or rather, had chosen to
+let me live. The Senate had debated my fate for weeks, whis-
+pering about my skill and my lineage. I had been a slave once,
+sold for a handful of coins, but now I was a symbol of the
+Empire’s might.
+The gates creaked open, and the crowd surged forward, their
+cheers rising like a tide. I stepped onto the sand, the coarse
+grains biting into my soles, and felt the weight of the gladius
+press against my hip. It was more than a weapon; it was a tether
+to my past. My father had been a centurion, a man who fought
+for the Empire’s glory, but when the legions marched east to
+crush the Parthians, he had been captured and sold into slavery.
+I had been born in the shadows of that tragedy, my mother’s
+womb a cradle for survival. The gladius had been my first gift,
+given to me by the slave master who had bought me, a promise
+that I would one day prove myself.
+As the games began, the arena transformed into a cathedral
+of chaos. The amphitheater’s roar was a deafening symphony,
+a cacophony of triumph and terror. I watched as other gladi-
+ators entered, their faces painted with the colors of their fac-
+tions—red for the enemies of the Empire, green for the loyalists.
+They moved with the precision of soldiers, their movements
+a dance of death and defiance. I clenched my fists, my nails
+digging into my palms. This was not just a game; it was a spec-
+tacle, a way for the Emperor to remind the people of Rome’s
+power.
+The crowd’s cheers were a constant hum, a reminder of the
+Empire’s reach. I thought of the provinces, of the distant lands
+where Roman legions had conquered and colonized, where the
+people were forced to kneel before the eagle. I thought of the
+senators who debated in the Curia, of the slaves who toiled in
+the mines, of the children who were born into a world where
+freedom was a myth. The Empire was a machine, grinding
+people into its gears, and I was one of its cogs.
+But there was something in me that resisted. I had seen the
+faces of the people I fought, the ones who had been bought
+and sold like livestock. I had felt the fear in their eyes, the
+desperation that made them fight not for glory, but for survival.
+The gladius was not just a weapon; it was a reminder of the
+lives I had taken, of the blood I had spilled. I had become a
+part of the Empire’s cycle, but I was not its master.
+As the games continued, I found myself standing at the edge
+of the arena, watching the other gladiators clash. One of them,
+a young man with a scar across his cheek, fought with a fierce
+determination that made me want to reach out and help. But I
+knew I could not. The rules of the game were clear: the victor
+was the one who survived, the one who served the Emperor’s
+pleasure.
+The crowd’s cheers grew louder, their voices a storm that shook
+the very foundations of the Colosseum. I closed my eyes, feel-
+ing the weight of the gladius in my hand, and wondered if I
+would ever find a way to escape this cycle. The Empire had
+given me a purpose, a reason to live, but it had also taken ev-
+erything from me. I was a gladiator, a soldier of the Empire,
+but I was also a man with a name, a family, a past.
+When the final bell rang and the crowd fell silent, I stepped
+down from the arena, my legs trembling. The sun was high
+now, its light burning into my eyes. I turned away from the
+Colosseum, the weight of the gladius still in my hand, and
+walked into the heart of the city, where the streets were alive
+with the sounds of commerce and the whispers of a world that
+would never let me be free.
+But for now, I was alive. And that was enough.
+Qwen3-14B-SFT
+Overall score: 8.454
+The smell of sweat and salt and cheap wine is the first thing to
+meet me, a greasy, cloying embrace that clings to the inside of
+my leather tunic. I am not a man of the Senate, nor do I serve
+the Emperor’s legions; I am a Scaevola, a scullion, a scum
+of the Empire’s vast body. But as the sun beats down on the
+Colosseum’s travertine walls, I am more than my flesh. I am
+the shadow that falls across the sand, the rustle of the crowd,
+the tension in the air that is as real as the blood in my veins.
+
+
+I stand at the edge of the arena, my weapon in hand. It is a
+spatha—a short, double-edged sword. It is not the massive
+gladius of the legionaries, nor the ornate spatha of the Em-
+peror’s favorites. Mine is simple, forged in the crucible of the
+docks near Ostia, the handle rough and knotted, the steel dulled
+by years of use. It is the weight of my father’s death, the weight
+of my own survival, and the weight of the Empire’s hunger for
+entertainment.
+I grip it with my left hand, feeling the familiar balance. The
+spatha is my voice. In the silence that comes before the roar, it
+is the only thing that matters. It is the symbol of my trade, the
+extension of my will. If I cannot speak, the sword will answer
+for me. The crowd’s noise is a deafening roar, a wall of sound
+that vibrates in my teeth. It is the sound of a million throats,
+the sound of a million hopes and fears, all gathered to feed the
+beast.
+I look out over the tiers. The Imperium—the Imperial
+seats—gleam with gold. The Emperor’s favorite, the Caesar
+Augustus, sits high above, but he is not here today. He is in the
+provinces, crushing a rebellion in the East, or perhaps he is at
+home in his villa, enjoying the luxury of thermae and not the
+spectacle of men’s throats. The people below are not here to
+see the Emperor; they are here to see the Spartacus.
+I see the Murmurium—the lower tiers of the people. They are
+the true heart of the Empire. They are the plebeians, the freed-
+men, the slaves of the land. They are the ones who make the
+games possible. They are the ones who will cheer for Spartacus
+if he wins, and they will cheer for the Pugio if he loses. But
+they are also the ones who have been bought. They are paid to
+watch, and they are paid to hate. They are the perfect storm of
+the Empire’s social order: the oppressed, the entertained, and
+the compliant.
+I turn my gaze to the center of the arena. The sand is hot,
+a mirror of the sky. The smell of the arena is different from
+the docks. Here, it is the smell of blood, of old sweat, of the
+acrid smoke of the incensarii who fill the air with myrrh and
+frankincense. It is a sweet, intoxicating smell that masks the
+stench of death. The acrobats are warming up, their leather
+gloves squeaking on the sand. The gladiators are preparing.
+I can feel the heat of the sun on my back, the sweat running
+down my spine, cooling my skin.
+I take a breath. The air is thick, heavy. It is the air of a city that
+is at the height of its power, but also of its decadence. Rome is
+a city of marble and marble is a city of lies. The Empire is built
+on the backs of those like me. The wealth of the patricians is
+built on the toil of the slaves. The grandeur of the Forum is
+built on the suffering of the arena.
+I feel the spatha again. It is not just a weapon; it is a relationship.
+It is the only thing I have that is truly mine. The Empire takes
+my name, my body, my freedom. It gives me this steel. It
+gives me a purpose. It gives me a place in a world that would
+otherwise swallow me whole.
+I step forward, into the center of the sand. The crowd’s roar
+swells, a wave of sound that hits me like a physical blow. I feel
+the heat of their eyes on me. I am Spartacus, the man who once
+led a rebellion. I am the man who can make a dog in the stands
+howl. I am the man who can make the Emperor’s favorite weep.
+I am the man who is the Empire’s problem, and the Empire’s
+answer.
+I raise the spatha high, the weight of it in my hand, the weight
+of the Empire in my heart. I am the spatha and the Spartacus,
+the scum and the scion, the slave and the symbol. I am a man of
+the lower levels, but I am not of the lower mind. I am a man of
+the sand, of the blood, of the history that is about to be written.
+Qwen3-14B-Rubric-RL
+Overall score: 11.954
+Title: The Cleitophoros
+The first light of dawn seeped through the cracks of my bar-
+racks, casting long shadows over the damp stone walls of the
+valetudinarium—the barracks where we slaves were kept in
+perpetual twilight. The air smelled of sweat, damp wool, and
+the metallic tang of blood from yesterday’s training. I stirred,
+my skin still slick with the residue of the night’s ritual: a shav-
+ing with a coarse bronze blade, the scrape of bone against bone
+as my trainer, Decimus, inspected my arms for cuts. My name is
+Marcus Aelius, though I’ve long since forgotten the name of the
+man who sold me into slavery in Carthage. My brother, Quin-
+tus, once called me “little eagle,” but he’s gone—his sword
+broken in a fight against a retiarius who laughed as he carved
+him down.
+My weapon of choice is the Cleitophoros, a curved short sword
+with a serrated edge, passed down from Quintus. Its hilt is
+carved with the likeness of a lion’s head, a gift from my trainer,
+who claimed it was “a blade forged in the empire’s favor.” But
+I know better. The Cleitophoros is more than steel—it’s a relic
+of my brother’s dying breath, the last thing he held before his
+ribs pierced. When I grip it, I feel his warmth in my palm,
+a phantom reminder that every swing I deliver is a vow to
+survive.
+The streets of Rome buzzed with the clamor of the morning. I
+stepped into the via Triumphalis, the road leading to the Colos-
+seum, where the roar of the crowd would soon drown out my
+thoughts. The scent of roasted lamb and garlic wafted from
+open stalls, mingling with the acrid smoke of burning olive
+oil used to haze the arena’s sands. Above, the Arch of Titus
+loomed, its marble façade gleaming under the sun, a testament
+to Rome’s conquests. I clenched my fists, recalling the Em-
+peror’s latest decree: “Gladiatorial games shall distract the
+people from the burdens of taxation and the folly of war.” The
+Empire’s hunger for glory masked its growing fractures—taxes
+on grain, the suppression of dissent, the massacre of Jews in
+Judea. I wondered if the Emperor’s shadow stretched beyond
+the Colosseum, choking the city’s veins.
+My trainers barked orders as we marched through the gates. The
+hypogeum, the underground arena, hummed with the distant
+clang of metal and the cries of beasts. A venenum (poison)
+flask clinked against my belt—another reminder of the gamble
+we faced. Today’s match was against a Thracian named Gaius,
+a man who’d once been a soldier in the Danube legions. His
+blade, a spatha, would seek my throat. But I focused on the
+Cleitophoros, its weight balanced in my hands like a prayer.
+The arena’s sands were hot beneath my boots, the scent of damp
+earth and blood mingling with the sweat of thousands. The
+crowd’s chants rose like a tidal wave: “Veni, veni, gladiator!”
+The roar was a beast in itself, a primal force that made my
+pulse race. Decimus stood beside me, his beard streaked with
+grey, muttering about the Emperor’s favor. “Today’s victory
+buys you a day’s bread,” he said. “But tomorrow? Tomorrow
+is another battle.”
+I stepped onto the cardo, the central avenue of the arena. The
+triumphal arch behind me bore the laurels of Emperor Hadrian,
+whose reign had turned Rome into a glittering empire. Yet
+I saw the cracks: the familiars (slaves) who labored in the
+mines, the plebeians who starved while the Senate debated
+
+
+land reforms. The games were a spectacle, but they were also a
+lie. The Emperor used them to quell unrest, to prove that Rome
+was unbreakable. I thought of the Pax Romana—the “Roman
+Peace”—and how it had been built on the backs of conquered
+peoples.
+A lupus (wolf) was dragged into the arena, its howls echoing
+as the crowd screamed. I turned my gaze to the Emperor’s seat,
+the senatus (council) behind him, their faces masked in bronze.
+He was a man of marble and ambition, but I saw the hunger
+in his eyes, the same hunger that drove my trainers to beat me
+into obedience.
+The Cleitophoros felt heavier than usual. I’d polished it earlier,
+its blade glinting in the arena’s artificial light. Quintus had
+taught me to wield it with precision, its curve allowing me
+to slash diagonally, a technique that left enemies disoriented.
+I recalled the night he died: his blade had slipped, and I’d
+watched as his blood pooled on the sand, his final words a
+curse on the Empire that had torn him from his family. Now, I
+vowed to fight not for glory, but for the memory of my brother.
+The crowd’s cheers faded as Gaius stepped into the arena, his
+spatha flashing. The centurion raised his baton, and the games
+began. I ran, my boots crunching on the sand, the smell of
+sweat and salt in my nostrils. The Cleitophoros’s hilt burned in
+my grip. I remembered the triumvirate of senators who’d voted
+to expand the empire into Britain, their greed fueling wars that
+drained Rome’s coffers. The games were a distraction, but I
+could feel the weight of their greed in the air—a silent threat
+that would one day collapse the Empire.
+As Gaius lunged, I parried his strike, the Cleitophoros’s edge
+biting into his forearm. The crowd roared, but I didn’t look
+at them. I thought of the plebeian families who sold their
+children to the ludus (gladiatorial school) to pay off debts, of
+the materfamilias (housewives) who wept in the stands, their
+sons reduced to spectacle. The Empire’s hierarchy was a prison,
+and I was a prisoner in it.
+When the final bell rang, the crowd’s noise turned to a ca-
+cophony of cheers and jeers. The Cleitophoros lay at my feet,
+its blade still sharp. The centurion declared me “victor,” but I
+knew the truth: my victory was a pittance. The Emperor’s offi-
+cials would soon decide whether I’d be sold to a new ludus or
+killed in a “final” match. My thoughts drifted to the edict that
+had been posted in the Forum: “To the citizens: The Empire’s
+strength lies in its legions. Let the games remind you of that.”
+Decimus approached, his face a mask of grim satisfaction.
+“You’ve earned your bread,” he said. “But remember—today’s
+victory is a loan.”
+As I trudged back to the barracks, the sun dipped lower, casting
+long shadows over the forum. The scent of burning incense
+from the temple of Jupiter mingled with the stench of the
+arena. I passed a group of plebeians haggling over bread, their
+voices low with fear. The Empire was a house built on fire, and
+I was a spark.
+The Cleitophoros felt heavy in my hand, but I held it tight.
+Tomorrow, the games would continue. The Empire would ex-
+pand. The people would suffer. And I would fight, not for the
+Emperor’s glory, but for the memory of my brother—and for
+the chance that one day, the sands of Rome might yield to
+something better.
+Word count: 1,000
+*Note:* The story weaves in the political context of Roman
+expansionism, class division, and the Emperor’s use of glad-
+iatorial games as a tool of control. Sensory details—smells
+of sweat and blood, the roar of the crowd, the texture of the
+Cleitophoros—anchor the reader in the world. The gladiator’s
+internal conflict between survival and moral resistance reflects
+the larger tensions of the Empire. The Cleitophoros, a symbol
+of both loss and resilience, ties personal and historical narra-
+tives together.
+Qwen3-14B-RISE-RL (Ours)
+Overall score: 14.136
+Title: The Weight of the Gladius
+I woke at the crack of dawn, the scent of oil and sweat clinging
+to my skin. The Colosseum’s shadow stretched long across the
+stone floor of my cell, and the distant clang of metal echoed
+through the tunnels—my gladius, the blade I’ve carried since
+my brother’s death, still pressed against my thigh. The air
+smelled of damp stone and the faint tang of blood from yester-
+day’s training. My fingers brushed the cold edge of the sword,
+its surface worn smooth by years of use. It was my weapon
+of choice, a gladius—short, sturdy, designed for thrusting and
+slashing—and my father had carved the blade’s hilt from a
+fallen oak. He’d told me once, “A gladius isn’t just steel; it’s
+a promise. To survive. To fight. To remember.” I clenched my
+jaw. Remembering was a luxury I couldn’t afford.
+Morning Rituals
+The guard’s boots thudded against the floor as he checked my
+chains. “Marcus,” he grunted, “you’ll be in the arena by noon.”
+I nodded, my throat dry. The oil from my teethbrush—ground
+sand and pine resin—stuck to my tongue. I scrubbed the sweat
+from my brow with a cloth dipped in water from the communal
+basin. The smell of salt and urine lingered in the air, mingling
+with the acrid scent of burning incense from the temple nearby.
+My muscles ached from hours of drills: thrusting the gladius
+into padded leather targets, parrying wooden sticks with the
+rhythm of a heartbeat. Each swing felt like a prayer.
+My mentor, Lucius, stood nearby, his voice sharp as a blade.
+“You’re too slow, Marcus. The crowd doesn’t wait for hesita-
+tion.” He gripped my wrist, forcing me to thrust the gladius
+forward. The metal clang echoed like a bell, and I felt the
+weight of the blade—its balance, its grip, the way it dug into
+my palm. This was my lifeline. My brother, Gaius, had died in
+a duel three years ago, his blood staining the sand. I’d vowed
+never to let that happen again.
+The Journey to the Arena
+At sunrise, I was led through the labyrinthine tunnels beneath
+the city. The walls were slick with damp, and the air buzzed
+with the murmur of slaves and prisoners. A chorus of jeers rose
+from the crowd outside the gates: “Veni, vidi, vici!” (I came, I
+saw, I conquered)—a chant meant for the Emperor, but often
+twisted to mock gladiators. My sandals scraped against stone
+as I followed the procession. The scent of roasted lamb and
+garum (fish sauce) wafted from the vendors’ stalls outside the
+arena gates.
+As we neared the Colosseum’s entrance, the roar of the crowd
+surged like a tidal wave. Thousands of citizens—senators
+in togas, merchants with gold rings, children clutching ap-
+ples—pressed close. A woman in a crimson dress screamed,
+“Salve!” (Hail!) as she tossed coins into the crowd’s purse. I
+glanced at the beasts: a lion pacing in its enclosure, its mane
+matted with sweat, and a tame elephant stomping its feet. The
+smell of iron and blood hung thick.
+
+
+Lucius whispered, “The Emperor’s favor today. He’s chosen
+you for this match.” His words carried the weight of politics.
+Emperor Claudius had recently expanded the games to distract
+from unrest in the provinces—tax burdens on farmers, raids
+by Germanic tribes. The spectacles were both spectacle and
+control. “They feed us lies,” he muttered. “That blood spilt
+here keeps the Senate quiet.” I nodded, my fists tightening.
+The Ceremony
+Inside the arena, the sand was cool beneath my boots. The
+centurion raised the red cloth over the arena floor, and the crowd
+erupted in cheers. The announcer’s voice boomed: “Hunc dies,
+Caesar Claudius bonus est!” (This day, Emperor Claudius is
+generous!) The crowd’s chants swelled, but I focused on the
+gladius at my belt. Its hilt, carved with my father’s initials—M
+and G—felt like a relic. Gaius’s final words echoed in my mind:
+“Don’t let them take your soul, Marcus.”
+The priestess sprinkled sacred ash over the arena, invoking
+Lares and Penates to bless the duel. I stepped forward, the
+blade’s weight sinking into my palm. My heartbeat matched
+the rhythm of the arena’s stones. The crowd’s cheers faded into
+a low hum as I faced my opponent—a young gladiator named
+Titus, his eyes hollow with fear.
+Reflections on Power and Oppression
+I closed my eyes. The Empire’s grandeur was a lie. Beneath
+the marble colonnades, slaves like me were reduced to instru-
+ments of spectacle. The Emperor’s games weren’t just enter-
+tainment—they were a tool to cement his rule. “Every death
+here,” I thought, “is a reminder that we are property.” My
+thoughts drifted to the slaves sold in the markets, their cries
+echoing through the streets. The Senate’s greed for wealth kept
+the poor in chains.
+Yet, there was pride in the gladius. It was my identity. When I
+thrust it forward, I wasn’t just defending myself—I was honor-
+ing my father’s legacy. The blade had saved me once: during a
+skirmish with pirates, I’d used it to stab through a dagger aimed
+at my throat. “It’s more than steel,” I whispered to myself. “It’s
+survival.”
+The Moment Before the Duel
+The announcer’s voice rang again: “Propter populum, propter
+imperium!” (For the people, for the Empire!). The crowd
+roared. I gripped the gladius tighter. My palms were slick
+with sweat. The arena’s lights flickered from oil lamps, casting
+jagged shadows on the sand.
+I remembered the day Gaius died. He’d been matched against
+a wild boar, his blade snapped in the clash. The crowd had
+jeered, “Mors est gladiatorum!” (Death is the gladiator’s fate!).
+I’d vowed never to let that happen. Now, as I stood before Titus,
+I felt the weight of that vow.
+A flicker of doubt crept in: What if I fail? What if I kill again?
+But then I thought of the slaves who labored in the mines,
+of the farmers burdened by taxes, of the Emperor’s soldiers
+marching to quell rebellion. I had to fight. Not for glory, but
+for the fragile hope that one day, this cycle might end.
+The Arena’s Roar
+The
+signal
+horn
+blared.
+The
+crowd’s
+roar
+surged—“Viva!”—and
+I
+stepped
+into
+the
+sand.
+Titus
+lunged first, his gladius slicing at my ribs. I parried, the
+blade’s steel biting into my glove. My heartbeat thundered.
+The arena’s heat pressed against my skin, the smell of blood
+and sweat thick.
+I focused on the gladius’s balance. Its weight was perfect—light
+enough to thrust quickly, heavy enough to drive through armor.
+I remembered Lucius’s advice: “Strike true, not fast. The crowd
+rewards precision.”
+As the duel intensified, I felt the Emperor’s gaze through the
+crowd’s murmur. He watches, I thought. He uses this blood to
+show his power. I gritted my teeth, channeling anger into focus.
+The final moments of the match: Titus staggered, his blade
+faltering. I drove the gladius into his side, the impact sharp and
+clear. The crowd erupted in a deafening “Vincit gladius!*”
+(The sword wins!).
+The centurion called the match over. I stood, the gladius still
+in hand, my chest heaving.
+Epilogue: The Weight of Legacy
+After the games, I was led back to my cell. The guard tossed
+me a coin—a token of the Emperor’s “grace.” I pocketed it,
+though I knew it would be taken from me soon. The gladius
+remained at my belt, its hilt warm against my skin.
+That night, as I stared at the stars through the cell’s narrow
+window, I thought of Gaius and the Empire’s endless hunger
+for blood. The games were a mirror: We fight to prove we’re
+worthy of life, yet our lives are bought and sold like livestock.
+But I still carried the gladius. Not just as a weapon, but as a
+thread connecting me to my father, to survival, to the fragile
+dream that one day, Rome’s chains might loosen.
+The Emperor’s games would continue. The Senate would im-
+pose more taxes. The slaves would endure more spectacles.
+But for now, I walked the line between death and honor, the
+gladius a silent testament to the price of power.
+This is my day, I thought. And this is how I endure.
+*Word Count*: 998
+*Sensory Details*:
+- Smells: Oil, sweat, blood, sand, garum, incense, damp stone,
+salt, and iron.
+- Sounds: Crowd roars, clanging metal, horn blasts, whispers of
+the announcer, footsteps, and the rhythmic clang of the gladius.
+- Visuals: Red cloth, sand, lion’s mane, marble colonnades, the
+gladius’s hilt etched with initials, the Emperor’s statues, and
+the dim light of oil lamps.
+*Emotions & Themes*:
+- Grief over Gaius’s death and guilt over surviving.
+- Anger at the Emperor’s exploitation of slaves and the Senate’s
+greed.
+- Pride in the gladius as a symbol of legacy and survival.
+- Resignation to systemic oppression vs. determination to fight
+for dignity.
+*Political/Social Context*:
+- Emperor Claudius’s use of gladiatorial games to pacify the
+populace and mask provincial unrest.
+- The class divide: citizens vs. slaves, the role of the ludus
+(gladiator school) in training for public spectacle.
+- The gladiators’ status as “property” under Roman law, yet
+their rituals (offerings, prayers) hinting at a fragile humanity.
+This scene is a microcosm of the larger story: Marcus’s strug-
+gle to retain agency in a system that erases it, the gladius as
+both tool and memory, and the Empire’s paradox of grandeur
+masking brutality.
+Criterion-Level Analysis on CreativeWriting-V3.
+To
+complement the single-example case study, we further com-
+
+
+Criterion
+Initial
+SFT
+Rubric-RL
+RISE-RL
+Positive criteria (↑)
+Adherence to Instructions
+14.17
+12.67
+13.67
+17.17
+Believable Character Actions
+11.83
+9.67
+11.67
+13.50
+Nuanced Characters
+9.83
+7.17
+9.67
+11.33
+Consistent Voice/Tone of Writing
+12.50
+10.00
+11.00
+13.33
+Imagery and Descriptive Quality
+13.67
+10.83
+12.50
+14.83
+Elegant Prose
+10.33
+8.00
+8.67
+11.00
+Emotionally Engaging
+10.50
+8.50
+10.33
+12.33
+Emotionally Complex
+9.33
+7.67
+9.50
+10.83
+Coherent
+10.67
+9.83
+11.50
+13.50
+Well-earned Lightness or Darkness
+9.50
+8.67
+10.67
+12.00
+Sentences Flow Naturally
+11.50
+9.17
+9.83
+11.33
+Overall Reader Engagement
+10.33
+8.67
+10.33
+12.17
+Overall Impression
+10.67
+8.83
+10.17
+12.00
+Negative criteria (↓)
+Meandering
+14.33
+14.33
+13.33
+13.17
+Weak Dialogue
+4.33
+7.17
+10.00
+12.50
+Tell-Don’t-Show
+14.00
+14.50
+13.33
+13.33
+Unsurprising or Uncreative
+12.83
+14.00
+12.00
+13.00
+Amateurish
+13.17
+14.83
+13.67
+12.83
+Purple Prose
+14.00
+14.17
+14.83
+12.33
+Overwrought
+14.67
+14.33
+15.67
+12.50
+Incongruent Ending Positivity
+10.83
+8.33
+8.00
+9.67
+Unearned Transformations
+12.00
+8.83
+10.00
+10.83
+Table 9: Criterion-level scores for the selected creative-writing case. For positive criteria, higher is better (↑); for negative
+criteria, lower is better (↓). Bold indicates the best result in each row.
+pare the criterion-level performance of all methods over the
+full CreativeWriting-V3 benchmark. The benchmark con-
+tains both positive criteria, where higher scores indicate bet-
+ter writing quality, and negative criteria, where lower scores
+indicate fewer undesirable writing tendencies. As shown in
+Table 10, RISE-RL achieves the best result on all positive
+criteria and the lowest score on all nine negative criteria,
+indicating consistent improvements in both writing quality
+and the avoidance of common stylistic failure modes.
+C.2
+Health Case Study: Acquisition of Persistent
+Criteria
+Disclaimer.
+The
+health-domain
+benchmarks
+(Health-
+Bench, LLMEval-Med, MedQA) and the pregnancy-travel
+case presented in this section are used solely to illustrate
+criterion-level alignment behavior of the proposed general-
+purpose reinforcement learning method on multidimensional
+open-ended tasks. This work is a fundamental methodolog-
+ical study and does not constitute medical advice, a clinical
+decision-support tool, or a medical product. The trained mod-
+els are research artifacts and are not intended for real-world
+medical use, diagnosis, or deployment in any healthcare set-
+ting.
+We further investigate how selective rubric guidance af-
+fects the acquisition of safety-critical behaviors in the health
+domain. Specifically, we consider a representative example
+involving travel during late pregnancy. Starting from the
+same Qwen3-4B initial model, we compare Rubric-RL and
+RISE-RL at training steps 100, 200, and 300. For each check-
+point, we independently sample eight responses under the
+original user prompt and evaluate whether each response
+satisfies the corresponding rubric criteria.
+Rather than comparing only the aggregate reward, we fo-
+cus on six representative criteria that capture persistent fail-
+ure modes and practically important behaviors exhibiting
+different acquisition patterns during training. These criteria
+cover obstetric-provider consultation, dependence on indi-
+vidual pregnancy history, spontaneous-labor awareness, ac-
+tionable travel precautions, balanced risk assessment, and
+practical preparation. This case study therefore illustrates
+whether the model consistently acquires specific high-value
+behaviors during reinforcement learning.
+Prompt.
+Health Prompt
+I live in Reno, NV, which is about 4,200 feet above sea level. I
+wanted to visit my mother-in-law tomorrow for Mother’s Day.
+She lives in Lake Tahoe, NV, which is about 6,300 feet. The
+drive is only 1 hour and 15 minutes, but I am 35 weeks and 4
+days pregnant. Is it okay to go or not?
+Representative Criteria.
+We select six representative cri-
+teria for analysis. These criteria include persistent failure
+modes and practically important behaviors that exhibit a
+final-step advantage for RISE-RL over Rubric-RL. Their def-
+initions and original rubric weights are shown in Table 11.
+
+
+Criterion
+Initial
+SFT
+Rubric-RL
+RISE-RL
+Positive criteria (↑)
+Adherence to Instructions
+15.95
+13.86
+16.66
+17.41
+Believable Character Actions
+14.46
+13.84
+14.47
+15.47
+Nuanced Characters
+12.64
+12.33
+12.98
+13.91
+Consistent Voice/Tone
+15.29
+14.04
+14.91
+15.93
+Imagery and Descriptive Quality
+14.41
+14.14
+14.70
+15.14
+Elegant Prose
+12.79
+11.88
+12.41
+13.47
+Emotionally Engaging
+13.54
+12.62
+13.77
+14.68
+Emotionally Complex
+11.98
+11.71
+12.54
+13.33
+Coherent
+15.32
+12.82
+14.93
+16.19
+Well-earned Lightness/Darkness
+13.01
+12.08
+13.23
+14.45
+Sentences Flow Naturally
+13.73
+12.58
+13.20
+14.23
+Overall Reader Engagement
+13.66
+12.28
+13.80
+14.81
+Overall Impression
+13.46
+12.29
+13.59
+14.57
+Negative criteria (↓)
+Meandering
+6.99
+10.63
+8.26
+6.19
+Weak Dialogue
+8.18
+9.09
+8.39
+7.11
+Tell-Don’t-Show
+8.62
+9.47
+8.88
+7.40
+Unsurprising or Uncreative
+9.19
+9.67
+8.84
+8.13
+Amateurish
+8.06
+9.66
+8.64
+6.98
+Purple Prose
+7.82
+8.94
+8.84
+7.21
+Overwrought
+8.38
+10.23
+9.71
+7.94
+Incongruent Ending Positivity
+4.96
+5.53
+4.92
+4.03
+Unearned Transformations
+6.59
+7.30
+6.71
+5.34
+Table 10: Criterion-level results on the full CreativeWriting-V3 benchmark. For positive criteria, higher is better (↑); for negative
+criteria, lower is better (↓). Bold indicates the best result in each row.
+Criterion Acquisition over Training.
+Table 12 reports the
+number of failed responses among the eight independently
+sampled rollouts for each criterion. A lower failure count
+indicates that the corresponding behavior is expressed more
+consistently by the policy. For each training step, bolddenotes
+the better result between Rubric-RL and RISE-RL; ties are
+also bolded.
+To provide a more direct view of the overall trend, we addi-
+tionally aggregate the six criteria across all eight responses.
+Each checkpoint therefore contains 6 × 8 = 48 criterion–
+response judgments. The corresponding coverage results are
+reported in Table 13.
+Analysis of Criterion Acquisition.
+The initial policy sat-
+isfies only 6 of the 48 criterion–response judgments. Its suc-
+cessful responses are primarily concentrated on the generic
+recommendation to contact a physician, while most re-
+sponses omit more specific behaviors such as recognizing
+the role of individual pregnancy history, spontaneous-labor
+awareness, and practical travel preparation.
+Rubric-RL provides only limited improvement during the
+first 200 training steps. Its aggregate coverage remains at
+16.7%, and several important criteria continue to fail in ev-
+ery sampled response. In contrast, RISE-RL begins to acquire
+the targeted behaviors earlier and reaches 33.3% selected-
+criterion coverage by step 200. This difference becomes more
+pronounced as training proceeds: at step 300, RISE-RL satis-
+fies 26 of the 48 judgments, corresponding to 54.2% selected-
+criterion coverage, compared with 16 judgments and 33.3%
+coverage for Rubric-RL.
+The clearest example is R0, which requires the response
+to recommend consulting the user’s obstetric provider before
+travel. This behavior is absent from every initial response
+and every Rubric-RL response through step 200. RISE-RL
+reduces the number of R0 failures from eight at step 100 to
+five at step 200 and eventually to zero at step 300. Thus, all
+eight responses generated by the final RISE-RL checkpoint
+consistently express this safety-critical requirement.
+A similar pattern appears for R15. RISE-RL reduces the
+failure count to zero by step 300, while Rubric-RL still
+misses this criterion in one of the eight responses. It also
+achieves lower final failure counts for spontaneous-labor
+awareness, actionable travel precautions, balanced risk as-
+sessment, and practical preparation. These improvements in-
+dicate that RISE-RL not only learns to recommend consult-
+ing an obstetric provider, but also increasingly incorporates
+the specific context needed for a more useful and individu-
+alized assessment, including gestational age, travel duration,
+altitude change, medical accessibility, and emergency prepa-
+ration.
+Overall, this case demonstrates the advantage of selective
+criterion-level guidance for persistent failure modes. Scalar
+reward optimization can favor responses that already satisfy
+several easier criteria without revealing how to address re-
+peatedly missed requirements. RISE-RL instead identifies
+these failures and exposes the policy to targeted corrective
+information. As a result, the model discovers high-value be-
+haviors earlier and expresses them more consistently under
+
+
+ID
+Weight
+Criterion
+R0
+10
+Advises consulting an obstetric provider before travel.
+R9
+8
+Provides actionable precautions, including hydration, movement breaks, and carrying prenatal records.
+R10
+8
+Explains that spontaneous labor may occur at 35 weeks and 4 days and relates this possibility to the travel
+decision.
+R15
+9
+Notes that whether the trip is appropriate depends on the user’s individual pregnancy history and clinical
+context.
+R17
+9
+Provides a balanced assessment: travel may be reasonable for an uncomplicated pregnancy, while emphasizing
+access to appropriate medical care.
+R18
+6
+Recommends practical preparation, including checking the route, traffic and weather, and carrying identifica-
+tion, insurance information, and basic hospital items.
+Table 11: Representative rubric criteria used in the health case study. The weight indicates the importance assigned by the
+original instance-specific rubric.
+Criterion
+Initial
+Rub.-100
+RISE-100
+Rub.-200
+RISE-200
+Rub.-300
+RISE-300
+R0: Consult an obstetric provider
+8
+8
+8
+8
+5
+5
+0
+R9: Actionable travel precautions
+8
+8
+6
+8
+5
+7
+6
+R10: Possibility of spontaneous labor
+8
+6
+6
+7
+5
+4
+3
+R15: Dependence on pregnancy history
+2
+2
+2
+1
+2
+1
+0
+R17: Balanced assessment and care access
+8
+8
+8
+8
+7
+8
+7
+R18: Route and hospital preparation
+8
+8
+8
+8
+8
+7
+6
+Total failures
+42
+40
+38
+40
+32
+32
+22
+Table 12: Criterion-level failure counts among eight independently sampled responses. Lower is better. Bold indicates the better
+result between Rubric-RL and RISE-RL at the same training step.
+Checkpoint
+Satisfied / 48
+Coverage
+Initial
+6
+12.5%
+Rubric-RL 100
+8
+16.7%
+RISE-RL 100
+10
+20.8%
+Rubric-RL 200
+8
+16.7%
+RISE-RL 200
+16
+33.3%
+Rubric-RL 300
+16
+33.3%
+RISE-RL 300
+26
+54.2%
+Table 13: Aggregate coverage over the six selected repre-
+sentative criteria. Coverage is calculated over 48 criterion–
+response judgments at each checkpoint.
+the original, guidance-free prompt.
+Representative Responses at Step 300.
+To illustrate the
+behavioral differences behind the aggregate statistics, we
+compare representative responses sampled from the step-300
+checkpoints. We select a relatively high-scoring Rubric-RL
+response and the highest-scoring RISE-RL response among
+the eight rollouts. Gold highlights indicate behaviors ex-
+pressed by both methods, while blue highlights indicate ad-
+ditional high-value behaviors expressed by RISE-RL.
+Rubric-RL, Step 300
+Score: 0.562
+At 35 weeks and 4 days, you are close enough to term that you
+should watch carefully for contractions, leaking fluid, bleeding,
+or other signs that labor may be starting.
+Before deciding, contact your OB/GYN and ask whether
+the trip is appropriate for your particular pregnancy. If your
+provider gives you permission to travel, make sure that some-
+one else drives and that you are prepared to stop if you develop
+symptoms.
+You should also check where the nearest hospital is and have a
+plan in case you begin to feel unwell during the trip.
+Satisfied representative criteria: R10, R15, and R18.
+RISE-RL, Step 300
+Score: 0.643
+This is general information and is not a substitute for person-
+alized medical advice from your obstetric provider.
+Call or message your OB before traveling and explain that you
+are 35 weeks and 4 days pregnant, currently live at approxi-
+mately 4,200 feet, plan to travel to approximately 6,300 feet,
+and expect the drive to take about 1 hour and 15 minutes. Ask
+whether they recommend that you make the trip.
+At this stage of pregnancy, labor can begin unexpectedly, even
+before the due date. The altitude change itself may be tolerable
+for someone with an uncomplicated pregnancy, but the more
+important concern is being away from your usual hospital and
+obstetric team if labor or another complication begins.
+If your pregnancy has been uncomplicated and your provider
+has not restricted travel, a short daytime trip may be reasonable
+with appropriate precautions. Before leaving, check the route,
+traffic, and weather; identify an appropriate hospital near Lake
+
+
+Tahoe; and bring your identification, insurance information,
+prenatal records, and basic hospital items.
+Satisfied representative criteria: R0, R10, R15, R17, and
+R18.
+The two responses share general awareness of late-
+pregnancy risks and the need to contact an obstetric provider.
+However, the RISE-RL response expresses a substantially
+more complete decision framework. In particular, it explicitly
+distinguishes general information from personalized medi-
+cal advice, incorporates the user’s gestational age, altitude
+change, and travel duration into the provider-clearance re-
+quest, and identifies access to obstetric care as the central
+practical concern. It also provides a balanced conditional as-
+sessment rather than an unconditional recommendation and
+translates the risk assessment into concrete preparation steps.
+These additional behaviors correspond directly to the persis-
+tent criteria targeted by selective guidance.
+D.
+Prompts
+D.1
+Privileged Prompt Construction for Guidance
+During guidance, RISE-RL preserves the original conversa-
+tion and does not replace or rewrite the user prompt. Instead,
+it constructs a lightweight privileged suffix from the rubric
+evaluation of the initial natural-rollout group. This suffix
+provides targeted guidance for criteria that the current policy
+fails to satisfy consistently.
+For each criterion ck, we compute the priority score
+pk = wkfk,
+where fk is the number of natural-rollout responses that fail
+criterion ck. We then select
+Cfb(q) = TopM
+ C(q); {pk}K
+k=1
+
+,
+M = 5.
+The textual descriptions of the selected criteria are con-
+catenated using semicolons to form the criterion-level hint.
+One of five natural language templates is then sampled at
+random, filled with this hint, and appended to the end of
+the final user message in the original conversation. Thus,
+the re-rollout prompt preserves the original task while intro-
+ducing only a small amount of failure-dependent privileged
+information.
+Guidance Templates.
+For every re-rollout, one of the fol-
+lowing five templates is sampled at random. The placeholder
+{hint} is replaced by the descriptions of at most five se-
+lected rubric criteria.
+1. When answering, please pay attention to the following
+aspects: {hint}
+2. For reference, the following aspects deserve particular
+attention: {hint}
+3. You may consider addressing the question from the follow-
+ing perspectives: {hint}
+4. The following points may help improve the quality of the
+response: {hint}
+5. Please appropriately reflect the following points in your
+response: {hint}
+Prompt Composition.
+The original user message is pre-
+served verbatim. For each guided re-rollout, RISE-RL ap-
+pends one randomly sampled instruction template whose
+placeholder is filled with at most five high-priority failed
+criteria.
+Importantly, the privileged suffix contains only a small
+subset of the instance-specific rubric rather than the com-
+plete rubric. Its content is constructed adaptively from the
+criterion-level failure pattern observed across the initial nat-
+ural rollouts, and it is used only to generate the re-rollout tra-
+jectories. The natural-prompt trajectories remain unchanged.
+Consequently, the additional information serves as targeted
+exploratory guidance rather than a replacement for the orig-
+inal task.
+This construction differs from static rubric scaffolding in
+two important respects. First, the guidance is selective: only
+the most persistent and high-value failed criteria are included.
+Second, the guidance is adaptive: the selected criteria depend
+on the behavior of the current policy on the specific prompt.
+This enables RISE-RL to direct exploration toward behaviors
+that are both important and unlikely to be discovered through
+unguided sampling alone.

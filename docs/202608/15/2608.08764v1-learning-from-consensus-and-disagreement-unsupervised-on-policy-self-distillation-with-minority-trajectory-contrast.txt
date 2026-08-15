@@ -1,0 +1,364 @@
+Title: Learning from Consensus and Disagreement: Unsupervised On-Policy Self-Distillation with Minority-Trajectory Contrast
+
+URL Source: https://arxiv.org/pdf/2608.08764v1
+
+Published Time: Tue, 11 Aug 2026 01:25:20 GMT
+
+Number of Pages: 9
+
+Markdown Content:
+# Learning from Consensus and Disagreement: Unsupervised On-Policy Self-Distillation with Minority-Trajectory Contrast 
+
+# Jiaxin Guo 1,2 , Yanwei Yue 1,2 , Xuanbo Fan 1,2 , Chunyu Yang 3, Yan Zhang 1,2* 
+
+> 1
+
+School of Intelligence Science and Technology, Peking University 
+
+> 2
+
+State Key Laboratory of General Artificial Intelligence, Peking University, Beijing, China 
+
+> 3
+
+Ucap Cloud 
+
+Abstract 
+
+On-policy self-distillation improves language-model reason-ing by querying a teacher on states actually visited by the stu-dent. Recent methods create a powerful information asymme-try by exposing the teacher to privileged context, yet they fun-damentally rely on external supervision—such as gold solu-tions or verifiers—to construct this advantage. We introduce CODA (Consensus and Disagreement Alignment), a fully unsupervised framework that creates reliable privileged in-formation entirely from the latent uncertainty structure of a model’s own unlabeled rollouts. C ODA extracts two comple-mentary signals. In the positive branch , answer-level con-sensus identifies a stable reasoning mode, which conditions a frozen self-teacher to provide dense distributional guid-ance on fresh student trajectories. However, because agree-ment does not guarantee correctness, positive-only distilla-tion risks amplifying correlated errors into a false consensus. To break this harmful feedback loop, C ODA incorporates a 
+
+negative branch that exploits disagreement: minority tra-jectories are treated as unstable alternatives and gently pe-nalized via a reference-anchored, KTO-style calibration ob-jective. This unpaired binary feedback provides robust reg-ularization without requiring the strong assumption that the consensus is the absolute ground truth. Empirical evaluations on competition-level mathematical benchmarks demonstrate that C ODA significantly improves reasoning , outperform-ing self-generated baselines and effectively stabilizing train-ing against erroneous consensus. 
+
+# 1 Introduction 
+
+Long chains of thought have substantially improved language-model reasoning, but they also sharpen a funda-mental train–test mismatch(Wei et al. 2022; Agarwal et al. 2024). A model trained on fixed expert traces learns un-der clean prefixes, yet at inference time must continue from its own imperfect decisions; a single early deviation can move it into states that offline supervision never covers. On-policy distillation mitigates this exposure gap by querying a teacher on trajectories sampled from the current student (Ross, Gordon, and Bagnell 2011; Agarwal et al. 2024; Gu et al. 2024; Ko et al. 2024). Recent on-policy self-distillation further shows that the same model can teach itself when the teacher receives privileged information hidden from the stu-dent (Zhao et al. 2026; Penaloza et al. 2026; Stein, Huang, 
+
+> *
+
+Corresponding author Existing Methods (Privileged Supervision) CODA (Proposed Framework)  
+
+> Gold CoT / Verifier ✓
+> Privileged Teacher Student Rollout External Supervision
+> Unlabeled rollouts Trajectory Analysis
+> Path 1 Consensus Path 2
+> Disagree-ment
+> Self-teaching
+> Calibration Existing: Privilege requires external supervision. CODA: Agreement guides learning; disagreement constrains amplification.
+> Updated Student
+
+Figure 1: Contrast of two knowledge-amplification paradigms: existing privilege-based learning relies on externally supplied supervision, whereas C ODA constructs privileged context from agreement and uses disagreement calibration for robust unsupervised self-distillation. and Goldstein 2026). The resulting capability gap is not cre-ated by a larger teacher, but by an information asymmetry: conditioned on a solution or other task-specific evidence, a copy of the model can provide more informative token-level targets along the states actually visited by the student. This perspective, however, exposes a critical supervision bottleneck. Existing privileged-information methods typi-cally obtain their asymmetry from a reference chain of thought, a gold final answer, or a verifier-approved tra-jectory. Their apparent self-distillation therefore still fun-damentally depends on an externally supplied object that tells the teacher what to know. Removing labels does more than remove a training target: it removes the source of the teacher’s advantage. We ask a more basic question than how to distill without labels: can a reasoning model create re-liable privileged information entirely from the uncertainty structure of its own unlabeled rollouts? 
+
+Self-consistency offers a starting point for endogenous asymmetry. When independently sampled reasoning paths converge, their agreement reveals a stable policy mode (Wang et al. 2023). Exposing a representative consensus tra-arXiv:2608.08764v1 [cs.LG] 9 Aug 2026 jectory exclusively to a self-teacher creates privileged con-text, enabling dense distributional guidance on fresh stu-dent rollouts. However, agreement is not correctness. Corre-lated model errors can produce a false consensus , and con-ditioning the teacher on this erroneous context rationalizes and propagates its bias(Xu et al. 2026b; Zheng et al. 2026). Positive-only self-distillation thus closes a harmful feedback loop: it promotes mistakes to privileged information, con-verting sampling error into flawed-prefix self-amplification (Fu et al. 2026; Guo et al. 2026a; Press et al. 2023). Figure 1 contrasts existing paradigms with our approach. While prior methods rely on external supervision, we re-place it with agreement-derived context and introduce dis-agreement calibration to constrain the amplification of un-stable modes. Crucially, the same rollout set exposes not only agreement but also disagreement . While consensus identifies stable reasoning modes, minority trajectories ex-pose isolated, unstable alternatives. Exploiting this nega-tive evidence does not require assuming the consensus is the absolute ground truth—a necessary concession when the model exhibits systematic biases. Instead, we impose a weaker, policy-relative constraint: an isolated alternative should not become more likely than it was under the ini-tial policy. This parallels the “lucky hit” phenomenon in test-time reinforcement learning, where negative outcomes remain informative without absolute correctness guarantees (Zuo et al. 2026). Based on this insight, we introduce C ODA ( Consen-sus and Disagreement Alignment ), a fully unsupervised framework with two complementary branches. Given an unlabeled question, C ODA infers consensus by sampling di-verse reasoning paths and grouping them by terminal an-swer. In the positive branch, a representative consensus tra-jectory conditions a privileged self-teacher, whose token dis-tributions guide a fresh on-policy student rollout. In the negative branch, minority trajectories receive a reference-anchored, KTO-style undesirable-response objective rela-tive to the frozen initial policy (Ethayarajh et al. 2024). KTO is ideal here because its unpaired binary feedback gently dis-courages minority trajectories without constructing prefer-ence pairs or certifying the consensus as a correct winner. By bounding this penalization, the disagreement branch acts as a robust regularizer rather than a claim of semantic fal-sity, mitigating the risk of penalizing true answers under a biased policy. Together, consensus creates an endogenous teacher–student information asymmetry, while disagree-ment prevents unstable self-generated modes from gain-ing probability unchecked. 
+
+Our contributions are threefold: • We formulate fully unsupervised privileged on-policy self-distillation : a model constructs self-teaching infor-mation asymmetry solely from the agreement structure of its unlabeled rollouts, requiring no gold solutions, re-ward models, or verifiers. • We identify false-consensus amplification as a failure mode of positive-only self-distillation and propose dual-signal alignment, combining consensus-conditioned dis-tribution matching with reference-anchored calibration of disagreeing trajectories to suppress this bias. • We empirically demonstrate that C ODA significantly improves reasoning, outperforming self-generated base-lines. Extensive analysis validates our design effectively stabilizes training against noisy or erroneous consensus. 
+
+# 2 Related Work 
+
+On-policy distillation and privileged self-distillation. 
+
+Traditional knowledge distillation suffers from exposure bias in autoregressive generation (Hinton, Vinyals, and Dean 2015; Ross, Gordon, and Bagnell 2011). On-policy distil-lation mitigates this by aligning teacher and student distri-butions on student-generated sequences using various diver-gence metrics (Agarwal et al. 2024; Gu et al. 2024; Ko et al. 2024) or adaptive objectives to handle noisy feedback (Jia et al. 2026; Xu et al. 2026b; Zheng et al. 2026; Xu et al. 2026a). Recently, privileged self-distillation removes the ex-ternal teacher entirely by conditioning a frozen self-teacher on privileged context, such as gold solutions or externally validated consensus (Zhao et al. 2026; Penaloza et al. 2026; Ye et al. 2026; Stein, Huang, and Goldstein 2026; Jin et al. 2026). However, these methods fundamentally assume the privileged context is externally provided. We instead con-struct this asymmetry from unlabeled rollouts and address the robustness challenges of self-generated, noisy context. 
+
+Self-improvement from model-generated feedback. 
+
+Models can self-improve using signals derived from their own generations, such as inference-time self-consistency (Wang et al. 2023), reward-guided self-training (Zuo et al. 2026; Hubotter et al. 2026; Yang et al. 2026), or preference optimization via paired (Rafailov et al. 2023; Guo et al. 2026b) and unpaired (Ethayarajh et al. 2024) objectives. In on-policy distillation, unreliable student prefixes are typically addressed via filtering or credit assignment (Fu et al. 2026; Xu et al. 2026b; Zheng et al. 2026; Shen et al. 2026a,b). Most closely related to our work is Multi-rollout OPD (Yu et al. 2026), which exploits cross-rollout relation-ships to form peer-conditioned teacher signals. However, it relies on ground-truth correctness to partition successful and failed trajectories. Our setting is orthogonal: we operate entirely without ground-truth labels or verifiers, inferring supervision—and regularizing errors—solely from the uncertainty structure of unlabeled generations. 
+
+# 3 Method 
+
+3.1 Problem Setup 
+
+Let Dx = {xi}Ni=1 be a collection of questions without so-lutions, final answers, preference labels, or executable re-wards. We seek to improve an autoregressive reasoning pol-icy πθ using only text sampled from the policy itself. A com-pletion y = ( y1, . . . , y T ) contains an unconstrained reason-ing trace followed by a final answer. Its sequence probability factorizes as 
+
+Pθ (y | x) = 
+
+> T
+
+Y
+
+> t=1
+
+πθ (yt | x, y <t ). (1) At every update, the current policy generates two kinds of on-policy data. First, an evidence set Yθ (x) =
+
+{y(1) , . . . , y (s)} is sampled to infer the latent agreement structure of the model’s solutions. Second, after constructing privileged context from that set, the student independently samples a training trajectory r ∼ Pθ (· | x). Separating these roles is important: the evidence trajectories decide what in-formation the teacher receives, whereas the fresh trajectory determines the prefixes on which teacher and student distri-butions are aligned. The training signal must satisfy two constraints. It must be fully unsupervised : no ground-truth answer may be used to accept, reject, or weight a training prompt. It must also be 
+
+on-policy : both the evidence set and the aligned trajectory are regenerated as πθ evolves. The answer extractor a(y) is used only to canonicalize the final answer for grouping; it does not judge correctness. Invalid or missing answers re-ceive the special symbol ⊥ and do not vote. 
+
+3.2 From Self-Consistency to Privileged Context 
+
+For every valid normalized answer z, we estimate its empir-ical support under the current policy, 
+
+bpθ (z | x) = 1
+
+s
+
+> s
+
+X
+
+> j=1
+
+I
+
+h
+
+a(y(j)) = z
+
+i
+
+. (2) Let c(z) = sbpθ (z | x). We retain a prompt only when the largest answer group contains at least two trajectories, and define the possibly tied modal answer set 
+
+Zmaj = arg max  
+
+> z
+
+c(z), max  
+
+> z
+
+c(z) ≥ 2. (3) The modal and minority trajectory pools are then 
+
+Ymaj = {yi | a(yi) ∈ Z maj }, (4) 
+
+Ymin = {yi | a(yi) /∈ Z maj }. (5) We select a representative y+ ∈ Ymaj using a label-free se-lector g, without certifying its absolute correctness. To re-solve ties in answer support, g operates across the union of all tied modal pools. Since sequence length proxies the amount of reasoning exposed to the teacher, we empirically evaluate three selection rules for g: uniform random, short-est, and longest trajectory. The resulting privileged context, c+ = ϕ(x, y +), presents 
+
+y+ as a reference and prompts the teacher to solve the problem independently. This distinction prevents direct to-ken imitation; while y+ conditions the teacher’s distribu-tion, the alignment loss is strictly evaluated on the sepa-rately generated student trajectory r. We term this mecha-nism consensus-conditioned self-teaching .
+
+3.3 Consensus-Conditioned Distribution Alignment 
+
+The student samples an on-policy trajectory r ∼ Pθ (· | x)
+
+without observing y+. At each prefix r<t , the trainable stu-dent and the frozen privileged teacher yield next-token dis-tributions under asymmetric information: 
+
+pθ,t (v) = πθ (v | x, r <t ), q+ 
+
+> t
+
+(v) = π0(v | ϕ(x, y +), r <t ).
+
+(6) This formulation ensures the teacher’s advantage stems solely from the consensus context while maintaining on-policy correction along student-visited states. To align these distributions, we define a consensus-conditioned objective using a generalized divergence Dα:
+
+Lcon (x) = 1
+
+|Mr |
+
+X
+
+> t∈Mr
+
+min Dα(q+ 
+
+> t
+
+, p θ,t ), τ , (7) where Mr masks non-response tokens and τ clips exces-sive divergences to prevent formatting tokens from domi-nating the loss. The parameter α ∈ [0 , 1] interpolates be-tween forward KL ( α = 0 ), generalized Jensen–Shannon (0 < α < 1), and reverse KL ( α = 1 ). In our experiments, we set α = 0 (forward KL) to transfer the teacher’s full dis-tribution. While this positive branch provides dense guidance even from imperfect derivations, a false consensus can systemat-ically bias q+ 
+
+> t
+
+. This vulnerability necessitates a complemen-tary mechanism whose validity does not rely on assuming 
+
+y+ is strictly correct. 
+
+3.4 Reference-Anchored Disagreement Calibration 
+
+For a minority trajectory y− ∈ Ymin , consensus alignment provides no explicit reason to suppress the behavior that pro-duced it. Directly forming a preference pair (y+, y −) would be overly strong, as modal membership does not guarantee 
+
+y+ is correct. We instead assign an unpaired undesirable la-bel to y− using a reference-anchored, KTO-style objective (Ouyang et al. 2022; Ethayarajh et al. 2024). For a response token y− 
+
+> t
+
+, define the student–reference log-ratio: 
+
+ℓ− 
+
+> t
+
+(θ) = log πθ (y− 
+
+> t
+
+| x, y −
+
+> <t
+
+)
+
+π0(y− 
+
+> t
+
+| x, y −
+
+> <t
+
+) . (8) Since our negative branch operates at the token level against a fixed reference policy, we fix the KTO reference point to zero and directly minimize the centered objective: 
+
+Ldis (x) = Ey−∼ eYmin 
+
+> t∼My−
+
+softplus  βℓ − 
+
+> t
+
+(θ) − log 2  , (9) where eYmin ⊆ Ymin contains at most K selected minority trajectories. By penalizing positive log-ratios, this objective reduces the relative likelihood of minority tokens. Crucially, the frozen π0 anchor prevents indiscriminate likelihood min-imization; it merely ensures that observed disagreement modes are not amplified beyond their initial probability. Because minority membership is a weak signal—a minor-ity trajectory might contain correct reasoning if the consen-sus is false— we strictly treat this branch as a regularizer rather than a claim of semantic falsity, enforced via valid-answer filtering, length capping, and a small coefficient λ.Figure 2 summarizes the resulting two-branch on-policy training loop, integrating consensus-conditioned self-teaching with reference-anchored disagreement calibration. (A) Unsupervised CoT Generation & Grouping 
+
+# z
+
+(B) Consensus-Conditioned Self-Teaching ( ℒ!"# )(C) Disagreement-Based Minority Calibration ( ℒ$%& ) (D) Joint On-Policy Optimization 
+
+Unlabeled Prompts x 
+
+Student Rollout: 
+
+y!"# $ ~ 𝜋 % · |𝑥 
+
+Construct Privileged Context 𝜑 𝑥, 𝑦⁺ 
+
+Student 𝜋 !
+
+predict 𝑝 !,# 
+
+Teacher 𝜋₀ 
+
+predict 𝑞 ₜ⁺
+
+condition on 𝜑 
+
+Calculate Alignment Objective ℒ!"# :
+
+𝐾𝐿 𝑝 $,& ‖𝑞 ₜ⁺
+
+y$% majority 
+
+Reference Policy 𝜋 &
+
+Compare Policy Ratios lₜ⁻ 
+
+combine loss ℒ'()* = ℒ !"# + 𝜆ℒ $%& 
+
+Update Student 𝜋 !and Refactor Reference Point 
+
+> On-Policy Iteration Loop
+
+y'% majority 
+
+y(% majority 
+
+y)* minority 
+
+## ... 
+
+minority Transform ratios to utility    
+
+> 𝑈 !: ℒ "#$ 𝑥 = 𝔼 %!∼' "#$ 𝑈 !
+> Reweight Minority Tokens
+
+Figure 2: Overview of C ODA. (A) Unlabeled student rollouts are grouped by normalized final answer to identify consensus and disagreement trajectories. (B) A representative consensus trajectory provides privileged context for token-level teacher–student alignment on a fresh student rollout. (C) Minority trajectories are calibrated against the frozen reference policy, and (D) the two signals are combined in an on-policy update. 
+
+3.5 Joint Objective and On-Policy Update 
+
+The complete per-question objective combines the two com-plementary signals: 
+
+LCoDA (x) = Lcon (x) + λLdis (x). (10) Here, Lcon extracts privileged guidance from repeated ev-idence, while Ldis mitigates the risk of false consensus by regularizing isolated modes. Because all rollouts are continuously sampled from the active student πθ , both the constructed consensus context and the penalized minority modes dynamically evolve as the policy improves. To maintain signal quality, prompts lacking a repeated valid answer skip the update entirely. Crucially, this joint on-policy loop operates strictly without ground-truth labels, extracting both learning and regularization sig-nals purely from the model’s internal rollout structure. 
+
+# 4 Experiments 
+
+4.1 Datasets and Metrics 
+
+We train on mathematical reasoning problems from 
+
+OpenThoughts (Guha et al. 2025). While supervised base-lines utilize the provided expert solutions, C ODA constructs its training signal entirely from the problem prompts and its own on-policy rollouts. We evaluate on five competition-level benchmarks: AIME 2024, 2025, 2026 , HMMT 2025 ,and AMO-Bench . For evaluation, we report avg@16 
+
+(sample-average accuracy across 16 generations). 
+
+4.2 Baselines 
+
+We compare C ODA against the unmodified base model 
+
+and two groups of post-training baselines: (1) Supervised 
+
+methods using expert trajectories or gold labels: SFT (off-policy imitation), OPSD (Zhao et al. 2026) (on-policy self-distillation conditioned on gold solutions), and GRPO (Shao et al. 2024) (optimizing group-relative advantages via bi-nary correctness rewards). (2) Self-Generated methods: 
+
+SFT-Self (oracle-filtered)(Wang et al. 2023) (SFT on self-generated trajectories filtered by ground truth), TTRL(Zuo et al. 2026) (rewarding answer agreement without gold la-bels), C ODA–Consensus Only (our positive branch alone), and C ODA–Full. Notably, C ODA–Full operates entirely without external supervision or oracle filtering. 
+
+4.3 Implementation Details 
+
+Experiments use instruction-tuned Qwen3-1.7B and 
+
+Qwen3-4B (Yang et al. 2025). We apply LoRA (Hu et al. 2022) ( r = 64 , α = 128 ) to all linear projection modules. Training runs for one epoch using bfloat16, FlashAttention-2, and vLLM on 8 NVIDIA H100 GPUs, with a 5 × 10 −6
+
+learning rate and 0.1 gradient clipping. For C ODA, each prompt generates s = 10 candidate tra-jectories (temperature 1.3, top-p = 0 .95 ). Prompts require at least two valid responses sharing a modal answer to proceed. To construct the privileged context, Qwen3-1.7B selects the shortest modal trajectory (analyzed in Section 5.2), while Qwen3-4B samples one randomly. The adapter-disabled initial policy serves as both the Model Setting Method AIME24 AIME25 AIME26 AMO HMMT25 Avg. Qwen3-4B Base Model 74.38 65.83 65.21 12.12 42.29 51.97 Supervised SFT 72.71 68.12 67.29 11.38 40.00 51.90 OPSD 75.42 68.75 69.58 14.50 45.83 54.82                                                                               
+
+> GRPO 75.21 70.00 67.71 13.88 45.21 54.40 Self-Generated SFT-Self (oracle-filtered) 75.00 66.46 66.88 13.62 45.21 53.43 TTRL 74.38 66.25 66.04 13.00 43.96 52.73 CODA–Consensus Only 74.58 67.08 67.92 12.88 46.04 53.70 CODA–Full 74.58 68.96 70.21 14.50 44.58 54.57
+> Qwen3-1.7B Base Model 48.33 37.08 36.67 3.50 23.12 29.74 Supervised SFT 51.25 37.92 40.83 4.38 26.25 32.13 OPSD 57.29 42.29 46.88 4.88 27.71 35.81
+> GRPO 51.10 39.58 40.83 5.50 26.46 32.69 Self-Generated SFT-Self (oracle-filtered) 52.08 38.75 38.33 4.50 25.00 31.73 TTRL 50.00 38.33 37.92 5.00 25.83 31.42 CODA–Consensus Only 53.33 42.08 44.38 3.75 28.33 34.37 CODA–Full 56.67 41.67 47.29 4.75 30.21 36.12
+
+Table 1: Main reasoning results on Qwen3-4B and Qwen3-1.7B (accuracy, %). “Avg.” is the unweighted average over the five benchmarks. Bold indicates the best result within each setting (Supervised vs. Self-Generated). SFT-Self uses oracle correctness filtering and is included as a diagnostic self-imitation reference, not as a fully unsupervised method. Selector AIME24 AIME25 AIME26 AMO HMMT25 Avg. Random 55.00 41.46 46.67 4.00 29.17 35.26 Shortest 56.67 41.67 47.29 4.75 30.21 36.12 
+
+Longest 54.79 41.04 46.25 3.88 30.42 35.28 Table 2: Comparison of trajectory selectors from the modal answer pool on Qwen3-1.7B (accuracy, %). Selecting the shortest trajectory consistently yields the best overall performance (best values in bold). frozen teacher and reference anchor. The consensus branch aligns forward KL on a fresh student rollout (max 2,048 tokens), clipping token-level divergences at 0.05. The dis-agreement calibration branch ( β = 0 .1) limits training to at most one minority trajectory (max 1,024 tokens) per prompt. 
+
+# 5 Results 
+
+5.1 Overall Performance 
+
+Table 1 evaluates post-training methods on Qwen3-4B and Qwen3-1.7B. We compare fully unsupervised approaches (C ODA, TTRL) against supervised references (SFT, OPSD, GRPO) and an oracle-filtered diagnostic (SFT-Self) to deter-mine the efficacy of unlabeled rollout structures. 
+
+CODA improves reasoning without correctness super-vision. CODA–Full achieves the strongest average per-formance among fully unsupervised methods across both model scales. On Qwen3-4B, it improves the base model by 2.60 points and outperforms TTRL by 1.84 points, reach-ing 54.57%—only 0.25 points behind supervised OPSD. On Qwen3-1.7B, the trend amplifies: C ODA improves the base model by 6.38 points, exceeding supervised OPSD by 0.31 points. These broad improvements across multiple benchmarks confirm that repeated answer agreement sup-plies highly effective privileged context, even without refer-ence solutions or ground-truth labels. 
+
+Minority calibration complements consensus alignment. 
+
+Comparing C ODA–Consensus Only with C ODA–Full iso-lates the contribution of disagreement calibration. At 1.7B, the minority-trajectory objective increases average accu-racy from 34.37% to 36.12%, improving four out of five benchmarks. The 4B model shows a consistent average gain (53.70% to 54.57%), particularly on more challenging eval-uations like AIME 2025, AIME 2026, and AMO. While heuristic negative supervision naturally introduces minor trade-offs (e.g., on HMMT 2025), the aggregate gains across both scales demonstrate that penalizing isolated modes ef-fectively counteracts the self-amplification risks of positive-only distillation. 
+
+Relation to oracle-filtered self-imitation and super-vised references. CODA–Full significantly surpasses the oracle-filtered SFT-Self baseline. This gap indicates that our improvements stem from dense, consensus-conditioned teacher guidance and disagreement regularization, rather than merely filtering plausible solutions. By approaching (at 4B) or exceeding (at 1.7B) the aggregate accuracy of su-pervised methods, the results demonstrate that jointly ex-ploiting endogenous agreement and disagreement is a highly competitive alternative to correctness-filtered self-training. 5.2 Selecting Privileged Context from Consensus 
+
+Answer-level self-consistency identifies a modal pool, but the positive branch still requires a representative trajectory to instantiate the teacher’s privileged context. We therefore ask whether this choice should be random or should favor a particular response length. 
+
+Final performance. Answer-level agreement identifies a set of candidate trajectories, but it does not specify which member should be revealed to the teacher. We evaluate uni-form random selection against two deterministic, label-free alternatives: the shortest and longest trajectories in Ymaj . Ta-ble 2 reports final sample-average accuracy for Qwen3-1.7B. Selecting the shortest modal trajectory produces the high-est average accuracy, improving over random selection by 0.86 points and over the longest selector by 0.84 points. The improvement appears on four of five benchmarks, including all three AIME evaluations and AMO. Thus, the gain from consensus-conditioned self-teaching does not require expos-ing the teacher to the longest available derivation; a concise representative is at least as informative and is less likely to introduce superfluous reasoning into the privileged context. 
+
+Response length and accuracy. Figure 3 further traces the performance difference relative to uniform random se-lection as the average response length changes over train-ing. The horizontal zero line represents the random-selector baseline. Notably, the shortest selector yields the most sub-stantial positive gains when the overall average response length is long. However, as the model’s responses naturally become shorter over training, this advantage diminishes and occasionally turns negative. This dynamic reveals a clear structural trade-off. When the policy generates verbose trajectories, selecting the most concise consensus effectively strips away redundant explo-ration and correlated errors. Conversely, once outputs are al-ready concise, strictly enforcing the shortest selection may inadvertently discard necessary reasoning steps. This obser-vation rules out a simple “more tokens is better” hypothesis: the ideal privileged context must capture the stable solution mode while minimizing noisy verbosity. 
+
+5.3 False Consensus and Training Stability 
+
+Consensus provides accessible privilege, but modal mem-bership does not guarantee correctness. We investigate whether erroneous consensus accumulates during training and whether disagreement calibration mitigates this fail-ure mode by comparing C ODA–Full against consensus-only alignment, both with and without an oracle quality filter (used strictly as a diagnostic using gold answers). 
+
+Final performance. To isolate the effect of modal uncer-tainty, Table 3 compares C ODA–Full, Consensus Only, and its oracle-filtered variant (which removes prompts with in-correct modal answers). Interestingly, perfect filtering does not consistently improve final average accuracy, shifting it from 53.70% to 53.90% at 4B and 35.28% to 35.17% at 1.7B. Thus, oracle filtering alone is insufficient to boost peak performance; its primary value is revealing how noisy con-sensus impacts optimization dynamics. 
+
+Figure 3: Accuracy difference of shortest vs. longest modal-trajectory selection relative to a random baseline. Notably, the shortest selector yields robust positive gains when the overall average response length is long (left side of panels), but this advantage diminishes as responses become shorter. 
+
+Figure 4: The sample-average accuracy over training steps. Consensus Only improves early but undergoes the largest late-stage decline. Oracle filtering does not yield the highest peak, yet produces the most stable trajectory. C ODA–Full displays an intermediate pattern: disagreement calibration reduces the collapse. 
+
+Training dynamics. Figure 4 tracks HMMT25 accuracy over training steps. While all variants initially improve, un-filtered Consensus Only suffers a severe late-stage decline. Conversely, oracle filtering maintains a smooth trajectory. This comparison confirms the false-consensus hazard: re-peatedly conditioning the teacher on incorrect modal trajec-tories propagates misleading distributional targets, whereas removing them prevents error feedback. 
+
+Effect of disagreement calibration. CODA–Full exhibits an intermediate behavior: its performance declines more gradually than unfiltered Consensus Only rather than col-lapsing. This matches our expectation that the KTO-style disagreement loss constrains the amplification of unstable modes despite imperfect modal contexts. While it does not Model Variant AIME24 AIME25 AIME26 AMO HMMT25 Avg. Qwen3-4B CODA–Full 74.58 68.96 70.21 14.50 44.58 54.57 
+
+Consensus Only 74.58 67.08 67.92 12.88 46.04 53.70 Consensus Only + Oracle Filter 74.79 66.25 69.58 13.25 45.62 53.90 Qwen3-1.7B CODA–Full 56.67 41.67 47.29 4.75 30.21 36.12 
+
+Consensus Only 54.79 41.04 46.25 3.88 30.42 35.28 
+
+Consensus Only + Oracle Filter 54.37 40.62 48.12 4.00 28.75 35.17 Table 3: False-consensus analysis (sample-average accuracy, %). “Consensus Only” uses Lcon without disagreement calibra-tion. “+ Oracle Filter” additionally discards prompts whose modal answer is incorrect, using gold answers only for this diag-nostic. Bold indicates the best value within each model block. Consensus samples s Avg. (%) 5 35.05 10 35.26 20 35.41 Table 4: Effect of the consensus sample using random modal-trajectory selection. The s = 20 final evaluation is still in progress and is not estimated from training metrics. fully match the stability of the gold-standard oracle filter, disagreement calibration successfully recovers a major share of this robustness without requiring any correctness labels. 
+
+5.4 Effect of Consensus Sample Size 
+
+The consensus estimator depends on the number of trajec-tories sampled per prompt. A larger evidence set can reduce sampling variance and make the modal answer more repre-sentative of the policy distribution, but its generation cost grows linearly with the sample count. We study this trade-off on Qwen3-1.7B using random selection from the modal pool and vary s ∈ { 5, 10 , 20 } while keeping the remaining training configuration fixed. 
+
+Optimization behavior. Figure 5 compares the two end-points, s = 5 and s = 20 . As training proceeds, the larger evidence set increasingly separates from s = 5 : it reaches a lower consensus-alignment loss and a higher consensus accuracy. The widening gap suggests that additional roll-outs reduce finite-sample noise in the modal-answer esti-mate. Consequently, the privileged teacher is conditioned on a more stable consensus signal, producing more coher-ent distributional targets and allowing the student to fit the training prompts more rapidly. This result supports increas-ing s when optimization stability is the primary concern. 
+
+Diminishing returns and capability limits. The available final evaluations nevertheless show only a modest improve-ment from s = 5 to s = 10 (35.05% to 35.26%). This small gain is consistent with consensus saturation . A mod-erate sample count already resolves many prompts for which the correct answer is the dominant policy mode; additional samples mainly affect borderline cases or suppress a small number of sampling outliers. More samples cannot correct a systematic error when the model repeatedly follows the 
+
+Figure 5: Effect of consensus sample count ( s) on Qwen3-1.7B training dynamics (legend K denotes s). A larger ev-idence set ( s = 20 ) yields lower training loss and higher consensus accuracy, reflecting a less noisy privileged signal. same incorrect reasoning pattern, because the wrong answer remains the modal outcome even under a more accurate esti-mate. Thus, increasing s improves estimation of the model’s current answer distribution, but does not remove the capa-bility bound of that distribution. 
+
+Accuracy–efficiency trade-off. Increasing s from 5 to 20 requires four times as many generated reasoning trajectories per prompt. The curves indicate a cleaner training signal, but the completed final results do not yet establish a com-mensurate generalization gain. We therefore use s = 10 as the default: it provides a stronger consensus estimate than 
+
+s = 5 while avoiding the full generation cost of s = 20 . The takeaway is that larger evidence sets accelerate and stabi-lize consensus-conditioned optimization, whereas moderate 
+
+s offers a more favorable accuracy–compute trade-off. 
+
+# 6 Conclusion 
+
+We introduced CODA, a fully unsupervised on-policy self-distillation framework that enhances language model reasoning without gold labels or oracle filtering. Rather than blindly trusting the most frequent generation, C ODA constructs privileged context from answer-level consensus while regularizing false consensus by penalizing minority trajectories via a reference-anchored objective. Evaluations on competition-level mathematical benchmarks demonstrate that this dual-signal alignment significantly outperforms positive-only baselines, prevents late-stage training collapse, and rivals fully supervised methods. Ultimately, C ODA es-tablishes that the internal uncertainty structure of unlabeled rollouts provides a robust foundation for self-improvement. References 
+
+Agarwal, R.; Vieillard, N.; Zhou, Y.; Stanczyk, P.; Ramos Garea, S.; Geist, M.; and Bachem, O. 2024. On-policy distillation of language models: Learning from self-generated mistakes. In International Conference on Learn-ing Representations , volume 2024, 21246–21263. Ethayarajh, K.; Xu, W.; Muennighoff, N.; Jurafsky, D.; and Kiela, D. 2024. Kto: Model alignment as prospect theoretic optimization. arXiv preprint arXiv:2402.01306 .Fu, Y.; Huang, H.; Jiang, K.; Liu, J.; Jiang, Z.; Zhu, Y.; and Zhao, D. 2026. Revisiting on-policy distillation: Em-pirical failure modes and simple fixes. arXiv preprint arXiv:2603.25562 .Gu, Y.; Dong, L.; Wei, F.; and Huang, M. 2024. Minillm: Knowledge distillation of large language models. In The twelfth international conference on learning representa-tions .Guha, E.; Marten, R.; Keh, S.; Raoof, N.; Smyrnis, G.; Bansal, H.; Nezhurina, M.; Mercat, J.; Vu, T.; Sprague, Z.; et al. 2025. OpenThoughts: Data Recipes for Reasoning Models. arXiv preprint arXiv:2506.04178 .Guo, J.; Sun, H.; Zhang, W.; Fan, X.; and Zhang, Y. 2026a. Mitigating error accumulation in knowledge editing for multi-hop question answering. In Proceedings of the AAAI Conference on Artificial Intelligence , volume 40, 30862– 30870. Guo, J.; Sun, H.; Zhang, W.; Yang, C.; and Zhang, Y. 2026b. Failures are Treasures: Constructing a Pedagogical Bridge for Agentic Strategy Distillation. In Findings of the Asso-ciation for Computational Linguistics: ACL 2026 , 18808– 18823. Hinton, G.; Vinyals, O.; and Dean, J. 2015. Distill-ing the knowledge in a neural network. arXiv preprint arXiv:1503.02531 .Hu, E. J.; Shen, Y.; Wallis, P.; Allen-Zhu, Z.; Li, Y.; Wang, S.; Wang, L.; Chen, W.; et al. 2022. Lora: Low-rank adapta-tion of large language models. Iclr , 1(2): 3. Hubotter, J.; Lubeck, F.; Behric, L.; Baumann, A.; Bagatella, M.; Marta, D.; Hakimi, I.; Shenfeld, I.; Kleine Buening, T.; Guestrin, C.; and Krause, A. 2026. Reinforcement Learning via Self-Distillation. arXiv preprint arXiv:2601.20802 .Jia, N.; Yang, H.; Ma, X.; Lian, J.; Zhang, S.; Zhang, W.; Zeng, K.; Cai, X.; and Sun, Z. 2026. Asymmetric on-policy distillation: Bridging exploitation and imitation at the token level. arXiv preprint arXiv:2605.06387 .Jin, Y.; Wang, Y.; Fu, L.; Xiao, Y.; Luo, Y.; Liu, H.; Prakash, B. A.; Hester, J.; Wang, J.; and Kumar, S. 2026. UniSD: To-wards a Unified Self-Distillation Framework for Large Lan-guage Models. arXiv preprint arXiv:2605.06597 .Ko, J.; Kim, S.; Chen, T.; and Yun, S.-Y. 2024. Distillm: Towards streamlined distillation for large language models. 
+
+arXiv preprint arXiv:2402.03898 .Ouyang, L.; Wu, J.; Jiang, X.; Almeida, D.; Wainwright, C. L.; Mishkin, P.; Zhang, C.; Agarwal, S.; Slama, K.; Ray, A.; et al. 2022. Training language models to fol-low instructions with human feedback. arXiv preprint arXiv:2203.02155 .Penaloza, E.; Vattikonda, D.; Gontier, N.; Lacoste, A.; Charlin, L.; and Caccia, M. 2026. Privileged Informa-tion Distillation for Language Models. arXiv preprint arXiv:2602.04942 .Press, O.; Zhang, M.; Min, S.; Schmidt, L.; Smith, N. A.; and Lewis, M. 2023. Measuring and narrowing the com-positionality gap in language models. In Findings of the Association for Computational Linguistics: EMNLP 2023 ,5687–5711. Rafailov, R.; Sharma, A.; Mitchell, E.; Ermon, S.; Manning, C. D.; and Finn, C. 2023. Direct preference optimization: Your language model is secretly a reward model. arXiv preprint arXiv:2305.18290 .Ross, S.; Gordon, G.; and Bagnell, D. 2011. A reduction of imitation learning and structured prediction to no-regret on-line learning. In Proceedings of the fourteenth international conference on artificial intelligence and statistics , 627–635. JMLR Workshop and Conference Proceedings. Shao, Z.; Wang, P.; Zhu, Q.; Xu, R.; Song, J.; Bi, X.; Zhang, H.; Zhang, M.; Li, Y. K.; Wu, Y.; et al. 2024. DeepSeek-Math: Pushing the Limits of Mathematical Reasoning in Open Language Models. arXiv preprint arXiv:2402.03300 .Shen, G.; Cheng, X.; Zhao, C.; Huang, L.; Li, J.; Zhao, D.; and Yu, X. 2026a. Anti-Self-Distillation for Reason-ing RL via Pointwise Mutual Information. arXiv preprint arXiv:2605.11609 .Shen, G.; Huang, L.; Cheng, X.; Zhao, C.; Li, J.; Zhao, D.; and Yu, X. 2026b. From Generic Correlation to Input-Specific Credit in On-Policy Self Distillation. arXiv preprint arXiv:2605.11613 .Stein, A.; Huang, F.; and Goldstein, T. 2026. GATES: Self-distillation under privileged context with consensus gating. 
+
+arXiv preprint arXiv:2602.20574 .Wang, Y.; Kordi, Y.; Mishra, S.; Liu, A.; Smith, N. A.; Khashabi, D.; and Hajishirzi, H. 2023. Self-instruct: Align-ing language models with self-generated instructions. In 
+
+Proceedings of the 61st annual meeting of the associa-tion for computational linguistics (volume 1: long papers) ,13484–13508. Wei, J.; Wang, X.; Schuurmans, D.; Bosma, M.; Xia, F.; Chi, E.; Le, Q. V.; Zhou, D.; et al. 2022. Chain-of-thought prompting elicits reasoning in large language mod-els. Advances in neural information processing systems , 35: 24824–24837. Xu, Y.; Sang, H.; Zhou, Z.; He, R.; and Wang, Z. 2026a. PACED: Distillation and On-Policy Self-Distillation at the Frontier of Student Competence. arXiv preprint arXiv:2603.11178 .Xu, Y.; Sang, H.; Zhou, Z.; He, R.; Wang, Z.; and Gerami-fard, A. 2026b. Tip: Token importance in on-policy distilla-tion. arXiv preprint arXiv:2604.14084 .Yang, A.; Li, A.; Yang, B.; Zhang, B.; Hui, B.; Zheng, B.; Yu, B.; Gao, C.; Huang, C.; Lv, C.; et al. 2025. Qwen3 technical report. arXiv preprint arXiv:2505.09388 .Yang, C.; Qin, C.; Si, Q.; Chen, M.; Gu, N.; Yao, D.; Lin, Z.; Wang, W.; Wang, J.; and Duan, N. 2026. Self-Distilled RLVR. arXiv preprint arXiv:2604.03128 .Ye, T.; Dong, L.; Wu, X.; Huang, S.; and Wei, F. 2026. On-Policy Context Distillation for Language Models. arXiv preprint arXiv:2602.12275 .Yu, W.; Li, X.; Zhao, Y.; Liu, X.; Zhang, R.; Wang, H.; Luo, Y.; Wu, C. H.; Mittal, G.; Fredrikson, M.; and Hu, Y. 2026. Multi-Rollout On-Policy Distillation via Peer Successes and Failures. arXiv preprint arXiv:2605.12652 .Zhao, S.; Xie, Z.; Liu, M.; Huang, J.; Pang, G.; Chen, F.; and Grover, A. 2026. Self-Distilled Reasoner: On-Policy Self-Distillation for Large Language Models. arXiv preprint arXiv:2601.18734 .Zheng, B.; Ma, X.; Liang, Y.; Ruan, J.; Fu, X.; Lin, K.; Zhu, B.; Zeng, K.; and Cai, X. 2026. Scope: Signal-calibrated on-policy distillation enhancement with dual-path adaptive weighting. arXiv preprint arXiv:2604.10688 .Zuo, Y.; Zhang, K.; Sheng, L.; Qu, S.; Cui, G.; Zhu, X.; Li, H.; Long, X.; Hua, E.; Qi, B.; et al. 2026. Ttrl: Test-time re-inforcement learning. Advances in Neural Information Pro-cessing Systems , 38: 131459–131483.

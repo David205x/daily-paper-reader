@@ -1,0 +1,878 @@
+Title: Reinforcing Step-level Reasoning for Effective Self-Correction in LLMs
+
+URL Source: https://arxiv.org/pdf/2608.11573v1
+
+Published Time: Thu, 13 Aug 2026 00:21:52 GMT
+
+Number of Pages: 20
+
+Markdown Content:
+# Reinforcing Step-level Reasoning for Effective Self-Correction in LLMs 
+
+Vu Duc Anh 1, Nhat M. Hoang 1, Do Xuan Long 2,4, Cong-Duy Nguyen 3, Ponhvoan Srey 1, Luu Anh Tuan 1,31Nanyang Technological University, Singapore, 
+
+> 2
+
+National University of Singapore, 3VinUniversity, Vietnam, 4Institute for Infocomm Research (I 2R), A*STAR, 
+
+{vuducanh001, hoangmin003, ponhvoan002, anhtuan.luu}@ntu.edu.sg ,
+
+xuanlong.do@u.nus.edu , duy.ntc@vinuni.edu.vn 
+
+Abstract 
+
+Achieving effective self-correction, where mod-els verify and correct their own mistakes, re-mains a fundamental challenge for large lan-guage models (LLMs). In this work, we pro-pose Self-Fix Step-DPO (SFS-DPO), a rein-forcement learning based, two-stage frame-work for step-level self-verification and self-correction. The first stage strengthens step-level reasoning via step-level preference op-timization, while the second stage explicitly trains models to self-verify and self-correct. We further introduce a teacher-assisted vari-ant, SFS-DPO-R, which incorporates explana-tory rationales for error verification to provide stronger corrective signals. Comprehensive in-domain and out-of-domain evaluations across multiple LLMs demonstrate that SFS-DPO and SFS-DPO-R consistently outperform prior step-level training baselines. Our analysis further reveals improvements in self-correction fre-quency and effectiveness, highlighting the im-portance of strengthening step-level reasoning for robust performance. 
+
+1 Introduction 
+
+Despite recent advances in frontier large language models (LLMs), smaller LLMs still struggle with complex math reasoning, where early errors can propagate throughout the entire solution (Lightman et al., 2023; Hong et al., 2024; Chen et al., 2025). To provide more localized learning signals, recent studies have shifted toward step-level objectives (Lai et al., 2024; Xu et al., 2025; Lu et al., 2025). However, they mainly optimize preferences over better reasoning continuations, without explicitly correcting erroneous steps that were already gener-ated (Kumar et al., 2024; Pan et al., 2025). This limitation motivates a complementary paradigm of self-correction , which introduces self-improving loops that enable models to detect and correct their own mistakes during inference. This 
+
+Figure 1: Initialization Stage (Stage 1) learns local step preferences by favoring correct continuations over incorrect ones, without revising errors. Step-wise Self-Correction (Stage 2) complements this by training ex-plicit self-corrections: revising incorrect steps toward preferred continuations before proceeding, converting step-wise preferences into targeted multi-step reasoning improvements. 
+
+has inspired a parallel line of research on training LLMs to self-correct (Kumar et al., 2024; Yang et al., 2025b; Zhao et al., 2025). While these methods highlight the promises of self-correction, they introduce optimization challenges. Specif-ically, Kumar et al. (2024) demonstrate that su-pervised fine-tuning (SFT) on correction traces is prone to distribution shift and behavior collapse, and propose an on-policy reinforcement learning (RL) solution. To improve the self-correction ro-bustness, Ma et al. (2025); Yang et al. (2025b) fur-ther decompose the optimization process into two phases: first, training the models using SFT with carefully designed templates, followed by a sec-ond RL phase for self-correction. However, these initialization strategies are primarily designed to 1arXiv:2608.11573v1 [cs.CL] 12 Aug 2026 Method Init. Optimization Training Size Init. / Opt. Spont. Err. Detect. Error Critic External Teacher                                                         
+
+> SCoRe RL RL 12K/12K ✗✗✗✗
+> SuperCorrect SFT Step RL 100K/10K ✔✔✔✔
+> LEMMA -SFT -/88.9K ✔✔✗✗
+> S3C-MATH -SFT -/927K ✔✔✔✔
+> SPOC SFT RL 860K/-✔✔✔✗
+> S2RSFT RL 3.1K/10K ✔✔✔✗
+> SFS-DPO (ours) Step RL Step RL 10K/8.4K ✔✔✗✗
+> SFS-DPO-R (ours) Step RL Step RL 10K/8.4K ✔✔✔✔
+> Table 1: Comparison of self-correction methods in LLMs. Our methods (SFS-DPO and SFS-DPO-R) achieve competitive capability coverage with significantly less training data than prior approaches.
+
+enforce models to follow specific templates that facilitate the self-correction phase, rather than to explicitly strengthen step-level reasoning. Explic-itly strengthening step-level reasoning is crucial, since step-wise self-correction involves two chal-lenging subproblems, error detection and targeted revision, and weak step-level reasoning can cause their joint learning to produce noisy signals and compounding errors (Caruana, 1997). We introduce Self-Fix Step-DPO (SFS-DPO), a two-stage framework that trains LLMs to self-verify and self-correct via step-level reinforcement learning. As shown in Figure 1, the initialization stage applies an RL-based step-level preference op-timization to strengthen step-wise reasoning, while the second stage (Step-wise Self-Correction) trains the models to self-correct via learning the prefer-ences between a self-corrected continuation and the continuation produced when an incorrect step is left unaddressed. We further propose a teacher-assisted variant, SFS-DPO-R, which augments corrections with explanatory rationales to provide stronger cor-rective signals and improve downstream accuracy. Comprehensive in-domain and out-of-domain eval-uations on multiple LLMs show that SFS-DPO and SFS-DPO-R yield consistent gains over baselines. Our contributions are threefold: • We propose an RL-based, step-level self-correction training framework with two vari-ants, SFS-DPO and SFS-DPO-R, that im-proves step-level reasoning and enables ef-fective self-correction in LLMs. • We conduct comprehensive in-domain and out-domain experiments demonstrating that our method achieves consistent improvements over existing baselines across multiple LLMs. • We analyze self-correction behavior in our framework, providing empirical insights into its frequency, effectiveness, and relationship with reasoning performance. 
+
+2 Related Work 
+
+2.1 RL for LLM Reasoning 
+
+Preference optimization has been widely used to align language models for reasoning tasks, typi-cally operating at the level of full solutions or com-plete responses (Rafailov et al., 2023). However, answer-level preferences can be coarse for complex math reasoning, as incorrect solutions may share long correct prefixes with correct ones, leading to weak credit assignment. To address this limita-tion, recent work has explored learning signals at the level of individual reasoning steps (Chen et al., 2024; Lai et al., 2024; Xu et al., 2025; Lightman et al., 2023; Jin et al., 2025; Lahlou et al., 2025). Notably, Step-DPO (Lai et al., 2024) defines pref-erence comparisons over next-step continuations conditioned on a correct prefix, explicitly targeting the first erroneous step in a reasoning trajectory and providing localized supervision without requiring explicit step-level labels. In addition, process super-vision (Lightman et al., 2023) demonstrates that su-pervising intermediate reasoning steps with explicit correctness judgments significantly improves math-ematical reasoning by enabling more precise credit assignment. Our work builds on this line by using step-level preference optimization as a first training stage for learning step-wise self-correction. 
+
+2.2 Teaching LLMs to Self-Correct 
+
+Self-correction is a critical capability for scaling the reliability of large language models. As a result, a growing body of work studies how to equip LLMs to self-correct their own reasoning (Kumar et al., 2024; Yang et al., 2025b; Zeng et al., 22025; Zhao et al., 2025), see Section 1. Notably, SCoRe (Kumar et al., 2024) learns intrinsic self-correction via multi-turn on-policy reinforcement learning on self-generated data, highlighting dis-tribution shift and behavior collapse as limitations of offline correction training. SuperCorrect (Yang et al., 2025b) proposes a two-stage teacher–student framework that initializes models with supervised fine-tuning on hierarchical thought templates and then applies preference optimization using teacher-provided correction traces. S3C-MATH (Yan et al., 2025) trains step-level self-correction by inserting incorrect steps into correct solution traces and su-pervising models to detect and fix these errors dur-ing generation. SPOC (Zhao et al., 2025) induces spontaneous self-correction at inference time by al-ternating solution generation and verification using reinforcement learning. S 2R (Ma et al., 2025) com-bines supervised initialization with outcome- and process-level reinforcement learning to train mod-els that self-verify and iteratively refine their rea-soning. In contrast, our work initializes step-level self-correction with a step-wise RL-based prefer-ence optimization stage, which we empirically find yields more robust downstream self-correction than from scratch or supervised fine-tuning. 
+
+3 Methodology 
+
+Task Formulation. We formulate self-correction in language model reasoning as the generation of a multi-step trajectory with explicit error detection and repair. Given an input problem x, a language model πθ produces a reasoning trajectory 
+
+{sj }Mj=1 = ( s1, . . . , s M , ˆy),
+
+where each step sj is generated autoregressively as 
+
+sj ∼ πθ(· | x, s <j )
+
+We formulate self-correction by allowing each step 
+
+sj to take one of three types, {SOLUTION STEP ,
+
+> ERROR
+
+-DETECTION STEP , FIXED STEP }, corre-sponding respectively to a standard reasoning step, an explicit signal (optionally with reasoning) in-dicating that the previous step is incorrect, or a corrected version of an erroneous step. When an 
+
+> ERROR
+
+-DETECTION STEP is generated, the model produces a FIXED STEP that replaces the incorrect reasoning in the trajectory. The final answer ˆy is obtained from the terminal corrected trajectory. 
+
+Motivation. Step-wise self-correction requires optimizing two objectives simultaneously: evaluat-ing the correctness of a reasoning step and generat-ing a corrected alternative. Jointly optimizing these objectives can produce noisy learning signals when step-level reasoning capability is insufficient, as errors in step evaluation and step revision may com-pound (Caruana, 1997). Our framework, therefore, adopts a two-phase training strategy: (1) Step-level Preference Optimization as a initialization stage that improves step-level reasoning capability by aligning the model toward correct intermediate rea-soning steps; and (2) Step-wise Self-Correction stage . We hypothesize that modeling preference signals at the step level will provide a stronger foun-dation for subsequent step-wise self-correction, en-abling more effective generation of corrected steps once an incorrect step is identified. 
+
+3.1 Initialization Stage 
+
+In the first stage, we employ a reinforcement learn-ing objective to initialize the model as a initializa-tion training phase. Specifically, it aims to maxi-mize the likelihood of a correct SOLUTION STEP 
+
+s+ 
+
+> k
+
+while minimizing that of the incorrect SOLU - 
+
+> TION STEP
+
+s− 
+
+> k
+
+. The optimization objective is: 
+
+LPre (θ) = −E(x, {si}k−1   
+
+> i=1 ,s +
+> k,s −
+> k)∼D
+
+"
+
+log σ
+
+
+
+β log πθ(s+ 
+
+> k
+
+| x, {si}k−1 
+
+> i=1
+
+)−
+
+log πθ(s− 
+
+> k
+
+| x, {si}k−1 
+
+> i=1
+
+)#
+
+.
+
+where πθ denotes the policy model being opti-mized, β controls the strength of the preference regularization, and D is a dataset of step-level pref-erence pairs. This stage serves as a initialization phase that establishes a strong foundation for sub-sequent step-wise self-correction optimization. In this work, we adopt the step-level preference opti-mization framework of Lai et al. (2024) to imple-ment this initialization stage. 
+
+3.2 Step-wise Self-Correction 
+
+After equipping the model with RL-based step-level supervision signals, we further enable explicit self-correction capability by supervising the model to recognize and correct the erroneous reasoning steps. Formally, given an incorrect reasoning step 
+
+s− 
+
+> k
+
+following a correct trajectory {s1, . . . , s k−1},we construct a preference objective that favors a 3self-corrected continuation c+ 
+
+> k
+
+over the subsequent incorrect step s− 
+
+> k+1
+
+that would be generated if the error remains unaddressed. The resulting loss: 
+
+LSC (θ) = −E(x, {si}k−1   
+
+> i=1 ,s −
+> k,c +
+> k,s −
+> k+1 )∼D SC
+
+"
+
+log σ
+
+
+
+β log πθ(c+ 
+
+> k
+
+| x, {si}k−1 
+
+> i=1
+
+, s − 
+
+> k
+
+)
+
+πref (c+ 
+
+> k
+
+| x, {si}k−1 
+
+> i=1
+
+, s − 
+
+> k
+
+)
+
+− β log πθ(s− 
+
+> k+1
+
+| x, {si}k−1 
+
+> i=1
+
+, s − 
+
+> k
+
+)
+
+πref (s− 
+
+> k+1
+
+| x, {si}k−1 
+
+> i=1
+
+, s − 
+
+> k
+
+)
+
+#
+
+.
+
+Here, πref denotes a frozen baseline model, s−
+
+> k
+
+denotes an incorrect reasoning step, while s−
+
+> k+1
+
+represents the subsequent continuation produced when the error is not detected. In contrast, c+
+
+> k
+
+corresponds to a self-corrected reasoning step that explicitly addresses the detected error. We investi-gate two variants of self-correction supervision that differ in how the corrected step c+ 
+
+> k
+
+is constructed. 
+
+3.2.1 Self-Fix Step-DPO (SFS-DPO) 
+
+Under the SFS-DPO setting, the self-corrected step is constructed by explicitly detecting and fixing an erroneous reasoning step. Formally, we define: 
+
+c+ 
+
+> k
+
+= {dk−1, s + 
+
+> k
+
+},
+
+where dk−1 is an explicit error-detection signal that flags the flaw in the incorrect step s− 
+
+> k
+
+, and s+ 
+
+> k
+
+is the corrected reasoning step that resolves the detected error. This formulation enables teacher-free self-correction by relying solely on model-generated detection and correction signals. 
+
+3.2.2 Self-Fix Step-DPO with Reasoning (SFS-DPO-R) 
+
+SFS-DPO-R further incorporates external teacher supervision to provide richer corrective signals. Specifically, we leverage a strong teacher model to generate an explicit explanation of why the pre-vious step is incorrect. The corrected step is then defined as: 
+
+c+ 
+
+> k
+
+= {dk−1, r k−1, s + 
+
+> k
+
+},
+
+where rk−1 denotes a teacher-generated rationale explaining the error in s− 
+
+> k
+
+. By augmenting the correction with high-quality explanatory reasoning, SFS-DPO-R offers stronger supervision at the cost of additional teacher dependence. We evaluate both SFS-DPO and SFS-DPO-R to contrast a fully teacher-free setting with a teacher-assisted variant, thereby quantifying the trade-off between quality and reliance on external models. 
+
+4 Main Experiments 
+
+4.1 Experimental Setup Baselines. To comprehensively evaluate the ef-fectiveness of our proposed methods, we conduct experiments on seven widely used open-source LLMs, following the original Step-DPO experi-mental setup. Specifically, we use three backbone LLMs from Step-DPO: DeepSeekMath-7B (Shao et al., 2024), Qwen2-7B, and Qwen2-7B-Instruct (Bai et al., 2023). DeepSeekMath-7B and Qwen2-7B are further fine-tuned on the MetaMath (Yu et al., 2024) and MMIQC (Liu et al., 2025) datasets, yielding DeepSeekMath-7B-SFT and Qwen2-7B-SFT. In addition, we include three stronger recent instruction-tuned models, Llama-3.1-8B-Instruct (Grattafiori et al., 2024), Qwen3-8B (Yang et al., 2025a) and Qwen2.5-14B-Instruct (Yang et al., 2024b), as well as the recent math-specialized model Qwen2.5-Math-7B-Instruct (Yang et al., 2024a), to further assess the scalability and robust-ness of our methods across both general-purpose and math-oriented reasoning LLMs. 
+
+Dataset Construction & Training Setup. To construct preference learning data for the step-wise self-correction stage, we first collect samples from the original 10K dataset of Lai et al. (2024). For each sample, we then append the rejected reasoning step to the initial reasoning to form a new reasoning prefix with an erroneous reasoning step, and use the subsequent rejected reasoning step as the rejected sample for our dataset. Following Pan et al. (2025), to construct the chosen step, we concatenate the correct reasoning step with a self-correction signal. The same set of signal phrases, listed in Figure 6, is then used to automatically identify self-correction behavior in generated responses. Through this pro-cess, we obtain a resource-free SFS-DPO dataset containing 8,416 samples. We further leverage GPT-4o (Hurst et al., 2024) to generate explicit ex-planations for incorrect reasoning steps and insert them between the self-correction signal and the cor-rect reasoning step, resulting in the SFS-DPO-R dataset. Further details are provided in Figure 7. In the initialization stage, to ensure a fair compar-ison, we use the same 10K-sample training dataset from Step-DPO (Lai et al., 2024), which is col-lected from the training set of GSM8K (Cobbe et al., 2021) and MATH (Hendrycks et al., 2021), as the initial source of step-level reasoning supervi-sion. All models are first trained for three epochs in 4In-Domain Out-of-Domain Model MATH GSM8K GK2023 OCW Avg. 
+
+DeepSeekMath-7B-SFT 51.7 86.8 38.2 19.1 49.0 + Step-DPO 51.8 (+0 .1) 86.7 (−0.1) 43.4 (+5 .2) 18.0 (−1.1) 50.0 (+1 .0) 
+
++ SFS-DPO 52.2 ∗ 
+
+> (+0 .5)
+
+87.6 ∗ 
+
+> (+0 .8)
+
+43.9 (+5 .7) 23.2 (+4 .1) 51.7 (+2 .7) 
+
++ SFS-DPO-R 52.2 ∗ 
+
+> (+0 .5)
+
+88.0 ∗ 
+
+> (+1 .2)
+
+43.9 (+5 .7) 25.0 (+5 .9) 52.3 (+3 .3) 
+
+Qwen2-7B-SFT 53.9 87.6 46.2 15.8 50.9 + Step-DPO 55.3 (+1 .4) 87.6 (+0 .0) 45.7 (−0.5) 15.8 (+0 .0) 51.1 (+0 .2) 
+
++ SFS-DPO 55.6 ∗ 
+
+> (+1 .7)
+
+87.9 (+0 .3) 46.0 (−0.2) 23.9 (+8 .1) 53.4 (+2 .5) 
+
++ SFS-DPO-R 55.4 (+1 .5) 88.0 ∗ 
+
+> (+0 .4)
+
+46.2 (+0 .0) 22.8 (+7 .0) 53.1 (+2 .2) 
+
+Qwen2-7B-Instruct 55.7 85.0 39.7 20.2 50.2 + Step-DPO 57.1 (+1 .4) 86.2 (+1 .2) 42.9 (+3 .2) 21.3 (+1 .1) 51.9 (+1 .7) 
+
++ SFS-DPO 58.6 ∗ 
+
+> (+2 .9)
+
+86.6 ∗ 
+
+> (+1 .6)
+
+46.0 (+6 .3) 20.6 (+0 .4) 53.0 (+2 .8) 
+
++ SFS-DPO-R 59.1 ∗ 
+
+> (+3 .4)
+
+86.0 (+1 .0) 44.7 (+5 .0) 22.1 (+1 .9) 53.0 (+2 .8) 
+
+Qwen2.5-Math-7B-Instruct 83.6 95.2 57.4 23.9 65.0 + Step-DPO 84.6 (+1 .0) 95.8 (+0 .6) 67.0 (+9 .6) 31.6 (+7 .7) 69.8 (+4 .8) 
+
++ SFS-DPO 84.7 (+1 .1) 95.8 (+0 .6) 68.3 (+10 .9) 32.0 (+8 .1) 70.2 (+5 .2) 
+
++ SFS-DPO-R 85.0 ∗ 
+
+> (+1 .4)
+
+96.0 (+0 .8) 67.8 (+10 .4) 32.7 (+8 .8) 70.4 (+5 .4) 
+
+Qwen3-8B 72.9 92.8 58.4 31.3 63.9 + Step-DPO 73.4 (+0 .5) 92.8 (+0 .0) 58.2 (−0.2) 31.3 (+0 .0) 63.9 (+0 .0) 
+
++ SFS-DPO 73.5 (+0 .6) 93.1 (+0 .3) 58.4 (+0 .0) 33.1 (+1 .8) 64.5 (+0 .6) 
+
++ SFS-DPO-R 73.7 ∗ 
+
+> (+0 .8)
+
+93.9 ∗ 
+
+> (+1 .1)
+
+59.0 (+0 .6) 34.2 (+2 .9) 65.2 (+1 .3) 
+
+Llama-3.1-8B-Instruct 50.4 86.2 38.4 25.0 50.0 + Step-DPO 51.8 (+1 .4) 86.4 (+0 .2) 41.8 (+3 .4) 27.6 (+2 .6) 51.9 (+1 .9) 
+
++ SFS-DPO 51.0 (+0 .6) 86.7 (+0 .5) 42.1 (+3 .7) 28.3 (+3 .3) 52.0 (+2 .0) 
+
++ SFS-DPO-R 51.7 (+1 .3) 87.1 ∗ 
+
+> (+0 .9)
+
+42.6 (+4 .2) 27.9 (+2 .9) 52.3 (+2 .3) 
+
+Qwen2.5-14B-Instruct 78.8 93.8 65.5 37.5 68.9 + Step-DPO 79.3 (+0 .5) 94.1 (+0 .3) 65.7 (+0 .2) 36.0 (−1.5) 68.8 (−0.1) 
+
++ SFS-DPO 79.2 (+0 .4) 94.5 ∗ 
+
+> (+0 .7)
+
+65.7 (+0 .2) 38.2 (+0 .7) 69.4 (+0 .5) 
+
++ SFS-DPO-R 79.4 (+0 .6) 94.5 ∗ 
+
+> (+0 .7)
+
+67.8 (+2 .3) 37.7 (+0 .2) 69.9 (+1 .0) 
+
+Table 2: Percentage accuracy on in-domain (MATH, GSM8K) and out-of-domain (GK2023, OCW) benchmarks with greedy decoding. Numbers in parentheses denote absolute accuracy change relative to the corresponding base backbone. For in-domain benchmarks, * denotes statistically significant improvements over Step-DPO according to one-sided McNemar’s test (p < 0.05). 
+
+the initialization stage with batch size 4. We then train SFS-DPO and SFS-DPO-R for four epochs in the self-correction stage using batch size 8. All training stages use the AdamW optimizer with a warmup ratio of 0.02 and learning rate of 5 × 10 −7.
+
+Benchmarks. To evaluate our method, we con-sider both in-domain and out-of-domain (OOD) benchmarks. In-domain performance is mea-sured on GSM8K (Cobbe et al., 2021) and 
+
+MATH (Hendrycks et al., 2021), with 1,319 and 5,000 test questions, respectively. To assess gen-eralization, we report results on GaoKao2023 
+
+(GK2023) (Liao et al., 2024) comprising 385 competition-level math problems from the 2023 Chinese university entrance exam, and OCW-Courses (OCW) (Lewkowycz et al., 2022) con-taining 272 undergraduate-level STEM problems requiring multi-step reasoning. All benchmarks are evaluated using answer accuracy. We define the self-correction rate metric as the fraction of model-generated solutions that are correct, conditioned on the model deciding to perform self-correction. Following Ma et al. (2025), we further report Error Recall, the fraction of incorrect reasoning steps that the model flags via a self-correction signal. 
+
+4.2 In-Domain Results 
+
+Our main experimental results in Table 2 demon-strate that explicitly modeling step-level self-correction yields stronger gains than prior step-wise preference learning. Across seven backbones and two in-domain datasets, Step-DPO provides limited and inconsistent improvements. While SFS-DPO and SFS-DPO-R improve over the base models in all settings, Step-DPO mostly gives gains below 1%, with performance plateauing or slightly degrading on GSM8K for Qwen2-7B-SFT and DeepSeekMath-7B-SFT. In contrast, SFS-DPO and SFS-DPO-R learn explicit self-correction and 5achieve larger gains than Step-DPO, outperforming it in 11/14 and 12/14 settings, respectively. This suggests that self-correction training improves rea-soning performance while teaching models when and how to revise their reasoning. On the model level, our method yields aver-age improvements of 0.83/0.97% on the math-specialized backbones, and even larger gains of 0.95/1.23% on the instruction-tuned backbones. Qwen2-7B-Instruct achieves the most noticeable gains, with a 3.4% improvement on MATH under SFS-DPO-R. Improvements are smaller on recent backbones, namely Qwen2.5-14B-Instruct, Qwen3-8B and Llama-3.1-8B-Instruct. One likely factor is that these backbones already self-correct more often before training, leaving less room to intro-duce new correction behavior; further analysis is provided in Section B. Overall, these results high-light that the primary advantage of our method lies not in finer-grained preference learning alone, but in optimizing preferences over corrected reasoning trajectories. Averaged across seven backbones, SFS-DPO im-proves accuracy by 1.11% on MATH and 0.69% on GSM8K, while SFS-DPO-R further increases the gains to 1.36% and 0.87%, respectively. The con-sistent advantage of SFS-DPO-R over SFS-DPO indicates that explicit explanatory reasoning about errors provides additional supervision beyond cor-rection alone. By exposing the model to why a rea-soning step is incorrect, SFS-DPO-R encourages more accurate error localization and more targeted repairs, leading to improved downstream accuracy. 
+
+4.3 Out-Of-Domain Results (OOD) 
+
+To assess robustness under distribution shift, we evaluate on the competition-level GK2023 bench-mark and undergraduate OCWCourses (OCW), as shown in Table 2. Step-DPO shows inconsistent OOD behavior, including degradation on Qwen2-7B-SFT for GK2023 and on the larger Qwen2.5-14B-Instruct for OCW, while SFS-DPO and SFS-DPO-R consistently maintain or improve accuracy across all backbones and datasets. Notably, Qwen2-7B-Instruct achieves a substantial 6.3% improve-ment on GK2023 under SFS-DPO, while Qwen2.5-Math-7B-Instruct achieves the largest overall OOD gains, reaching 10.9% on GK2023 and 8.8% on OCW. These results indicate that explicit step-level error detection and correction yields correction strategies that generalize beyond the training distri-bution, while the small gap between SFS-DPO and SFS-DPO-R suggests that self-generated correction signals already capture much of the transferable structure needed for OOD reasoning. 
+
+5 Discussions 
+
+5.1 Comparison to Self-Correction Baselines Model MATH GSM8K SC Rate Error Recall                 
+
+> LEMMA 48.5 83.3 45.3 49.9 S2R48.7 84.4 46.5 54.6 SFS-DPO 51.0 86.7 28.8 33.2 SFS-DPO-R 51.7 87.1 23.9 35.9
+
+Table 3: Comparison of prior self-correction methods and ours with Llama-3.1-8B-Instruct as the backbone. 
+
+We compare our framework with prior self-correction supervised fine-tuning (SFT) baselines. Due to the availability of comparable baselines, we conduct all experiments using Llama-3.1-8B-Instruct as the shared backbone. As shown in Table 3, SFS-DPO and SFS-DPO-R consistently outperform existing baselines on both MATH and GSM8K while exhibiting lower self-correction rates and lower Error Recall, indicating that neither correcting more often nor detecting more errors translates into better performance. This may be due to SFT-based methods suffering from distri-bution shift and behavior collapse (Kumar et al., 2024), which biases the model toward excessive self-correction: it follows correction templates rather than selectively revising genuine errors. Fur-ther analysis of these behavioral metrics is dis-cussed in Section 5.3. 
+
+5.2 The Role of Initialization Stage                               
+
+> Initialization MATH GSM8K SFT  Step RL (ours) 55.6 87.9 No init. 53.1 (-2.5) 87.3 (-0.6)
+> No init. + Joint Training 53.3 (-2.2) 84.1 (-3.8)
+> RL 53.3 (-2.2) 83.6 (-4.3)
+> Instruct  Step RL (ours) 58.6 86.6 No init. 53.1 (-4.1) 85.6 (-1.0)
+> No init. + Joint Training 56.9 (-1.7) 86.4 (-0.2)
+> RL 55.7 (-0.9) 86.4 (-0.2)
+
+Table 4: Comparison of training strategies using Qwen2-7B models. Results in percentage are reported relative to our SFS-DPO baseline. 
+
+Table 4 compares our step-level initialization with three alternatives: no initialization, joint training of 64.6 12.5 7.4 14.9 31.2 38.9 42.1 36.4 24.8 25.7 28.8 28.0 10.2 23.9 16.7 15.8 44.9 46.6 45.2 43.9                                     
+
+> 1234
+> 83 85 87 89 91 93 Qwen2-7B-Instruct
+> 85.5 86.4 86.0 86.7
+> 1234
+> 92 94 96 98 Qwen2.5-7B-Math-Instruct
+> 95.2 95.1 96.0 95.0
+> 1234
+> 91 93 95 97
+> Qwen3-8B
+> 93.6 93.6 93.9 93.8
+> 1234
+> 84 86 88 90 92
+> Llama-3.1-8B-Instruct
+> 86.5 87.1 86.3 87.3
+> 1234
+> 92 94 96 98 Qwen2.5-14B-Instruct
+> 94.3 94.5 94.4 94.0
+> 50 53 56 59 62 65 68
+> 58.3 58.4 59.1 58.6
+> 78 81 84 87
+> 83.2 83.1 85.0 83.4
+> 71 74
+> 73.1 73.3 73.7 73.0
+> 49 52 55
+> 51.4 51.7 51.6 51.4
+> 76 79 82
+> 79.2 79.4 78.9 79.0
+> Epochs GSM8K MATH Self-Correction Rate
+
+Figure 2: Self-correction rate of SFS-DPO-R under five Instruct LLMs. Self-correction rate shows a positive correlation with task accuracy 1 5 10 15 20 25 
+
+> Number of self-correction steps per solution 010 20 30 40 50 Percentage (%) GSM8K MATH
+
+Figure 3: Distribution of numbers of self-correction steps per solution under SFS-DPO-R, averaged over six backbone models. 
+
+reasoning and self-correction ability, and standard RL initialization. Removing the initialization stage leads to clear performance degradation, showing that directly optimizing self-correction signals with-out a strong reasoning foundation is insufficient. In addition, joint training is also detrimental, suggest-ing that step-wise reasoning and self-correction are better learned sequentially rather than as a single mixed objective. Standard RL initialization further underperforms Step RL, indicating that step-level preference optimization provides a stronger founda-tion for later self-correction training. Furthermore, the degradation is especially pronounced on the more challenging MATH benchmark and in the SFT setting. Overall, these results highlight the im-portance of establishing strong step-level reasoning before optimizing self-correction behavior. 
+
+5.3 Self-Correction Rate 
+
+We study the role of the self-correction (SC) rate in model performance. As shown in Figure 2, the SC rate exhibits a positive correlation with over-all performance, indicating that the self-correction ability of our framework plays an important role in improving reasoning accuracy. However, a high SC rate does not necessarily translate into better accuracy. Across MATH and GSM8K, some self-1 5 10 15 20 25      
+
+> 0510 15 20 25
+> Frequency of reasoning steps per solution (%)
+> (count)
+> GSM8K MATH
+> 1510 15 20 25
+> Reasoning Step
+> 0510
+> Frequency of SC occurrence (%)
+> (index)
+
+Figure 4: Distribution of self-correction behavior under SFS-DPO-R, averaged over six backbone models. 
+
+correction methods achieve high SC rates while still underperforming in final task accuracy (Ta-ble 3), suggesting that excessive self-correction may reflect forced correction behavior rather than effective reasoning improvement. In contrast, our methods achieve stronger overall performance de-spite lower SC rates, indicating that our framework learns to apply self-correction more selectively and effectively. Rather than maximizing correction fre-quency, our method encourages the model to self-correct primarily on more challenging examples where the original reasoning is likely to fail. This suggests that effective self-correction requires not only knowing how to self-correct, but also knowing when not to self-correct. Overall, these findings indicate that SC rate alone is insufficient as a stan-dalone indicator of self-correction quality. What ul-timately matters is whether self-correction behavior is positively aligned with task performance, such that revisions reinforce correct reasoning instead of introducing unnecessary or spurious changes. 
+
+5.4 Self-Correction Behavior 
+
+Figure 3 and Figure 4 present a detailed analysis of the self-correction behavior exhibited by the mod-els on GSM8K and MATH. Figure 3 analyzes the 7Problem A custodian has to clean a school with 80 classrooms. They have 5 days to get it done. It takes them 15 minutes per classroom. If they work an 8 hour day, what percentage of their day, on average, is spent cleaning classrooms? Base Model ... Step 3: Now, we need to find out what percentage of the day is spent cleaning classrooms. To do this, we divide the time spent cleaning classrooms (1200 minutes) by the total time in a day (480 minutes) and multiply by 100 to get the percentage. So the percentage is (1200 /480) × 100 = 250% .However, this result is not possible because a percentage cannot be more than 100%. There must be a mistake in our calculation. Let’s retrace our steps. Step 4: We found that it takes 1200 minutes to clean all the classrooms and there are 480 minutes in a day. So the percentage of the day spent cleaning classrooms should be (1200 /480) × 100 = 250% .« Repeated block » « Repeated block » The mistake is in the calculation of the percentage of the day spent cleaning classrooms. The percentage of the day spent cleaning classrooms should be the time spent cleaning classrooms divided by the total time in a day, which is (1200 /480) × 100 = 250              
+
+> SFS-DPO-R ... Step 2: The conversion of hours to minutes is also correct. It is indeed 20 hours. Step 3: The calculation of the percentage of the day spent cleaning is incorrect. We should have divided the time spent cleaning (20 hours) by the total work hours (8 hours) and then multiplied by 100 to get the percentage. The correct calculation is (20 /8) ∗100 = 250% .The mistake was in the last step. We should not have multiplied by 100 after dividing. The correct calculation should be (20 /8) ∗100 = 250% . But this doesn’t make sense because the percentage cannot be more than 100% . The mistake was in the last step. We should not have multiplied by 100 after dividing. The mistake was in the calculation of the total work hours. The custodian works an 8-hour day, but they have 5 days to clean the classrooms. So the total work hours should be 8 hours/day * 5 days = 40 hours. Now let’s correct the calculation. Step 3: The correct calculation of the percentage of the day spent cleaning is (20 /40) ∗100 = 50% . So, on average, the custodian spends 50% of their day cleaning classrooms. The answer is: 50
+
+Table 5: Qualitative reasoning between Qwen2-7B-SFT and Qwen2-7B-SFT-SFS-DPO-R. 
+
+distribution of the total number of self-correction steps in solutions, conditioned on the presence of the self-correction signal. It shows that most so-lutions contain only a few self-correction steps, with single-correction cases being most common and the frequency decreasing as corrections in-crease. Cases with more than three corrections are relatively uncommon, suggesting that the model does not rely on repeated or forced revisions. Fig-ure 4 further shows that self-correction occurrences broadly follow the distribution of reasoning lengths rather than concentrating at specific positions, indi-cating no strong positional bias in self-correction behavior toward specific reasoning stages. Overall, these results suggest that SFS-DPO-R encourages stable and targeted self-correction behavior during multi-step reasoning, providing a foundation for learning when to self-correct effectively and selec-tively. 
+
+5.5 Case Study 
+
+As shown in Table 5, the base Qwen2-7B-SFT model makes an error in its calculation and repeat-edly generates incorrect reasoning without effec-tively resolving the mistake. In contrast, SFS-DPO-R enables the model to detect the erroneous rea-soning step, localize the calculation error in the middle of the solution, and explicitly reason about the source of the mistake. Additional qualitative examples are provided in the Section D. 
+
+6 Conclusion 
+
+In this work, we propose SFS-DPO, a two-stage framework that enables small LLMs to explicitly detect and correct erroneous reasoning steps dur-ing inference. The framework builds on step-level preference optimization, with an RL-based initial-ization to strengthen step-wise reasoning, followed by targeted training for self-correction. We further introduce SFS-DPO-R, a teacher-assisted variant that incorporates explanatory rationales to provide stronger corrective signals. Comprehensive exper-iments across multiple model backbones demon-strate consistent improvements over prior methods on both in-domain and out-of-distribution bench-marks. These results highlight that explicitly mod-eling how errors are identified and fixed, rather than merely preferring better continuations, is critical for robust math reasoning, positioning step-wise self-correction as a promising direction for improv-ing the reliability of large language models. 8Limitations 
+
+While our framework represents an advancement in self-correction capabilities during inference of LLMs, several limitations persist. Firstly, SFS-DPO-R relies on stronger models’ generated ratio-nales, introducing additional teacher dependence and potential propagation of teacher biases or er-rors. In addition, our evaluation focuses on mathe-matical reasoning tasks, where intermediate reason-ing steps are naturally well-defined. The general-ization of the proposed method to more open-ended settings, such as creative writing, has not been fully explored. Future work will explore scaling this framework to more complex datasets. Finally, we examined moderately sized LLMs, ranging from 7 to 14 billion parameters. Experiments with larger and more capable models could strengthen our claims. 
+
+References 
+
+Jinze Bai, Shuai Bai, Yunfei Chu, Zeyu Cui, Kai Dang, Xiaodong Deng, Yang Fan, Wenbin Ge, Yu Han, Fei Huang, et al. 2023. Qwen technical report. arXiv preprint arXiv:2309.16609 .Rich Caruana. 1997. Multitask learning. Machine learning , 28(1):41–75. Guoxin Chen, Minpeng Liao, Chengxi Li, and Kai Fan. 2024. Step-level value preference optimization for mathematical reasoning. In Findings of the Associ-ation for Computational Linguistics: EMNLP 2024 ,pages 7889–7903, Miami, Florida, USA. Association for Computational Linguistics. Qiguang Chen, Libo Qin, Jinhao Liu, Dengyun Peng, Jiannan Guan, Peng Wang, Mengkang Hu, Yuhang Zhou, Te Gao, and Wanxiang Che. 2025. Towards reasoning era: A survey of long chain-of-thought for reasoning large language models. arXiv preprint arXiv:2503.09567 .Karl Cobbe, Vineet Kosaraju, Mohammad Bavarian, Mark Chen, Heewoo Jun, Lukasz Kaiser, Matthias Plappert, Jerry Tworek, Jacob Hilton, Reiichiro Nakano, Christopher Hesse, and John Schulman. 2021. Training verifiers to solve math word prob-lems. Preprint , arXiv:2110.14168. Aaron Grattafiori, Abhimanyu Dubey, Abhinav Jauhri, Abhinav Pandey, Abhishek Kadian, Ahmad Al-Dahle, Aiesha Letman, Akhil Mathur, Alan Schelten, Alex Vaughan, et al. 2024. The llama 3 herd of mod-els. arXiv preprint arXiv:2407.21783 .Dan Hendrycks, Collin Burns, Saurav Kadavath, Akul Arora, Steven Basart, Eric Tang, Dawn Song, and Jacob Steinhardt. 2021. Measuring mathematical problem solving with the MATH dataset. In Thirty-fifth Conference on Neural Information Processing Systems Datasets and Benchmarks Track (Round 2) .Jiwoo Hong, Noah Lee, and James Thorne. 2024. Orpo: Monolithic preference optimization without refer-ence model. arXiv preprint arXiv:2403.07691 .Aaron Hurst, Adam Lerer, Adam P Goucher, Adam Perelman, Aditya Ramesh, Aidan Clark, AJ Os-trow, Akila Welihinda, Alan Hayes, Alec Radford, et al. 2024. Gpt-4o system card. arXiv preprint arXiv:2410.21276 .Zhensheng Jin, Xinze Li, Yifan Ji, Chunyi Peng, Zheng-hao Liu, Qi Shi, Yukun Yan, Shuo Wang, Furong Peng, and Ge Yu. 2025. Recut: Balancing rea-soning length and accuracy in llms via stepwise trails and preference optimization. arXiv preprint arXiv:2506.10822 .Aviral Kumar, Vincent Zhuang, Rishabh Agarwal, Yi Su, John D Co-Reyes, Avi Singh, Kate Baumli, Shariq Iqbal, Colton Bishop, Rebecca Roelofs, et al. 2024. Training language models to self-correct via reinforcement learning. arXiv preprint arXiv:2409.12917 .Salem Lahlou, Abdalgader Abubaker, and Hakim Hacid. 2025. Port: Preference optimization on reasoning traces. In Proceedings of the 2025 Conference of the Nations of the Americas Chapter of the Association for Computational Linguistics: Human Language Technologies (Volume 1: Long Papers) , pages 10989– 11005. Xin Lai, Zhuotao Tian, Yukang Chen, Senqiao Yang, Xi-angru Peng, and Jiaya Jia. 2024. Step-dpo: Step-wise preference optimization for long-chain reasoning of llms. arXiv preprint arXiv:2406.18629 .Aitor Lewkowycz, Anders Andreassen, David Dohan, Ethan Dyer, Henryk Michalewski, Vinay Ramasesh, Ambrose Slone, Cem Anil, Imanol Schlag, Theo Gutman-Solo, Yuhuai Wu, Behnam Neyshabur, Guy Gur-Ari, and Vedant Misra. 2022. Solving quantita-tive reasoning problems with language models. In 
+
+Proceedings of the 36th International Conference on Neural Information Processing Systems , NIPS ’22, Red Hook, NY, USA. Curran Associates Inc. Minpeng Liao, Chengxi Li, Wei Luo, Wu Jing, and Kai Fan. 2024. MARIO: MAth reasoning with code inter-preter output - a reproducible pipeline. In Findings of the Association for Computational Linguistics: ACL 2024 , pages 905–924, Bangkok, Thailand. Associa-tion for Computational Linguistics. Hunter Lightman, Vineet Kosaraju, Yuri Burda, Harri-son Edwards, Bowen Baker, Teddy Lee, Jan Leike, John Schulman, Ilya Sutskever, and Karl Cobbe. 2023. Let’s verify step by step. In The Twelfth Inter-national Conference on Learning Representations .Haoxiong Liu, Yifan Zhang, Yifan Luo, and Andrew C Yao. 2025. Augmenting math word problems via 
+
+9iterative question composing. In Proceedings of the AAAI Conference on Artificial Intelligence , vol-ume 39, pages 24605–24613. Zimu Lu, Aojun Zhou, Ke Wang, Houxing Ren, Weikang Shi, Junting Pan, Mingjie Zhan, and Hong-sheng Li. 2025. Step-controlled DPO: Leveraging stepwise errors for enhancing mathematical reason-ing of language models. Ruotian Ma, Peisong Wang, Cheng Liu, Xingyan Liu, Jiaqi Chen, Bang Zhang, Xin Zhou, Nan Du, and Jia Li. 2025. S 2r: Teaching llms to self-verify and self-correct via reinforcement learning. arXiv preprint arXiv:2502.12853 .Zhuoshi Pan, Yu Li, Honglin Lin, Qizhi Pei, Zinan Tang, Wei Wu, Chenlin Ming, H. Vicky Zhao, Conghui He, and Lijun Wu. 2025. LEMMA: Learning from er-rors for MatheMatical advancement in LLMs. In 
+
+Findings of the Association for Computational Lin-guistics: ACL 2025 , pages 11615–11639, Vienna, Austria. Association for Computational Linguistics. Rafael Rafailov, Archit Sharma, Eric Mitchell, Christo-pher D Manning, Stefano Ermon, and Chelsea Finn. 2023. Direct preference optimization: Your language model is secretly a reward model. Advances in neural information processing systems , 36:53728–53741. Zhihong Shao, Peiyi Wang, Qihao Zhu, Runxin Xu, Junxiao Song, Xiao Bi, Haowei Zhang, Mingchuan Zhang, YK Li, Yang Wu, et al. 2024. Deepseekmath: Pushing the limits of mathematical reasoning in open language models. arXiv preprint arXiv:2402.03300 .Huimin Xu, Xinnian Mao, Feng-Lin Li, Xiaobao Wu, Wang Chen, Wei Zhang, and Luu Anh Tuan. 2025. Full-step-dpo: Self-supervised preference optimiza-tion with step-wise rewards for mathematical reason-ing. In Findings of the Association for Computa-tional Linguistics: ACL 2025 , pages 24343–24356. Yuchen Yan, Jin Jiang, Yang Liu, Yixin Cao, Xin Xu, Mengdi Zhang, Xunliang Cai, and Jian Shao. 2025. Sˆ 3cmath: Spontaneous step-level self-correction makes large language models better mathematical reasoners. In Proceedings of the AAAI Conference on Artificial Intelligence , volume 39, pages 25588– 25596. An Yang, Anfeng Li, Baosong Yang, Beichen Zhang, Binyuan Hui, Bo Zheng, Bowen Yu, Chang Gao, Chengen Huang, Chenxu Lv, et al. 2025a. Qwen3 technical report. arXiv preprint arXiv:2505.09388 .An Yang, Beichen Zhang, Binyuan Hui, Bofei Gao, Bowen Yu, Chengpeng Li, Dayiheng Liu, Jianhong Tu, Jingren Zhou, Junyang Lin, et al. 2024a. Qwen2. 5-math technical report: Toward mathematical ex-pert model via self-improvement. arXiv preprint arXiv:2409.12122 .Ling Yang, Zhaochen Yu, Tianjun Zhang, Minkai Xu, Joseph E. Gonzalez, Bin CUI, and Shuicheng YAN. 2025b. Supercorrect: Advancing small LLM rea-soning with thought template distillation and self-correction. In The Thirteenth International Confer-ence on Learning Representations .Qwen An Yang, Baosong Yang, Beichen Zhang, Binyuan Hui, Bo Zheng, Bowen Yu, Chengyuan Li, Dayiheng Liu, Fei Huang, Guanting Dong, Hao-ran Wei, Huan Lin, Jian Yang, Jianhong Tu, Jianwei Zhang, Jianxin Yang, Jiaxin Yang, Jingren Zhou, Jun-yang Lin, Kai Dang, Keming Lu, Keqin Bao, Kexin Yang, Le Yu, Mei Li, Mingfeng Xue, Pei Zhang, Qin Zhu, Rui Men, Runji Lin, Tianhao Li, Tingyu Xia, Xingzhang Ren, Xuancheng Ren, Yang Fan, Yang Su, Yi-Chao Zhang, Yunyang Wan, Yuqi Liu, Zeyu Cui, Zhenru Zhang, Zihan Qiu, Shanghaoran Quan, and Zekun Wang. 2024b. Qwen2.5 technical report. 
+
+ArXiv , abs/2412.15115. Longhui Yu, Weisen Jiang, Han Shi, Jincheng YU, Zhengying Liu, Yu Zhang, James Kwok, Zhenguo Li, Adrian Weller, and Weiyang Liu. 2024. Metamath: Bootstrap your own mathematical questions for large language models. In The Twelfth International Con-ference on Learning Representations .Yongcheng Zeng, Xinyu Cui, Xuanfa Jin, Guoqing Liu, Zexu Sun, Dong Li, Ning Yang, Jianye Hao, Haifeng Zhang, and Jun Wang. 2025. Evolving llms’ self-refinement capability via iterative preference opti-mization. arXiv preprint arXiv:2502.05605 .Xutong Zhao, Tengyu Xu, Xuewei Wang, Zhengxing Chen, Di Jin, Liang Tan, Zishun Yu, Zhuokai Zhao, Yun He, Sinong Wang, et al. 2025. Boosting llm reasoning via spontaneous self-correction. arXiv preprint arXiv:2506.06923 .
+
+10 A Choice of Statistical Test 
+
+For the main benchmark results, where the evalu-ation outcomes are binary (correct/incorrect), we adopt McNemar’s test for the significant testing. This test is particularly suitable for paired binary evaluation settings, as it directly compares the pre-diction differences between two systems on the same evaluation samples. Specifically, McNemar’s test focuses on discordant pairs, i.e., cases where the prediction outcomes differ between our method and the Step-DPO baseline. We use a one-sided exact McNemar’s test under the hypothesis that our method improves over the baseline and report results with p < 0.05 as statistically significant. We only report McNemar’s test results for the main benchmarks due to their relatively larger eval-uation sizes. For smaller OOD benchmarks, we do not report significance results since the limited number of evaluation samples makes McNemar’s test statistically underpowered and less reliable. 
+
+B Additional Analysis 
+
+We present additional analysis of self-correction behavior before and after applying SFS-DPO and SFS-DPO-R in Table 6. Before training, sev-eral backbone models, including DeepSeekMath-7B-SFT, Qwen2-7B-SFT and Qwen2-7B-Instruct show limited self-correction ability. After train-ing, SFS-DPO and SFS-DPO-R generally improve self-correction behavior on these models. How-ever, a higher self-correction rate does not nec-essarily imply better reasoning performance, as shown by Llama-3.1-8B-Instruct and Qwen3-8B, where the self-correction rate decreases after train-ing while the overall reasoning performance im-proves. This suggests that effective self-correction depends on selective and accurate revision rather than frequency alone. Figure 5 further analyzes epoch-wise behavior on the two SFT backbones. For DeepSeekMath-7B-SFT, both self-correction rate and task accuracy peak at epoch 2, suggesting positive alignment be-tween correction behavior and reasoning perfor-mance. In contrast, Qwen2-7B-SFT shows rela-tively stable self-correction rates with only minor accuracy fluctuations, again indicating that correc-tion effectiveness and selectivity matter more than raw correction frequency.                         
+
+> Model Base SFS-DPO SFS-DPO-R
+> DeepSeekMath-7B-SFT 8.1 14.2 19.1 Qwen2-7B-SFT 8.0 14.2 13.1 Qwen2-7B-Instruct 5.3 12.5 14.9 Qwen2.5-7B-Math-Instruct 21.0 35.7 42.1 Qwen3-8B 35.8 26.9 28.8 Llama-3.1-8B-Instruct 37.0 28.8 23.9 Qwen-2.5-14B-Instruct 37.5 43.8 46.6
+
+Table 6: Self-correction rates of SFS-DPO and SFS-DPO-R across different backbone models. 1 2 3 485 87 89 91                       
+
+> 87.8 88.0 87.7 87.5
+> DeepSeekMath-7B-SFT
+> 123485 87 89 91
+> 88.0 87.4 87.7 87.5
+> Qwen2-7B-SFT
+> 50 53 56 59
+> 52.0 52.2 51.9 51.8 14.6 19.1 17.2 16.0
+> 50 53 56 55.4 55.4 54.9 55.1 13.1 12.0 13.0 12.0
+> Epochs
+> GSM8K MATH Self-Correction Rate
+
+Figure 5: Self-correction rate of SFS-DPO-R under two SFT models. 
+
+C Data Construction Details 
+
+We provide additional details on our data construc-tion process. As shown in Figure 6, we use a set of transition signals adapted from Pan et al. (2025) to indicate the beginning of self-correction behavior. We further extend this list with additional explicit phrases, such as “The previous step is incorrect.” and “There is a mistake.”, to encourage clearer error-detection behavior before generating the cor-rected reasoning step. 
+
+D Qualitative Analysis of SFS-DPO-R Self-Correction 
+
+The qualitative examples are provided in Tables 7– 13. We include one comparison with LEMMA and S2R, where these methods exhibit self-correction behavior but still produce excessive or insuffi-ciently targeted revisions. The remaining exam-ples focus on the base model and Step-DPO. The base model often propagates earlier errors with-out explicit repair, while Step-DPO can improve local step preference but still fails to revise already-generated incorrect steps. In contrast, SFS-DPO-R more reliably localizes erroneous intermediate steps and applies concise corrections while preserv-ing coherent reasoning. These examples support that effective self-correction requires selective and accurate revision, not correction frequency alone. 11 “Self-Fix Step-DPO” Prompt Construction {Question} . Let’s think step by step. 
+
+{Annotated Incorrect Reasoning Steps} {Choose one transition phrase below} 
+
+• But, wait, let’s pause and examine this more carefully. • Wait a second, let’s ensure this is right. Calculating carefully: • Hmm, I want to verify this calculation. Let’s go through it: • Wait, this doesn’t seem right. Let’s pause and consider this: • Let’s pause and consider what we know so far. • This didn’t seem right. Wait, let’s correct that. • Wait, something seems off. Let’s pause and consider what we know so far. • Let’s pause and consider if we’ve set up everything correctly. • Wait a second. Is everything correct? Let me double-check. • Wait, maybe there’s something wrong. Let’s pause and reconsider. • The result looks strange, is everything correct? Let me double-check. • Does this make sense? Let’s rethink this. • Could I have missed something? Let’s pause and consider what we know so far. • Wait ⋆
+
+• The previous step is incorrect. ⋆
+
+• There is a mistake. ⋆
+
+{Annotated Corrected Continuation} 
+
+Figure 6: Dataset construction for SFSDPO with the set of transition phrases fetched from Pan et al. (2025). ⋆
+
+denotes additional phrases. 
+
+12 Step-DPO 
+
+SFS-DPO-R 
+
+Let's think step by step. Step 1: 
+
+Find the dates on which both stores have sales. The bookstore has a sale on days that are 
+
+multiples of 5. So the dates are 5, 10, 15, 20, 25, 30 (for July). The shoe store has a sale every 6 days. If it has a sale on July 3, then the next sale will be on July 9, then on July 15, and so on. So the dates of its sales are 3, 9, 15, 21, 27. 
+
+Find the dates when the shoe store has a sale. The shoe store has a sale every 6 days. If they 
+
+have a sale on July 3, then they will have a sale on July 3 + 6 = 9, 15, 21, 27, 33, 39, 45, 51, 57. 
+
+Let's think step by step. Step 1:  Find the dates when the shoe store has a sale. The shoe store 
+
+has a sale every 6 days. If they have a sale on July 3, then they will have a sale on July 3 + 6 = 9, 15, 21, 27, 33, 39, 45, 51, 57. 
+
+The previous step is incorrect. The incorrect step calculates dates beyond July, specifically going up to day 57, while the focus should remain within the confines of July's 31 days. Here is the corrected  Step 1: Find the dates on which both stores have sales. The bookstore has a sale on days that are multiples of 5. So the dates are 5, 10, 15, 20, 25, 30 (for July). The shoe store 
+
+has a sale every 6 days. If it has a sale on July 3, then the next sale will be on July 9, then on July 15, and so on. So the dates of its sales are 3, 9, 15, 21, 27. 
+
+Step 2: Find the dates when the bookstore has a sale. The bookstore has a sale on days that are 
+
+multiples of 5. So the dates when the bookstore has a sale are 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60. Figure 7: Illustration of the process for constructing the SFS-DPO-R dataset. Incorrect intermediate reasoning steps are identified and corrected with self-correction signals and self-correction reasonings. 
+
+13 Problem Courtney attended a concert and reported that the audience was 48 in number. However, Kelly went to the same concert and said that Courtney had made the mistake of overstating the number of people in attendance by 20%. If Kelly was right, how many people really attended the concert? Base Model Step 1: Identify the number of people Courtney reported. Courtney reported that the audience was 48 in number. Step 2: Determine the percentage by which Courtney overestimated the number of people. According to Kelly, Courtney overestimated the number of people by 20%. Step 3: Calculate the actual number of people based on the overestimation. If the number of people was overestimated by 20%, then the actual number of people is 80% of the number Courtney reported. To find 80% of 48, we use the formula: Actual number of people = 48 × 80 100 = 48 × 0.8 = 38 .4
+
+Since the number of people must be a whole number, we round 38.4 to the nearest whole number, which is 38. Therefore, the actual number of people who attended the concert is 38 .
+
+SFS-DPO-R Let’s think step by step. Step 1: If Courtney’s count of 48 was overstated by 20% ,then the actual number of people at the concert is 48 minus 20% of 48. Step 2: To find 20% of 48, we multiply 48 by 20 /100 , which gives us 48 × 20 100 = 9 .6.Step 3: To find the actual number of people at the concert, we subtract this 9.6 from the 48 that Courtney counted. So, the actual number of people is 48 − 9.6 = 38 .4. S However, the number of people cannot be a decimal, so there must be a mistake in our calculation. Let’s retrace our steps and see where we went wrong. Step 1: If Courtney’s count of 48 was overstated by 20% , then the actual number of people at the concert is 48 minus 20% of the actual number of people. Let’s call the actual number of people x. Then, 20% of x is 0.2x. So, the equation becomes 48 = x + 0 .2x.Step 2: Combining like terms on the right side gives 48 = 1 .2x.Step 3: To solve for x, we divide both sides of the equation by 1.2: x = 48 1.2 = 40 .So, the actual number of people at the concert is 40. The answer is: 40 
+
+> Table 7: Qualitative reasoning between base Qwen2-7B-Instruct and Qwen2-7B-Instruct-SFS-DPO-R, where the base model produces a plausible but incorrect solution, while SFS-DPO-R identifies the error source and revises the reasoning to obtain the correct result.
+
+14 Problem Annie’s soccer team is conducting a passing drill in which each of the 11 members of the soccer team must pass the ball to each of the other members exactly three times. How many times must the ball be passed before the passing drill is over? Please reason step by step, and put your final answer within \boxed. Step-DPO ## Step 1: Determine the total number of passes each player must make Each of the 11 players must pass the ball to each of the other 10 players exactly three times. This means each player will make 
+
+10 ∗ 3 = 30 passes in total. ## Step 2: Calculate the total number of passes made by all players Since there are 11 players, and each player makes 30 passes, it might seem like the total number of passes is 
+
+11 ∗ 30 . However, this counts each pass twice (once for each player involved in the pass), so we need to divide this number by 2 to get the actual number of passes. ## Step 3: Calculate the total number of passes The total number of passes is (11 ∗ 30) /2 = 165 . The final answer is: 165 
+
+S2R ... The total number of unique passes is 330 / 2 = 165. Wait, let me recheck my solution. To verify the answer, we can consider the structure of the problem and the nature of the passing drill. The problem involves 11 players, and each player must pass the ball to each of the other 10 players exactly three times. This means that each player will make 10 passes, and since there are 11 players, it might seem like there would be 11 x 10 = 110 passes. However, this counts each pass twice (once for each player involved in the pass), so we need to divide by 2 to get the correct number of unique passes. The correct calculation is (11 players x 10 passes/player) / 2 = 55 unique passes. Since each player must pass the ball 3 times to each of the other 10 players, we need to multiply the number of unique passes by 3 to get the total number of passes. 55 unique passes x 3 = 165 passes.The answer provided is 165, which matches the result of this reasoning. Therefore, the answer is correct LEMMA ... This means there are 55 unique pairs of players. Now, since each player must pass the ball to each of the other players three times, we need to multiply the number of unique pairs by the number of passes each player makes: Total passes = 3 × 55 = 165 .
+
+Hmm, let’s verify this calculation. Each of the 11 players is passing to 10 other players, and since each pass is counted three times, we can also express it as: Total passes = 3 × (11 × 10) = 3 × 110 = 330 .
+
+Wait a second. This seems inconsistent with our earlier calculation. Let’s clarify: we only need to count the unique pairs once, and then multiply by the number of passes per pair. So, the correct approach is indeed to calculate the total number of unique pairs and multiply by the number of passes per pair: Total passes = 3 × 55 = 165 .
+
+Thus, the total number of times the ball must be passed before the drill is over is indeed 165 .
+
+SFS-DPO-R ## ... ## Step 2: Calculate the total number of passes made by all players in one round of passing. If each of the 11 players passes to the other 10 players exactly 3 times, it might initially seem like the calculation is 
+
+11 players ∗ 10 players ∗3 passes = 330 passes. However, this counts each pass twice because when one player passes to another, it counts as a pass for both the passer and the receiver. So, we need to divide this number by 2 to get the actual number of unique passes in one round. ## Step 3: Calculate the total number of passes needed for the drill. The calculation from Step 2, 
+
+11 ∗ 10 ∗ 3, is the correct way to find the total number of passes needed because it correctly accounts for the fact that each of the 11 players must pass to the other 10 players exactly 3 times, without double-counting the passes. So, the total number of passes needed is 11 ∗ 10 ∗ 3 = 330. The final answer is: 330 
+
+Table 8: Qualitative comparison on the MATH dataset between the base Llama-3.1-8B-Instruct-Step-DPO model and Llama-3.1-8B-Instruct-SFS-DPO-R. S 2R cannot perform correct self-correction while LEMMA exhibits excessive self-correction by repeatedly revising turning a correct reasoning path into an incorrect final answer, while SFS-DPO-R performs a targeted correction and reaches the correct answer. 
+
+15 Problem Let a, b, c, d be nonnegative real numbers such that a + b + c + d = 1 . Find the maximum value of 
+
+a2 + b2 + c2 + d2.
+
+Step-DPO ... ## Step 2: We can use the Cauchy-Schwarz inequality to find a relationship between a2 + b2 + c2 + d2
+
+and a + b + c + d. Applying the Cauchy-Schwarz inequality to the numbers a, b, c, d and 1, 1, 1, 1, we get 
+
+(a2 + b2 + c2 + d2)(1 2 + 1 2 + 1 2 + 1 2) ≥ (a + b + c + d)2.
+
+This simplifies to 
+
+a2 + b2 + c2 + d2 ≤ (a + b + c + d)2
+
+4 .
+
+## Step 3: Since we are given that a + b + c + d = 1 , we can substitute this into the inequality from the previous step to get 
+
+a2 + b2 + c2 + d2 ≤ 12
+
+4 = 14 .
+
+This means that the maximum value of a2 + b2 + c2 + d2 is 14 .
+
+## Step 4: To find when the maximum value is achieved, we need to find the values of a, b, c, d that satisfy the equality condition of the Cauchy-Schwarz inequality. The equality condition is satisfied when the two sequences are proportional, i.e., when a = b = c = d = 14 .
+
+## Step 5: Therefore, the maximum value of a2 + b2 + c2 + d2 is achieved when a = b = c = d = 14 .
+
+The final answer is: 14
+
+SFS-DPO-R ## Step 1: Understand the problem and the constraint given We are given that a + b + c + d = 1 and we need to find the maximum value of a2 + b2 + c2 + d2. This is an optimization problem with a constraint. ## Step 2: Identify a relevant inequality or method to apply The Cauchy-Schwarz inequality is a powerful tool for problems involving sums of squares. It states that for any real numbers x1, x 2, . . . , x n and 
+
+y1, y 2, . . . , y n,
+
+(x21 + x22 + · · · + x2
+
+> n
+
+)( y21 + y22 + · · · + y2
+
+> n
+
+) ≥ (x1y1 + x2y2 + · · · + xnyn)2.
+
+However, in this case, we can use a simpler inequality, the QM-AM (Quadratic Mean - Arithmetic Mean) inequality, which states that for nonnegative real numbers, the quadratic mean is greater than or equal to the arithmetic mean. That is, 
+
+r a2 + b2 + c2 + d2
+
+4 ≥ a + b + c + d
+
+4 .
+
+Squaring both sides of the QM-AM inequality and multiplying by 4 gives us 
+
+a2 + b2 + c2 + d2 ≤ (a + b + c + d)2
+
+1 = ( a + b + c + d)2 = 1 2 = 1 .
+
+This inequality gives us an upper bound on a2 + b2 + c2 + d2.## Step 3: Determine when equality occurs To find the maximum value of a2 + b2 + c2 + d2, we need to find when the equality occurs in the QM-AM inequality. Equality occurs when all the numbers are equal, i.e., a = b = c = d = 14 .
+
+## Step 4: Conclude the maximum value Since the maximum value of a2 + b2 + c2 + d2 is achieved when a = b = c = d = 14 , the maximum value is 
+
+a2 + b2 + c2 + d2 =
+
+ 14
+
+2
+
++
+
+ 14
+
+2
+
++
+
+ 14
+
+2
+
++
+
+ 14
+
+2
+
+= 116 + 116 + 116 + 116 = 416 = 14 .
+
+However, we can see that the previous step is incorrect. The correct maximum value is simply the upper bound we found in Step 2, which is 1. The final answer is: 1
+
+Table 9: Qualitative comparison on the MATH dataset between the base Llama-3.1-8B-Instruct-Step-DPO model and Llama-3.1-8B-Instruct-SFS-DPO-R. While Step-DPO arrives at an incorrect conclusion due to flawed inequality reasoning, SFS-DPO-R identifies the mistake, revises its reasoning, and recovers the correct maximum value. 
+
+16 Problem In a right triangle, the leg opposite angle x is 42 units long and the hypotenuse is 59 units long. Which of the following is NOT true: (A) sin x = 42 59 (B) sin(90 ◦ −x) = 42 59 
+
+(C) cos(90 ◦ − x) = 42 59 (D) sin(90 ◦ − x) − cos = 0 
+
+Base Model Step 1: We know that in a right triangle, the sine of an angle is equal to the length of the opposite side divided by the length of the hypotenuse. So, sin x = 42 59 . This means that statement A is true. Step 2: We also know that sin(90 ◦ − x) is equal to the cosine of the angle x. So, 
+
+sin(90 ◦ − x) = cos x. And we know that cos x = 42 59 . So, sin(90 ◦ − x) = 42 59 . This means that statement B is true. Step 3: We also know that cos(90 ◦ − x) is equal to the sine of the angle x. So, 
+
+cos(90 ◦ − x) = sin x. And we know that sin x = 42 59 . So, cos(90 ◦ − x) = 42 59 . This means that statement C is true. Step 4: However, statement D says that sin(90 ◦ − x) − cos = 0 . But we just found out that sin(90 ◦ − x) = cos x and cos x = 42 59 . So, sin(90 ◦ − x) − cos = 42 59 − 42 59 = 0 .This means that statement D is also true. « Repeated block » « Repeated block » « Repeated block » « Repeated block » No answer 
+
+SFS-DPO-R Step 1: We know that in a right triangle, the sine of an angle is defined as the ratio of the length of the side opposite the angle to the length of the hypotenuse. So, 
+
+sin x = 42 59 , which means statement A is true. Step 2: We also know that sin(90 ◦ − x) is equal to the cosine of the angle x. This is a well-known identity in trigonometry. So, sin(90 ◦ − x) = cos x. And we know that 
+
+cos x = 42 59 , which means statement B is true. Step 3: We also know that cos(90 ◦ − x) is equal to the sine of the angle x. This is another well-known identity in trigonometry. So, cos(90 ◦ − x) = sin x. And we know that sin x = 42 59 , which means statement C is true. Step 4: However, statement D says sin(90 ◦ − x) − cos = 0 . But we just established that sin(90 ◦ −x) = cos x and cos x = 42 59 . So, sin(90 ◦ −x)−cos = cos x−cos x = 0 .This means statement D is true. So, all the statements A, B, C, and D are true. But the question asks for the statement that is NOT true. So, there must be a mistake in our reasoning. Let’s retrace our steps. Upon closer inspection, we realize that in step 4, we assumed that sin(90 ◦−x) = cos x.But this is not correct. The correct identity is sin(90 ◦ − x) = cos x. So, statement B should be sin(90 ◦ − x) = cos x, not sin(90 ◦ − x) = 42 59 . With this correction, we can see that statement B is not true. So, the statement that is NOT true is B. The answer is: B
+
+> Table 10: Qualitative comparison on the Gaokao2023 dataset between the base Qwen2-7B-SFT model and Qwen2-7B-SFT-SFS-DPO-R. While the base model produces a seemingly coherent but incomplete reasoning trajectory, SFS-DPO-R explicitly identifies the source of error at the step level and revises the flawed reasoning, ultimately leading to the correct final answer.
+
+17 Problem A chord of a circle is perpendicular to a radius at the midpoint of the radius. The ratio of the area of the larger of the two regions into which the chord divides the circle to the smaller can be expressed in the form aπ + b√cdπ − e√f , where a, b, c, d, e, and f are positive integers, a and e are relatively prime, and neither c nor f is divisible by the square of any prime. Find the remainder when the product a · b · c · d · e · f is divided by 1000. Base Model Step 1: Draw a diagram. Step 2: Label the radius of the circle r.Step 3: Draw the chord and the two radii that are perpendicular to the chord. ... Step 11: Find the product a · b · c · d · e · f .Step 12: Find the remainder when the product is divided by 1000. The final answer is 
+
+120 .
+
+SFS-DPO-R Step 1: Given a circle with radius R, a chord is perpendicular to a radius at the midpoint of the radius. This means the distance from the center of the circle to the chord is  
+
+> R
+> 2
+
+. The length of the chord can be found using the Pythagorean theorem in the right triangle formed by the radius, half the chord, and the distance from the center to the chord. The length of half the chord is 
+
+q
+
+R2 −   R
+
+> 2
+
+2 =
+
+q
+
+R2 − R2 
+
+> 4
+
+=
+
+q 3R2 
+
+> 4
+
+= R√32 .Therefore, the length of the chord is R√3.Step 2: The area of the circle is πR 2. To find the area of the smaller region formed by the chord, we need to calculate the area of the circular segment. The angle subtended by the chord at the center of the circle can be found using the cosine rule in the triangle formed by two radii and the chord. The cosine of the angle θ is given by 
+
+cos θ = ( R 
+
+> 2
+
+)2+( R 
+
+> 2
+
+)2−R2   
+
+> 2·R
+> 2·R
+> 2
+
+= R24 + R24 −R2
+
+> R22
+
+= R22 −R2
+
+> R22
+
+= − R22
+
+> R22
+
+= −1. However, this is incorrect because we need to consider the angle subtended by the chord on the circle, which is 2θ = 2 cos −1  − 12
+
+ = 2 · 2π 
+
+> 3
+
+= 2π 
+
+> 3
+
+.Step 2: The area of the sector with angle 2π 
+
+> 3
+
+is 13 πR 2. The area of the triangle formed by the two radii and the chord is 12 R2 sin   2π
+
+> 3
+
+ = 12 R2 · 
+
+> √32
+
+= R2√34 . Therefore, the area of the smaller segment is 13 πR 2 − R2√34 = R2
+
+ π 
+
+> 3
+
+−
+
+> √34
+
+
+
+.... Step 6: To find the remainder when the product a · b · c · d · e · f is divided by 1000, we identify a = 8 , b = 3 , c = 3 , d = 4 , e = 3 , and f = 3 . The product is 
+
+8 · 3 · 3 · 4 · 3 · 3 = 2592 . The remainder when 2592 is divided by 1000 is 592 .Thus, the answer is 592 .
+
+Table 11: Qualitative comparison on the MATH dataset between the base Qwen2.5-Math-7B-Instruct model and Qwen2.5-Math-7B-Instruct-SFS-DPO-R. SFS-DPO-R demonstrates explicit self-correction by detecting and revising an incorrect intermediate reasoning step, ultimately recovering the correct solution, while the base model produces an incorrect answer without correction. 
+
+18 Problem A regular octagon ABCDEF GH has an area of one square unit. What is the area of the rectangle ABEF ? [asy] pair A,B,C,D,I,F,G,H; A=(-1,1); B=(1,1); H=(-2.41,-0.41); C=(2.41,-0.41); G=(-2.41,-2.41); D=(2.41,-2.41); F=(-1,-3.82); I=(1,-3.82); draw(A–B–C–D–I–F–G–H–cycle,linewidth(0.7)); label(" A",A,N); label(" B",B,N); label(" C",C,E); label(" D",D,E); label(" E",I,S); label(" F ",F,S); label(" G",G,W); label(" H",H,W); [/asy] Base Model Step 1: Understand the structure of the regular octagon and the rectangle ABEF .A regular octagon can be divided into 8 isosceles triangles, each with a central angle of 45 ◦. The area of the octagon is given as 1 square unit. ... Step 4: Calculate the area of the rectangle ABEF .Since each triangle has an area of 18 square units, the area of the rectangle ABEF 
+
+(which is composed of two such triangles) is: Area of ABEF = 2 × 18 = 28 = 14 square units Thus, the area of the rectangle ABEF is: 
+
+14
+
+SFS-DPO-R Step 1: Understanding the Geometry of the Regular Octagon A regular octagon can be divided into 8 isosceles triangles by drawing lines from the center to each vertex. Each of these triangles has a central angle of 360 ◦ 
+
+> 8
+
+= 45 ◦.... Step 5: Calculating the Area of the Rectangle ABEF The rectangle ABEF can be seen as composed of two isosceles triangles and a central square. Each isosceles triangle has an area of 18 of the octagon’s area, which is 18 square units. Since there are two such triangles in the rectangle, their combined area is 2 × 18 = 14 square units. The central square, which is part of the rectangle, has an area equal to the remaining part of the octagon after removing the 8 isosceles triangles. The area of the central square is 1 − 8 × 18 = 1 − 1 = 0 (this is incorrect, so we need to re-evaluate). The correct approach is to recognize that the central square’s area is the remaining part after removing the 4 pairs of triangles, which is 1 − 4 × 14 = 1 − 12 = 12 .Thus, the area of the rectangle ABEF is the sum of the areas of the two isosceles triangles and the central square: Area of ABEF = 14 + 12 = 14 + 24 = 34
+
+Therefore, the area of the rectangle ABEF is 12 .
+
+> Table 12: Qualitative comparison on the MATH dataset between the base Qwen2.5-14B-Instruct model and Qwen2.5-14B-Instruct-SFS-DPO-R. SFS-DPO-R exhibits self-correction by identifying that the initial decomposition of rectangle ABEF is incomplete, but its revised reasoning remains internally inconsistent, leading to an incorrect final answer despite attempting correction.
+
+19 Problem Patrick has three glue sticks that are partially used. One has 1/6 left, the second has 
+
+2/3 left, and the third one has 1/2 left. If a glue stick is 12 millimeters long originally, what is the total length of the glue sticks that are not used? Step-DPO Step 1: Interpret the given fractions. The response incorrectly treats the fractions left as if they should be converted into fractions already used. It therefore claims that the first, second, and third glue sticks have 5/6, 1/3, and 1/2 used, respectively. Step 2: Calculate the lengths. It calculates 12   56
+
+ = 10 mm, 12   13
+
+ = 4 mm, and 
+
+12   12
+
+ = 6 mm. Step 3: Return the result. The total used length is 10 + 4 + 6 = 20 mm. The final answer is 20 .
+
+SFS-DPO-R Step 1: Interpret “not used.” The response initially considers computing the unused length using the complement of a used fraction. But wait—the question says that the glue sticks have 1/6, 2/3, and 1/2 left. Therefore, the fractions left are already the unused portions; they should not be converted into their complements. Step 2: Correct the calculation. The unused lengths are 12   16
+
+ = 2 mm, 12   23
+
+ = 8 
+
+mm, and 12   12
+
+ = 6 mm. Step 3: Return the corrected result. Thus, the total unused length is 2 + 8 + 6 = 16 
+
+mm, and the final answer is 16 .
+
+> Table 13: Qualitative comparison on GSM8K between Qwen3-8B-Step-DPO and Qwen3-8B-SFS-DPO-R. Step-DPO mistakes the fractions left for fractions used and returns incorrect answer, whereas SFS-DPO-R identifies the interpretation error and correctly returns groundtruth answer.
+
+20

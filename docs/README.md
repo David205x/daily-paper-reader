@@ -6,71 +6,95 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-08-11
-- 运行时间：2026-08-11 21:14:46 UTC
+- 最新运行日期：2026-08-15
+- 运行时间：2026-08-15 20:54:33 UTC
 - 运行状态：成功
-- 本次总论文数：17
-- 精读区：6
+- 本次总论文数：25
+- 精读区：14
 - 速读区：11
 
 ### 今日简报（AI）
-今日共读17篇论文，其中6篇精读，重点集中在多模态大模型策略优化与上下文价值对齐。最值得关注的是两篇9.0分精读：《Multi-Branch Policy Optimization》与《Contextual Value Alignment》，分别指向多模态策略分支与多层组合融合的对齐新思路。普通读者可优先浏览8.0分速读中的RoMeRL与BOUND，了解自进化体记忆与偏好蒸馏的实用进展。
-- 详情：[/202608/11/README](/202608/11/README)
+今日完成25篇论文扫描，精读14篇、速读11篇，其中两篇获9.0高分。最值得关注的是LLM智能体信用分配的Gated-BEPO与编码智能体训练的DiDPO，均达到9.0/10。若时间有限，可先从速读中TRACE可信检索增强引擎及MemOPD长程智能体蒸馏看起。
+- 详情：[/202608/15/README](/202608/15/README)
 
 ### 精读区论文标签
-1. [Multi-Branch Policy Optimization for Multimodal Large Language Models](/202608/11/2608.07581v1-multi-branch-policy-optimization-for-multimodal-large-language-models)  
+1. [Gated-BEPO: Confidence-Gated Bellman Credit Assignment for Large Language Model Agents](/202608/15/2608.06861v1-gated-bepo-confidence-gated-bellman-credit-assignment-for-large-language-model-agents)  
    标签：评分：9.0/10、query:rl
-   evidence：面向多模态LLM推理的树状多分支策略优化
-2. [Contextual Value Alignment via Multilayer Combinatorial Fusion](/202608/11/2608.07642v1-contextual-value-alignment-via-multilayer-combinatorial-fusion)  
+   evidence：面向LLM智能体长程任务的强化学习信用分配与置信门控
+2. [DiDPO: Diff-in-Diff Policy Optimization for Coding Agent Training](/202608/15/2608.07147v1-didpo-diff-in-diff-policy-optimization-for-coding-agent-training)  
    标签：评分：9.0/10、query:rl
-   evidence：面向大模型价值对齐，针对RLHF等方法的局限提出多代理组合融合框架
-3. [StructReward: Efficient Structured Process Rewards for Self-Correcting Multimodal Reasoning](/202608/11/2608.08326v1-structreward-efficient-structured-process-rewards-for-self-correcting-multimodal-reasoning)  
+   evidence：基于可验证奖励的代码智能体差分策略优化
+3. [Learning from Environmental Feedback: Credit Assignment across Multiple Timescales for Agentic Reinforcement Learning](/202608/15/2608.08255v1-learning-from-environmental-feedback-credit-assignment-across-multiple-timescales-for-agentic-reinforcement-learning)  
    标签：评分：9.0/10、query:rl
-   evidence：提出了面向多模态推理RLVR的结构化分步过程奖励
-4. [Improving Generalization Robustness of Multimodal RLVR](/202608/11/2608.08802v1-improving-generalization-robustness-of-multimodal-rlvr)  
+   evidence：利用环境反馈进行多时间尺度信用分配，适用于agentic RL奖励设计
+4. [StructReward: Efficient Structured Process Rewards for Self-Correcting Multimodal Reasoning](/202608/15/2608.08326v2-structreward-efficient-structured-process-rewards-for-self-correcting-multimodal-reasoning)  
    标签：评分：9.0/10、query:rl
-   evidence：修复多模态大模型RLVR中的奖励函数问题
-5. [From Relevance to Execution Utility: Reward-Aware Dynamic Execution Gating for Skill-Based LLM Agents](/202608/11/2608.09168v1-from-relevance-to-execution-utility-reward-aware-dynamic-execution-gating-for-skill-based-llm-agents)  
+   evidence：为多模态推理中的RLVR设计结构化过程奖励
+5. [RISE-RL: Rubric-Informed Selective Exploration for Open-Ended Reinforcement Learning](/202608/15/2608.09123v1-rise-rl-rubric-informed-selective-exploration-for-open-ended-reinforcement-learning)  
    标签：评分：9.0/10、query:rl
-   evidence：基于奖励感知的执行门控用于大语言模型智能体技能执行
-6. [Beyond Solvability: Task Learnability as a Static Prior for LLM RL Post-Training](/202608/11/2608.09217v1-beyond-solvability-task-learnability-as-a-static-prior-for-llm-rl-post-training)  
+   evidence：基于评分准则的RL选择性探索用于大模型对齐；直接契合RLHF与奖励设计
+6. [Procedural Fairness Failures in RLHF from Preference Averaging](/202608/15/2608.10126v1-procedural-fairness-failures-in-rlhf-from-preference-averaging)  
    标签：评分：9.0/10、query:rl
-   evidence：提出任务可学习性作为LLM强化学习后训练中的静态采样先验
+   evidence：RLHF中偏好平均导致公平性失效，提出偏好感知RLHF
+7. [Efficient Reinforcement Learning for Long-Horizon Tool-Use Agentic Tasks](/202608/15/2608.10357v1-efficient-reinforcement-learning-for-long-horizon-tool-use-agentic-tasks)  
+   标签：评分：9.0/10、query:rl
+   evidence：面向长时程工具使用智能体的高效强化学习系统
+8. [Reinforcing Step-level Reasoning for Effective Self-Correction in LLMs](/202608/15/2608.11573v1-reinforcing-step-level-reasoning-for-effective-self-correction-in-llms)  
+   标签：评分：9.0/10、query:rl
+   evidence：基于强化学习的步骤级偏好优化，用于大语言模型推理自我纠正
+9. [Retry, Switch, or Abstain? Learning Strategy-Aware Tool-Use Policies via Controlled Error Injection](/202608/15/2608.11977v1-retry-switch-or-abstain-learning-strategy-aware-tool-use-policies-via-controlled-error-injection)  
+   标签：评分：9.0/10、query:rl
+   evidence：面向LLM智能体的工具使用策略学习，贴近任务自动化
+10. [Token-Level Credit Assignment Optimization for Generative Document Retrieval](/202608/15/2608.12049v1-token-level-credit-assignment-optimization-for-generative-document-retrieval)  
+   标签：评分：9.0/10、query:rl
+   evidence：面向生成式检索RL的token级信用分配与奖励分解
+11. [SAG: SQL-Retrieval Augmented Generation with Query-Time Dynamic Hyperedges](/202608/15/2608.12129v1-sag-sql-retrieval-augmented-generation-with-query-time-dynamic-hyperedges)  
+   标签：评分：9.0/10、query:rl
+   evidence：基于SQL检索的动态超边增强生成，用于结构化和多跳知识访问
+12. [A Framework for Designing Reward Functions: From Objectives to Features to Human-Aligned Reward Functions](/202608/15/2608.12302v1-a-framework-for-designing-reward-functions-from-objectives-to-features-to-human-aligned-reward-functions)  
+   标签：评分：9.0/10、query:rl
+   evidence：面向人类对齐奖励函数的正式设计流程，涵盖目标、结果变量和偏好拟合
+13. [Better Decomposition, Free Aggregation: A Synthesizer-Folding Framework for Multilingual Multi-Hop Question Answering](/202608/15/2608.13160v1-better-decomposition-free-aggregation-a-synthesizer-folding-framework-for-multilingual-multi-hop-question-answering)  
+   标签：评分：9.0/10、query:rl
+   evidence：面向多语言多跳问答的检索增强生成
+14. [Teach the Magnitude, Not the Direction: Verifier-Bounded Credit Assignment for Multi-Turn Multi-step LLM Agents](/202608/15/2608.13179v1-teach-the-magnitude-not-the-direction-verifier-bounded-credit-assignment-for-multi-turn-multi-step-llm-agents)  
+   标签：评分：9.0/10、query:rl
+   evidence：面向多轮LLM智能体的RL信用分配与奖励信号设计
 
 ### 速读区论文标签
-1. [RoMeRL: Balancing Feedback Coverage and the Memory-Reward Trap in Self-Evolving Agent Memory via Reduced-Order Utility States](/202608/11/2608.02508v3-romerl-balancing-feedback-coverage-and-the-memory-reward-trap-in-self-evolving-agent-memory-via-reduced-order-utility-states)  
+1. [Progressive Content Refinement with Decaying Reward Joint LinUCB](/202608/15/2608.06750v1-progressive-content-refinement-with-decaying-reward-joint-linucb)  
    标签：评分：8.0/10、query:rl
-   evidence：面向自进化大模型智能体的记忆系统引入RL，解决奖励分配与反馈覆盖问题
-2. [Control-Diverse Reinforcement Fine-Tuning: Decoupling the Shared Control Bottleneck of RL Post-Training](/202608/11/2608.08224v1-control-diverse-reinforcement-fine-tuning-decoupling-the-shared-control-bottleneck-of-rl-post-training)  
+   evidence：面向LLM迭代优化的含奖励衰减建模的上下文赌博机算法
+2. [MemOPD: On-Policy Distillation through Memory State Alignment for Long-Horizon Agents](/202608/15/2608.07068v1-memopd-on-policy-distillation-through-memory-state-alignment-for-long-horizon-agents)  
    标签：评分：8.0/10、query:rl
-   evidence：分析大模型强化微调的内部控制机制，提出后训练控制系数度量组件对奖励增益的控制作用
-3. [BOUND: Brief-Guided Corrective Preference Distillation at Search-Control Boundaries](/202608/11/2608.08768v1-bound-brief-guided-corrective-preference-distillation-at-search-control-boundaries)  
+   evidence：面向长时程LLM智能体的在线策略蒸馏与PPO训练，属智能体策略优化
+3. [TRACE: Trustworthy Retrieval-Augmented Conversational Engine](/202608/15/2608.10176v1-trace-trustworthy-retrieval-augmented-conversational-engine)  
    标签：评分：8.0/10、query:rl
-   evidence：通过偏好蒸馏修正多步搜索推理中的漂移
-4. [MoRSE: Task-Oriented Multi-Agent System with Mixture of Role-Subtask Experts](/202608/11/2608.09251v1-morse-task-oriented-multi-agent-system-with-mixture-of-role-subtask-experts)  
+   evidence：用于约束感知对话推荐的检索增强生成
+4. [TideRL: Boosting Agentic RL Goodput with Readiness-Aware Scheduling](/202608/15/2608.10402v1-tiderl-boosting-agentic-rl-goodput-with-readiness-aware-scheduling)  
    标签：评分：8.0/10、query:rl
-   evidence：基于LLM的多智能体系统，通过角色-子任务条件化参数特化实现复杂任务自动化
-5. [Learning Preference Adaptation for Large Language Model Personalization via Verbal Reinforcement Learning](/202608/11/2608.09507v1-learning-preference-adaptation-for-large-language-model-personalization-via-verbal-reinforcement-learning)  
-   标签：评分：8.0/10、query:rl
-   evidence：通过语言化强化学习进行任务特定偏好适配，以改进LLM对齐
-6. [Bidirectional Context Self-Distillation for Reinforcement Learning of Skill-Based LLM Agents](/202608/11/2608.09555v1-bidirectional-context-self-distillation-for-reinforcement-learning-of-skill-based-llm-agents)  
-   标签：评分：8.0/10、query:rl
-   evidence：改进LLM智能体技能利用的强化学习框架
-7. [SkillReason: Reasoning-Enhanced Agent Skill Retrieval for Implicit User Requests](/202608/11/2608.08640v1-skillreason-reasoning-enhanced-agent-skill-retrieval-for-implicit-user-requests)  
+   evidence：面向多轮智能体大模型RL工作负载的系统优化
+5. [TEMPO: Semantic-Action Decoupled RL Post-Training for Vision-Language-Action Models](/202608/15/2608.07314v1-tempo-semantic-action-decoupled-rl-post-training-for-vision-language-action-models)  
    标签：评分：7.0/10、query:rl
-   evidence：面向隐含请求的智能体技能检索推理框架
-8. [DistillCache: KL-Guided Adaptive KV-Cache Eviction for Memory-Efficient LLM Inference](/202608/11/2608.08878v1-distillcache-kl-guided-adaptive-kv-cache-eviction-for-memory-efficient-llm-inference)  
+   evidence：面向视觉-语言-动作模型的语义-动作解耦强化学习后训练
+6. [TrustRoboReward: Preference-Ordered Isotonic Score Editing for Multi-Paradigm Robot Reward Models](/202608/15/2608.08491v1-trustroboreward-preference-ordered-isotonic-score-editing-for-multi-paradigm-robot-reward-models)  
    标签：评分：7.0/10、query:rl
-   evidence：将KV缓存淘汰建模为序贯决策，用REINFORCE学习淘汰策略，优化大模型推理内存
-9. [Different Feedback, Different Updates: Selective Self-Learning from User Interactions for Large Language Models](/202608/11/2608.09109v1-different-feedback-different-updates-selective-self-learning-from-user-interactions-for-large-language-models)  
+   evidence：为RLHF、DPO和Bradley-Terry框架设计奖励模型
+7. [Tree-of-Experience: Hierarchical Experience Management for Self-Evolving Agents](/202608/15/2608.09044v1-tree-of-experience-hierarchical-experience-management-for-self-evolving-agents)  
    标签：评分：7.0/10、query:rl
-   evidence：从用户反馈中进行选择性自学习，按更新范围分解，用于LLM对齐
-10. [Stateful Multi-Agent LLMs for Cross-View Interface Alignment in Automotive Model-Based Systems Engineering](/202608/11/2608.08038v1-stateful-multi-agent-llms-for-cross-view-interface-alignment-in-automotive-model-based-systems-engineering)  
+   evidence：自进化智能体的分层经验管理；提升智能体任务自动化能力
+8. [Evo-Bench: Can Language Models Improve Agent Harness?](/202608/15/2608.09096v1-evo-bench-can-language-models-improve-agent-harness)  
+   标签：评分：7.0/10、query:rl
+   evidence：评估智能体自主改进运行框架的基准；关联大模型智能体任务自动化
+9. [PluginEval: A Diagnostic Benchmark for Fine-Grained Error Attribution in Function Calling](/202608/15/2608.08700v1-plugineval-a-diagnostic-benchmark-for-fine-grained-error-attribution-in-function-calling)  
    标签：评分：6.0/10、query:rl
-   evidence：在多智能体LLM流水线中使用VSS检索增强生成处理知识密集型工程验证
-11. [SodaMem: Evidence-Grounded Temporal Graph Memory for LLM Agents](/202608/11/2608.08055v1-sodamem-evidence-grounded-temporal-graph-memory-for-llm-agents)  
+   evidence：面向LLM自主智能体工具路由的诊断基准
+10. [Learning from Consensus and Disagreement: Unsupervised On-Policy Self-Distillation with Minority-Trajectory Contrast](/202608/15/2608.08764v1-learning-from-consensus-and-disagreement-unsupervised-on-policy-self-distillation-with-minority-trajectory-contrast)  
    标签：评分：6.0/10、query:rl
-   evidence：面向LLM智能体的证据支撑时间图记忆
+   evidence：面向大模型多步推理的在线策略自蒸馏，利用少数轨迹对比且无需外部监督
+11. [Evo-Bench: Can Language Models Improve Agent Harness?](/202608/15/2608.09096v2-evo-bench-can-language-models-improve-agent-harness)  
+   标签：评分：6.0/10、query:rl
+   evidence：面向大模型智能体自主优化运行框架能力的基准测试，关联任务自动化
 
 
 <div class="dpr-home-promo-card">
