@@ -1,133 +1,12 @@
 {
-  "generated_at": "2026-08-15T20:38:26.012446+00:00",
-  "updated_date": "20260815",
+  "generated_at": "2026-08-16T20:29:36.180427+00:00",
+  "updated_date": "20260816",
   "carryover_days": 9,
   "tag_states": {
     "rl": {
-      "updated_date": "20260815",
+      "updated_date": "20260816",
       "carryover_days": 9,
       "items": [
-        {
-          "id": "2608.13200v1",
-          "source": "arxiv",
-          "title": "GEM: A Generative Embedding Model Bridging Reasoning and Retrieval",
-          "abstract": "Modern LLMs excel at reasoning and instruction following, enabling users to express complex and diverse information needs. However, conventional retrievers largely rely on surface-level matching between queries and documents, resulting in a growing gap between how users express their needs and how retrievers interpret them. In this paper, we present GEM, a generative embedding model that augments retrieval through its own knowledge by explicitly reasoning about user intent and relevance criteria. GEM unifies generation and embedding within a single model: it first reasons over the query, then appends an embedding token to encode the enriched context for retrieval. \\zhili{Evaluated on reasoning-intensive and instruction-following retrieval tasks, GEM demonstrates the effectiveness of its reasoning-augmented retrieval, outperforming its non-reasoning variant and matching baselines using substantially larger models.} Furthermore, GEM's generative nature allows test-time compute scaling via prompting to further enhance retrieval performance. Our code is available at: https://anonymous.4open.science/r/GEM.",
-          "authors": [
-            "Zhili Shen",
-            "Craig Macdonald"
-          ],
-          "primary_category": "cs.CL",
-          "categories": [
-            "cs.CL",
-            "cs.AI",
-            "cs.IR"
-          ],
-          "published": "2026-08-13T13:03:49+00:00",
-          "link": "https://arxiv.org/pdf/2608.13200v1",
-          "tags": [
-            "keyword:rl",
-            "query:rl"
-          ],
-          "llm_score": 8.0,
-          "llm_evidence_en": "generative embedding model that reasons for retrieval; relevant to RAG and knowledge-intensive tasks",
-          "llm_evidence_cn": "推理增强的生成式嵌入检索模型；直接关联RAG与知识密集型任务",
-          "llm_evidence": "推理增强的生成式嵌入检索模型；直接关联RAG与知识密集型任务",
-          "canonical_evidence": "推理增强的生成式嵌入检索模型；直接关联RAG与知识密集型任务",
-          "llm_tldr_en": "GEM unifies generation and embedding: it first reasons over the query, then appends an embedding token to encode enriched context for retrieval; improves retrieval on reasoning-intensive and instruction-following tasks, directly supporting knowledge-intensive applications.",
-          "llm_tldr_cn": "传统检索器依赖查询与文档的表面匹配，难以理解用户复杂的真实信息需求。该文提出生成式嵌入模型GEM，在单一模型内统一生成与嵌入：先对查询进行显式推理，再追加嵌入token对丰富后的上下文进行编码用于检索。在推理密集型与指令跟随检索任务上，GEM展现出优于表面匹配检索器的效果。这项工作将大模型的推理能力注入检索过程，能为检索增强生成与知识密集型任务提供更可靠的检索基础。",
-          "llm_tldr": "传统检索器依赖查询与文档的表面匹配，难以理解用户复杂的真实信息需求。该文提出生成式嵌入模型GEM，在单一模型内统一生成与嵌入：先对查询进行显式推理，再追加嵌入token对丰富后的上下文进行编码用于检索。在推理密集型与指令跟随检索任务上，GEM展现出优于表面匹配检索器的效果。这项工作将大模型的推理能力注入检索过程，能为检索增强生成与知识密集型任务提供更可靠的检索基础。",
-          "llm_tags": [
-            "query:rl"
-          ],
-          "matched_query_tag": "query:rl",
-          "matched_query_text": "retrieval augmented generation for knowledge intensive tasks",
-          "matched_requirement_id": "req-8",
-          "selection_source": "carryover_cache",
-          "paper_id": "2608.13200v1",
-          "carry_days": 1
-        },
-        {
-          "id": "2608.10676v1",
-          "source": "arxiv",
-          "title": "Self-Correcting Long-Horizon Search Agents via Tree-Structured Memory",
-          "abstract": "Large language model (LLM)-based search agents answer questions through multi-step interactions with external environments. However, providing complete execution trajectories to the LLM causes unbounded context growth and introduces noise. Existing compression methods reduce context at the cost of important details and often replace erroneous facts without repairing downstream reasoning derived from them. To address this problem, we propose ReTree, a self-correcting tree-structured memory mechanism for search agents. ReTree constructs a bounded per-step reasoning context while preserving source-linked evidence. It models search as an evidence tree whose nodes store bounded summaries, evidence, and revision histories. When newly retrieved evidence contradicts an earlier claim, ReTree traces back to the node where the claim was introduced, replaces outdated evidence, regenerates summaries, prunes affected branches, and resumes search. Source-grounded evidence provenance supports reliable conflict localization and keeps final claims traceable to retrieved passages. Experiments on four public question-answering and search benchmarks show that ReTree consistently outperforms Full-Trajectory ReAct, improving answer accuracy by up to 25.6 percentage points (pp); the average maximum per-step reasoning context of Full-Trajectory ReAct is $1.27$--$1.51\\times$ that of ReTree. These results establish ReTree as an effective self-correcting memory abstraction for long-horizon search.",
-          "authors": [
-            "Aijun Yang",
-            "Qianxue Guo",
-            "Ziyi Huang",
-            "Yuxuan Chen",
-            "Shiyou Qian",
-            "Jian Cao"
-          ],
-          "primary_category": "cs.AI",
-          "categories": [
-            "cs.AI"
-          ],
-          "published": "2026-08-11T08:56:42+00:00",
-          "link": "https://arxiv.org/pdf/2608.10676v1",
-          "tags": [
-            "keyword:rl",
-            "query:rl"
-          ],
-          "llm_score": 8.0,
-          "llm_evidence_en": "LLM search agents for long-horizon task automation with self-correcting tree memory",
-          "llm_evidence_cn": "面向长程任务自动化的LLM搜索智能体，使用自纠正树状记忆",
-          "llm_evidence": "面向长程任务自动化的LLM搜索智能体，使用自纠正树状记忆",
-          "canonical_evidence": "面向长程任务自动化的LLM搜索智能体，使用自纠正树状记忆",
-          "llm_tldr_en": "LLM search agents struggle with unbounded context and noise; ReTree introduces a bounded tree-structured memory preserving source-linked evidence and enabling self-correction for long-horizon multi-step question answering.",
-          "llm_tldr_cn": "针对LLM搜索智能体在长程交互中上下文无界增长且噪声累积的问题，ReTree提出了树状结构记忆机制，将搜索过程建模为证据树，节点存储有界摘要、证据与修订历史，在压缩上下文的同时保留可追溯证据并支持自纠正。实验表明该机制能有效修复错误而不破坏下游推理，为长期搜索任务提供更稳健的上下文管理方案。",
-          "llm_tldr": "针对LLM搜索智能体在长程交互中上下文无界增长且噪声累积的问题，ReTree提出了树状结构记忆机制，将搜索过程建模为证据树，节点存储有界摘要、证据与修订历史，在压缩上下文的同时保留可追溯证据并支持自纠正。实验表明该机制能有效修复错误而不破坏下游推理，为长期搜索任务提供更稳健的上下文管理方案。",
-          "llm_tags": [
-            "query:rl"
-          ],
-          "matched_query_tag": "query:rl",
-          "matched_query_text": "large language model agents for task automation",
-          "matched_requirement_id": "req-4",
-          "selection_source": "carryover_cache",
-          "paper_id": "2608.10676v1",
-          "carry_days": 1
-        },
-        {
-          "id": "2608.13173v1",
-          "source": "arxiv",
-          "title": "SkillShapley: Boundary-Adaptive Shapley Valuation for Skill Step Attribution in LLM Agents",
-          "abstract": "Agent skills are crucial external instructions that enable language agents to execute long procedural tasks such as coding or document processing. Existing agent skills are primarily created through human manual crafting or agent execution traces, with limited understanding of how each step contributes to overall skill performance on specific tasks; i.e., there remains an open problem in quantifying the contribution of individual steps within an agent skill. To address this issue, we first model skill-step attribution as a Shapley value-based contribution estimation problem, and then propose SkillShapley, a step-level attribution framework for agent skills. Notably, SkillShapley operates in two phases, motivated by key empirical insights, i.e., discretized benchmark rewards that create sharp performance cliffs, and step interactions that are largely additive rather than synergistic. Specifically, it first identifies informative coalitional regions, and then adaptively samples new coalitions that can yield reusable marginal evidence. Experiments on skills from the widely adopted SkillsBench demonstrate that our SkillShapley can effectively and efficiently identify high- or low-value skill steps, providing several key takeaways for agent skill creation.",
-          "authors": [
-            "Chang Liu",
-            "Yuqi Zhang",
-            "Yiman Zhong",
-            "Boyi Liu",
-            "Hengjun Wang",
-            "Shuyue Wei"
-          ],
-          "primary_category": "cs.AI",
-          "categories": [
-            "cs.AI"
-          ],
-          "published": "2026-08-13T12:41:03+00:00",
-          "link": "https://arxiv.org/pdf/2608.13173v1",
-          "tags": [
-            "keyword:rl",
-            "query:rl"
-          ],
-          "llm_score": 8.0,
-          "llm_evidence_en": "Shapley-based step attribution for improving LLM agent skills",
-          "llm_evidence_cn": "基于Shapley的步骤归因用于改进LLM智能体技能",
-          "llm_evidence": "基于Shapley的步骤归因用于改进LLM智能体技能",
-          "canonical_evidence": "基于Shapley的步骤归因用于改进LLM智能体技能",
-          "llm_tldr_en": "SkillShapley uses Shapley values to estimate individual step contributions in LLM agent skills, enabling transparent attribution and improved debugging of long procedural tasks.",
-          "llm_tldr_cn": "针对LLM智能体技能中各个步骤对整体任务表现贡献难以量化的问题，提出SkillShapley，将步骤归因建模为Shapley值估计，并设计边界自适应两阶段框架来计算每个步骤的贡献。该框架有助于理解复杂技能的执行路径，辅助智能体技能的调试与优化，是对智能体任务自动化可解释性的重要补充。",
-          "llm_tldr": "针对LLM智能体技能中各个步骤对整体任务表现贡献难以量化的问题，提出SkillShapley，将步骤归因建模为Shapley值估计，并设计边界自适应两阶段框架来计算每个步骤的贡献。该框架有助于理解复杂技能的执行路径，辅助智能体技能的调试与优化，是对智能体任务自动化可解释性的重要补充。",
-          "llm_tags": [
-            "query:rl"
-          ],
-          "matched_query_tag": "query:rl",
-          "matched_query_text": "large language model agents for task automation",
-          "matched_requirement_id": "req-4",
-          "selection_source": "carryover_cache",
-          "paper_id": "2608.13173v1",
-          "carry_days": 1
-        },
         {
           "id": "2608.11604v1",
           "source": "arxiv",
@@ -151,19 +30,19 @@
             "query:rl"
           ],
           "llm_score": 8.0,
-          "llm_evidence_en": "Learning from online user feedback for LLM shopping agents, akin to RLHF",
-          "llm_evidence_cn": "利用在线用户反馈学习改进LLM购物智能体，类似RLHF",
-          "llm_evidence": "利用在线用户反馈学习改进LLM购物智能体，类似RLHF",
-          "canonical_evidence": "利用在线用户反馈学习改进LLM购物智能体，类似RLHF",
-          "llm_tldr_en": "LOFA enables LLM shopping agents to learn from noisy, heterogeneous online user feedback without human annotation, converting real interaction logs into reliable training signals.",
-          "llm_tldr_cn": "针对大模型购物智能体依赖离线信号、忽视真实在线用户反馈的问题，提出LOFA框架，从实际交互日志中提取学习信号，无需人工标注即可持续改进智能体行为。该方法能有效应对反馈异质、稀疏、噪声大的挑战，将用户自然语言反馈转为可用的训练信号，为在线智能体的反馈学习提供了实践方案。",
-          "llm_tldr": "针对大模型购物智能体依赖离线信号、忽视真实在线用户反馈的问题，提出LOFA框架，从实际交互日志中提取学习信号，无需人工标注即可持续改进智能体行为。该方法能有效应对反馈异质、稀疏、噪声大的挑战，将用户自然语言反馈转为可用的训练信号，为在线智能体的反馈学习提供了实践方案。",
+          "llm_evidence_en": "LLM shopping agents learning from real online user feedback",
+          "llm_evidence_cn": "LLM购物智能体从在线用户反馈中学习",
+          "llm_evidence": "LLM购物智能体从在线用户反馈中学习",
+          "canonical_evidence": "LLM购物智能体从在线用户反馈中学习",
+          "llm_tldr_en": "Proposes LOFA to let LLM shopping agents learn directly from heterogeneous, sparse and noisy real-world online user feedback without human annotation, improving agent behavior from interaction logs.",
+          "llm_tldr_cn": "现有购物智能体主要依赖离线训练信号或合成偏好数据，忽视了真实在线交互中用户自然反馈的丰富监督。针对反馈异质、稀疏且噪声大的问题，论文提出LOFA框架，使智能体无需人工标注即可直接从在线交互日志中学习，将真实反馈转化为可靠的学习信号。实验表明该框架能有效利用在线反馈提升购物智能体的服务质量，为电子商务智能体的持续优化提供了新途径。",
+          "llm_tldr": "现有购物智能体主要依赖离线训练信号或合成偏好数据，忽视了真实在线交互中用户自然反馈的丰富监督。针对反馈异质、稀疏且噪声大的问题，论文提出LOFA框架，使智能体无需人工标注即可直接从在线交互日志中学习，将真实反馈转化为可靠的学习信号。实验表明该框架能有效利用在线反馈提升购物智能体的服务质量，为电子商务智能体的持续优化提供了新途径。",
           "llm_tags": [
             "query:rl"
           ],
           "matched_query_tag": "query:rl",
-          "matched_query_text": "reinforcement learning from human feedback for llm alignment",
-          "matched_requirement_id": "req-5",
+          "matched_query_text": "large language model agents for task automation",
+          "matched_requirement_id": "req-4",
           "selection_source": "carryover_cache",
           "paper_id": "2608.11604v1",
           "carry_days": 1
@@ -192,13 +71,13 @@
             "query:rl"
           ],
           "llm_score": 8.0,
-          "llm_evidence_en": "Skill-guided adaptive memory retrieval for knowledge-intensive LLM tasks",
-          "llm_evidence_cn": "技能引导的自适应记忆检索，面向知识密集型LLM任务",
-          "llm_evidence": "技能引导的自适应记忆检索，面向知识密集型LLM任务",
-          "canonical_evidence": "技能引导的自适应记忆检索，面向知识密集型LLM任务",
-          "llm_tldr_en": "ERSkill treats memory retrieval as learnable skills and uses a router to select adaptive evidence construction strategies, improving performance on heterogeneous knowledge-intensive queries.",
-          "llm_tldr_cn": "针对LLM智能体长期记忆检索机制固定不变、难以适应异构查询的问题，提出ERSkill框架，将交互历史编译为结构化记忆库，并把检索行为表示为可执行技能。路由模块在推理时动态匹配最优技能以构建定制化证据，实验表明该方法在异构记忆查询上优于静态检索，为知识密集任务的适应性证据检索提供了新思路。",
-          "llm_tldr": "针对LLM智能体长期记忆检索机制固定不变、难以适应异构查询的问题，提出ERSkill框架，将交互历史编译为结构化记忆库，并把检索行为表示为可执行技能。路由模块在推理时动态匹配最优技能以构建定制化证据，实验表明该方法在异构记忆查询上优于静态检索，为知识密集任务的适应性证据检索提供了新思路。",
+          "llm_evidence_en": "Self-evolving skill-guided memory retrieval for LLM agents, directly relevant to retrieval-augmented generation",
+          "llm_evidence_cn": "面向LLM智能体的自演化技能引导记忆检索，与检索增强生成直接相关",
+          "llm_evidence": "面向LLM智能体的自演化技能引导记忆检索，与检索增强生成直接相关",
+          "canonical_evidence": "面向LLM智能体的自演化技能引导记忆检索，与检索增强生成直接相关",
+          "llm_tldr_en": "ERSkill treats memory retrieval in LLM agents as evolvable skills, using a trained router to match queries to optimal retrieval skills for constructing evidence in answer generation.",
+          "llm_tldr_cn": "大模型智能体的长期记忆检索机制通常是静态的，难以适应多样化查询。ERSkill将检索行为表示为可执行技能，并把交互历史组织成结构化记忆库，通过训练路由器动态选择最优技能来构造证据。该方法使智能体能够根据查询自适应调整检索策略，提升基于记忆的问答生成质量，展示了检索组件的可演化性。",
+          "llm_tldr": "大模型智能体的长期记忆检索机制通常是静态的，难以适应多样化查询。ERSkill将检索行为表示为可执行技能，并把交互历史组织成结构化记忆库，通过训练路由器动态选择最优技能来构造证据。该方法使智能体能够根据查询自适应调整检索策略，提升基于记忆的问答生成质量，展示了检索组件的可演化性。",
           "llm_tags": [
             "query:rl"
           ],
@@ -207,85 +86,6 @@
           "matched_requirement_id": "req-8",
           "selection_source": "carryover_cache",
           "paper_id": "2608.12720v1",
-          "carry_days": 1
-        },
-        {
-          "id": "2608.10538v1",
-          "source": "arxiv",
-          "title": "SKILLER: Language-Level Reinforcement Learning for Reusable Skill Extraction in Small Language Models",
-          "abstract": "Agent skills represent a standardized format for packaging procedural knowledge and domain expertise, serving within agent harness systems as an essential mechanism to continually constrain a language model's behavior space for repeatable, high-quality task execution. However, because strong closed-source models entail high inference costs, current popular agent harnesses, such as Codex and OpenClaw, remain prohibitively expensive when deploying these skills to accomplish real-world tasks. The rapid capability enhancement of open-source models deployable on consumer-grade GPUs presents a compelling opportunity to drastically reduce these costs by leveraging skill-based behavioral constraints. Nevertheless, automatically generating effective skills tailored specifically for such compact models remains a significant practical challenge. To address this, we propose SKILLER, a natural-language-driven reinforcement learning framework designed to automatically generate executor-specific skills for small models, which employs a strong model as the actor and critic, treats the small-model agent system as the environment, and propagates all reinforcement learning signals entirely via natural language. Extensive experimental evaluations across five relevant benchmarks using Qwen3.5-9B and Qwen3.5-4B demonstrate that SKILLER outperforms three open-source and one closed-source skill generation or evolution methods, achieving absolute gains ranging from 4.3 to 20.4 percentage points for the 9B model and 1.8 to 13.3 points for the 4B model, while remarkably matching the performance of strong closed-source models on single-skill tasks in SkillsBench. The project is available at https://github.com/DANG-ai/SKILLER.",
-          "authors": [
-            "Chenhao Dang",
-            "Siyuan Xiong",
-            "Conghui He",
-            "Weijia Li"
-          ],
-          "primary_category": "cs.AI",
-          "categories": [
-            "cs.AI"
-          ],
-          "published": "2026-08-11T06:22:02+00:00",
-          "link": "https://arxiv.org/pdf/2608.10538v1",
-          "tags": [
-            "keyword:rl",
-            "query:rl"
-          ],
-          "llm_score": 8.0,
-          "llm_evidence_en": "language-level reinforcement learning for reusable skill extraction in small language models",
-          "llm_evidence_cn": "在小语言模型上使用语言级强化学习进行可复用技能抽取",
-          "llm_evidence": "在小语言模型上使用语言级强化学习进行可复用技能抽取",
-          "canonical_evidence": "在小语言模型上使用语言级强化学习进行可复用技能抽取",
-          "llm_tldr_en": "SKILLER applies language-level reinforcement learning to extract reusable skills from small language models, enabling low-cost agent harnesses on consumer-grade GPUs while preserving task execution quality.",
-          "llm_tldr_cn": "该论文指出闭源模型驱动的智能体技能执行成本高，难以在消费级GPU上部署。为此提出SKILLER，一种针对小语言模型的语言级强化学习方法，用于自动抽取可复用的技能，从而降低智能体系统的部署成本。实验表明，SKILLER能从小模型中提取高质量技能，并在保持任务执行质量的同时大幅减少推理开销。该工作为开源模型在真实智能体应用中的实用化提供了新的技术路径。",
-          "llm_tldr": "该论文指出闭源模型驱动的智能体技能执行成本高，难以在消费级GPU上部署。为此提出SKILLER，一种针对小语言模型的语言级强化学习方法，用于自动抽取可复用的技能，从而降低智能体系统的部署成本。实验表明，SKILLER能从小模型中提取高质量技能，并在保持任务执行质量的同时大幅减少推理开销。该工作为开源模型在真实智能体应用中的实用化提供了新的技术路径。",
-          "llm_tags": [
-            "query:rl"
-          ],
-          "matched_query_tag": "query:rl",
-          "matched_query_text": "reinforcement learning for large language model",
-          "matched_requirement_id": "req-1",
-          "selection_source": "carryover_cache",
-          "paper_id": "2608.10538v1",
-          "carry_days": 1
-        },
-        {
-          "id": "2608.10812v2",
-          "source": "arxiv",
-          "title": "Reference-Free Post-Training of Open Large Language Models for Multilingual Machine Translation",
-          "abstract": "We study reference-free post-training for multilingual machine translation with open large language models. Starting from the supervised-finetuned MiLMMT-46-v0.1 models, we apply Group Relative Policy Optimization (GRPO) with a reward that averages two reference-free quality estimation models and is gated by language identification. We then linearly interpolate the supervised fine-tuning (SFT) and reinforcement learning (RL) model checkpoints to obtain MiLMMT-46-v1.0. Across 46 languages, the resulting models consistently improve translation quality over their SFT counterparts, outperform strong recent open baselines, including Seed-X, HY-MT2, and TranslateGemma, and achieve leading reference-free scores against evaluated proprietary systems such as Google Translate, Gemini 3 Pro, and GPT-5. We further investigate on-policy distillation (OPD) and find that it reaches, but does not surpass, the quality frontier achieved by RL with checkpoint interpolation. We release the models and code to facilitate future research.",
-          "authors": [
-            "Chris Han",
-            "Pengzhi Gao",
-            "Pei Fu",
-            "Jian Luan"
-          ],
-          "primary_category": "cs.CL",
-          "categories": [
-            "cs.CL",
-            "cs.AI"
-          ],
-          "published": "2026-08-11T11:30:38+00:00",
-          "link": "https://arxiv.org/pdf/2608.10812v2",
-          "tags": [
-            "keyword:rl",
-            "query:rl"
-          ],
-          "llm_score": 8.0,
-          "llm_evidence_en": "group relative policy optimization (GRPO) for language generation in machine translation",
-          "llm_evidence_cn": "将组相对策略优化用于机器翻译语言生成",
-          "llm_evidence": "将组相对策略优化用于机器翻译语言生成",
-          "canonical_evidence": "将组相对策略优化用于机器翻译语言生成",
-          "llm_tldr_en": "Applies GRPO, a policy gradient method, with a reference-free quality-estimation reward to post-train open LLMs for multilingual machine translation, improving quality across 46 languages without gold references.",
-          "llm_tldr_cn": "该论文研究开放大语言模型在无参考场景下的多语言机器翻译后训练。作者在SFT模型基础上应用组相对策略优化（GRPO），并设计由两个无参考质量评估模型加语言识别门控的奖励函数。通过SFT与RL检查点的线性插值获得最终模型MiLMMT-46-v1.0。在46种语言上的实验表明，翻译质量一致优于SFT基线及多个强开源基线。该工作验证了策略优化在无参考翻译后训练中的有效性。",
-          "llm_tldr": "该论文研究开放大语言模型在无参考场景下的多语言机器翻译后训练。作者在SFT模型基础上应用组相对策略优化（GRPO），并设计由两个无参考质量评估模型加语言识别门控的奖励函数。通过SFT与RL检查点的线性插值获得最终模型MiLMMT-46-v1.0。在46种语言上的实验表明，翻译质量一致优于SFT基线及多个强开源基线。该工作验证了策略优化在无参考翻译后训练中的有效性。",
-          "llm_tags": [
-            "query:rl"
-          ],
-          "matched_query_tag": "query:rl",
-          "matched_query_text": "policy gradient methods for language generation",
-          "matched_requirement_id": "req-3",
-          "selection_source": "carryover_cache",
-          "paper_id": "2608.10812v2",
           "carry_days": 1
         },
         {
@@ -311,21 +111,113 @@
             "query:rl"
           ],
           "llm_score": 8.0,
-          "llm_evidence_en": "GRPO policy optimization with reference-free reward models for multilingual machine translation with LLMs",
-          "llm_evidence_cn": "使用GRPO策略优化与无参考奖励模型进行大模型多语言翻译",
-          "llm_evidence": "使用GRPO策略优化与无参考奖励模型进行大模型多语言翻译",
-          "canonical_evidence": "使用GRPO策略优化与无参考奖励模型进行大模型多语言翻译",
-          "llm_tldr_en": "This paper applies GRPO with gated reference-free quality-estimation rewards to post-train MiLMMT-46, improving translation across 46 languages over SFT and open baselines.",
-          "llm_tldr_cn": "开源大模型的多语言机器翻译后训练通常依赖参考译文，成本高且泛化受限。该工作基于监督微调模型MiLMMT-46-v0.1，应用GRPO策略优化方法，奖励为两个无参考质量估计模型的平均分数，并经语言识别门控，得到MiLMMT-46-v1.0。在46种语言上，模型翻译质量一致优于SFT，并超过Seed-X、HY-MT2、TranslateGemma等强基线，无参考评分达领先水平，验证了无参考RL后训练的有效性。",
-          "llm_tldr": "开源大模型的多语言机器翻译后训练通常依赖参考译文，成本高且泛化受限。该工作基于监督微调模型MiLMMT-46-v0.1，应用GRPO策略优化方法，奖励为两个无参考质量估计模型的平均分数，并经语言识别门控，得到MiLMMT-46-v1.0。在46种语言上，模型翻译质量一致优于SFT，并超过Seed-X、HY-MT2、TranslateGemma等强基线，无参考评分达领先水平，验证了无参考RL后训练的有效性。",
+          "llm_evidence_en": "Applies GRPO policy optimization to post-train open LLMs, with a reward averaging reference-free QE models gated by language id",
+          "llm_evidence_cn": "对开源大模型进行GRPO强化学习后训练，设计语言门控的参考无关质量评估奖励",
+          "llm_evidence": "对开源大模型进行GRPO强化学习后训练，设计语言门控的参考无关质量评估奖励",
+          "canonical_evidence": "对开源大模型进行GRPO强化学习后训练，设计语言门控的参考无关质量评估奖励",
+          "llm_tldr_en": "This work applies GRPO policy optimization to post-train open LLMs for multilingual MT, with a reward that averages two reference-free quality estimators gated by language id. The resulting models improve over SFT and outperform strong open baselines across 46 languages.",
+          "llm_tldr_cn": "针对多语言机器翻译，作者对已监督微调的开源大模型进行GRPO强化学习后训练，奖励由两个参考无关质量估计模型平均并受语言识别门控。进一步将SFT与RL检查点线性插值得到最终模型。在46种语言上，该模型持续优于SFT版本并超过多个强开源基线，取得领先的参考无关分数。",
+          "llm_tldr": "针对多语言机器翻译，作者对已监督微调的开源大模型进行GRPO强化学习后训练，奖励由两个参考无关质量估计模型平均并受语言识别门控。进一步将SFT与RL检查点线性插值得到最终模型。在46种语言上，该模型持续优于SFT版本并超过多个强开源基线，取得领先的参考无关分数。",
           "llm_tags": [
             "query:rl"
           ],
           "matched_query_tag": "query:rl",
-          "matched_query_text": "policy gradient methods for language generation",
-          "matched_requirement_id": "req-3",
+          "matched_query_text": "reinforcement learning for large language model",
+          "matched_requirement_id": "req-1",
           "selection_source": "carryover_cache",
           "paper_id": "2608.10812v1",
+          "carry_days": 1
+        },
+        {
+          "id": "2608.10823v1",
+          "source": "arxiv",
+          "title": "MoE Proxy Models for Low-Cost Failure Reproduction and Diagnosis in LLM RL Post-Training",
+          "abstract": "Reinforcement learning (RL) post-training of large language models (LLMs) is computationally intensive and involves complex system pipelines with substantial debugging overhead. In practice, factors such as framework adaptation, numerical precision, and operator implementation can cause failures, including gradient overflow and loss divergence. Reproducing such failures directly on large models requires considerable time and computational resources. This paper systematically analyzes failures encountered during large-scale RL training on the Huawei Ascend platform, summarizes representative failure types, and identifies three model-side factors relevant to fault reproduction. Based on these factors, we propose a proxy-model construction method for low-cost fault investigation and auxiliary diagnosis. It employs structure-preserving, clustering-based expert pruning to select representative experts while retaining the model's backbone architecture, routing mechanism, and basic task capabilities. Our experimental results show that the proxy models reduce accelerator requirements by 50%-87.5% and achieve up to a 33.3x reduction in per-step NPU-hour cost, while preserving major training dynamics and reproducing fault responses consistent with the original models. Overall, the proxy models can serve as low-cost surrogates for fault reproduction, targeted validation, and auxiliary diagnosis in RL post-training.",
+          "authors": [
+            "Yikai Wang",
+            "Chuansai Zhou",
+            "Yuhang Zhou",
+            "Weiqiang Wu",
+            "Cong Wu",
+            "Yue Deng",
+            "Ben Feng",
+            "Mingming Zhu",
+            "Beirong Zhou",
+            "Zhibin Wang",
+            "Sheng Zhong",
+            "Chen Tian",
+            "Wangze Zhang"
+          ],
+          "primary_category": "cs.LG",
+          "categories": [
+            "cs.LG"
+          ],
+          "published": "2026-08-11T11:50:48+00:00",
+          "link": "https://arxiv.org/pdf/2608.10823v1",
+          "tags": [
+            "keyword:rl",
+            "query:rl"
+          ],
+          "llm_score": 8.0,
+          "llm_evidence_en": "RL post-training of LLMs and failure diagnosis via MoE proxy models",
+          "llm_evidence_cn": "使用MoE代理模型对大模型RL后训练中的故障进行低成本复现与诊断",
+          "llm_evidence": "使用MoE代理模型对大模型RL后训练中的故障进行低成本复现与诊断",
+          "canonical_evidence": "使用MoE代理模型对大模型RL后训练中的故障进行低成本复现与诊断",
+          "llm_tldr_en": "This paper develops MoE proxy models to reproduce and diagnose failures such as gradient overflow and loss divergence in LLM RL post-training, reducing debugging cost on Huawei Ascend.",
+          "llm_tldr_cn": "大模型强化学习后训练计算密集且管线复杂，梯度溢出和损失发散等故障排错代价极高。本文系统分析了华为昇腾平台上大规模RL训练中遇到的典型故障，归纳出三类与故障复现相关的模型侧因素，并据此构造MoE代理模型。代理模型可以在低资源条件下复现故障，从而显著降低直接在大型模型上复现和诊断所需的时间与算力。这为LLM RL训练管线的可靠性保障提供了低成本解决方案。",
+          "llm_tldr": "大模型强化学习后训练计算密集且管线复杂，梯度溢出和损失发散等故障排错代价极高。本文系统分析了华为昇腾平台上大规模RL训练中遇到的典型故障，归纳出三类与故障复现相关的模型侧因素，并据此构造MoE代理模型。代理模型可以在低资源条件下复现故障，从而显著降低直接在大型模型上复现和诊断所需的时间与算力。这为LLM RL训练管线的可靠性保障提供了低成本解决方案。",
+          "llm_tags": [
+            "query:rl"
+          ],
+          "matched_query_tag": "query:rl",
+          "matched_query_text": "reinforcement learning for large language model",
+          "matched_requirement_id": "req-1",
+          "selection_source": "carryover_cache",
+          "paper_id": "2608.10823v1",
+          "carry_days": 1
+        },
+        {
+          "id": "2608.11967v1",
+          "source": "arxiv",
+          "title": "LoongReflect: Boosting Long-Horizon Reflection in Search Agents via Global Perspective Distillation",
+          "abstract": "Large language model agents increasingly rely on long-horizon reasoning to solve complex tasks involving planning, tool use, and memory. A critical capability in such settings is reflection: assessing trajectory progress, identifying missing evidence and unreliable intermediate states, and deciding whether to continue, revise, or abandon the current branch. Learning effective reflection, however, is challenging because reflection is performed locally within the current branch, whereas its utility can only be determined by its contribution to the final trajectory outcome. This local-global mismatch makes outcome-based reinforcement learning provide only local, sparse and delayed supervision for reflective decisions. To solve these, we propose LoongReflect, a training framework that formulates reflection as a memory-control policy. The agent operates over a reversible trajectory tree using explicit reflect and backtrack actions. Reflection consolidates verified facts, missing evidence, and branch-specific risks into working memory, while backtracking removes an unreliable branch from the active context and preserves a concise corrective lesson. To learn this policy, LoongReflect combines two complementary signals through a look-ahead, extragradient-style coordination mechanism. A fast channel distills globally informed reflective behavior from a privileged teacher, with supervision restricted to reflection and backtracking tokens. A slow channel optimizes complete trajectories using outcome-based GRPO, aligning local control decisions with final task success. Experiments on multi-hop retrieval-augmented generation and mathematical reasoning benchmarks demonstrate consistent improvements over outcome-only reinforcement learning and self-distillation baselines.",
+          "authors": [
+            "Zhixin Zhang",
+            "Xinke Jiang",
+            "Zhibang Yang",
+            "Weixuan Xu",
+            "Guohong Qiu",
+            "Xu Chu",
+            "Junfeng Zhao",
+            "Yasha Wang"
+          ],
+          "primary_category": "cs.LG",
+          "categories": [
+            "cs.LG",
+            "cs.AI"
+          ],
+          "published": "2026-08-12T11:56:03+00:00",
+          "link": "https://arxiv.org/pdf/2608.11967v1",
+          "tags": [
+            "keyword:rl",
+            "query:rl"
+          ],
+          "llm_score": 8.0,
+          "llm_evidence_en": "global perspective distillation for long-horizon reflection in search agents under sparse RL supervision",
+          "llm_evidence_cn": "面向搜索智能体长程反思的全局视角蒸馏方法，应对RL监督稀疏延迟",
+          "llm_evidence": "面向搜索智能体长程反思的全局视角蒸馏方法，应对RL监督稀疏延迟",
+          "canonical_evidence": "面向搜索智能体长程反思的全局视角蒸馏方法，应对RL监督稀疏延迟",
+          "llm_tldr_en": "LoongReflect tackles the local-global mismatch in reflection learning by distilling global trajectory perspective into local reflective decisions, overcoming sparse delayed supervision from outcome-based RL.",
+          "llm_tldr_cn": "长程搜索智能体的反思能力决定其能否在规划、工具使用与记忆中判断路径是否值得继续。本文指出反思决策在局部执行但其效用由最终轨迹结果决定，这种局部-全局错位使基于结果的RL只能提供稀疏延迟监督。为此提出LoongReflect，利用全局视角蒸馏把整体轨迹知识注入局部反思决策，弥补监督不足。方法有望提升搜索智能体在复杂任务中的长期规划与纠偏能力，为智能体RL训练提供新的监督信号设计思路。",
+          "llm_tldr": "长程搜索智能体的反思能力决定其能否在规划、工具使用与记忆中判断路径是否值得继续。本文指出反思决策在局部执行但其效用由最终轨迹结果决定，这种局部-全局错位使基于结果的RL只能提供稀疏延迟监督。为此提出LoongReflect，利用全局视角蒸馏把整体轨迹知识注入局部反思决策，弥补监督不足。方法有望提升搜索智能体在复杂任务中的长期规划与纠偏能力，为智能体RL训练提供新的监督信号设计思路。",
+          "llm_tags": [
+            "query:rl"
+          ],
+          "matched_query_tag": "query:rl",
+          "matched_query_text": "policy optimization methods for multi step reasoning in llms",
+          "matched_requirement_id": "req-9",
+          "selection_source": "carryover_cache",
+          "paper_id": "2608.11967v1",
           "carry_days": 1
         }
       ]

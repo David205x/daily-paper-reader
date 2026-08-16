@@ -1,0 +1,293 @@
+Title: Guided Table Retrieval for Structured Data Search
+
+URL Source: https://arxiv.org/pdf/2608.11644v1
+
+Published Time: Thu, 13 Aug 2026 00:27:32 GMT
+
+Number of Pages: 7
+
+Markdown Content:
+# Guided Table Retrieval for Structured Data Search 
+
+# Alekh Jindal, Jyoti Pandey, Christina Pavlopoulou, Ronith PR, Sharath Prakash, Shi Qiao, Shivani Tripathi, Wangda Zhang 
+
+research@tursio.ai Tursio Bellevue, USA 
+
+## ABSTRACT 
+
+Answering natural language questions over structured databases requires identifying the relevant tables and determining how to join them—a task that demands both schema knowledge and semantic understanding of the user’s intent. We present guided table retrieval ,a four-phase pipeline that combines deterministic grounding via hash-based predictors, structural exploration of join-graph reacha-bility, LLM-powered disambiguation of sources and targets, and al-gorithmic merging into minimal, topologically ordered join trees. By decomposing the problem into phases with distinct responsibilities— determinism, coverage, semantic reasoning, and coherence—the pipeline avoids the brittleness of end-to-end LLM approaches while leveraging LLMs where their contextual judgment is most needed. We evaluate on BIRD-DEV and the enterprise-scale BEAVER bench-mark, achieving 94% and 70% precision respectively, with 92% and 53% F1—substantially outperforming existing baselines on preci-sion and F1 while producing exact join trees that can be directly consumed by downstream query compilers. 
+
+## 1 INTRODUCTION 
+
+Structured databases organize data into tables connected through foreign-key relationships, forming rich join graphs that encode the semantics of the underlying domain. Retrieving relevant informa-tion from such databases requires not only identifying the right tables but also determining how to join them—a task that demands both schema knowledge and an understanding of the query’s intent. This is particularly challenging for users who are unfamiliar with the schema or the query language, as they cannot be expected to specify which tables to retrieve or how to connect them. Consider the TPC-H benchmark [18] schema shown in Figure 1, and the natural-language question: “Which Indian suppliers are shipping the most to China?” Answering this question requires the following SQL query:                                                        
+
+> SELECT S. S_NAME AS Supplier_Name ,
+> SUM (L. L_QUANTITY ) AS Total_Quantity ,
+> COUNT (DISTINCT L. L_ORDERKEY ) AS Distinct_Orders
+> FROM LINEITEM L
+> JOIN SUPPLIER SON L. L_SUPPKEY =S. S_SUPPKEY
+> JOIN NATION SN ON S. S_NATIONKEY =SN . N_NATIONKEY
+> JOIN ORDERS OON L. L_ORDERKEY =O. O_ORDERKEY
+> JOIN CUSTOMER CON O. O_CUSTKEY =C. C_CUSTKEY
+> JOIN NATION CN ON C. C_NATIONKEY =CN . N_NATIONKEY
+> WHERE SN . N_NAME =' INDIA '
+> AND CN . N_NAME =' CHINA '
+> GROUP BY S. S_NAME
+> ORDER BY Total_Quantity DESC ;
+
+Although the question mentions only suppliers and two countries, the correct query involves six tables and five joins—and reveals several non-trivial retrieval challenges: 
+
+Figure 1: The TPC-H join graph. A natural-language question such as “ Which Indian suppliers are shipping the most to China? ” requires navigating this graph to identify six tables and five joins—most of which are never mentioned explicitly in the question. 
+
+(1) The Customer table is needed implicitly: “shipping to China” refers to customer locations, not a destination column. (2) The Nation table appears twice in different roles—once for the supplier’s nationality and once for the customer’s—requiring contextual disambiguation. (3) The Lineitem table is never mentioned by name, yet it provides the shipping metrics (quantity, order count) that are needed to answer the question. (4) The Orders table serves purely as a bridge, connecting sup-pliers to customers through the join graph despite having no columns directly relevant to the question. Clearly, high-quality search over structured data must go beyond surface-level keyword matching: it needs to unpack the intent of a natural-language query into the relevant tables and their join relationships, taking into account both semantic context and the structure of the join graph. Existing approaches fall short on one or more of these dimen-sions. Schema linking methods attempt to map question tokens to schema elements [10, 12], but operate on individual tables without reasoning about join paths. Retrieval-augmented generation (RAG) methods retrieve individual tables and provide them as context for LLMs to generate SQL [5, 16, 17], but treat each table indepen-dently and ignore the join structure. Feeding the full schema to the LLM is infeasible for large databases with hundreds of tables, as it explodes context length and cost—a challenge highlighted by enterprise benchmarks such as BEAVER [2]. Other approaches rely on sample queries to infer relevant tables and joins [20], but are inherently brittle: they depend on the coverage and quality of the sample queries, and exhibit unpredictable behavior when the user’s arXiv:2608.11644v1 [cs.DB] 12 Aug 2026 Alekh Jindal, Jyoti Pandey, Christina Pavlopoulou, Ronith PR, Sharath Prakash, Shi Qiao, Shivani Tripathi, Wangda Zhang 
+
+question falls outside the sample distribution. Meanwhile, table dis-covery methods for data lakes [3, 9, 23] focus on finding unionable or joinable tables across heterogeneous sources, but do not address the problem of assembling a coherent join tree for a specific query over a known schema. In this paper, we propose Guided Table Retrieval , a systematic approach that combines deterministic grounding with graph-based exploration and LLM-powered disambiguation. Our approach pro-ceeds in four stages: (1) Grounding. We use hash-based predictors to identify tokens (and their linguistic variants) in the question that match schema elements or data values. Carefully constructed, clean yet rep-resentative sample values, along with disambiguated schema elements, ensure high recall with deterministic precision. (2) Exploration. Starting from the grounded tables, we enumerate reachability in the join graph to discover all source tables that can reach the grounded targets, and compute their coverage— i.e., how many target tables each source can reach. (3) Disambiguation. We use LLM-based semantic inference to select the best source table and refine the set of target tables, leveraging the reachability graph and coverage information. The LLM may prune spurious targets or introduce additional ones that the grounding step missed. (4) Merging. We collect the join-graph paths from the selected source to each target, compute minimal prefixes that cover all targets, and combine them into a compact, topologically ordered join tree. This design is deliberate in how it allocates responsibilities: ground-ing provides determinism , ensuring that schema matches are pre-cise and reproducible; exploration provides coverage , systematically enumerating join-graph structure rather than guessing at connec-tions; disambiguation provides semantic reasoning , leveraging LLMs where their strength—contextual judgment—is most needed; and merging provides coherence , synthesizing the final join tree that is both minimal and syntactically correct. Together, these stages pro-duce a complete join structure that can directly guide downstream SQL generation. 
+
+## 2 BACKGROUND 
+
+In this section, we describe the Tursio search platform and its foundational components, and then position table retrieval—the focus of this paper—within the broader query processing pipeline. 
+
+## 2.1 The Tursio Search Platform 
+
+Tursio [8] is a search platform that makes structured databases searchable in natural language. Rather than treating natural lan-guage queries as black-box inputs to an LLM, Tursio processes them systematically using techniques inspired by traditional query planning and rewriting. The key idea is to build a context graph —an abstraction layer over the underlying databases—that captures table semantics, column descriptions, data profiles, join relationships, and custom measures. Tursio then uses this context graph to con-textualize user intent, compile queries, plan execution, and reason over results. Figure 2 illustrates the high-level architecture, which consists of four main stages: Relational Databases 
+
+> Cloud Data Warehouses
+> NoSQL Data Stores
+> Data Modeling
+> Query Processing
+> Search Interface
+> Non-experts
+> Applications
+> Agents
+
+Figure 2: High-level architecture of the Tursio search platform. A context graph is inferred over the underly-ing databases, and natural language queries are processed through query compilation, query planning, and result reasoning—with LLMs infused into each stage. 
+
+(1) Data Modeling. Tursio connects to the underlying databases and automatically infers a context graph, including table seman-tics, column profiles, join relationships, and custom measures. (2) Query Compilation. Given a natural language question from a business user, Tursio contextualizes the user intent by iden-tifying the relevant tables (data models) and the operations needed to answer the query. (3) Query Planning. Tursio compiles the identified tables and operations into a well-formed query plan—a tree of grounded operators—and applies rewriting transformations to improve correctness and expressiveness. (4) Result Reasoning. Tursio executes the query plan and presents the results with natural language summaries, visualizations, and explainability features. LLMs are infused into every stage of this pipeline, but each stage constrains the LLM’s role to a specific, well-defined task—mirroring the philosophy from learned query optimization [7, 15] that de-composing into fine-grained, model-augmented steps yields better accuracy and debuggability than a single monolithic model. 
+
+## 2.2 Context Graph 
+
+The context graph is the foundation that enables Tursio to under-stand the database and contextualize user queries. It is inferred automatically when a database is connected, and evolves over time as the underlying data changes. 
+
+Profiling. Tursio profiles each column by collecting fixed-size samples (100K–1M rows), applying data cleaning to remove outliers and gather representative values. These profiles capture column types, statistics (count, distinct count, min, max), ontologies, sample values, and data types. 
+
+Semantics. Tursio uses LLMs to infer human-readable descrip-tions for tables and columns, resolving cryptic naming conven-tions common in enterprise databases (e.g., mapping cust_acctbal 
+
+to “Customer Account Balance”). These descriptions are stored as aliases in the context graph and used during query compilation to match user intent to schema elements. 
+
+Join Inference. Building an accurate context graph requires iden-tifying how tables relate to one another. Tripathi et al. [19] describe a scalable approach to inferring join relationships that combines statistical pruning with LLM-based adjudication. The approach first Guided Table Retrieval for Structured Data Search 
+
+infers primary key candidates using lightweight statistics (count, distinct count, approximate distinct count) and heuristic scoring, then detects inclusion dependencies across table pairs using sample-based overlap analysis. LLMs are used to adjudicate ambiguous candidates—leveraging semantic understanding of table and col-umn names to distinguish meaningful foreign-key relationships from coincidental value overlaps. This statistics-LLM combination scales to large schemas (hundreds of tables with hundreds of thou-sands of candidate pairs) while maintaining high precision. The resulting join relationships form the edges of the context graph, connecting tables into a coherent join graph that is central to the table retrieval problem addressed in this paper. 
+
+Join Trees. The inferred join relationships are organized into 
+
+left-join trees —rooted trees where the root (fact table) has the most foreign-key references, and dimension tables are attached along their reachable join paths. These join trees encode valid ways to combine tables without introducing data duplication, and serve as the structural backbone for query compilation. 
+
+## 2.3 Search Quality Evaluation 
+
+In our earlier work, we presented an evaluation of the Tursio search platform, comparing it against ChatGPT and Perplexity on a real-istic banking schema [6]. Their results show that Tursio achieves answer relevancy statistically comparable to both baselines (97.8% vs. 98.1% on simple, 90.0% vs. 100.0% on medium, and 89.5% vs. 100.0% on hard questions), despite Tursio answering from a struc-tured database while the baselines generate responses from the open web. Crucially, their analysis identifies database complete-ness —not model comprehension—as the primary bottleneck. They also highlight that business users ask high-level, abstract questions that omit explicit references to tables, join paths, or metric def-initions: the ratio of SQL token-length to question token-length is significantly higher in enterprise workloads than in academic benchmarks like BIRD [13]. This finding directly motivates the present work. When business users ask questions like “ Which Indian suppliers are shipping the most to China? ”, the system must bridge the gap between the high-level intent and the underlying schema—identifying not just which tables are relevant, but how they connect through the join graph. The table retrieval problem, which we formalize and solve in this paper, is the critical first step in this bridge: it takes a natural lan-guage question and produces a complete join tree that downstream query compilation can use to generate correct SQL. 
+
+## 2.4 Problem Statement 
+
+Given a natural language question 𝑞 and a context graph G =
+
+(T , E) , where T is the set of tables and E is the set of join relation-ships (edges), the table retrieval problem is to identify: (1) A set of target tables 𝑇 ⊆ T that are relevant to answering 𝑞 ,(2) A source table 𝑠 ∈ T from which all targets are reachable in G,and (3) A join tree 𝐽 rooted at 𝑠 that connects 𝑠 to all tables in 𝑇 via edges in E, such that 𝐽 is minimal (no unnecessary tables) and topologically ordered (respecting join directions). The output join tree 𝐽 is then passed to the query compilation stage, which grounds the parsed operators onto the tables in 𝐽 
+
+and generates the final SQL query. This decomposition—retrieving tables first, then compiling the query—allows each stage to focus on its strength: table retrieval reasons about schema structure and join-graph topology, while query compilation reasons about operators, filters, and aggregations. 
+
+## 3 GUIDED TABLE RETRIEVAL 
+
+Figure 3 illustrates the end-to-end guided table retrieval pipeline. Given a natural language question and a context graph, the pipeline proceeds through four phases— grounding , exploration , disambigua-tion , and merging —corresponding to the nine numbered steps in the diagram. Each phase is deliberately scoped: grounding is deter-ministic and fast, exploration is structural and exhaustive, disam-biguation leverages LLM reasoning where it is most needed, and merging is algorithmic and guaranteed to produce a valid join tree. We describe each phase in detail below, using the TPC-H example from Section 1 as a running illustration. 
+
+## 3.1 Grounding 
+
+The first phase identifies an initial set of target tables —tables that are lexically or semantically connected to the user’s question (steps 1–3 in Figure 3). 
+
+Hash-based prediction (steps 1–2). We maintain an inverted index that maps tokens to schema elements and sampled data values. Given a question 𝑞 , we tokenize it and generate linguistic variants for each token—including lemmas, synonyms, and common abbre-viations. Each variant is hashed and looked up in the index, which stores mappings of the form: 
+
+hash (𝑡𝑜𝑘𝑒𝑛 ) −→ {( 𝑡𝑎𝑏𝑙𝑒, 𝑐𝑜𝑙𝑢𝑚𝑛, match_type )} 
+
+where match_type distinguishes between schema matches (the to-ken matches a table name, column name, or alias) and value matches (the token matches a sampled data value in a column). All tables that receive at least one match are collected into the initial target set of tables 𝑇 0.
+
+Example. For the question “ Which Indian suppliers are shipping the most to China? ”, the hash predictor matches: 
+
+• “Indian” and “India” → value match in Nation.N_Name 
+
+• “suppliers” → schema match on Supplier (table name) 
+
+• “shipping” → schema match on Lineitem.L_ShipDate (column alias) 
+
+• “China” → value match in Nation.N_Name This yields an initial target set 𝑇 0 = {Nation , Supplier , Lineitem }.
+
+Semantic enrichment (step 3). Hash-based prediction offers high precision but may miss tables that are relevant yet not lexically present in the question. To improve recall, we apply a semantic fallback when the hash predictor returns fewer than 𝑘 targets (we use 𝑘 =3 in practice). Following the deep context approach of Tursio, described in our earlier work [8], each table in the context graph has a precomputed embedding derived from its synthetically generated query context—a set of representative natural-language questions that the table could help answer. We embed the user’s question using the same model and retrieve the top-𝑘 most similar tables by cosine similarity, adding any new tables to 𝑇 0.Alekh Jindal, Jyoti Pandey, Christina Pavlopoulou, Ronith PR, Sharath Prakash, Shi Qiao, Shivani Tripathi, Wangda Zhang Merged prefixes in topological order 
+
+1
+
+2
+
+3
+
+4
+
+5
+
+6
+
+7
+
+8
+
+8
+
+9
+
+3
+
+Figure 3: The guided table retrieval pipeline. A user question is first grounded to initial target tables via hash-based predictors (steps 1–2), optionally enriched with table embeddings (step 3). Reachability graphs are then explored to identify candidate source tables and their coverage (step 4). An LLM disambiguates the best source and destination tables (steps 5–6), and all paths from the selected source are enumerated (step 7). The LLM selects the best paths (step 8), and their prefixes are merged into a compact join tree in topological order (step 9). 
+
+In our running example, the hash predictor already returns three targets, so semantic enrichment is not triggered. However, for a va-guer question like “ How are our sales trending? ”, the hash predictor might only match Orders (via “sales”), and semantic enrichment would add Lineitem and Customer based on their query-context similarity. 
+
+## 3.2 Exploration 
+
+The second phase discovers which tables in the context graph can serve as the source (root) of a join tree that reaches the initial targets (step 4 in Figure 3). 
+
+Reachability computation. For each table 𝑡 ∈ T , we compute its 
+
+reachability set 𝑅 (𝑡 ) ⊆ T : the set of all tables reachable from 𝑡 by following directed join edges in the context graph. Since join trees in Tursio are rooted left-join trees, reachability follows the direc-tion of foreign-key relationships—from fact tables (parents) toward dimension tables (children). The reachability sets are precomputed and cached, so this step incurs no per-query cost. 
+
+Coverage scoring. Given the initial target set 𝑇 0, we compute the 
+
+coverage of each table as: 
+
+coverage (𝑡 ) = |𝑅 (𝑡 ) ∩ 𝑇 0 |
+
+Tables with higher coverage can reach more of the initial targets through the join graph, making them stronger candidates for the source. We retain all tables with coverage (𝑡 ) ≥ 1 as candidate sources, ranked by coverage. Note that a candidate need not cover 
+
+all initial targets at this stage: the disambiguation phase (Section 3.3) jointly selects the source and refines the target set, ensuring that the final source 𝑠 table can reach all final target tables 𝑇 in the context graph. 
+
+Example. In the TPC-H join graph (Figure 1), the reachability sets of selected tables are: 
+
+• 𝑅 (Lineitem ) = {Part , PartSupp , Supplier , Nation , Region ,
+
+Orders , Customer }• 𝑅 (Supplier ) = {Nation , Region }• 𝑅 (Orders ) = {Customer , Nation , Region }
+
+Against 𝑇 0 = {Nation , Supplier , Lineitem }, the coverage scores are: Lineitem = 2 (reaches Supplier and Nation), Supplier = 1(reaches Nation), Orders = 1 (reaches Nation). Lineitem emerges as the top candidate source, since it has the highest coverage and is itself a target. 
+
+## 3.3 Disambiguation 
+
+The third phase uses an LLM to make two semantic decisions that require understanding the user’s intent: selecting the best source table and refining the set of target tables (steps 5–8 in Figure 3). This is where the pipeline transitions from deterministic, structure-based reasoning to LLM-powered contextual judgment. 
+
+Source and target selection (steps 5–6). We present the LLM with: (1) The user’s question 𝑞 .(2) The candidate source tables, ranked by coverage, along with their reachability sets. (3) The initial target set 𝑇 0 from the grounding phase. The LLM is asked to (a) select the single best source table 𝑠 , and (b) refine the initial targets into the final target set 𝑇 (corresponding to the target tables in the problem statement of Section 2). The re-finement may prune spurious targets—tables that matched lexically but are not semantically relevant—or extend the set with tables that the grounding phase missed but that the LLM recognizes as necessary from context. 
+
+Example. Given the candidate sources and initial targets from the previous phase, the LLM selects Lineitem as the source 𝑠 (highest coverage, central to “shipping” semantics) and refines the target set to 𝑇 = {Supplier , Nation , Orders , Customer }. Notably, the LLM 
+
+adds Orders and Customer—recognizing that “shipping to China” Guided Table Retrieval for Structured Data Search 
+
+implies customer locations, which requires traversing through Or-ders to reach Customer and then Nation. 
+
+Path enumeration (step 7). Once the source 𝑠 is selected, we enu-merate all join paths from 𝑠 to each target 𝑑 ∈ 𝑇 in the context graph. A path 𝑃 (𝑠, 𝑑 ) = [𝑠, 𝑡 1, 𝑡 2, . . . , 𝑑 ] is a sequence of tables connected by join edges. When multiple paths exist between 𝑠 and a target (e.g., through different intermediate tables), all are enumerated for the LLM to choose from. 
+
+Path selection (step 8). The LLM is presented with all enumerated paths and asked to select the best path for each target, based on semantic relevance to the question. This step is critical when the join graph contains multiple routes between two tables—the LLM must determine which route carries the correct semantics. 
+
+Example. From Lineitem to Nation, there are two paths in the TPC-H graph: (1) Lineitem → Supplier → Nation (supplier’s country) (2) Lineitem → Orders → Customer → Nation (customer’s country) The question requires both paths: the first to filter Indian suppliers, the second to filter Chinese customers. The LLM recognizes this and selects both, assigning each the appropriate semantic role. This is precisely the kind of disambiguation that purely structural methods cannot perform—it requires understanding that “India” and “China” refer to different entities in the question. 
+
+## 3.4 Merging 
+
+The final phase combines the selected paths into a single, compact join tree 𝐽 that can be passed to the query compiler (step 9 in Figure 3). 
+
+Prefix extraction. Each selected path 𝑃 (𝑠, 𝑑 𝑖 ) from the source to a target corresponds to a prefix of the source table’s full join tree in the context graph. A prefix is the minimal subtree rooted at 𝑠 that includes all tables on the path. Formally, for a path 𝑃 =
+
+[𝑠, 𝑡 1, . . . , 𝑑 𝑖 ], its prefix is prefix (𝑃 ) = {𝑠, 𝑡 1, . . . , 𝑑 𝑖 } along with the edges connecting consecutive tables. 
+
+Prefix merging. When multiple paths share intermediate tables, their prefixes overlap. We merge all prefixes by taking their union, deduplicating shared nodes and edges. The key insight is that we only need to include tables up to the last target on each path: if a path passes through tables beyond the final target that the LLM selected, those trailing tables are trimmed. 
+
+Example. Suppose the LLM selected source A and two paths in a hypothetical schema: 
+
+𝑃 1 = [A, B, C, D]
+
+𝑃 2 = [A, C, E, F]
+
+If the final targets are 𝑇 = {D, F}, both paths are needed in full, yielding the merged set {A, B, C, D, E, F}. However, if the targets are 𝑇 = {B, F}, path 𝑃 1 can be trimmed to [A, B] (since C and D are beyond the target), yielding the smaller merged set {A, B, C, E, F}.
+
+Topological ordering. The merged set of tables and edges forms a DAG rooted at the source 𝑠 . We compute a topological ordering of this DAG, which determines the join sequence: the source table is listed first, followed by each subsequent table in an order that respects the join dependencies (a table appears only after all tables it depends on). The result is the join tree 𝐽 —rooted at 𝑠 , connecting all tables in 𝑇 , minimal, and topologically ordered—satisfying all three requirements of the problem statement in Section 2. 
+
+Example. Returning to the running TPC-H example, the merged join tree is: Lineitem → Supplier → Nation S → Orders → Customer →
+
+Nation C
+
+where Nation appears twice with different roles (supplier nation and customer nation), and the topological order ensures that each join can reference the tables it depends on. This join tree is passed directly to the query compiler, which grounds the filter predicates (“India” on Nation S, “China” on Nation C), aggregation (sum of quantity from Lineitem), and grouping (by Supplier.S_Name) to produce the final SQL query. 
+
+## 4 EVALUATION 
+
+We evaluate the guided table retrieval pipeline described in Section 3 on two established benchmarks: BIRD-DEV [13] and BEAVER [2]. Our evaluation builds on the experimental setup from our earlier work on making databases searchable [8], which evaluated the full Tursio search platform end-to-end; here we focus specifically on the table retrieval component and analyze its behavior in detail. 
+
+## 4.1 Metrics 
+
+Following the evaluation methodology of BEAVER benchmark [2], we measure table retrieval quality using four metrics: 
+
+• Precision — fraction of retrieved tables that are in the gold set. 
+
+• Recall — fraction of gold tables that are successfully retrieved. 
+
+• F1 — the harmonic mean of precision and recall. 
+
+• Perfect Recall (PR) — fraction of queries for which all gold tables are retrieved. Perfect Recall is particularly important in production: missing even a single table typically produces syntactically valid but semantically incorrect SQL, since the query compiler cannot compensate for a missing join path. We also report Accuracy —the fraction of queries where the retrieved set exactly matches the gold set—which jointly penalizes both missing and extraneous tables. 
+
+## 4.2 Benchmarks 
+
+BIRD-DEV. The BIRD benchmark [13] contains 1,534 natural-language questions over 11 databases spanning diverse domains (financial, educational, sports, community, etc.). Each database has a moderate schema (5–15 tables) with well-defined foreign keys, making it a good testbed for evaluating grounding and join-graph exploration. 
+
+BEAVER. The BEAVER benchmark [2] targets enterprise-scale table retrieval, with 6 datasets drawn from real-world data ware-houses (DW, Keystone, CSAIL_Stata variants). These schemas are significantly larger (up to hundreds of tables) and feature nois-ier metadata, ambiguous naming conventions, and complex join graphs—precisely the conditions where guided table retrieval is most needed. BEAVER reports baseline performance using the best results across multiple retrieval methods (embedding-based top-5 and top-10), providing a strong comparison point. Alekh Jindal, Jyoti Pandey, Christina Pavlopoulou, Ronith PR, Sharath Prakash, Shi Qiao, Shivani Tripathi, Wangda Zhang 
+
+Figure 4: Table retrieval results on BIRD-DEV, broken down by database. Bars show per-database scores; the leftmost group (AVERAGE) shows the overall mean. Tursio achieves 85% accuracy, 94% precision, 89% recall, 92% F1, and 81% Per-fect Recall across all 11 databases. 
+
+## 4.3 Results on BIRD-DEV 
+
+Figure 4 shows the table retrieval results on BIRD-DEV, broken down by database. Tursio achieves strong overall performance: 85% accuracy, 94% precision, 89% recall, 92% F1, and 81% Perfect Re-call. Several observations stand out. First, precision is consistently high across all databases (90–100%), confirming that the grounding phase (Section 3.1) rarely introduces spurious tables—the hash-based predictors and semantic enrichment are effective at identi-fying genuinely relevant tables. Second, recall varies more across databases , reflecting differences in schema complexity and the de-gree to which questions implicitly reference tables. Databases like 
+
+California_Schools and Financial achieve near-perfect recall, while more complex schemas like European_Football_2 show lower recall due to indirect table references that require deeper join-graph traversal. Third, Perfect Recall at 81% means that for four out of five queries, the pipeline retrieves the complete set of gold tables—a strong result given that the pipeline must navi-gate join graphs and resolve ambiguous references without any schema-specific tuning. 
+
+## 4.4 Results on BEAVER 
+
+Figure 5 shows the results on the BEAVER benchmark, comparing Tursio (bars) against the best-performing BEAVER baseline (triangle markers). The baseline represents the best results across all models evaluated in the BEAVER paper [2], including both top-5 and top-10 embedding-based retrieval methods. Tursio achieves substantially higher precision (70% vs. 32% base-line average) and F1 (53% vs. 34%), while showing comparable or slightly lower recall (43% vs. 54%). This precision–recall trade-off is by design: unlike baseline methods that retrieve a fixed-size su-perset of candidate tables (top-𝑘 ), guided table retrieval produces the exact set of tables predicted to be necessary for the query. This yields fewer false positives at the cost of occasionally missing tables that require deeper semantic reasoning. The results vary across datasets, reflecting the diversity of schema characteristics in BEAVER: 
+
+• Keystone achieves the highest scores across all metrics (73% accuracy, 100% precision, 73% recall, 84% F1), suggesting a well-structured schema where Tursio provides strong guidance. 
+
+Figure 5: Table retrieval results on BEAVER, broken down by dataset. Diamond markers show the Tursio average; triangle markers show the best BEAVER baseline (best of top-5 and top-10 embedding-based retrieval across all models evaluated in [2]). Tursio outperforms the baseline on precision and F1. 
+
+• DW shows high precision (93%) but moderate recall (53%), indi-cating that the grounding phase successfully identifies relevant tables but the exploration and disambiguation phases miss some implicit references in this large schema. 
+
+• CSAIL_Stata variants show lower overall performance, reflect-ing schemas with particularly ambiguous metadata and complex join topologies that challenge all methods (including baseline). 
+
+## 4.5 Discussion 
+
+The evaluation reveals three key insights about Tursio’s guided table retrieval. 
+
+Precision is the pipeline’s strength. Across both benchmarks, Tur-sio consistently achieves high precision—94% on BIRD-DEV and 70% on BEAVER (vs. 32% baseline). This is a direct consequence of the four-phase design: grounding provides deterministic, high-confidence matches; exploration constrains the search to struc-turally valid join paths; disambiguation uses LLM reasoning to prune spurious candidates; and merging produces a minimal join tree with no extraneous tables. 
+
+Recall depends on schema complexity. On well-structured schemas (BIRD-DEV, Keystone), recall is high (89% and 73% respectively). On noisier, larger schemas (CSAIL_Stata variants), recall drops— primarily because implicit table references require semantic reason-ing that goes beyond what the current grounding and exploration phases can capture. Improving recall on enterprise-scale schemas is an active area of work, potentially through richer profiling, domain-specific embeddings, or multi-hop exploration strategies. 
+
+Exact retrieval vs. top-𝑘 retrieval. A fundamental distinction be-tween guided table retrieval and baseline methods is the retrieval granularity. Baseline methods retrieve a ranked list of 𝑘 candidate tables and rely on downstream components to filter; guided table retrieval produces the exact set of tables needed, assembled into a join tree. This makes the pipeline’s output directly usable by the query compiler—no further filtering or join inference is needed— but it also means that every missed table directly impacts recall, whereas top-𝑘 methods absorb misses in their larger candidate set. Guided Table Retrieval for Structured Data Search 
+
+## 5 RELATED WORK 
+
+We discussed table discovery in data lakes and RAG-based text-to-SQL methods in Section 1. Here we cover other related work. 
+
+Schema encoding for text-to-SQL. Several text-to-SQL parsers en-code the database schema as a graph and use neural architectures to select relevant tables and columns. RAT-SQL [21] uses relation-aware transformers to jointly reason over question tokens and schema elements via a schema graph. BRIDGE [14] anchors data-base cell values in the question to improve cross-domain schema grounding. These methods learn table selection implicitly as part of end-to-end SQL generation, whereas our approach performs table retrieval as an explicit, interpretable pipeline stage—producing a join tree that is independent of the downstream query compiler. 
+
+Natural language interfaces and intent disambiguation. NaLIR [11] pioneered interactive natural language interfaces that construct parse trees and engage users in disambiguation dialogues to resolve ambiguous database queries. Wolfson et al. [22] decompose complex questions into structured sub-steps (QDMR), providing an inter-mediate representation that can guide multi-table query formula-tion. Our disambiguation phase serves a similar purpose—resolving which tables a question refers to—but does so non-interactively via a single LLM call over the reachability graph, avoiding the need for user interaction. 
+
+Knowledge graphs and ontology-based data access. Aurum [4] builds enterprise knowledge graphs over schema metadata (join paths, containment, semantic similarity) to enable graph-based data discovery. Ontop [1] maps relational schemas to ontologies, allow-ing users to query through a knowledge graph abstraction that hides join complexity. Our context graph shares the motivation of making schema structure navigable, but differs in that it is automat-ically inferred (via statistical profiling and LLM adjudication [19]) and used as a runtime structure for per-query table retrieval rather than a static query interface. 
+
+## 6 CONCLUSION 
+
+We presented guided table retrieval, a systematic approach to iden-tifying the tables and join paths needed to answer natural language questions over structured databases. The pipeline decomposes the problem into four phases—grounding, exploration, disambiguation, and merging—each with a well-defined role: hash-based predictors provide deterministic anchoring, join-graph traversal ensures struc-tural coverage, LLM reasoning resolves semantic ambiguities, and prefix merging produces minimal join trees. Our evaluation on BIRD-DEV and BEAVER demonstrates that this decomposition achieves high precision (94% and 70%) and strong F1 (92% and 53%), substantially outperforming existing base-lines. Unlike top-𝑘 retrieval methods, guided table retrieval pro-duces exact join trees that are correct and complete, and are directly consumable by query compilers, eliminating the need for down-stream table filtering or join inference. Several directions remain open. There is room to improve recall on enterprise-scale schemas with noisy metadata through richer profiling, domain-specific embeddings, and multi-hop exploration. The disambiguation phase currently relies on a single LLM call; iterative refinement with feedback from the query compiler could further improve accuracy. Finally, extending the pipeline to han-dle multi-turn conversations—where context accumulates across questions—is a natural next step toward making databases truly searchable for business users. 
+
+## REFERENCES 
+
+[1] Diego Calvanese, Benjamin Cogrel, Sarah Komla-Ebri, Roman Kontchakov, Da-vide Lanti, Martin Rezk, Mariano Rodriguez-Muro, and Guohui Xiao. 2017. Ontop: Answering SPARQL Queries over Relational Databases. Semantic Web 8, 3 (2017), 471–487. [2] Peter Baile Chen, Fabian Wenz, Yi Zhang, Devin Yang, Justin Choi, Nesime Tatbul, Michael Cafarella, Çağatay Demiralp, and Michael Stonebraker. 2025. BEAVER: An Enterprise Benchmark for Text-to-SQL. https://arxiv.org/abs/2409.02038 [3] Grace Fan, Jin Wang, Yuliang Li, Dan Zhang, and Renée J. Miller. 2023. Semantics-aware Dataset Discovery from Data Lakes with Contextualized Column-based Representation Learning. PVLDB 16, 7 (2023), 1726–1739. [4] Raul Castro Fernandez, Ziawasch Abedjan, Famien Koko, Gina Yuan, Samuel Madden, and Michael Stonebraker. 2018. Aurum: A Data Discovery System. In 
+
+ICDE . IEEE, 1001–1012. [5] Dawei Gao, Haibin Wang, Yaliang Li, Xiuyu Sun, Yichen Qian, Bolin Ding, and Jingren Zhou. 2024. Text-to-SQL Empowered by Large Language Models: A Benchmark Evaluation. PVLDB 17, 5 (2024), 1132–1145. [6] Sulbha Jain, Shivani Tripathi, Shi Qiao, and Alekh Jindal. 2026. Tursio Database Search: How far are we from ChatGPT? (2026). arXiv:2603.18835 [cs.DB] [7] Alekh Jindal, Shi Qiao, Rathijit Sen, and Hiren Patel. 2021. Microlearner: A fine-grained Learning Optimizer for Big Data Workloads at Microsoft. In ICDE .IEEE, 2423–2434. [8] Alekh Jindal, Shi Qiao, Shivani Tripathi, Niloy Debnath, Kunal Singh, Pushpanjali Nema, Sharath Prakash, Aditya Halder, Ronith PR, Sadiq Mohammed, Abdul Hameed, Karan Hanswadkar, Ayush Kshitij, Sarthak Bhatt, Rony Chatterjee, Jyoti Pandey, Christina Pavlopoulou, and Ravi Shetye. 2026. Making Databases Searchable with Deep Context. (2026). arXiv:2602.08320 [cs.DB] [9] Aamod Khatiwada, Grace Fan, Roee Shraga, Zixuan Chen, Wolfgang Gatter-bauer, Renée J. Miller, and Mirek Riedewald. 2023. SANTOS: Relationship-based Semantic Table Union Search. Proc. ACM Manag. Data 1, 1 (2023), 9:1–9:25. [10] Wenqiang Lei, Weixin Wang, Zhixin Ma, Tian Gan, Wei Lu, Min-Yen Kan, and Tat-Seng Chua. 2020. Re-examining the Role of Schema Linking in Text-to-SQL. In EMNLP . 6943–6954. [11] Fei Li and H. V. Jagadish. 2014. Constructing an Interactive Natural Language Interface for Relational Databases. PVLDB 8, 1 (2014), 73–84. [12] Haoyang Li, Jing Zhang, Cuiping Li, and Hong Chen. 2023. RESDSQL: Decoupling Schema Linking and Skeleton Parsing for Text-to-SQL. In AAAI , Vol. 37. 13067– 13075. [13] Jinyang Li, Binyuan Hui, Ge Qu, Jiaxi Yang, Binhua Li, Bowen Li, Bailin Wang, Bowen Qin, Ruiying Geng, Nan Huo, Xuanhe Zhou, Ma Chenhao, Guoliang Li, Kevin Chang, Fei Huang, Reynold Cheng, and Yongbin Li. 2023. Can LLM Already Serve as A Database Interface? A BIg Bench for Large-Scale Database Grounded Text-to-SQLs. In Advances in Neural Information Processing Systems .[14] Xi Victoria Lin, Richard Socher, and Caiming Xiong. 2020. BRIDGE: Bridging Textual and Tabular Data for Cross-Domain Text-to-SQL Semantic Parsing. In 
+
+Findings of EMNLP . 4870–4888. [15] Parimarjan Negi, Matteo Interlandi, Ryan Marcus, Mohammad Alizadeh, Tim Kraska, Marc T. Friedman, and Alekh Jindal. 2021. Steering Query Optimizers: A Practical Take on Big Data Workloads. In SIGMOD , Guoliang Li, Zhanhuai Li, Stratos Idreos, and Divesh Srivastava (Eds.). ACM, 2557–2569. [16] Mohammadreza Pourreza and Davood Rafiei. 2023. DIN-SQL: Decomposed In-Context Learning of Text-to-SQL with Self-Correction. In NeurIPS .[17] Shayan Talaei, Mohammadreza Pourreza, Yu-Chen Chang, Azalia Mirhoseini, and Amin Saberi. 2024. CHESS: Contextual Harnessing for Efficient SQL Synthesis. arXiv:2405.16755 [18] Transaction Processing Performance Council. [n.d.]. TPC-H Decision Support Benchmark. https://www.tpc.org/tpch/ [19] Shivani Tripathi, Ravi Shetye, Shi Qiao, and Alekh Jindal. 2026. Scalable Join Inference for Large Context Graphs. (2026). arXiv:2603.04176 [cs.DB] [20] Vanna AI. 2024. Vanna: Open-Source RAG Framework for SQL Generation. https://github.com/vanna-ai/vanna [21] Bailin Wang, Richard Shin, Xiaodong Liu, Oleksandr Polozov, and Matthew Richardson. 2020. RAT-SQL: Relation-Aware Schema Encoding and Linking for Text-to-SQL Parsers. In ACL . 7567–7578. [22] Tomer Wolfson, Mor Geva, Ankit Gupta, Matt Gardner, Yoav Goldberg, Daniel Deutch, and Jonathan Berant. 2020. Break It Down: A Question Understanding Benchmark. Transactions of the Association for Computational Linguistics 8 (2020), 183–198. [23] Erkang Zhu, Dong Deng, Fatemeh Nargesian, and Renée J. Miller. 2019. JOSIE: Overlap Set Similarity Search for Finding Joinable Tables in Data Lakes. In 
+
+SIGMOD . 847–864.
