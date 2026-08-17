@@ -1,0 +1,472 @@
+Title: MoE Proxy Models for Low-Cost Failure Reproduction and Diagnosis in LLM RL Post-Training
+
+URL Source: https://arxiv.org/pdf/2608.10823v1
+
+Published Time: Wed, 12 Aug 2026 01:00:40 GMT
+
+Number of Pages: 9
+
+Markdown Content:
+# MoE Proxy Models for Low-Cost Failure Reproduction and Diagnosis in LLM RL Post-Training 
+
+## Yikai Wang 1∗, Chuansai Zhou 2∗, Yuhang Zhou 1, Weiqiang Wu 2, Cong Wu 2,Yue Deng 1, Ben Feng 2, Mingming Zhu 2, Beirong Zhou 2, Zhibin Wang 1,Sheng Zhong 1, Chen Tian 1, Wangze Zhang 2
+
+> 1
+
+State Key Laboratory for Novel Software Technology, Nanjing University, China 
+
+> 2
+
+Huawei, China 
+
+Abstract 
+
+Reinforcement learning (RL) post-training of large language models (LLMs) is computationally intensive and involves complex system pipelines with substantial debugging over-head. In practice, factors such as framework adaptation, nu-merical precision, and operator implementation can cause fail-ures, including gradient overflow and loss divergence. Repro-ducing such failures directly on large models requires consid-erable time and computational resources. This paper system-atically analyzes failures encountered during large-scale RL training on the Huawei Ascend platform, summarizes repre-sentative failure types, and identifies three model-side factors relevant to fault reproduction. Based on these factors, we pro-pose a proxy-model construction method for low-cost fault investigation and auxiliary diagnosis. It employs structure-preserving, clustering-based expert pruning to select repre-sentative experts while retaining the model’s backbone archi-tecture, routing mechanism, and basic task capabilities. Our experimental results show that the proxy models reduce accel-erator requirements by 50% –87 .5% and achieve up to a 33 .3×
+
+reduction in per-step NPU-hour cost, while preserving major training dynamics and reproducing fault responses consistent with the original models. Overall, the proxy models can serve as low-cost surrogates for fault reproduction, targeted valida-tion, and auxiliary diagnosis in RL post-training. 
+
+## Introduction 
+
+Reinforcement learning (RL) post-training has become an important stage for improving the instruction-following, complex reasoning, and human-preference alignment capa-bilities of large language models (Christiano et al. 2017; Ziegler et al. 2019; Ouyang et al. 2022; Guo et al. 2025a). However, compared with pre-training and supervised fine-tuning, RL post-training relies on online trajectory gener-ation, reward feedback, policy updates, and multi-model coordination, resulting in greater stochasticity and system complexity (Ouyang et al. 2022; Sheng et al. 2024; Hu et al. 2024). Subtle inconsistencies in framework adapta-tion, weight synchronization, numerical precision, operator implementation, and optimization configurations may lead to reward stagnation, abnormal KL growth, or training di-vergence (Henderson et al. 2018; Andrychowicz et al. 2021; Huang et al. 2024; Zhong et al. 2026; Qi et al. 2025). Such 
+
+> ∗
+
+These authors contributed equally. 
+
+faults may emerge only after prolonged training, making re-production and validation on the original large model compu-tationally expensive (Wortsman et al. 2023). This challenge is particularly pronounced for Mixture-of-Experts (MoE) mod-els, as dynamic expert routing and sparse computation fur-ther complicate the reproduction of training behavior (Fedus, Zoph, and Shazeer 2022; Dai et al. 2024; Lo et al. 2025). Therefore, constructing a lightweight proxy model that pre-serves major training dynamics and fault-response character-istics of the original model represents a promising approach to reducing the cost of fault analysis and diagnosis. Existing proxy-model approaches mainly focus on effi-ciency optimization, hyperparameter exploration, or stabil-ity analysis during pre-training (Yang et al. 2021; Wortsman et al. 2023), while model compression techniques such as pruning, quantization, and knowledge distillation primarily optimize inference efficiency, compression ratio, or task per-formance (Frantar and Alistarh 2023; Frantar et al. 2022; Hinton, Vinyals, and Dean 2015). These methods generally do not consider whether a compressed model preserves the model-side characteristics through which post-training faults are manifested (Lee et al. 2025; Lu et al. 2024; Liu et al. 2024b; Xie et al. 2024). For MoE models, directly remov-ing, averaging, or merging experts may alter static routing preferences, expert-utilization patterns, and hidden-state rep-resentations (Lu et al. 2024; Lo et al. 2025; Li et al. 2026). Consequently, a compressed model may retain certain infer-ence capabilities while failing to reproduce the fault-induced anomalies and training trends of the original model. To address this limitation, we propose a multi-view, frequency-aware expert pruning method for constructing low-cost MoE proxy models. Our method first summarizes representative issues in large-scale RL post-training (Huang et al. 2024; Zhong et al. 2026; Qi et al. 2025) and identifies three fault-relevant model characteristics: routing decisions, expert-utilization patterns, and hidden-state representations. To preserve these characteristics, we model expert similar-ity from three perspectives: Router parameters, expert co-activation behavior, and routed-context representations. The resulting distances are fused and used for K-Medoids clus-tering, through which representative experts are selected to construct the proxy model. Without parameter averaging or additional fine-tuning, the proposed method preserves the arXiv:2608.10823v1 [cs.LG] 11 Aug 2026 backbone architecture, Top-k routing rule, and standard MoE execution structure. We evaluate the proposed method on the Qwen and DeepSeek families of MoE models (Yang et al. 2025; Liu et al. 2025; Xu et al. 2026). The resulting proxy models re-duce accelerator requirements by 50% –87 .5% and achieve up to a 33 .3× reduction in per-step NPU-hour cost. Under fault-free RL post-training, the proxy models preserve the major evolution trends of reward and actor KL loss, indicating that they maintain consistent training dynamics with the original models. Under faults related to numerical consistency and training stability, the proxy models further reproduce consis-tent anomaly directions and temporal trends. These results demonstrate that the proposed proxy models provide compu-tationally efficient surrogates for low-cost fault reproduction, targeted validation, and auxiliary diagnosis. Our main contributions are as follows: 
+
+• We summarize representative fault categories, anoma-lous manifestations, and primary causes in large-scale RL post-training, and define a proxy-model fault-reproduction criterion based on anomaly directions and training trends. 
+
+• We propose a multi-view, frequency-aware MoE expert pruning method that constructs lightweight proxy models while preserving the backbone architecture, Top-k rout-ing mechanism, and standard MoE execution structure. 
+
+• We evaluate the proposed proxy models across differ-ent MoE architectures and expert budgets, demonstrating substantial cost reductions while preserving task capabil-ity, fault-response consistency, and RL training trends for low-cost fault reproduction and auxiliary diagnosis. The remainder of this paper is organized as follows. Sec-tion 2 discusses RL post-training instability, proxy-model motivation, and the limitations of existing approaches. Sec-tion 3 presents the fault-aware proxy construction framework and the proposed multi-view, frequency-aware expert prun-ing method. Section 4 evaluates its computational efficiency, training-dynamics fidelity, fault reproduction capability, and expert-selection effectiveness. Finally, Section 5 concludes the paper. 
+
+## Background 
+
+Instability of RL Post-Training 
+
+Reinforcement learning (RL) post-training has become a crit-ical stage for improving the instruction-following, reasoning, and alignment capabilities of large language models (Chris-tiano et al. 2017; Ziegler et al. 2019; Ouyang et al. 2022; Guo et al. 2025a). However, RL is inherently characterized by high variance, non-stationarity, and sensitivity to hyper-parameters (Schulman et al. 2015; Henderson et al. 2018; Andrychowicz et al. 2021; Spangher et al. 2025). When ap-plied to large language models, interactions among online sampling, reward modeling, KL regularization, and complex system pipelines further amplify training instability (Sheng et al. 2024; Hu et al. 2024). As a result, subtle inconsisten-cies in weight synchronization, numerical precision, operator implementation, or optimization configurations can lead to reward stagnation, abnormal KL growth, gradient overflow, or even training divergence (Huang et al. 2024; Zhong et al. 2026; Qi et al. 2025). These anomalies often emerge only after prolonged training, by which time substantial compu-tational resources have already been consumed, while their root causes remain difficult to identify. Therefore, reproduc-ing training anomalies and identifying their primary causes at low cost has become an urgent problem for improving the stability of RL post-training. 
+
+Motivation for Proxy-Model Validation 
+
+RL post-training involves multiple models (policy, refer-ence, reward, and optional value models) and continu-ously performs autoregressive generation and online sam-pling (Ouyang et al. 2022). Consequently, reproducing and diagnosing faults directly on the target large model is pro-hibitively expensive. A natural strategy to reduce this cost is to employ a lightweight proxy model—a compressed variant of the original model that can be executed on fewer accel-erators while preserving sufficient structural and behavioral fidelity to serve as a surrogate for fault analysis. This idea has shown initial promise in the pre-training stage, where small-scale models have been used for low-cost hyperparam-eter search and stability analysis. Representative examples include μTransfer, which enables hyperparameters tuned on small-scale models to be transferred to substantially larger models (Yang et al. 2021), and small-scale Transformer prox-ies that reproduce large-model training instabilities and eval-uate their mitigation strategies at reduced cost (Wortsman et al. 2023). These prior findings suggest that proxy-based validation is a viable concept, motivating us to explore its systematic construction specifically for RL post-training. 
+
+Limitations of Existing Proxy 
+
+Existing proxy-model approaches and model compression techniques, including pruning, knowledge distillation, and quantization, provide general-purpose foundations for con-structing lightweight surrogate models (Frantar and Alistarh 2023; Hinton, Vinyals, and Dean 2015; Frantar et al. 2022). However, these approaches are designed primarily to reduce model size, improve inference efficiency, or preserve task performance, and generally do not consider whether the re-sulting models retain the architectural structures, execution paths, and training dynamics associated with faults (Lee et al. 2025; Lu et al. 2024; Liu et al. 2024b; Xie et al. 2024; Guo et al. 2025b; Zhang et al. 2025; Chen et al. 2022). When applied to RL post-training, such proxy models suffer from three fundamental limitations that prevent their direct use for fault diagnosis. First, compression methods such as distillation primarily preserve final output distributions, whereas RL post-training faults often originate from intermediate execution stages, rollout generation, gradient propagation, or weight synchro-nization. These process-level anomalies may be smoothed over or masked by output-oriented compression objectives, making the compressed model insensitive to the very faults we aim to diagnose. Second, RL feedback signals are sparse and delayed; a compressed model that retains only static inference capa-bility may fail to produce valid exploration trajectories or discriminative reward distributions (Roy et al. 2025), caus-ing its training dynamics to deviate substantially from those of the original model. Moreover, simply scaling down model components proportionally does not preserve the conditions under which reward hacking, over-optimization, or training instability emerge (Amodei et al. 2016; Casper et al. 2023; Gao, Schulman, and Hilton 2023; Rafailov et al. 2024), as these phenomena are sensitive to the relative scale of capacity and regularization. Third, for Mixture-of-Experts (MoE) architectures (Fe-dus, Zoph, and Shazeer 2022; Jiang et al. 2024; Dai et al. 2024; Liu et al. 2024a), common practices such as expert merging or parameter averaging may alter router decision re-gions, Top-k expert combinations, and expert co-activation patterns (Li et al. 2026), all of which influence the man-ifestation of routing-related faults. Altering these mecha-nisms changes the dynamic expert-selection behavior and hidden-state propagation paths, making it unlikely that the compressed model will reproduce routing-related anomalies observed in the original model (Lo et al. 2025). These limitations reveal a fundamental gap between ex-isting proxy models and the requirements of fault diagnosis in RL post-training. Therefore, constructing a proxy model for this setting demands a specialized approach that explic-itly preserves fault-relevant structures, routing dynamics, and hidden-state propagation characteristics, rather than simply optimizing for task accuracy or speed. 
+
+## System Design 
+
+This section presents the construction of a lightweight proxy model for low-cost fault validation and auxiliary diagnosis in RL post-training. We first discuss the key objectives and challenges of proxy-model construction and then present the proposed method. 
+
+Design Objectives and Challenges 
+
+The central question in proxy-model construction is: how can we minimize model size while preserving the ability to reproduce fault-related behaviors of the original model? This involves two interconnected challenges. 
+
+First, we must determine which architectural and behav-ioral characteristics are essential for fault reproduction. RL post-training faults are diverse and highly coupled—similar symptoms may arise from different causes, while the same cause may manifest differently. Without a systematic iden-tification of fault-relevant factors, pruning risks removing structures critical to fault sensitivity. 
+
+Second, we must achieve compression without destroy-ing these characteristics. Conventional compression meth-ods prioritize model size, inference speed, or task perfor-mance (Frantar and Alistarh 2023; Frantar et al. 2022; Hin-ton, Vinyals, and Dean 2015), with limited consideration of whether the compressed model retains fault-related execu-tion paths, routing behaviors, or training dynamics. These challenges indicate that proxy-model construction must jointly optimize for both compression efficiency and fault-response preservation, rather than minimizing parame-ter count alone. 
+
+Proposed Method 
+
+To address the above challenges, we first characterize rep-resentative RL post-training faults and identify the model characteristics that should be preserved during proxy con-struction. These characteristics guide the multi-view expert-similarity design introduced in the following subsections. 
+
+Problem Characterization We characterize practical RL post-training faults, identify the fault-relevant characteris-tics that guide expert pruning, and define the criterion for evaluating the proxy model. Based on our experience with large-scale RL post-training on the Huawei Ascend platform, we summarize representa-tive faults and analyze their typical manifestations and dom-inant causes, as shown in Table 1 (Huang et al. 2024; Zhong et al. 2026; Qi et al. 2025). Although the fault categories may overlap, their domi-nant causes highlight three model characteristics that are particularly relevant to MoE proxy construction: routing de-cisions, expert-utilization patterns, and hidden-state repre-sentations. Routing decisions determine how inputs are as-signed to different experts and directly affect the execution paths of MoE models (Fedus, Zoph, and Shazeer 2022; Dai et al. 2024; Lo et al. 2025). Expert-utilization patterns re-flect dynamic routing relationships and expert co-activation behavior under different inputs (Lo et al. 2025; Lee et al. 2025). Hidden-state representations characterize the input representations received and processed by individual experts. Accordingly, these characteristics are modeled through the Router-parameter, co-activation, and routed-context views, respectively. Preserving them during expert pruning is there-fore essential for constructing a reliable proxy model. We do not require the proxy and original models to pro-duce numerically identical training metrics. Instead, we con-sider a fault reproduced when the two models exhibit sim-ilar anomaly types, metric-change directions, and temporal trends under the same fault condition. 
+
+Proxy Model Construction The goal is to reduce the num-ber of MoE experts while preserving fault-relevant charac-teristics. We propose a multi-view, frequency-aware pruning method that selects representative experts without parameter averaging or additional fine-tuning. The overall framework is illustrated in Figure 1, and Algorithm 1 summarizes the procedure. Consider the l-th MoE layer with N experts. Let T denote the calibration set. For each token t, let hlt be the input hidden state, Elt the Top-k selected expert set, and plt,i the routing weight for expert i. If expert i is not selected, plt,i = 0 .
+
+Multi-View Expert Similarity. We measure expert differ-ences from three complementary perspectives: 
+
+Router-Parameter Distance. Router parameters determine the static preferences with which experts are selected for different input hidden states and are therefore a key factor affecting expert-routing consistency. We use the weight vec-tors wli to capture static routing preferences. If a bias exists, it is concatenated. The distance is: 
+
+Dlr (i, j ) = ∥wli − wlj ∥2. (1) Issue Category Typical Symptoms Primary Causes 
+
+Framework and model-state con-sistency issues Training–inference divergence; checkpoint or recovery failures Backend inconsistencies; weight synchronization or conversion errors; parallelism configuration mis-matches Operator implementation and numerical consistency issues Numerical deviations; probability or gradient discrepancies Operator differences; precision errors; data-layout or reduction-order inconsistencies Expert routing consistency is-sues Routing shifts; expert imbalance; abnormal expert selection Router errors; Top-k mismatches; expert mapping or dispatch inconsistencies Optimization and training stabil-ity issues Reward degradation; KL divergence increase; training instability Improper optimization settings; reward or KL configu-ration issues; inadequate gradient clipping 
+
+Table 1: Taxonomy of representative issues in large-scale RL post-training. Method Overview: Proxy Model Construction via Multi-View Expert Pruning  
+
+> Calibration
+> Data
+
+... 
+
+... 
+
+Forward Pass     
+
+> Original MoE Layer ( 𝑵 Experts)
+> Router-parameter
+> distance
+> Co-activation
+> distance
+> Routed-context
+> prototype distance
+> 𝒘 𝒊
+> vs.
+> 𝑫 𝒓 𝒘 𝒊 , 𝒘 𝒋
+> Experts
+> 𝑫 𝒄 𝒊, 𝒋
+> vs.
+> 𝑝 𝑖 𝑝 𝑗
+
+Joint distance 
+
+𝑫 joint = 𝜶 𝒓 ഥ𝑫 𝒓 + 𝜶 𝒄 𝑫 𝒄 + 𝜶 𝒇 ഥ𝑫 𝒇 
+
+> K-medoids clustering (K clusters)
+> Representative selection
+
+★ ★ ★ ★...   
+
+> Original MoE Layer ( 𝑵 Experts)
+> prune & reconstruct
+> Proxy MoE Layer ( 𝑲 Experts)
+
+1 Routing Statistics Collection  2 Multi-View Similarity and Expert Pruning  3 Proxy Model Reconstruction     
+
+> Experts
+> 𝒘 j
+> 𝑫 𝒇 𝐢, 𝒑
+> ★★★★
+
+…   
+
+> Router
+> 𝐸′ 1𝐸′ 2𝐸′ K
+> ...
+> +
+> Router
+> 𝐸 1
+
+... 
+
++ 
+
+> 𝐸 2𝐸 N
+
+Collect    
+
+> hidden
+> states
+> top-k
+> selections
+> router
+> weights
+> activation
+> frequency
+> 𝐸 1𝐸 4
+> Router
+> 𝐸 2𝐸 3𝐸 𝑁 ...
+> +
+
+Figure 1: Overview of the proposed fault-aware proxy model construction framework via multi-view and frequency-aware expert pruning. The framework collects routing statistics from the original MoE model, measures expert similarity from router parameters, co-activation behavior, and routed-context representations, and reconstructs a lightweight proxy model by selecting representative experts while preserving the original MoE execution path. 
+
+Co-Activation Distance. Expert co-activation relation-ships reflect the expert-combination patterns and utilization distributions induced by Top-k routing and are therefore important for characterizing dynamic routing consistency. This dynamic joint-selection behavior is quantified by the co-activation distance: 
+
+Dlc(i, j ) = 1 −
+
+P 
+
+> t∈T
+
+I[i ∈ E lt ∧ j ∈ E lt ]
+
+qP 
+
+> t∈T
+
+I[i ∈ E lt ] · P 
+
+> t∈T
+
+I[j ∈ E lt ] + ϵ.
+
+(2) Here, I[·] denotes the indicator function. 
+
+Routed-Context Prototype Distance. The routed-context prototype distance is introduced to preserve the input repre-sentation characteristics of the hidden states routed to differ-ent experts, and is defined as: 
+
+Dlf (i, j ) = 
+
+P 
+
+> t∈T
+
+plt,i hlt
+
+∥ P 
+
+> t∈T
+
+plt,i hlt∥2 + ϵ −
+
+P 
+
+> t∈T
+
+plt,j hlt
+
+∥ P 
+
+> t∈T
+
+plt,j hlt∥2 + ϵ 2
+
+.
+
+(3) 
+
+Distance Fusion and Proxy Reconstruction. To eliminate scale differences, we normalize Dr and Df using the 95th percentile of their off-diagonal entries, clipping to [0 , 1] ;
+
+Dc is already within this range. For experts with insuf-ficient calibration support (i.e., cumulative routing mass 
+
+mli = P 
+
+> t
+
+plt,i < τ m), we replace their Df with Dr . Since Router parameters do not depend on specific activation sam-ples, this strategy provides a more stable structural-similarity estimate for low-support experts. The joint distance is: 
+
+Dl
+
+> joint
+
+(i, j ) = αr ˜Dlr (i, j ) + αcDlc(i, j ) + αf ˜Dlf (i, j ), (4) where αr + αc + αf = 1 .We apply K-Medoids clustering using Djoint , initializing medoids with the most frequently activated experts. From each resulting cluster, we select the most frequently acti-vated expert as the representative. For each MoE layer, we copy the MLP parameters and corresponding Router weights of the selected experts to reconstruct the proxy model. This preserves the original backbone and Top-k routing mecha-nism without introducing parameter averaging or additional Algorithm 1: Multi-View and Frequency-Aware Expert Prun-ing 
+
+Input : Original MoE model M and calibration statistics Scal 
+
+Parameter : Target expert number K, fusion weights 
+
+αr, α c, α f , and routing-mass threshold τm
+
+Output : Proxy model Mproxy and expert mappings {πl}Ll=1  
+
+> 1:
+
+Initialize Mproxy from M. 
+
+> 2:
+
+for l = 1 to L do  
+
+> 3:
+
+Compute router distance Dl
+
+> r
+
+. 
+
+> 4:
+
+Compute co-activation distance Dl
+
+> c
+
+. 
+
+> 5:
+
+Compute routed-context distance Dl 
+
+> f
+
+. 
+
+> 6:
+
+Normalize Dl 
+
+> r
+
+and Dl 
+
+> f
+
+. 
+
+> 7:
+
+Replace unreliable eDl 
+
+> f
+
+(i, j ) with eDl
+
+> r
+
+(i, j ) according to τm. 
+
+> 8:
+
+Fuse the three distances into Dl
+
+> joint
+
+. 
+
+> 9:
+
+Initialize K medoids using the most frequently acti-vated experts.  
+
+> 10:
+
+Apply K-Medoids on Dl 
+
+> joint
+
+to obtain clusters 
+
+{C lk}Kk=1 . 
+
+> 11:
+
+for k = 1 to K do  
+
+> 12:
+
+Select the most frequently activated expert rk from 
+
+Clk. 
+
+> 13:
+
+Set πl(k) = rk. 
+
+> 14:
+
+Copy expert rk and its router parameters into 
+
+Mproxy . 
+
+> 15:
+
+end for  
+
+> 16:
+
+end for  
+
+> 17:
+
+Update each MoE layer from N experts to K experts.  
+
+> 18:
+
+Preserve the original backbone and Top-k routing mech-anism.  
+
+> 19:
+
+return Mproxy and {πl}Ll=1 .fine-tuning. 
+
+## Experiments 
+
+This section evaluates the proposed proxy models from four perspectives: computational efficiency, training-dynamics fi-delity, fault-reproduction capability, and expert-selection ef-fectiveness. We first quantify the resource savings achieved by proxy construction, then examine whether the proxy mod-els preserve major RL training trends and reproduce repre-sentative post-training faults, and finally analyze the contri-butions of the multi-view design and expert-selection strat-egy. 
+
+Experimental Setup 
+
+Models and Hardware. We conduct the main experiments on Qwen3-30B-A3B (Yang et al. 2025) using a Huawei A3 server equipped with 16 Ascend 910 NPUs. The original model contains 128 routed experts in each MoE layer with Top-8 routing. For Qwen3-30B-A3B, we construct proxy models retaining 48 and 64 experts per layer. We further evaluate the proposed method on DeepSeek models (Liu et al. 2025) with different model scales and MoE configurations to verify its general applicability.                     
+
+> Model Variant Experts NPUs Time/Step
+> Qwen3-30B-A3B Original 128 16 128.93 s Qwen3-30B-A3B Proxy 48 8114.83 s DeepSeek-V3.2 Original 256 512 50 min DeepSeek-V3.2 Proxy 16 64 12 min
+
+Table 2: Computational cost of the original and proxy models during RL post-training. 
+
+Data and Training Configuration. We use an indepen-dent calibration set to collect expert activation frequen-cies, Top-k selections, routing weights, and routed hidden states. The calibration samples do not overlap with any test samples. GSM8K (Cobbe et al. 2021) is used for task-capability evaluation and as the task environment for fault-reproduction experiments. RL post-training is implemented using VERL (Sheng et al. 2024) and vLLM (Kwon et al. 2023) with GRPO (Shao et al. 2024). Unless otherwise spec-ified, the original and proxy models use the same RL training configuration. 
+
+Baselines and Evaluation Metrics. The capability compar-isons include pairwise-view ablations, frequency-only se-lection, random selection, and fixed First-K expert selec-tion. For fault reproduction, we compare our method with frequency-only selection and model-centric expert grouping and merging (Li et al. 2026). We inject two representative faults: the Rollout LogP Precision Fault for numerical con-sistency and the Actor Update Omission Fault for optimiza-tion stability. The evaluation metrics include task accuracy, computational cost, rollout–training LogP discrepancy, KL divergence, and training-dynamics consistency. 
+
+Computational Efficiency 
+
+We first evaluate the reduction in RL post-training resource costs achieved by the proxy models. As shown in Table 2, the proxy models substantially reduce the minimum deployment scale and per-step runtime, with the resulting NPU-hour costs analyzed below. For Qwen3-30B-A3B, the original model requires 16 As-cend 910 NPUs to launch training, whereas the proxy model retaining 48 experts requires only 8 NPUs. Under the same training pipeline, the per-step training time decreases from 128.93 seconds to 114.83 seconds, while the corresponding per-step NPU-hours decrease from 0.573 to 0.255, repre-senting an approximately 55.5% reduction in computational cost. In the larger-scale DeepSeek-V3.2 experiment, the original model requires 32 nodes with a total of 512 NPUs and takes approximately 50 minutes per training step. The proxy model requires only 4 nodes with a total of 64 NPUs, reducing the per-step training time to approximately 12 minutes. Its per-step computational cost decreases from 426.7 NPU-hours to 12.8 NPU-hours, corresponding to an approximately 33 .3×
+
+cost reduction. These results demonstrate that the constructed proxy mod-els substantially reduce the hardware requirements and com-putational cost of RL post-training, providing an efficient 10 20 30 40 50       
+
+> Training Step
+> 0.2 0.4 0.6 0.8 1.0
+> Mean Reward
+> Reward Dynamics (a)
+> 10 20 30 40 50
+> Training Step
+> 0.00 0.25 0.50 0.75 1.00
+> Actor KL Loss
+> KL-Loss Dynamics (b)
+> Original Model 64-Expert Proxy 32-Expert Proxy
+
+Figure 2: Reward and actor KL-loss dynamics of the original DeepSeek-V4-Flash model and its 64-expert and 32-expert proxy models. The proxy models preserve the major training trends of reward improvement and KL-loss growth, while re-taining more experts reduces the deviation from the original model. alternative for fault reproduction, validation, and diagnostic analysis. 
+
+Training-Dynamics Fidelity 
+
+Beyond reducing computational cost, an effective proxy model should preserve the major optimization dynamics of the original model during RL post-training. To evaluate this property, we compare the reward and actor KL loss of the original DeepSeek-V4-Flash model (Xu et al. 2026) with those of its 64-expert and 32-expert proxy models. As shown in Figure 2(a), all three models exhibit an over-all reward improvement trend despite short-term fluctua-tions. The 64-expert proxy model achieves a reward trajec-tory closer to the original model, while the 32-expert proxy model preserves the same increasing trend with a larger per-formance gap. These results indicate that the proxy models preserve the overall reward evolution of the original model, while retaining more experts improves training-trajectory fi-delity. Figure 2(b) shows that the actor KL loss of all models gradually increases during training, reflecting a consistent evolution of policy distribution shifts. Although the proxy models differ from the original model in absolute KL mag-nitude and local fluctuations, their overall change directions remain consistent. 
+
+Fault Reproduction Capability 
+
+After verifying that the proxy models preserve the major RL training dynamics, we further evaluate whether they can re-produce the fault-induced behaviors of the original models. A fault is considered reproduced when the proxy and origi-nal models exhibit consistent anomaly types, metric-change directions, and temporal trends under the same fault condi-tion. Based on the issue categories summarized in Table 1, we select two representative faults for evaluation: the Rollout LogP Precision Fault, which reflects numerical consistency issues, and the Actor Update Omission Fault, which reflects training stability issues during optimization. 
+
+Rollout LogP Precision Fault. This fault introduces a proba-bility discrepancy between the generation and training stages by reducing the numerical precision of the scaling factor used in Rollout LogP computation. Except for whether the fault 25 50 75 100 125 150 175 200 0.010 0.015 0.020                          
+
+> Rollout--Training  ΔLogP
+> (a) Original Model
+> Healthy Fault
+> 25 50 75 100 125 150 175 200 0.010 0.015 0.020 0.025 (b) 48-Expert Proxy
+> Healthy Fault
+> 25 50 75 100 125 150 175 200
+> Training Step
+> 0.002 0.004 0.006 0.008
+> KL Divergence
+> (c)
+> Healthy Fault
+> 25 50 75 100 125 150 175 200
+> Training Step
+> 0.002 0.004 0.006 0.008 0.010 (d)
+> Healthy Fault
+
+Figure 3: Comparison of Rollout–Training LogP discrepancy and KL divergence under the Rollout LogP Precision Fault. The original model and 48-expert proxy model exhibit con-sistent anomaly patterns after fault injection, including LogP shift and KL divergence increase. is enabled, the healthy and faulty runs use identical data and training configurations. Figure 3 compares the Rollout–Training LogP discrepancy and KL divergence of the original model and the 48-expert proxy model under healthy and faulty conditions. After fault injection, both models exhibit consistent anomaly patterns, including a shift in the Rollout–Training LogP discrepancy and an increase in KL divergence. Although the magnitude of the changes differs between the two models, their anomaly directions and temporal trends remain consistent, indicating that the proxy model preserves sensitivity to the numerical fault. To further analyze the impact of proxy construction strate-gies on fault reproduction, we compare our method with frequency-only selection and expert grouping and merg-ing. Under the same 48-expert budget, both our method and frequency-only selection reproduce the qualitative fault signatures, including the LogP-discrepancy shift and KL-divergence increase, whereas the expert-merging baseline fails to sustain stable training. Nevertheless, the ability to reproduce a single fault does not alone determine the quality of a proxy model. Compared with frequency-only selection, our method additionally accounts for complementary expert relationships and achieves stronger task-capability preser-vation while maintaining fault sensitivity. Detailed fault-reproduction comparisons are provided in appendix. 
+
+Actor Update Omission Fault. To evaluate whether the proxy model preserves sensitivity to optimization failures, we inject an Actor Update Omission Fault by disabling actor parameter updates while keeping the remaining RL pipeline unchanged. Under this fault, trajectories and rewards are still collected, but the policy cannot update according to the op-timization signals, preventing further policy improvement. Figure 4 compares the reward trajectories of the origi-nal and proxy models under healthy and faulty conditions. Since the per-step rewards are discrete and highly fluctuat-ing, centered rolling means are used to highlight long-term 0 40 80 120 160 200 Training Step 0.76 0.80 0.84 0.88 0.92 0.96 Reward      
+
+> Original Large Model
+> Healthy Actor update omitted
+> 040 80 120 160 200 Training Step 0.45 0.60 0.75 0.90 Reward
+> Pruned Proxy Model
+> Healthy Actor update omitted
+
+Figure 4: Reward dynamics under the Actor Update Omission Fault. Disabling actor updates suppresses reward improve-ment in both the original model and the pruned proxy model, demonstrating that the proxy model preserves the reward-stagnation behavior caused by this optimization fault. 
+
+Expert Similarity 48 Experts 64 Experts 
+
+Original Model 93.5% Context + Co-activation 44.0% 76.0% Router + Co-activation 46.5% 81.0% Context + Router 44.5% 77.5% 
+
+Ours (Three Views) 48.0% 86.0% 
+
+Table 3: GSM8K accuracy of Qwen3-30B-A3B proxy mod-els under different expert-similarity configurations. trends. The runs are aligned to their common training hori-zon, with a wider smoothing window used for the original model. Under healthy training, both models exhibit clear reward improvement, whereas omitting actor updates sub-stantially suppresses this trend. Although the magnitude of stagnation differs, both models exhibit the same fault-induced suppression of reward improvement, indicating that the proxy model preserves sensitivity to this optimization fault. 
+
+Ablation and Expert Selection Analysis 
+
+We analyze the proposed expert selection method from two aspects: the contribution of different expert-similarity views and its performance relative to alternative selection strate-gies. We conduct the multi-view ablation on Qwen3-30B-A3B and compare expert-selection strategies on DeepSeek-V3.2. 
+
+Multi-View Ablation Table 3 presents the results under different expert budgets and similarity configurations. The complete three-view method achieves accuracies of 48.0% and 86.0% when retaining 48 and 64 experts, respectively, outperforming all pairwise-view combinations. These results indicate that the three similarity views capture complemen-tary expert characteristics and jointly provide more effective guidance for expert selection. Increasing the number of re-tained experts further mitigates the capability degradation caused by pruning. 
+
+Expert Selection Comparison To further evaluate the ef-fectiveness of the proposed expert selection strategy, we com-pare it with frequency-only selection, random selection, and fixed First-K expert retention on DeepSeek-V3.2. 
+
+Selection Strategy GSM8K Accuracy 
+
+Original Model 95.0% Frequency-Only 53.0% Random Selection 3.0% Fixed First-K Experts 3.0% 
+
+Ours 58.5% 
+
+Table 4: GSM8K accuracy of different expert-selection strategies on DeepSeek-V3.2. Table 4 compares different expert-selection strategies when retaining 16 routed experts per layer. The proposed method achieves an accuracy of 58.5%, outperforming frequency-only selection by 5.5 percentage points. In con-trast, random selection and fixed retention of the first 16 experts both achieve only 3.0%, demonstrating that prun-ing experts without considering expert relationships leads to severe capability degradation. These results demonstrate that the proposed expert selec-tion strategy achieves better capability preservation under aggressive expert reduction. Overall, the proposed proxy models substantially reduce RL post-training cost while retaining sufficient task capa-bility, fault-response consistency, and major training trends. The ablation results further validate the effectiveness of the multi-view similarity design and frequency-aware expert se-lection. 
+
+## Conclusion 
+
+This paper presents a multi-view, frequency-aware proxy-model construction method for supporting low-cost issue lo-calization and auxiliary diagnosis in the RL post-training of Mixture-of-Experts large language models. By jointly mod-eling Router parameters, expert co-activation behavior, and routed-context representations, the proposed method selects representative experts while preserving the original back-bone, Top-k routing mechanism, and standard MoE exe-cution path. Experiments on Qwen and DeepSeek models demonstrate that the resulting proxy models substantially re-duce hardware requirements and training costs while retain-ing sufficient task capability for valid RL post-training. They also exhibit consistent fault responses and major training dynamics with the original models. These results demon-strate that the proposed proxy models can serve as efficient surrogates for low-cost fault reproduction, validation, and auxiliary diagnosis before deploying expensive verification on the original models. 
+
+## References 
+
+Amodei, D.; Olah, C.; Steinhardt, J.; Christiano, P.; Schul-man, J.; and Mané, D. 2016. Concrete problems in AI safety. 
+
+arXiv preprint arXiv:1606.06565 .Andrychowicz, M.; Raichuk, A.; Stańczyk, P.; Orsini, M.; Girgin, S.; Marinier, R.; Hussenot, L.; Geist, M.; Pietquin, O.; Michalski, M.; et al. 2021. What matters for on-policy deep actor-critic methods? a large-scale study. In International conference on learning representations .Casper, S.; Davies, X.; Shi, C.; Gilbert, T. K.; Scheurer, J.; Rando, J.; Freedman, R.; Korbak, T.; Lindner, D.; Freire, P.; et al. 2023. Open problems and fundamental limitations of reinforcement learning from human feedback. arXiv preprint arXiv:2307.15217 .Chen, T.; Huang, S.; Xie, Y.; Jiao, B.; Jiang, D.; Zhou, H.; Li, J.; and Wei, F. 2022. Task-specific expert pruning for sparse mixture-of-experts. arXiv preprint arXiv:2206.00277 .Christiano, P. F.; Leike, J.; Brown, T.; Martic, M.; Legg, S.; and Amodei, D. 2017. Deep reinforcement learning from hu-man preferences. Advances in neural information processing systems , 30. Cobbe, K.; Kosaraju, V.; Bavarian, M.; Chen, M.; Jun, H.; Kaiser, L.; Plappert, M.; Tworek, J.; Hilton, J.; Nakano, R.; et al. 2021. Training verifiers to solve math word problems. 
+
+arXiv preprint arXiv:2110.14168 .Dai, D.; Deng, C.; Zhao, C.; Xu, R.; Gao, H.; Chen, D.; Li, J.; Zeng, W.; Yu, X.; Wu, Y.; et al. 2024. Deepseekmoe: Towards ultimate expert specialization in mixture-of-experts language models. In Proceedings of the 62nd Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers) , 1280–1297. Fedus, W.; Zoph, B.; and Shazeer, N. 2022. Switch trans-formers: Scaling to trillion parameter models with simple and efficient sparsity. Journal of Machine Learning Research ,23(120): 1–39. Frantar, E.; and Alistarh, D. 2023. Sparsegpt: Massive lan-guage models can be accurately pruned in one-shot. In In-ternational conference on machine learning , 10323–10337. PMLR. Frantar, E.; Ashkboos, S.; Hoefler, T.; and Alistarh, D. 2022. Gptq: Accurate post-training quantization for generative pre-trained transformers. arXiv preprint arXiv:2210.17323 .Gao, L.; Schulman, J.; and Hilton, J. 2023. Scaling laws for reward model overoptimization. In International Conference on Machine Learning , 10835–10866. PMLR. Guo, D.; Yang, D.; Zhang, H.; Song, J.; Wang, P.; Zhu, Q.; Xu, R.; Zhang, R.; Ma, S.; Bi, X.; et al. 2025a. Deepseek-r1: Incentivizing reasoning capability in llms via reinforcement learning. arXiv preprint arXiv:2501.12948 .Guo, H.; Yao, J.; Wang, B.; Du, J.; Cao, S.; Di, D.; Zhang, S.; and Li, Z. 2025b. Cluster-driven expert pruning for mixture-of-experts large language models. arXiv preprint arXiv:2504.07807 .Henderson, P.; Islam, R.; Bachman, P.; Pineau, J.; Precup, D.; and Meger, D. 2018. Deep reinforcement learning that matters. In Proceedings of the AAAI conference on artificial intelligence , volume 32. Hinton, G.; Vinyals, O.; and Dean, J. 2015. Distill-ing the knowledge in a neural network. arXiv preprint arXiv:1503.02531 .Hu, J.; Wu, X.; Zhu, Z.; Wang, W.; Zhang, D.; Cao, Y.; et al. 2024. Openrlhf: An easy-to-use, scalable and high-performance rlhf framework. arXiv preprint arXiv:2405.11143 , 6. Huang, S.; Noukhovitch, M.; Hosseini, A.; Rasul, K.; Wang, W.; and Tunstall, L. 2024. The n+ implementation details of rlhf with ppo: A case study on tl; dr summarization. arXiv preprint arXiv:2403.17031 .Jiang, A. Q.; Sablayrolles, A.; Roux, A.; Mensch, A.; Savary, B.; Bamford, C.; Chaplot, D. S.; Casas, D. d. l.; Hanna, E. B.; Bressand, F.; et al. 2024. Mixtral of experts. arXiv preprint arXiv:2401.04088 .Kwon, W.; Li, Z.; Zhuang, S.; Sheng, Y.; Zheng, L.; Yu, C. H.; Gonzalez, J.; Zhang, H.; and Stoica, I. 2023. Efficient memory management for large language model serving with pagedattention. In Proceedings of the 29th symposium on operating systems principles , 611–626. Lee, J.; Hwang, S.-w.; Qiao, A.; Campos, D. F.; Yao, Z.; and He, Y. 2025. Stun: Structured-then-unstructured pruning for scalable moe pruning. In Proceedings of the 63rd Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers) , 13660–13676. Li, L.; Zhu, Q.; Wang, J.; Qin, X.; Li, W.; Gu, H.; Han, S.; and Guo, Y. 2026. Sub-moe: Efficient mixture-of-expert llms compression via subspace expert merging. In Proceedings of the AAAI Conference on Artificial Intelligence , volume 40, 22994–23002. Liu, A.; Feng, B.; Xue, B.; Wang, B.; Wu, B.; Lu, C.; Zhao, C.; Deng, C.; Zhang, C.; Ruan, C.; et al. 2024a. Deepseek-v3 technical report. arXiv preprint arXiv:2412.19437 .Liu, A.; Mei, A.; Lin, B.; Xue, B.; Wang, B.; Xu, B.; Wu, B.; Zhang, B.; Lin, C.; Dong, C.; et al. 2025. Deepseek-v3. 2: Pushing the frontier of open large language models. arXiv preprint arXiv:2512.02556 .Liu, E.; Zhu, J.; Lin, Z.; Ning, X.; Blaschko, M. B.; Yan, S.; Dai, G.; Yang, H.; and Wang, Y. 2024b. Efficient ex-pert pruning for sparse mixture-of-experts language models: Enhancing performance and reducing inference costs. arXiv preprint arXiv:2407.00945 .Lo, K. M.; Huang, Z.; Qiu, Z.; Wang, Z.; and Fu, J. 2025. A closer look into mixture-of-experts in large language models. In Findings of the Association for Computational Linguistics: NAACL 2025 , 4427–4447. Lu, X.; Liu, Q.; Xu, Y.; Zhou, A.; Huang, S.; Zhang, B.; Yan, J.; and Li, H. 2024. Not all experts are equal: Efficient expert pruning and skipping for mixture-of-experts large language models. In Proceedings of the 62nd Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers) , 6159–6172. Ouyang, L.; Wu, J.; Jiang, X.; Almeida, D.; Wainwright, C. L.; Mishkin, P.; Zhang, C.; Agarwal, S.; Slama, K.; Ray, A.; et al. 2022. Training language models to fol-low instructions with human feedback. arXiv preprint arXiv:2203.02155 .Qi, P.; Liu, Z.; Zhou, X.; Pang, T.; Du, C.; Lee, W. S.; and Lin, M. 2025. Defeating the training-inference mismatch via fp16. arXiv preprint arXiv:2510.26788 .Rafailov, R.; Chittepu, Y.; Park, R.; Sikchi, H.; Hejna, J.; Knox, W. B.; Finn, C.; and Niekum, S. 2024. Scaling laws for reward model overoptimization in direct alignment algo-rithms. In The Thirty-eighth Annual Conference on Neural Information Processing Systems .Roy, S.; Hajimirsadeghi, H.; Zhai, M.; and Samei, G. 2025. You Need Reasoning to Learn Reasoning: The Limitations of Label-Free RL in Weak Base Models. arXiv preprint arXiv:2511.04902 .Schulman, J.; Moritz, P.; Levine, S.; Jordan, M.; and Abbeel, P. 2015. High-dimensional continuous control using general-ized advantage estimation. arXiv preprint arXiv:1506.02438 .Shao, Z.; Wang, P.; Zhu, Q.; Xu, R.; Song, J.; Bi, X.; Zhang, H.; Zhang, M.; Li, Y.; Wu, Y.; et al. 2024. Deepseekmath: Pushing the limits of mathematical reasoning in open lan-guage models. arXiv preprint arXiv:2402.03300 .Sheng, G.; Zhang, C.; Ye, Z.; Wu, X.; Zhang, W.; Zhang, R.; Peng, Y.; Lin, H.; and Wu, C. 2024. Hybridflow: A flexible and efficient rlhf framework. arXiv preprint arXiv:2409.19256 .Spangher, L.; Pasumarthi, R. K.; Masiewicki, N.; Arnold, W. F.; Kaushal, A.; Johnson, D.; Grabowski, P.; and Ie, E. 2025. RLHF Algorithms Ranked: An Extensive Evaluation Across Diverse Tasks, Rewards, and Hyperparameters. In 
+
+Proceedings of the 2025 Conference on Empirical Methods in Natural Language Processing: Industry Track , 518–529. Wortsman, M.; Liu, P. J.; Xiao, L.; Everett, K.; Alemi, A.; Adlam, B.; Co-Reyes, J. D.; Gur, I.; Kumar, A.; Novak, R.; et al. 2023. Small-scale proxies for large-scale transformer training instabilities. arXiv preprint arXiv:2309.14322 .Xie, Y.; Zhang, Z.; Zhou, D.; Xie, C.; Song, Z.; Liu, X.; Wang, Y.; Lin, X.; and Xu, A. 2024. Moe-pruner: Pruning mixture-of-experts large language model using the hints from its router. arXiv preprint arXiv:2410.12013 .Xu, A.; Lin, B.; Xue, B.; Wang, B.; Xu, B.; Wu, B.; Zhang, B.; Lin, C.; Dong, C.; Ling, C.; et al. 2026. Deepseek-v4: Towards highly efficient million-token context intelligence. 
+
+arXiv preprint arXiv:2606.19348 .Yang, A.; Li, A.; Yang, B.; Zhang, B.; Hui, B.; Zheng, B.; Yu, B.; Gao, C.; Huang, C.; Lv, C.; et al. 2025. Qwen3 technical report. arXiv preprint arXiv:2505.09388 .Yang, G.; Hu, E. J.; Babuschkin, I.; Sidor, S.; Liu, X.; Farhi, D.; Ryder, N.; Pachocki, J.; Chen, W.; and Gao, J. 2021. Tuning large neural networks via zero-shot hyperparameter transfer. In Advances in Neural Information Processing Sys-tems .Zhang, Z.; Liu, X.; Cheng, H.; Xu, C.; and Gao, J. 2025. Diversifying the expert knowledge for task-agnostic pruning in sparse mixture-of-experts. In Findings of the Association for Computational Linguistics: ACL 2025 , 86–102. Zhong, T.; Ling, N.; Pi, Y.; Wei, Z.; Yu, T.; Fox, G.; Wu, P.; and Yu, X. 2026. Diagnosing Training Inference Mis-match in LLM Reinforcement Learning. arXiv preprint arXiv:2605.14220 .Ziegler, D. M.; Stiennon, N.; Wu, J.; Brown, T. B.; Rad-ford, A.; Amodei, D.; Christiano, P.; and Irving, G. 2019. Fine-tuning language models from human preferences. arXiv preprint arXiv:1909.08593 .

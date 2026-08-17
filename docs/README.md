@@ -6,71 +6,73 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-08-16
-- 运行时间：2026-08-16 20:42:00 UTC
+- 最新运行日期：2026-08-17
+- 运行时间：2026-08-17 20:16:36 UTC
 - 运行状态：成功
 - 本次总论文数：17
 - 精读区：6
 - 速读区：11
 
 ### 今日简报（AI）
-今日巡检17篇论文，精读6篇、速读11篇，重点锁定情感对话与多语言翻译两大方向。最值得关注的是基于可验证情感反馈的双循环自进化框架，以及无需参照物的开源大模型多语言翻译后训练方法，均获9.0高分。若想快速跟进，可优先阅读这两篇精读论文，并留意树状记忆自校正搜索智能体等速读亮点。
-- 详情：[/202608/16/README](/202608/16/README)
+今日精读17篇，聚焦多语言机器翻译与GRPO非英语场景，共6篇精读、11篇速读。  
+最值得关注两篇9分研究：无参考后训练提升多语翻译，以及GRPO在非英语/多语环境的规模化验证。  
+建议优先精读这两篇，可快速抓住多语言模型后训练的核心突破与实操细节。
+- 详情：[/202608/17/README](/202608/17/README)
 
 ### 精读区论文标签
-1. [Dual-Loop Self-Evolution via Verifiable Emotion Feedback for Multi-Turn Empathetic Dialogue](/202608/16/2608.10626v1-dual-loop-self-evolution-via-verifiable-emotion-feedback-for-multi-turn-empathetic-dialogue)  
+1. [Reference-Free Post-Training of Open Large Language Models for Multilingual Machine Translation](/202608/17/2608.10812v1-reference-free-post-training-of-open-large-language-models-for-multilingual-machine-translation)  
    标签：评分：9.0/10、query:rl
-   evidence：基于可验证情感奖励的强化学习用于多轮共情对话
-2. [Reference-Free Post-Training of Open Large Language Models for Multilingual Machine Translation](/202608/16/2608.10812v2-reference-free-post-training-of-open-large-language-models-for-multilingual-machine-translation)  
+   evidence：使用GRPO策略梯度强化学习对开放大语言模型进行后训练，结合无参考奖励优化翻译质量
+2. [GRPO Beyond English: A Large-Scale Study of GRPO in Non-English and Multilingual Settings](/202608/17/2608.13698v1-grpo-beyond-english-a-large-scale-study-of-grpo-in-non-english-and-multilingual-settings)  
    标签：评分：9.0/10、query:rl
-   evidence：使用GRPO强化学习与无参考奖励模型对多语言大模型进行翻译后训练
-3. [Scheduling Mixed RL Rollouts Beyond Prefix Locality](/202608/16/2608.11152v1-scheduling-mixed-rl-rollouts-beyond-prefix-locality)  
+   evidence：GRPO策略优化在多语言推理中的应用
+3. [MMDynOpt-Agent: Dynamic Optimization for Multimodal Large Language Model Reasoning via Reinforcement Learning](/202608/17/2608.14026v1-mmdynopt-agent-dynamic-optimization-for-multimodal-large-language-model-reasoning-via-reinforcement-learning)  
    标签：评分：9.0/10、query:rl
-   evidence：面向LLM混合RL后训练的异构rollout调度
-4. [Beyond Outcome Rewards: Step-Level Self-Distilled Policy Optimization for Deep Search Agents](/202608/16/2608.12764v1-beyond-outcome-rewards-step-level-self-distilled-policy-optimization-for-deep-search-agents)  
+   evidence：将多模态大模型推理建模为MDP并用端到端强化学习优化
+4. [A Graph-Based Reinforcement Learning Framework for Structured Drift Diagnosis and Recovery in Autonomous LLM Agents](/202608/17/2608.14109v1-a-graph-based-reinforcement-learning-framework-for-structured-drift-diagnosis-and-recovery-in-autonomous-llm-agents)  
    标签：评分：9.0/10、query:rl
-   evidence：面向搜索智能体RL的步骤级自蒸馏策略优化，以解决稀疏结果奖励问题
-5. [Learning Preference Adaptation for Large Language Model Personalization via Verbal Reinforcement Learning](/202608/16/2608.09507v2-learning-preference-adaptation-for-large-language-model-personalization-via-verbal-reinforcement-learning)  
+   evidence：基于图强化学习的自主LLM智能体漂移恢复
+5. [Improving Generalization Robustness of Multimodal RLVR](/202608/17/2608.08802v2-improving-generalization-robustness-of-multimodal-rlvr)  
    标签：评分：8.0/10、query:rl
-   evidence：通过口头强化学习进行大模型个性化中的任务相关偏好适应，类似RLHF奖励建模
-6. [DOCSCHISEL: Adaptive Tool Documentation Optimization Framework for LLM Agents](/202608/16/2608.10037v1-docschisel-adaptive-tool-documentation-optimization-framework-for-llm-agents)  
+   evidence：面向RLVR的奖励函数鲁棒性设计
+6. [Agentic Router: An Execution-Grounded Continual Learning Approach With Memory](/202608/17/2608.09184v1-agentic-router-an-execution-grounded-continual-learning-approach-with-memory)  
    标签：评分：8.0/10、query:rl
-   evidence：面向任务自动化的LLM智能体工具文档优化
+   evidence：面向命令行网络任务自动化的LLM智能体，执行反馈驱动
 
 ### 速读区论文标签
-1. [RLMOpt: Adaptive Prompt Optimization via Recursive Language Models](/202608/16/2608.10471v1-rlmopt-adaptive-prompt-optimization-via-recursive-language-models)  
+1. [SKILLER: Language-Level Reinforcement Learning for Reusable Skill Extraction in Small Language Models](/202608/17/2608.10538v2-skiller-language-level-reinforcement-learning-for-reusable-skill-extraction-in-small-language-models)  
    标签：评分：8.0/10、query:rl
-   evidence：RLM智能体在工具环境中自主执行提示优化，涉及预算分配与停止决策
-2. [SKILLER: Language-Level Reinforcement Learning for Reusable Skill Extraction in Small Language Models](/202608/16/2608.10538v1-skiller-language-level-reinforcement-learning-for-reusable-skill-extraction-in-small-language-models)  
+   evidence：用语言级强化学习为小语言模型提取可复用技能
+2. [LoongReflect: Boosting Long-Horizon Reflection in Search Agents via Global Perspective Distillation](/202608/17/2608.11967v1-loongreflect-boosting-long-horizon-reflection-in-search-agents-via-global-perspective-distillation)  
    标签：评分：8.0/10、query:rl
-   evidence：通过语言级强化学习提取智能体技能，约束小语言模型行为实现可复用任务执行
-3. [Self-Correcting Long-Horizon Search Agents via Tree-Structured Memory](/202608/16/2608.10676v1-self-correcting-long-horizon-search-agents-via-tree-structured-memory)  
-   标签：评分：8.0/10、query:rl
-   evidence：基于树结构记忆的LLM搜索智能体，用于检索增强的长程推理
-4. [Mitigating Context Interference for Reliable and Efficient Search Agents](/202608/16/2608.10743v1-mitigating-context-interference-for-reliable-and-efficient-search-agents)  
-   标签：评分：8.0/10、query:rl
-   evidence：面向多轮搜索智能体的检索上下文干扰缓解研究
-5. [Counterfactual Benchmarking and Training for Factuality Consistency and Order-Robust Grounded Reasoning in LLMs over Heterogeneous Knowledge](/202608/16/2608.07838v1-counterfactual-benchmarking-and-training-for-factuality-consistency-and-order-robust-grounded-reasoning-in-llms-over-heterogeneous-knowledge)  
+   evidence：利用全局视角蒸馏增强搜索智能体的长程反思能力
+3. [MoE Proxy Models for Low-Cost Failure Reproduction and Diagnosis in LLM RL Post-Training](/202608/17/2608.10823v1-moe-proxy-models-for-low-cost-failure-reproduction-and-diagnosis-in-llm-rl-post-training)  
    标签：评分：7.0/10、query:rl
-   evidence：面向异构知识的接地多跳QA基准与训练方法，与知识密集型RAG任务直接相关
-6. [Critic-Free Pretraining for Efficient Online Reinforcement Learning Fine-Tuning](/202608/16/2608.10473v1-critic-free-pretraining-for-efficient-online-reinforcement-learning-fine-tuning)  
+   evidence：大模型RL后训练故障复现
+4. [Learning from Online User Feedback for Shopping Agents](/202608/17/2608.11604v1-learning-from-online-user-feedback-for-shopping-agents)  
    标签：评分：7.0/10、query:rl
-   evidence：离线到在线强化学习微调范式，可迁移用于大语言模型强化学习微调
-7. [Guided Table Retrieval for Structured Data Search](/202608/16/2608.11644v1-guided-table-retrieval-for-structured-data-search)  
+   evidence：直接从在线用户反馈日志中学习购物智能体
+5. [ERSkill: Evolving for Skill-Guided Adaptive Memory Retrieval](/202608/17/2608.12720v1-erskill-evolving-for-skill-guided-adaptive-memory-retrieval)  
    标签：评分：7.0/10、query:rl
-   evidence：面向结构化数据库自然语言查询的引导式表格检索方法
-8. [LLMs Are Not Good Strategists, Yet Memory-Enhanced Agency Boosts Reasoning](/202608/16/2608.12626v1-llms-are-not-good-strategists-yet-memory-enhanced-agency-boosts-reasoning)  
+   evidence：面向LLM智能体的自适应记忆检索
+6. [SkillShapley: Boundary-Adaptive Shapley Valuation for Skill Step Attribution in LLM Agents](/202608/17/2608.13173v1-skillshapley-boundary-adaptive-shapley-valuation-for-skill-step-attribution-in-llm-agents)  
    标签：评分：7.0/10、query:rl
-   evidence：以记忆为策略优化的方法提升LLM多步推理与智能体行为
-9. [Adaptive Supervised Anchoring for On-Policy Self-Distillation](/202608/16/2608.07935v1-adaptive-supervised-anchoring-for-on-policy-self-distillation)  
+   evidence：提出用于LLM智能体技能步骤归因的Shapley值框架，有助于理解和改进任务自动化智能体
+7. [GEM: A Generative Embedding Model Bridging Reasoning and Retrieval](/202608/17/2608.13200v2-gem-a-generative-embedding-model-bridging-reasoning-and-retrieval)  
+   标签：评分：7.0/10、query:rl
+   evidence：通过显式推理查询意图生成嵌入以改进检索，直接支持面向知识密集型任务的检索增强生成
+8. [Bootstrapping Niche Multilingual Code Translation via Reinforcement Learning with Execution-Based Verifiable Supervision](/202608/17/2608.13854v1-bootstrapping-niche-multilingual-code-translation-via-reinforcement-learning-with-execution-based-verifiable-supervision)  
+   标签：评分：7.0/10、query:rl
+   evidence：基于执行奖励的LLM强化学习代码翻译
+9. [SheetCompass: Hierarchical Relation Graphs for Agentic Spreadsheet Reasoning](/202608/17/2608.14452v1-sheetcompass-hierarchical-relation-graphs-for-agentic-spreadsheet-reasoning)  
+   标签：评分：7.0/10、query:rl
+   evidence：面向表格推理与自动化的智能体框架
+10. [Optimize Cheap, Deploy Strong: Cost-Aware Cross-Tier Transfer for Evolutionary Optimization](/202608/17/2608.10694v1-optimize-cheap-deploy-strong-cost-aware-cross-tier-transfer-for-evolutionary-optimization)  
    标签：评分：6.0/10、query:rl
-   evidence：语言模型自蒸馏中的同策略轨迹采样，与文本生成策略优化密切相关
-10. [Adaptive Supervised Anchoring for On-Policy Self-Distillation](/202608/16/2608.07935v2-adaptive-supervised-anchoring-for-on-policy-self-distillation)  
+   evidence：面向大模型提示与智能体程序的成本感知演化优化
+11. [DIVE: Unlocking Self-Improvement in Frozen Language Models Through Diversity-Driven Skill Evolution](/202608/17/2608.12486v1-dive-unlocking-self-improvement-in-frozen-language-models-through-diversity-driven-skill-evolution)  
    标签：评分：6.0/10、query:rl
-   evidence：语言模型自蒸馏中的同策略轨迹采样，与文本生成策略优化密切相关
-11. [Macaron-V1: Towards Open Continual Learning with Self-Improvement and Mixture-of-LoRA](/202608/16/2608.09819v1-macaron-v1-towards-open-continual-learning-with-self-improvement-and-mixture-of-lora)  
-   标签：评分：6.0/10、query:rl
-   evidence：面向真实环境持续自改进的开放智能体模型家族
+   evidence：在不更新参数的情况下为冻结LLM进化可复用自然语言技能
 
 
 <div class="dpr-home-promo-card">

@@ -1,0 +1,560 @@
+Title: SheetCompass: Hierarchical Relation Graphs for Agentic Spreadsheet Reasoning
+
+URL Source: https://arxiv.org/pdf/2608.14452v1
+
+Published Time: Mon, 17 Aug 2026 01:01:31 GMT
+
+Number of Pages: 12
+
+Markdown Content:
+# SheetCompass: Hierarchical Relation Graphs for Agentic Spreadsheet Reasoning 
+
+# Panjing He, Mingyue Cheng, Yucong Luo,Li Li, Xiaohan Zhang 
+
+State Key Laboratory of Cognitive Intelligence, University of Science and Technology of China Hefei, China {hepanjing,lili0516,zxh25126485ïĳŒprime666}@mail.ustc.edu.cn mycheng@ustc.edu.cn 
+
+## Abstract 
+
+Spreadsheets are widely used to organize, analyze, and manipulate semi-structured data in real-world scenarios. However, automated spreadsheet reasoning remains a long-standing challenge for large language models (LLMs). Practical workbooks often feature a com-plex web of implicit cross-table associations and fine-grained col-umn dependencies. To process them, existing methods typically flatten these multi-dimensional structures into sequential strings, which strips away the critical intra-sheet boundaries and inter-sheet semantics. As a result, LLMs are deprived of the global spatial lay-outs that human experts naturally leverage during visual scanning. To bridge this gap, we propose SheetCompass, a graph-guided and memory-driven agentic framework for spreadsheet automation rea-soning. The key idea is to transform spreadsheets from raw tabular data into structured evidence spaces that can guide agent planning, execution, and reflection. Specifically, SheetCompass constructs a hierarchical graph to explicitly formalize implicit layouts into stable anchors at both the table and column levels, thereby mapping structural topologies while encoding spatial relations. To further enhance agent reliability, SheetCompass introduces a dual-level memory mechanism, which includes an expert knowledge mem-ory that provides tool-use and domain knowledge and a reasoning experience memory that is dynamically updated from previous execution trajectories to support workflow evolution and prevent continuous mistakes. Based on these components, SheetCompass coordinates three specialized agents—the navigational explorer, logical programmer, and critical reflector—to handle perception, execution, and iterative verification. Driven by this multi-agent co-ordination, extensive empirical evaluations across various datasets demonstrate that SheetCompass achieves state-of-the-art perfor-mance in complex spreadsheet automation tasks. Our code is avail-able at https://anonymous.4open.science/r/sheetcompass-411C. 
+
+## Keywords 
+
+Natural Language Processing, Spreadsheet Manipulation, Multi-Agent Workflow 
+
+> Permission to make digital or hard copies of all or part of this work for personal or classroom use is granted without fee provided that copies are not made or distributed for profit or commercial advantage and that copies bear this notice and the full citation on the first page. Copyrights for components of this work owned by others than the author(s) must be honored. Abstracting with credit is permitted. To copy otherwise, or republish, to post on servers or to redistribute to lists, requires prior specific permission and/or a fee. Request permissions from permissions@acm.org.
+> Conference acronym ’XX, Woodstock, NY
+> © 2018 Copyright held by the owner/author(s). Publication rights licensed to ACM. ACM ISBN 978-1-4503-XXXX-X/2018/06 https://doi.org/XXXXXXX.XXXXXXX
+
+ACM Reference Format: 
+
+Panjing He, Mingyue Cheng, Yucong Luo,Li Li, Xiaohan Zhang . 2018. SheetCompass: Hierarchical Relation Graphs for Agentic Spreadsheet Rea-soning. In Proceedings of Make sure to enter the correct conference title from your rights confirmation email (Conference acronym ’XX). ACM, New York, NY, USA, 12 pages. https://doi.org/XXXXXXX.XXXXXXX 
+
+## 1 Introduction 
+
+As a key knowledge representation medium, spreadsheets inher-ently include business logic and domain expertise[39, 55, 56, 60]. Nevertheless, the volume of heterogeneous data and the demand for repetitive manipulation make spreadsheet automation a critical bottleneck to increase industrial productivity[8, 23, 46]. In this con-text, Large Language Models (LLMs) emerge as a robust technical pathway for achieving automated spreadsheet[26, 43, 54]. Although LLMs demonstrate superior semantic understanding, their performance suffers a sharp decline when processing complex spreadsheets[1, 4, 12]. This weakness primarily stems from existing methodologies predominantly rely on an information-flattening paradigm, which linearizes multi-dimensional spreadsheets into se-quential string representations such as Markdown or JSON. While preserving textual content[34, 35, 43, 44], this approach funda-mentally leads to the loss of intra-sheet topological structure and inter-sheet semantic understanding[11, 40, 41, 61]. On the intra-sheet level, sequential string fundamentally shatters the inherent orthogonal positioning system of spreadsheet rows and columns. Consequently, complex layouts lose their spatial neighborhood within the token stream[27, 41, 64]. This separation makes it dif-ficult for the model to understand the original grid layout of the spreadsheet[21, 52]. At the inter-sheet level, this flattening pro-cess hides the implicit data dependencies and business logic across different worksheets[40, 61]. Critical elements, such as the direct correspondences between cost and price sheets, are broken down into isolated text fragments[11, 52, 64]. Without explicit inter-sheet semantic dependencies, the model fails to reconstruct the dynamic data flow across the workbook, leading to structural misalignment especially in cross-table reasoning[3, 43, 52, 61]. This dual-level information loss reveals a fundamental mismatch with the original design intent of the spreadsheeas visual grid-based tables instead of linear text. Spreadsheets are a semi-structured medium grounded in visual cognition, not a flat collection of data[42, 57]. Its layout is aligned with the human visual processing system[22]. As shown in Figure 1, human experts rely on rapid visual scanning to instantaneously reconstruct the spatial topology of a spreadsheet. By leveraging spatial cues alone, they immediately identify column hierarchies, data entities, and distinct data regions. This intuitive arXiv:2608.14452v1 [cs.AI] 14 Aug 2026 Conference acronym ’XX, June 03–05, 2018, Woodstock, NY Panjing He, Mingyue Cheng, Yucong Luo,Li Li, Xiaohan Zhang Work out the monthly total sales in a new row called  “Total”.                
+
+> Sales Jan Feb Mar
+> Peel 696 420 722
+> Grooms 429 419 146
+> | Sales | Jan | Feb | Mar |
+> | Peel | 696 | 420 | 722 |
+> | Grooms | 429 | 419 | 146|
+> Visual Scan
+> Temporal
+> Axis
+> Data Subject
+> Total
+> Implicit Alignment
+> ⚫Intra -sheet and Inter sheet
+> Information Loss
+> Data Area
+> Information Flatten
+> Excel to Markdown
+> Jan Feb Mar
+> Hierarchical Graph Multi -agent
+> column
+> Table
+> Explicit 2D Structure
+> Final output
+> Human
+> Export
+> Traditional
+> Methods
+> Structural Reasoning
+> SheetCompass
+
+Figure 1: A comparison of various methods. Traditional mark-down flattening collapses the 2D layout that human visual scanning effortlessly recovers. SheetCompass closes this gap with the hierarchical graph and multi-agent workflows. 
+
+process establishes an implicit alignment that bridges the seman-tic gaps between distant cells[45, 50, 67]. The intricate intra-table topologies and inter-table dependencies of complex spreadsheets lead to profound information loss when fed into LLMs. Human experts utilize multi-dimensional layout perception[9, 37], to ex-tract latent semantic information. In contrast, models must rely on statistical structural approximation within linear sequences. This neglect of physical topology and the failure to recognize inter-sheet relationships forces the model to attempt complex reasoning in a dimensionally unconstrained sequential space. Consequently, this spatial understanding gap primarily impedes high-fidelity spread-sheet automation. To address those information loss, this paper proposes the Sheet-Compass framework. This framework restores lost structural de-pendencies and ensures high-fidelity processing of complex tasks through a multi-agent workflow. For structural modeling, Sheet-Compass recasts neighborhoods into a hierarchical graph. Hierar-chical edges explicitly connect table-level and column-level nodes to preserve both intra-sheet spatial layouts and inter-sheet semantic structures. Building on this recovered topology, the framework in-troduces a dual-level memory mechanism, including expert knowl-edge memory and reasoning experience memory to provide stable tool-use knowledge and drive dynamic trajectory evolution. Driven by these structured spaces and memories, a multi-agent workflow coordinates a suite of specialized agents, where the navigational ex-plorer handles topological sensing and target anchoring, the logical programmer generates structured code execution, and the criti-cal reflector conducts closed-loop validation. Empirically, across various complex spreadsheet datasets, SheetCompass substantially outperforms existing methods in task success rate. Ultimately, this structural-and-reasoning decomposition built around graph topol-ogy resolves this major bottleneck by enabling downstream agents to navigate multi-dimensional grids without losing their intrinsic grid properties. Our contributions are threefold: 
+
+• We propose SheetCompass, a novel framework that bridges structural space perception with multi-agent reasoning, ef-fectively overcoming the structural information loss of con-ventional flat sequences. 
+
+• We introduce a hierarchical contextual graph that preserves intra-sheet spatial layouts and inter-sheet semantic linkages, combined with a dual-level memory and a coordinated multi-agent workflow to guarantee high-fidelity task execution. 
+
+• Extensive experiments on diverse complex benchmarks demon-strate that SheetCompass achieves state-of-the-art perfor-mance, empirically confirming the critical impact of struc-tural and semanticon cross-table reasoning. 
+
+## 2 Related Work 2.1 Automated Spreadsheet Manipulation 
+
+Early work on spreadsheet automation centers on program syn-thesis for repetitive tasks[13, 23, 24, 48]. Representative systems such as FlashFill[23] search a domain specific language (DSL) for programs that satisfy user-provided specifications[2, 36, 49]. While these methods are highly precise for deterministic tasks, they suffer from a severe curse of dimensionality because the DSL search space expands exponentially as constraints increase[32]. This makes tra-ditional program synthesis techniques struggle when handling complex tasks involving multi-tier dependencies and cross-table references[25, 36]. To mitigate rigid symbolic pipelines, later work uses deep learning to infer implicit spreadsheet structure[6, 15, 26, 28, 31]. SpreadsheetCoder introduces a neural formula prediction model that encodes row and column level context. TableSense[14] applies convolutional neural networks to layout detection. And TUTA[59] adopts a tree-structured transformer to model hierar-chical dependencies. These methods move the field beyond brittle pattern matching toward semantic modeling, but cross-table logi-cal reasoning remains challenging. LLMs push automation further toward intent understanding and autonomous reasoning[7, 47, 65]. SpreadsheetLLM[16] utilizes inverted index translation to com-press layout formats, while SheetAgent[7] and SheetCopilot[39] use multi-agent pipelines that split tasks into subtasks and call a code interpreter. Most LLM-based pipelines still serialize sheets as flat text[17]. That representation hides nonlinear topology and makes it harder to match how human experts work. 
+
+## 2.2 LLM-based Agents 
+
+Early research predominantly focused on augmenting the logical reasoning capabilities of individual LLMs[4, 10]. While prompting methods like Chain-of-Thought (CoT) enhance problem-solving by unlocking step-by-step reasoning [38, 58], modern frameworks like ReAct [26] carry this multi-step paradigm further by anchoring reasoning in empirical action. This integration enables agents to dy-namically interact with their environments, alternating between in-ternal thought generation, external tool execution, and subsequent feedback adaptions [30, 53]. Nevertheless, when confronted with long-horizon tasks of extreme complexity, single-agent systems frequently encounter the error accumulation effect inherent in pro-tracted reasoning chains[20]. Furthermore, they are susceptible to falling into self-verifying logical closures, which precipitates severe hallucinations and a fundamental lack of systemic robustness[33, SheetCompass: Hierarchical Relation Graphs for Agentic Spreadsheet Reasoning Conference acronym ’XX, June 03–05, 2018, Woodstock, NY 
+
+66]. To transcend the performance bottlenecks and reliability con-straints of monolithic models, the research community has progres-sively pivoted toward Multi-Agent Systems (MAS)[63]. This para-digm reconfigures complex global objectives into orchestrated sub-task workflows by introducing structured role-playing and granular labor-division mechanisms such as MetaGPT[29] and ChatDev[51]. By leveraging inter-agent debate[19] or collaboration[5], MAS can effectively rectify the inherent biases and stochastic errors of in-dividual models[62]. This evolutionary shift from isolated individ-ual intelligence toward synergetic collective intelligence provides profound theoretical inspirations for constructing more resilient, specialized, and interpretable research methodologies within highly dynamic and complex scenarios[18]. 
+
+## 3 Methods 
+
+In this section, we present the SheetCompass framework. We first formalize the problem of automated spreadsheet manipulation, followed by a detailed elaboration on our methodological design. Specifically, we introduce our coordinate-based structural percep-tion through comprehensive graph representations, followed by the memory mechanisms and the subsequent logical reasoning workflow driven by our multi-agent. 
+
+## 3.1 Problem Formulation 
+
+Let T = {𝑇 1,𝑇 2, . . . ,𝑇 𝑀 } denote the initial set of spreadsheets, where 𝑀 denotes the total number of distinct tables across all sheets and each sheet may contain multiple tables. Each user-issued instruction 𝑞 specifies a series of automated operations to be performed on T . Formally, spreadsheet automation is defined as D = {(T , 𝑞, A∗)𝑖 }| D |  
+
+> 𝑖 =1
+
+, where A∗ is the ground-truth response consisting of the target tables. The goal of the task is to model the probability of a generated table sequence ˆA conditioned on the input collection T and the query 𝑞 , formulated as: ˆA = arg max  
+
+> A′
+
+𝑝 (A ′ | 𝑞, T ; 𝜃 ) (1) where 𝜃 denotes the parameters of the model. 
+
+## 3.2 Overview of the SheetCompass Framework 
+
+To bridge the gap in structured grid processing, the SheetCom-pass framework decouples spreadsheet automation into space re-construction and coordinated reasoning. As shown in Figure2, the framework first rebuilds the spreadsheet’s missing structural depen-dencies by transforming raw grids into a unified hierarchical graph. By mapping columns and cross-sheet relationships into connected topological nodes, this graph successfully preserves both localized layout geometry and global semantic connections. Guided by this reconstructed space, SheetCompass employs a dual-level memory system, combining static expert knowledge with dynamic reasoning experience, to provide the foundation for robust decision-making. This rich pool of structural and cognitive knowledge ultimately drives a collaborative multi-agent workflow. Within this execution loop, specialized agents dynamically navigate the graph topology to anchor targets, generate precise execution scripts, and perform closed-loop self-reflection. Through this integration of topological mapping, dual memory guidance, and multi-agent synergy, Sheet-Compass ensures high-fidelity execution across multi-dimensional spreadsheet tasks without losing the intrinsic properties of the data. 
+
+## 3.3 Hierarchical Graph Construction 
+
+3.3.1 Graph Modeling. The fundamental challenge in automated spreadsheet reasoning lies in the severe loss of structural infor-mation during data serialization. Traditional approaches typically flatten multi-dimensional grids into text sequences, discarding crit-ical spatial layouts and global dependencies across multiple tables. To resolve this, we model the spreadsheet as a hierarchical graph, formally defined as G = (V , E) . Here, the vertex set V encom-passes multi-level spreadsheet components, while the edge set E
+
+maps out the intricate relationships among them. To mimic how hu-man experts naturally comprehend data, we divide these edges into structural edges ( 𝐸 str ) for physical layouts and semantic edges ( 𝐸 sem )for logical associations. This representation effectively transforms scattered cells into a connected knowledge space, providing global navigation and contextual constraints for downstream reasoning. Guided by the human habit of visual scanning, we organize the vertex set V into a two-tier hierarchy consisting of table nodes and column nodes. Specifically, for each table node, we extract its constituent columns to establish ownership and structural depen-dencies. A column node 𝑣 𝑖 ∈ 𝑉 col within the table is then defined by pairing its header name with a representative sample of its raw data entries. By avoiding dense cell-level modeling, this design successfully captures both semantic identity and factual context. Upon establishing these node representations, we automatically construct structural edges ( 𝐸 str ⊆ E ) directly from the sheet lay-out using deterministic parsing rules. This edge set 𝐸 str primarily consists of two functional categories: inclusion edges, which link each table node to its constituent column nodes based on structural boundaries, and adjacency edges, which connect neighboring col-umn nodes according to their horizontal order, denoted as pos (𝑖 )
+
+and pos (𝑖 + 1). Together, these rule-extracted edges form the stable backbone of our graph. 
+
+3.3.2 Semantic Alignment. The main upgrade in SheetCompass is how it connects related columns, even if they are far apart in the spreadsheet. To do this, we first give each column node a rich back-ground by header name and actual data rows into a feature vector 
+
+x. Next, we use a pre-trained transformer Φ to map these features into representations h𝑖 = Φ(x𝑖 ) and calculate their spatial-semantic similarity score using the cosine similarity function, denoted as 
+
+𝑠𝑖𝑚 𝑖 𝑗 = (h𝑖 · h𝑗 )/(∥ h𝑖 ∥∥ h𝑗 ∥) .To prevent mistakes, we also ask an LLM to score their logic relationship ( FLLM ), checking things like primary and foreign keys. We then mix these two scores together using a simple formula to make the final decision: 
+
+𝜖 𝑖 𝑗 =
+
+(
+
+1, if 𝛽 · 𝑠𝑖𝑚 𝑖 𝑗 + ( 1 − 𝛽 ) · F LLM (𝑣 𝑖 , 𝑣 𝑗 ) > 𝛼 
+
+0, otherwise. (2) Here 𝛼 is the confidence threshold and 𝛽 decides which score mat-ters more. If the combined total passes the threshold, we draw a logical link ( 𝜖 𝑖 𝑗 = 1) between the columns. Otherwise, we ignore it. This clear cut-off filters out wrong guesses and leaves only high-quality connections. Ultimately, this turns the messy spreadsheet Conference acronym ’XX, June 03–05, 2018, Woodstock, NY Panjing He, Mingyue Cheng, Yucong Luo,Li Li, Xiaohan Zhang Join Sales transactions to      
+
+> pricing to fill Revenue . Build aPivotTable on new sheet counting boomerang sales by website. Add a bar
+> chart titled……
+
+Instruction 
+
+Sales Record 
+
+Retail Price  Extracting tabular data and aligning steps to construct the unified graph. 
+
+Graph 
+
+Steps 
+
+Reflector 
+
+> Final Output
+> State: Without pivot table
+> State Check
+
+hint 
+
+lesson 
+
+Programmer                         
+
+> Date Product Quantity
+> 2015/9/8 Aspen 33
+> 2015/12/11 Yanaki 29
+> 2015/12/19 Bellen 3
+> 2015/8/23 Quad 36
+> ………
+> Product Retail Price …
+> Alpine 21.95 …
+> Aspen 21.95 …
+> Carlota 19.95 …
+> Crested Beaut 17.95 …
+> ………
+
+Dual-level Memory Details: Each sales transaction. 
+
+> Column: date, product, quantity
+> Shared
+
+Map 
+
+Date  Sales Record 
+
+> Node Semantic
+> Date
+> Product
+> Sales
+> Semantic Edge
+> Structural Edge
+> Column Node
+> Sheet Node
+
+Expert Knowledge 
+
+Reasoning Experience 
+
+Sales Record 
+
+Sandbox 
+
+Python Interpreter  
+
+> Subgraph 3
+> Fill in each transaction revenue = Retail Price
+> ×Quantity ….
+> Build a pivot table on the new sheet: filter …
+> Use the pivot result
+> to create a bar chart..
+> Subgraph 1
+
+1 2 3
+
+> Subgraph 2
+> grounding
+
+Microsoft Excel 
+
+Checklist 
+
+1. Revenue 
+
+2. Pivot table 
+
+3. Bar chart                         
+
+> Date Product Quantity Revenue
+> 2015/9/8 Aspen 33 604.8323
+> 2015/12/11 Yanaki 29 590.3675
+> 2015/12/19 Bellen 373.575
+> …………
+> Websites Count
+> Baidu 15
+> Alibaba 10
+> Google 8
+> Amazon 2
+> Sum 35
+> 0510 15
+> baidu Alibaba Geogle Amazon
+> Sales frequency by website
+
+Revenue 1
+
+Pivot Table 
+
+Bar Chart 
+
+> Detail: product sales date..
+> Examples:2015.09.08...
+
+2
+
+3
+
+Hierarchical Graph 
+
+Explorer 
+
+Multi-Agent Workflow 
+
+Figure 2: An overview of the SheetCompass framework. 
+
+into a clean, smart network, helping our downstream agents quickly find the right data across different sheets. 
+
+## 3.4 Dual-level Memory 
+
+To support multi-step reasoning under iterative feedback, Sheet-Compass introduces the expert knowledge memory as a permanent, general knowledge base. This component equips the dynamic agent ensemble with both stable domain knowledge and reliable tool-use knowledge, transforming risky text generation into precise engineering execution. Specifically, domain knowledge organizes procedural skills into clear rules, such as frequent formulas and common charts. Meanwhile, tool-use knowledge extracts general repair lessons by logging historical code-execution histories, which systematically captures the root causes of errors alongside their correct programming solutions. By looking up these verified rules and templates, the framework establishes a solid cognitive baseline that prevents large language models from making wrong guesses during complex spreadsheet tasks. In contrast, the reasoning experience memory is initially limited to the single task, functioning as a dynamic record of the active reasoning session. It carefully logs the episodic details of the cur-rent task, including where the agent moved on the graph, the error messages from the sandbox code, and the mismatches found by the checker. Feeding this short-term history directly back into the next prompting rounds ensures that each new action builds correctly upon previous outcomes, keeping data perception and automated reasoning tightly aligned. Crucially, the experiences accumulated during this active reasoning process are not discarded. Instead, suc-cessful trajectories and high-value reasoning lessons are extracted and transferred into long-term storage, continuously expanding the core repository of the expert knowledge memory. 
+
+## 3.5 Multi-agent Workflow 
+
+To transform complex instructions into executable code, Sheet-Compass coordinates a multi-agent workflow consisting of three dedicated roles: the explorer, the programmer, and the reflector. The explorer is designed to resolve the challenges of task decomposition and spatial locating within heterogeneous spreadsheet structures. It first maps high-level user instructions 𝑞 onto a sequence of logi-cally dependent atomic steps T = {𝑡 1, 𝑡 2, . . . , 𝑡 𝑛 }. Upon determining the target worksheet set, the explorer extracts topological features from the hierarchical graph G that are highly correlated with each sub-task 𝑡 𝑖 . To achieve this, it constructs a seed node set S𝑖 using a filtering mechanism based on semantic similarity: 
+
+S𝑖 = {𝑣 𝑗 ∈ 𝑉 | cos (t𝑖 , h𝑗 ) ≥ 𝜆 }, (3) where 𝜆 represents the seeding coefficient that acts as the filter-ing threshold. This mechanism ensures that seed nodes possess high semantic confidence while maintaining a compact context size, effectively preventing prompt overflow. Subsequently, the sys-tem performs adaptive subgraph evolution originating from S𝑖 .By running a breadth-first search (BFS) on G and finding the in-tersection of subgraph sequences, the globally shared subgraph 
+
+Gshared = Ñ𝑛 𝑖 =1 G𝑖 is extracted. This approach significantly com-presses the context length. The programmer acts as a constrained logic generation engine, whose primary responsibility is to combine the globally shared subgraph to transform each step 𝜏 𝑖 into executable scripts. The Pro-grammer follows a strict graph-grounded constraint mechanism. Unlike traditional text-to-code generation, the programmer must check entity alignment to ensure that all generated code variables are strictly anchored within the verified node sets of the spread-sheet graph. Within a secure sandbox environment equipped with a python interpreter and an excel engine, the programmer iterates SheetCompass: Hierarchical Relation Graphs for Agentic Spreadsheet Reasoning Conference acronym ’XX, June 03–05, 2018, Woodstock, NY 
+
+through the tasks, producing explicit planning and action trajecto-ries for each round. This restricts the search space of code genera-tion to the verified physical layout of the spreadsheet, maintaining semantic consistency during multi-step reasoning. The reflector implements a state-check feedback mechanism to ensure the robustness of task execution. Its core logic is to trans-late the explicit constraints within the user instruction 𝑞 into a concrete checklist, and then validate whether the metadata state 
+
+M of the spreadsheet after running the code satisfies each item. Upon detecting any discrepancy between the actual execution state 
+
+Δ(M) and the checklist requirements, the reflector transforms the logical contradictions into clear diagnostic notes and feeds them back to the workflow to trigger an iterative refinement process. Within this closed-loop feedback logic, a hyperparameter 𝜏 defines the maximum number of correction cycles allowed. Each time the reflector intercepts an error and requests a realignment from the explorer, one cycle is recorded, continuing until the task satisfies all items on the checklist or the threshold 𝜏 is reached. 
+
+## 4 Experiments 
+
+To validate the overall effectiveness of SheetCompass and the con-tributions of its core components, we conduct comprehensive ex-periments, including main comparisons against strong baselines and detailed ablation studies. 
+
+## 4.1 Experimental Setup 
+
+4.1.1 Datasets. To comprehensively evaluate the performance of the proposed framework, we adopted the SCB[39], SB[43],and SheetRM[7] dataset as our experimental benchmarks. Within all datasets, each instance is characterized by a complex sheet structure. Furthermore, for the SB dataset, each task instance is accompanied by three independent test cases to rigorously assess the robustness and accuracy of the model’s reasoning outcomes. 
+
+4.1.2 Metrics. To evaluate our framework comprehensively, we employ tailored metrics for the SCB and SB benchmarks. For SCB and SheetRM dataset, we utilize exec@1 to measure the runtime success rate and pass@1 to verify functional correctness against the ground truth[39]. For SB dataset, which contains multiple indepen-dent test cases per task, we adopt soft restriction and hard restric-tion metrics. The soft restriction calculates the average success rate across all test cases, evaluating general competence without heavily penalizing rare edge cases. Conversely, the hard restriction requires a solution to perfectly pass all test cases to receive credit[43]. 
+
+4.1.3 Baselines. To evaluate the effectiveness of SheetCompass, we select several representative baseline methods that cover two main technical paths: static generation and dynamic interaction. First, we include Binder, a classic table QA approach that translates natural language into SQL or Python code for data retrieval. We also incorporate traditional VBA script generation schemes, which use LLMs to generate macro code for native excel interfaces. These methods follow a static paradigm characterized by one-time gen-eration. While they perform well on simple and fixed tasks, they cannot perceive or correct errors during execution. To evaluate more advanced interactive capabilities, we compare our framework against LLM-based agents, including SheetCopilot, SheetAgent, and OS-Copilot. These frameworks use a closed-loop architecture based on a plan-action-observation cycle, allowing them to break down complex instructions into steps and dynamically adjust their actions based on environment feedback. 
+
+4.1.4 Backbones. We choose two representative LLMs from the GPT family as the backbones to evaluate model performance on different scales. Specifically, we select GPT-5 as our primary closed-source LLM due to its exceptional reasoning and instruction-following capabilities in complex spreadsheet tasks. In addition, we employ GPT-4o-mini as a highly cost-efficient backbone. This choice allows us to verify the generalizability and robustness of SheetCompass under more constrained model capacities. 
+
+## 4.2 Experimental Results 
+
+As presented in Table 1, our proposed SheetCompass consistently outperforms all baseline methods across all benchmarks, demon-strating substantial and robust improvements. Under the GPT-4 backbone, SheetCompass advances the state-of-the-art by im-proving pass@1 on SCB to 63.2%, hard restriction on SB to 18.3% and pass@1 on SheetRM to 43.5% ,which noticeably surpass the strongest baseline. This performance edge becomes even more pro-nounced when scaling to the GPT-5 backbone. Notably, on the challenging SB dataset, SheetCompass achieves absolute improve-ments of 6.4% on soft restriction and 6.9% on hard restriction. This steady performance edge is primarily driven by SheetCom-pass’s architecture, which effectively bridges structural perception with iterative execution. While existing baselines leverage LLM planning, they typically operate on flattened data sequences and struggle to capture the complex, non-linear topology of spread-sheets. In contrast, SheetCompass explicitly models the spread-sheet environment through its Hierarchical Graph, maintaining a high-fidelity structural skeleton while preserving cross-cell se-mantic dependencies. Guided by this topological grounding, the multi-agent workflow coordinates distinct roles to construct a holis-tic reasoning loop. Instead of relying on directly code generation, SheetCompass dynamically adapts to execution feedback while remaining anchored to stable structural constraints, thereby achiev-ing state-of-the-art performance in spreadsheet automation. 
+
+## 4.3 Ablation Study 
+
+4.3.1 Effect of Main Components. The ablation results presented in Table 2 indicate that each major component of the SheetCompass framework contributes significantly to the overall performance. Completely removing the hierarchical graph causes the sharpest performance drop, lowering the pass@1 on SCB and SheetRM by 14.9% and 10.9% respectively, while reducing the hard restriction on SB by 7.5%. This substantial decrease demonstrates that the structure provided by the graph is a foundational source of ground-ing rather than an optional enhancement. Similarly, disabling the multi-agent workflow or the dual-level memory leads to noticeable performance degradation across all metrics. These findings confirm that high-fidelity structural perception, collaborative multi-agent execution, and continuous memory retention are all indispensable and complementary to the robustness of SheetCompass. Conference acronym ’XX, June 03–05, 2018, Woodstock, NY Panjing He, Mingyue Cheng, Yucong Luo,Li Li, Xiaohan Zhang 
+
+Table 1: Comparison of the performance of SheetCompass with other approaches on the SCB, SB, and SheetRM benchmarks(%). 
+
+↑ indicates that a higher value is better. The best results are in bold and the second best are underlined. 
+
+Backbone Method SCB SB SheetRM Exec@1 ↑ Pass@1 ↑ Soft ↑ Hard ↑ Exec@1 ↑ Pass@1 ↑
+
+GPT-4 Binder / 15.6 1.2 0.0 / 6.3 VBA 77.8 37.1 8.3 5.2 56.2 2.8 OS-Copilot / 50.1 17.0 14.0 63.7 12.3 SheetCopilot 87.3 44.3 13.8 10.1 68.1 0.0 SheetAgent 94.1 61.1 17.6 13.5 92.4 31.2 Ours 95.1 63.2 22.6 18.3 93.7 42.5 
+
+GPT-5 Binder / 60.0 18.1 14.7 / 8.1 VBA 86.4 42.2 10.3 8.4 61.3 5.4 OS-Copilot / 60.0 18.0 14.0 74.8 20.5 SheetCopilot 65.0 55.0 16.5 13.1 52.7 2.2 SheetAgent 90.0 70.0 18.3 15.1 89.3 44.8 Ours 96.4 71.3 24.7 22.0 94.2 52.3 Table 2: Ablation study of the SheetCompass framework across different datasets (%). The results quantify the performance contributions of the hierarchical graph, dual-level memory, and multi-agent workflow, coupled with a fine-grained analysis of their internal components. ↑ indicates that higher values represent better performance. Category Component SCB SB SheetRM Exec@1 ↑ Pass@1 ↑ Soft ↑ Hard ↑ Exec@1 ↑ Pass@1 ↑
+
+Full Model SheetCompass 96.4 71.3 24.7 22.0 94.2 52.3 
+
+Main Component w/o Hierarchical Graph 87.2 56.4 18.1 14.5 85.2 41.4 w/o Multi-agent 89.5 59.1 19.3 15.2 87.4 43.3 w/o Dual-level Memory 92.6 60.4 21.2 18.8 90.5 44.3 w/ Hierarchical Graph w/o Structural Edge 90.8 62.3 20.5 16.8 88.7 45.7 w/o Semantics Edge 95.0 68.2 21.0 17.1 92.8 50.0 w/ Dual-level Memory w/o Expert Knowledge 93.8 69.7 22.7 17.3 91.7 51.1 w/o Reasoning Experience 94.5 68.9 23.1 18.4 92.3 50.5 w/ Multi-agent w/o Explorer 92.4 64.8 21.5 18.0 90.3 47.5 w/o Reflector 94.5 61.5 22.8 16.2 92.3 45.1 
+
+4.3.2 Effect of Hierarchical Graph. Further analysis of the hierar-chical graph reveals the relative importance of its internal structural cues. Removing the structural edges reduces the SheetRM exec@1 from 94.2% to 88.7%, which suggests that the table-column topol-ogy effectively preserves essential layout information. This layout preservation allows the model to capture the coarse organization of spreadsheets without facing excessive token overhead from mod-eling every individual cell relation. On the other hand, removing semantic edges severely harms performance on the challenging SB hard restriction task, where the score drops from 22.0% to 17.1%. This indicates that topological structure alone is insufficient when complex tasks require tracking cross-column dependencies and implicit formulas. 
+
+4.3.3 Effect of Dual-level Memory. The dual-level memory pro-vides essential task guidelines and interactive execution experi-ences necessary for long-term reasoning stability. Disabling expert knowledge reduces the SB hard restriction from 22.0% to 17.3%, which confirms that complex logical constraints in spreadsheets require explicitly injected professional rules to guide the LLM. Fur-thermore, removing reasoning experience causes the SCB pass@1 score to drop from 71.3% to 68.9%. This performance loss indicates that learning from historical execution trajectories helps SheetCom-pass avoid repetitive mistakes and handle long-range dependencies more effectively during multi-step tasks. 
+
+4.3.4 Effect of Multi-agent Workflow. At the execution stage, the multi-agent workflow coordinates distinct roles to generate and validate solutions through a collaborative process. As shown in Table 2, removing this workflow lowers the SCB pass@1 to 59.1%, confirming that a single-path generation strategy is inadequate for complex operations. The fine-grained analysis reveals a clear divi-sion of labor between the agents. Removing the explorer decreases SheetCompass: Hierarchical Relation Graphs for Agentic Spreadsheet Reasoning Conference acronym ’XX, June 03–05, 2018, Woodstock, NY single-table multi-table 025 50 75 100    
+
+> Pass@1 (%) SCB
+> single-table multi-table 010 20 30 40
+> Soft Restriction (%) SB
+> SheetAgent Ours SheetCopilot
+
+Figure 3: Performance comparison between single-table and multi-table scenarios across various baseline. 
+
+the SCB pass@1 to 64.8%, as the system loses the heuristic explo-ration needed to discover plausible execution paths. Meanwhile, re-moving the reflector primarily harms performance on the SheetRM pass@1, driving it down to 45.1%. This drop underscores the critical role of self-correction, as complex spreadsheet automation depends heavily on an independent agent to verify code execution against structural constraints. 
+
+## 4.4 Experimental Analysis 
+
+4.4.1 Analysis of Task Complexity. To assess how SheetCompass handles complex spreadsheets, we evaluate its performance under both single-table and multi-table settings. As shown in Figure 3, all methods perform better in the single-table setting than in the multi-table setting, reflecting the added challenge of cross-table dependencies. On SCB, the pass@1 of SheetAgent drops from 74.4% to 58.1% when moving from a single table to multiple tables. This drop indicates that linear spreadsheet inputs make it difficult for traditional methods to track columns across different worksheets. In contrast, SheetCompass is less affected by this layout change, achieving the highest score of 65.2% in the multi-table setting with a much smaller performance drop. A similar trend is observed on the SB dataset, where SheetCompass outperforms the baseline by 7.7% under the soft restriction metric. This is because SheetCompass builds a hierarchical graph over tables and columns, providing explicit structural anchors that help the model locate target data and filter out irrelevant columns. Figure 5 shows how the edge distribution of the hierarchical graph changes as task difficulty increases. In the single-table SCB setting, structural edges dominate at 81.3%, indicating that the model primarily relies on the physical skeleton of the spreadsheet when tasks are local. This is expected, as most single-table opera-tions can be resolved using nearby headers and basic table struc-tures. However, in the multi-table setting, the proportion of se-mantic edges rises from 18.7% to 29.9%. The SB dataset shows a similar trend, with semantic edges increasing from 12.1% to 21.7%. These results demonstrate that physical layout alone is insufficient for complex cross-table tasks where data connections are hidden. SheetCompass handles this by maintaining these semantic edges, which also helps the multi-agent workflow operate more effectively. Specifically, the Explorer can narrow down the operation space, allowing the system to accurately translate these dependency paths into executable operations. 
+
+4.4.2 Hyperparameter Sensitivity Analysis. The hyperparameter 𝜏 
+
+controls the number of reasoning cycles performed by the multi-agent workflow in SheetCompass. Increasing 𝜏 from 1 to 2 improves the accuracy on SCB and SheetRM to 71.9% and 54.7% respectively. This trend indicates that a single inference pass is often insufficient for understanding complex table logic. Through repeated cycles of generation, feedback, and revision, the model can fix runtime failures and semantic errors found by the reflector. However, when 
+
+𝜏 increases to 3 or 4, performance plateaus or slightly declines. For most spreadsheet tasks, two cycles are enough for error correction. Further iterations increase computational costs and can introduce unhelpful code edits, trapping the model in local optima. Therefore, we set 𝜏 = 2 as the default value to balance accuracy and efficiency. The parameter 𝛼 serves as the confidence threshold for build-ing the hierarchical graph. A candidate node is integrated into the topology only when its score passes this boundary. The framwork accuracy shows a concave pattern relative to 𝛼 , peaking at 0.85 with scores of 52.6% on SheetRM and 25.5% on SB. At a lower thresh-old ( 𝛼 = 0.75), the graph retains too many low-confidence nodes. These noisy nodes obscure critical structural lines and mislead the downstream reasoning process. Conversely, at a higher threshold (𝛼 = 0.9), many important structural vertices are excluded. This creates a sparse topology that lacks the necessary data dependen-cies. The optimal setting at 0.85 indicates that the graph must filter out noise while preserving core structural layout features. The parameter 𝜆 controls seed selection for building subgraphs during subproblem solving. It decides how representative an initial vertex must be before the subgraph search begins. SCB reaches 71.3% accuracy at 𝜆 = 0.6, while SB peaks at 26.1% when 𝜆 = 0.5. This difference matches the difficulty of the two datasets. SCB tasks are more regular, so a stricter seed threshold helps limit unnecessary graph expansion. In contrast, a lower 𝜆 is preferred for the noisier SB dataset because it expands the initial search frontier to prevent valid data paths from being pruned too early. Tuning 𝜆 allows the model to anchor its reasoning within a locally relevant context for each subtask, ensuring stable performance across spreadsheets with different structures. 
+
+## 4.5 Case Study 
+
+The Figure 6 shows a cross-table revenue calculation case in which the value of the discount node, such as 0.15, can be interpreted in multiple ways. Initially, the explorer and programmer follow an intuitive interpretation and incorrectly treat this value as an absolute discount amount. They therefore construct the compu-tation as 𝑟𝑒𝑣𝑒𝑛𝑢𝑒 = 𝑞𝑢𝑎𝑛𝑡𝑖𝑡𝑦 × 𝑟𝑒𝑡𝑎𝑖𝑙 𝑝𝑟𝑖𝑐𝑒 − 𝑑𝑖𝑠𝑐𝑜𝑢𝑛𝑡 . This er-ror is not obvious because the formula is syntactically valid and executable, although its semantic assumption conflicts with the numerical scale of the input. The reflector in the SheetCompass framework identifies this conflict through a state check. Using a floating-point value between 0 and 1 as an absolute monetary de-duction is inconsistent with basic business practice. Through the state feedback mechanism, the verification triggers an adaptive retry, prompting the explorer to re-anchor the semantics of the graph node and reinterpret it as a discount rate. the system then corrects the computation and generates the business-consistent formula 𝑟𝑒𝑣𝑒𝑛𝑢𝑒 = 𝑞𝑢𝑎𝑛𝑡𝑖𝑡𝑦 × 𝑟𝑒𝑡𝑎𝑖𝑙 𝑝𝑟𝑖𝑐𝑒 × ( 1 − 𝑑𝑖𝑠𝑐𝑜𝑢𝑛𝑡 ), which Conference acronym ’XX, June 03–05, 2018, Woodstock, NY Panjing He, Mingyue Cheng, Yucong Luo,Li Li, Xiaohan Zhang 43 58 72       
+
+> Accuracy (%)
+> τ
+> 1234
+> SCB SB SheetRM 22 26 43 58 72
+> Accuracy (%)
+> α
+> 0.75 0.8 0.85 0.9
+> SCB SB SheetRM 22 26 43 58 72
+> Accuracy (%)
+> λ
+> 0.4 0.5 0.6 0.7
+> SCB SB SheetRM 22 26
+
+Figure 4: Hyperparameter sensitivity analysis for SheetCompass. The bars represent accuracy on SCB (left), SheetRM(middle), SB (right) datasets across different settings for reasoning cycles ( 𝜏 ), confidence threshold ( 𝛼 ), and seeding coefficient ( 𝜆 ). single-table multi-table 020 40 60 80 100   
+
+> Edge Proportion (%) SCB
+> 81.3 18.7 70.1 29.9
+> single-table multi-table 020 40 60 80 100
+> Edge Proportion (%) SB
+> 87.9 12.1 78.3 21.7
+> Structural Edge Semantic Edge
+
+Figure 5: Distribution of structural and semantic edges across SCB and SB datesets. 
+
+passes verification. this correction demonstrates that verification does more than reject invalid outputs. It provides feedback that reshapes the next round of reasoning. The case highlights how SheetCompass combines topology awareness with a closed-loop cognitive ensemble layer, allowing the system to transition from error detection to logical self-repair while remaining robust and interpretable under complex instructions. 
+
+## 5 Conclusion 
+
+In this paper, we presented SheetCompass, a novel framework de-signed to bridge the structural and semantic gap in automated spreadsheet reasoning. By transitioning from flat text sequences to a hierarchical graph, we successfully captured the intrinsic topolog-ical hierarchies of spreadsheets. Our multi-agent workflow further emulates human expertise by coordinating specialized explorer, programmer, and reflector roles within a robust execution sandbox. Driven by this structured grounding, these agents collaborate to eliminate errors and maintain reasoning stability. Experimental results on the SCB, SB and SheetRM datasets demonstrate that SheetCompass significantly outperforms baseline methods. Specifi-cally, our approach achieves substantial performance leaps under both soft and hard restrictions by effectively resolving complex data dependencies. This work establishes a strong foundation for future research and provides a scalable, highly reliable solution for the next generation of enterprise-grade spreadsheet automation. 
+
+## A Experimental Setup A.1 Implementation Details 
+
+The implementation of SheetCompass leverages gpt-5 and gpt-4o-mini as the core reasoning engines within the Cognitive Ensemble, with the temperature maintained at 0 .2 and max tokens set to 4096 to ensure deterministic and stable output during complex logical synthesis. To realize the mathematical framework of the contextual graph, we employ BGE-M3 as the pre-trained transformer Φ to map heterogeneous raw features into a 1024-dimensional latent space, providing a unified foundation for measuring correlations between table and column nodes. Within the semantic alignment, we set the confidence threshold 𝛼 to 0 .85 to strictly govern the establishment of semantic edges 𝐸 𝑠𝑒𝑚 , ensuring that implicit logical couplings are only anchored when they surpass rigorous verification. Fur-thermore, the seeding coefficient 𝜆 for the collaborative filtering mechanism is configured at 0 .6 as demonstrated in our sensitivity analysis, which optimizes the tradeoff between semantic grounding and context compression to prevent prompt overflow. The entire system is integrated within a sandboxed python environment uti-lizing openpyxl and excel com interfaces for high-fidelity execution and verification of the generated functional scripts. 
+
+## A.2 Datasets 
+
+The evaluation is conducted on three specialized benchmarks de-signed to assess agent capabilities over complex tabular structures: SheetCopilotBench (SCB), SpreadsheetBench (SB), and SheetRM. The SCB dataset, derived from representative real-world software control tasks, comprises 221 samples characterized by rich cross-sheet dependencies, specifically focusing on advanced spreadsheet manipulations such as the automated configuration of formulas, pivot tables, and visualization charts. The SB dataset introduces higher structural heterogeneity, containing 912 real user instruc-tions compiled from online forums where approximately 35.7% of the workbooks contain multiple tables within a single sheet and 42.7% exhibit non-standard relational layouts such as nested or missing headers. Furthermore, following an online judge evalua-tion pipeline, each instruction in SB is paired with three distinct input-output test cases, totaling 2,729 test cases across the dataset to comprehensively test the model against solution overfitting under SheetCompass: Hierarchical Relation Graphs for Agentic Spreadsheet Reasoning Conference acronym ’XX, June 03–05, 2018, Woodstock, NY { " graph ": { 
+
+"nodes ": {Table_node: ["Sheet1_T0", "Retail Price_T1"], 
+
+Colmuns_node: ["Sheet1.Product", "Sheet1. Quantity", "Sheet1.Discount", "Retail Price. Product" …], 
+
+"edge ": [{ "type": "sematic" "source": " Sheet1.Product", "target":"Retail_Price.Product"," rational ": " product columns in sales and price tables represent the same concept." } "}, 
+
+{"type": "sematic", "source": " Sheet1.Quantity ", "target": " Sheet1.Discount", " rational ": " revenue is derived from quantity and discount "}. . . ] }                         
+
+> Date Time Product Quantity Discount
+> 2015/9/8 Aspen 33 0.165
+> 2015/12/11 Yanaki 29 0.15
+> 2015/12/19 Bellen 30.019
+> 2015/8/23 Quad 36 0.15
+> …………
+> Product Retail Price
+> Alpine 21.95
+> Aspen 21.95
+> Carlota 19.95
+> Crested Beaut 17.95
+> ……
+
+Date  Product  … Revenue 
+
+2015/9/8  Aspen  … 604.8323 
+
+2015/12/11  Yanaki  … 590.3675 
+
+2015/12/19  Bellen  … 73.575 
+
+2015/8/23  Quad  … 1222.47 
+
+2015/7/9  Crested Beaut  … 579.785 
+
+… … … …
+
+Context: My workbook has two tables. Sheet "Sheet1" records the sales of 
+
+a boomerang company. Sheet "Retail Price" lists the prices for all products. 
+
+Instruction:  I want to calculate the revenue for each transaction in the 
+
+sales table considering corresponding retail price and discount. Please help 
+
+me do this in a new column with header  "Revenue ".             
+
+> Fill in each Revenue = Quantity * Retail
+> Price - Discount .Associated nodes:
+> Quantity, Retail Price, Discount. …..
+> df['Revenue'] = df['Quantity'] * df['Retail Price'] - df['Discount']
+> State Check:Discount values are between
+> 0-1. Subtracting as an absolute amount is illogical. Triggering feedback.
+> Updated the semantic of the discount node to 'Discount Rate'. Revised plan: Revenue =Quantity * Retail Price * (1 - Discount)
+> df['Revenue'] = df['Quantity'] * df['Retail Price']
+> * (1 -df['Discount'])
+> State Check: Logically correct, validation
+> successful (Checklist Passed )
+
+Hierarchical 
+
+Graph 
+
+Feedback  Final output 
+
+> Explorer
+> Programmer
+> Reflector
+> Explorer
+> Programmer
+> Reflector
+
+Figure 6: A case study of SheetCompass solving a cross-table task. The figure illustrates the transition from spreadsheet to the construction of a hierarchical graph, followed by the iterative reasoning and verification process within the multi-agent. 
+
+irregular layout environments. To evaluate the model resilience against practical operational challenges, the SheetRM dataset intro-duces 180 multi-category tasks curated from professional spread-sheet software examination banks, which are distinguished by long-horizon multi-step reasoning chains and intentionally ambiguous textual requirements that force the agent to perform iterative task planning and reflection. In this work, a representative subset com-prising 50% of the original samples is extracted from the SheetRM dataset, for which ground truth references are manually constructed to facilitate rigorous verification. 
+
+## A.3 Evaluation Metrics 
+
+To provide a granular assessment of the framework performance across heterogeneous evaluation environments, our scoring mech-anisms are tailored to the distinct verification paradigms of the baseline benchmarks. For the SheetRM and SCB datasets, which evaluate immediate functional success over discrete software con-trol workflows, we employ Pass@1 and Exec@1 to quantify the percentage of tasks that generate syntactically correct, executable scripts on the first attempt. Conversely, for the complex and irreg-ular layouts of the SB dataset where each high-level instruction is validated against an Online Judge-style suite of multiple test cases, we implement Soft Restriction ( 𝑆 𝑠𝑜 𝑓 𝑡 ) and Hard Restriction (𝑆 ℎ𝑎𝑟𝑑 ) as advanced robustness criteria. Let D denote the total set of instructions in the dataset, T𝑖 represent the set of input-output test cases for a specific instruction 𝑖 ∈ D , and 𝑟 𝑖 𝑗 signify the resulting execution status of the 𝑗 -th test case. Soft Restriction measures the foundational logic-capturing capability of the agent by granting par-tial structural credit proportional to the success rate of individual test cases, formalized as: 
+
+𝑆 𝑠𝑜 𝑓 𝑡 = 1
+
+|D| 
+
+> | D |
+
+∑︁ 
+
+> 𝑖 =1
+
+1
+
+|T 𝑖 | 
+
+> | T 𝑖 |
+
+∑︁ 
+
+> 𝑗 =1
+
+⊮(𝑟 𝑖 𝑗 = ACC )
+
+!
+
+(4) In contrast, Hard Restriction assesses absolute operational relia-bility and functional robustness by awarding a positive score for an instruction if and only if all its associated test cases return a flawless execution status, emphasized as: 
+
+𝑆 ℎ𝑎𝑟𝑑 = 1
+
+|D| 
+
+> | D |
+
+∑︁ 
+
+> 𝑖 =1
+
+⊮(𝑟 𝑖 𝑗 = ACC , ∀𝑗 ∈ { 1, 2, . . . , |T 𝑖 |}) (5) where ⊮(·) serves as the standard indicator function that outputs 1 when its internal condition is satisfied and 0 otherwise. By juxtapos-ing immediate execution indicators with these multi-case restriction constraints, the evaluation framework effectively isolates simple code memorization from genuine spatial layout reasoning. Conference acronym ’XX, June 03–05, 2018, Woodstock, NY Panjing He, Mingyue Cheng, Yucong Luo,Li Li, Xiaohan Zhang 
+
+## B Prompt Specifications B.1 Prompt for Semantic Alignment 
+
+[System] You are a Spreadsheet Knowledge Graph Expert. Your objective is to perform semantic deconstruction and dependency scoring between spreadsheet nodes by providing concise semantic profiles and quantifying relationship confidence. [User] Instruc-tion <task_description> Cross-table edges <physical_edges> Nodes <node_list>. [Reasoning Objectives] (1) Node Profile: Generate a task-aware semantic phrase for each <node_id> reflecting its func-tional role within the spreadsheet hierarchy. (2) Relationship Scor-ing: Identify potential semantic links such as derive or align. (3) Quantification: For each link, assign a score between 0.0 and 1.0 rep-resenting the probability of the relationship’s existence considering the provided spreadsheet context. [Output Specification] Return a flattened list containing node_semantics with their corresponding functional phrases and semantic_scoring entries, including source node, target node, link type, confidence score, and a brief logical rationale. 
+
+## B.2 Prompt for the Explorer Agent 
+
+[System] You are a Spreadsheet Analyzer. Your objective is to first break the high-level instruction into ordered steps, and then ex-plore the spreadsheet graph by invoking specialized tools. Return JSON only. [User] Instruction <instruction> Current step <step> Seed ids <seeds> Current subgraph <subgraph> History <history> Budget <turn, max_turns, max_nodes>. [Reasoning Objectives] (1) Task Decomposition: Deconstruct the goal into atomic reason-ing steps. (2) Topological Exploration: Based on the current step and history, select one tool from [search_nodes, get_neighborhood, finish_exploration] to extract relevant subgraphs. (3) Contextual Grounding: Ensure that each exploration move aligns with the spe-cific data dependencies required by the decomposed steps. [Output Specification] Return a JSON object that either defines the reason-ing path in a steps key: { "steps": ["<step1>", "<step2>"] }, or executes a graph operation: { "tool": "search_nodes, get_neighborhood, fin-ish_exploration", "args": {} }. 
+
+## B.3 Prompt for Programmer Agent 
+
+[System] You are an advanced code-generation agent capable of cross-modal spreadsheet reasoning. Your objective is to translate operational instructions and structural tabular contexts into python code through a multi-turn, tool-augmented reasoning loop. [User] Task Specification <steps> Structural Subgraph <shared subgraph> [Reasoning Objectives] (1) Contextual Mapping: Analyze the struc-tural subgraph to align the semantic entities and anchoring coordi-nates with the required execution logic. (2) Algorithmic Synthesis: Translate the decomposed steps index and target instruction into precise programmatic actions. (3) Structural Preservation: Ensure the synthesized code strictly respects absolute spreadsheet coor-dinates and maintains topological integrity throughout execution. [Output Specification] Return a single structured JSON object spec-ifying the designated tool identifier and its operational parameters to interact with the environment until task completion. 
+
+## B.4 Prompt for Reflector Agent 
+
+[System] You are a unified spreadsheet verification and repair agent. Your objective is to evaluate whether the generated code satisfies the target instructions by analyzing physical runtime execution signals. [User] Task Specification Runtime Execution Signals <ex-ecution state>. [Reasoning Objectives] (1) Empirically Grounded Evaluation: Assess structural modifications by cross-referencing ex-ecution states with multi-point workbook telemetry data including before and after statistics and diff summaries to determine semantic alignment. (2) Quantitative Verdict Assignment: Map the evaluated system state to an explicit constraint token representing structural validity such as pass, fail or suspicious. 
+
+## C Expert Knowlege Memory C.1 Domain Knowledge 
+
+The domain knowledge base utilizes a comprehensive three tier architecture consisting of static rules, proactive hints, and evolu-tionary failure patterns to deliver logical constraints and semantic priors across diverse spreadsheet tasks. Within this framework, the combination of static rules and proactive hints serves as the foun-dational line of defense to ensure operational safety and logical alignment. Specifically, the system prevents destructive circular reference loops by strictly excluding target destination cells from data fetching and statistical functions. To maintain the integrity of business logic, the system enforces precise behavioral mappings, en-suring that data filtering translates to automated row hiding rather than physical row deletion, and visual highlighting maps to dynamic conditional formatting rather than static cell fills. Furthermore, be-fore any specific tool invocation occurs, the system performs an automated semantic scan to detect high risk business intents, such as complex matrix level extrema calculations, and immediately in-jects high priority alerts to intercept common technical pitfalls. Complementing these rigid architectural constraints is an adaptive evolutionary failure pattern mechanism that monitors a live cata-log of runtime execution errors, including type mismatches, input output faults, spatial anchoring shifts, and resource leaks. When a specific failure pattern or a valuable lesson verified during the reflection phase exceeds a predefined frequency threshold, the sys-tem triggers a promotion mechanism that serializes these insights into long term storage. This continuous optimization loop converts real time runtime experiences into universal static constraints. 
+
+## C.2 Tool-Use Knowledge 
+
+This framework categorizes the execution media into two distinct tool types consisting of a script control backend based on a high level programming language and a host application backend driven by native spreadsheet software. Both modules are integrated into the system via always on loading or keyword triggered activation mechanisms depending on operational requirements. The script control backend is primarily utilized for low latency and stateless manipulation of raw file structures, focusing on high efficiency in-cremental data writing and standard style configurations. However, this script tool explicitly lacks live execution time computing capa-bilities native to the spreadsheet engine, meaning it cannot handle dynamic formula evaluation, automatic column width adjustments, SheetCompass: Hierarchical Relation Graphs for Agentic Spreadsheet Reasoning Conference acronym ’XX, June 03–05, 2018, Woodstock, NY 
+
+or native pivot table creation. To prevent accidental data corrup-tion or full table overwrites, operations under this backend must avoid assuming that target tables begin at the origin cell, requiring the system to dynamically anchor absolute coordinates based on observable schema metadata before writing data. Conversely, the host application backend is dedicated to managing complex tasks that depend heavily on the internal spreadsheet engine, including the generation of interactive graphical objects and runtime ana-lytical computations. Operating through a standard component object model interface to drive the native spreadsheet application, this tool provides a robust execution environment that can handle advanced user macros and deep formatting dependencies. Because driving a native application consumes significant system memory, this backend enforces a comprehensive lifecycle management work-flow that governs environment initialization, workbook context establishment, active cell positioning, exception handling, and ex-plicit process resource reclamation. This careful tracking ensures that heavy background processes are properly terminated. 
+
+## GenAI Usage Disclosure 
+
+In accordance with the ACM Policy on the Use of AI, we fully dis-close the utilization of Generative AI tools. Codex was employed to assist in writing the baseline evaluation scripts as well as specific implementation portions of our framework code, and ChatGPT was used during the writing stage exclusively to improving gram-matical correctness and refining the text flow. The final phrasing, technical accuracy, and scientific arguments remain entirely the responsibility of the authors. 
+
+## References 
+
+[1] Josh Achiam, Steven Adler, Sandhini Agarwal, Lama Ahmad, Ilge Akkaya, Floren-cia Leoni Aleman, Diogo Almeida, Janko Altenschmidt, Sam Altman, Shyamal Anadkat, et al. 2023. Gpt-4 technical report. arXiv preprint arXiv:2303.08774 
+
+(2023). [2] Rohan Bavishi, Caroline Lemieux, Roy Fox, Koushik Sen, and Ion Stoica. 2019. AutoPandas: neural-backed generators for program synthesis. Proceedings of the ACM on Programming Languages 3, OOPSLA (2019), 1–27. [3] Martin Broadhurst. 2024. Leveraging ChatGPT for Excel: How large language models are changing spreadsheet practices. Journal of AI, Robotics & Workplace Automation 3, 3 (2024), 220–233. [4] Tom Brown, Benjamin Mann, Nick Ryder, Melanie Subbiah, Jared D Kaplan, Prafulla Dhariwal, Arvind Neelakantan, Pranav Shyam, Girish Sastry, Amanda Askell, et al. 2020. Language models are few-shot learners. Advances in neural information processing systems 33 (2020), 1877–1901. [5] Chi-Min Chan, Weize Chen, Yusheng Su, Jianxuan Yu, Wei Xue, Shanghang Zhang, Jie Fu, and Zhiyuan Liu. 2024. Chateval: Towards better llm-based evalu-ators through multi-agent debate. In International conference on learning repre-sentations , Vol. 2024. 9079–9093. [6] Xinyun Chen, Petros Maniatis, Rishabh Singh, Charles Sutton, Hanjun Dai, Max Lin, and Denny Zhou. 2021. Spreadsheetcoder: Formula prediction from semi-structured context. In International Conference on Machine Learning . PMLR, 1661– 1672. [7] Yibin Chen, Yifu Yuan, Zeyu Zhang, Yan Zheng, Jinyi Liu, Fei Ni, Jianye Hao, Hangyu Mao, and Fuzheng Zhang. 2025. SheetAgent: towards a generalist agent for spreadsheet reasoning and manipulation via large language models. In 
+
+Proceedings of the ACM on Web Conference 2025 . 158–177. [8] Mingyue Cheng, Qi Liu, Qingyang Mao, Yitong Zhou, Yupeng Li, Jiahao Wang, Jiaying Lin, Jiawei Cao, and Enhong Chen. 2025. A survey on table mining with large language models: Challenges, advancements and prospects. (2025). [9] Zhoujun Cheng, Haoyu Dong, Zhiruo Wang, Ran Jia, Jiaqi Guo, Yan Gao, Shi Han, Jian-Guang Lou, and Dongmei Zhang. 2022. Hitab: A hierarchical table dataset for question answering and natural language generation. In Proceedings of the 60th Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers) . 1094–1110. [10] Aakanksha Chowdhery, Sharan Narang, Jacob Devlin, Maarten Bosma, Gaurav Mishra, Adam Roberts, Paul Barham, Hyung Won Chung, Charles Sutton, Se-bastian Gehrmann, et al. 2023. Palm: Scaling language modeling with pathways. 
+
+Journal of machine learning research 24, 240 (2023), 1–113. [11] Xiang Deng, Huan Sun, Alyssa Lees, You Wu, and Cong Yu. 2022. Turl: Table understanding through representation learning. ACM SIGMOD Record 51, 1 (2022), 33–40. [12] Jacob Devlin, Ming-Wei Chang, Kenton Lee, and Kristina Toutanova. 2019. Bert: Pre-training of deep bidirectional transformers for language understanding. In 
+
+Proceedings of the 2019 conference of the North American chapter of the association for computational linguistics: human language technologies, volume 1 (long and short papers) . 4171–4186. [13] Jacob Devlin, Jonathan Uesato, Surya Bhupatiraju, Rishabh Singh, Abdel-rahman Mohamed, and Pushmeet Kohli. 2017. Robustfill: Neural program learning under noisy i/o. In International conference on machine learning . PMLR, 990–998. [14] Haoyu Dong, Shijie Liu, Shi Han, Zhouyu Fu, and Dongmei Zhang. 2019. Ta-blesense: Spreadsheet table detection with convolutional neural networks. In 
+
+Proceedings of the AAAI conference on artificial intelligence , Vol. 33. 69–76. [15] Haoyu Dong, Jiong Yang, Shi Han, and Dongmei Zhang. 2020. Learning for-matting style transfer and structure extraction for spreadsheet tables with a hybrid neural network architecture. In Proceedings of the 29th ACM International Conference on Information & Knowledge Management . 2389–2396. [16] Haoyu Dong, Jianbo Zhao, Yuzhang Tian, Junyu Xiong, Shiyu Xia, Mengyu Zhou, Yun Lin, José Cambronero, Yeye He, Shi Han, et al. 2024. Spreadsheetllm: Encoding spreadsheets for large language models. arXiv preprint arXiv:2407.09025 
+
+(2024). [17] Haoyu Dong, Jianbo Zhao, Yuzhang Tian, Junyu Xiong, Mengyu Zhou, Yun Lin, José Cambronero, Yeye He, Shi Han, and Dongmei Zhang. 2024. Encoding spreadsheets for large language models. In Proceedings of the 2024 Conference on Empirical Methods in Natural Language Processing . 20728–20748. [18] Ali Dorri, Salil S Kanhere, and Raja Jurdak. 2018. Multi-agent systems: A survey. 
+
+Ieee Access 6 (2018), 28573–28593. [19] Yilun Du, Shuang Li, Antonio Torralba, Joshua B Tenenbaum, and Igor Mordatch. 2024. Improving factuality and reasoning in language models through multiagent debate. In Forty-first international conference on machine learning .[20] Nouha Dziri, Ximing Lu, Melanie Sclar, Xiang Lorraine Li, Liwei Jiang, Bill Yuchen Lin, Sean Welleck, Peter West, Chandra Bhagavatula, Ronan Le Bras, et al. 2023. Faith and fate: Limits of transformers on compositionality. Advances in neural information processing systems 36 (2023), 70293–70332. [21] Dawei Gao, Haibin Wang, Yaliang Li, Xiuyu Sun, Yichen Qian, Bolin Ding, and Jin-gren Zhou. 2023. Text-to-sql empowered by large language models: A benchmark evaluation. arXiv preprint arXiv:2308.15363 (2023). [22] Liangcai Gao, Yibo Li, Lin Du, Xinpeng Zhang, Ziyi Zhu, Ning Lu, Lianwen Jin, Yongshuai Huang, and Zhi Tang. 2022. A survey on table recognition technology. 
+
+Journal of Image and Graphics 27, 6 (2022), 1898–1917. [23] Sumit Gulwani. 2011. Automating string processing in spreadsheets using input-output examples. ACM Sigplan Notices 46, 1 (2011), 317–330. [24] Sumit Gulwani and Mark Marron. 2014. Nlyze: Interactive programming by natural language for spreadsheet data analysis and manipulation. In Proceedings of the 2014 ACM SIGMOD international conference on Management of data . 803– 814. [25] Sumit Gulwani, Oleksandr Polozov, and Rishabh Singh. 2017. Program synthesis. 
+
+Foundations and Trends in Programming Languages 4, 1-2 (2017), 1–119. [26] Wanrong He, Haoyu Dong, Yihuai Gao, Zhichao Fan, Xingzhuo Guo, Zhitao Hou, Xiao Lv, Ran Jia, Shi Han, and Dongmei Zhang. 2023. HermEs: Interactive spread-sheet formula prediction via hierarchical formulet expansion. In Proceedings of the 61st Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers) . 8356–8372. [27] Jonathan Herzig, Pawel Krzysztof Nowak, Thomas Müller, Francesco Piccinno, and Julian Eisenschlos. 2020. TaPas: Weakly supervised table parsing via pre-training. In Proceedings of the 58th annual meeting of the association for computa-tional linguistics . 4320–4333. [28] Jonathan Herzig, Pawel Krzysztof Nowak, Thomas Müller, Francesco Piccinno, and Julian Eisenschlos. 2020. TaPas: Weakly supervised table parsing via pre-training. In Proceedings of the 58th annual meeting of the association for computa-tional linguistics . 4320–4333. [29] Sirui Hong, Mingchen Zhuge, Jonathan Chen, Xiawu Zheng, Yuheng Cheng, Jinlin Wang, Ceyao Zhang, Steven Yau, Zijuan Lin, Liyang Zhou, et al. 2024. MetaGPT: Meta programming for a multi-agent collaborative framework. In 
+
+International Conference on Learning Representations , Vol. 2024. 23247–23275. [30] Wenlong Huang, Fei Xia, Ted Xiao, Harris Chan, Jacky Liang, Pete Florence, Andy Zeng, Jonathan Tompson, Igor Mordatch, Yevgen Chebotar, et al. 2022. Inner monologue: Embodied reasoning through planning with language models. 
+
+arXiv preprint arXiv:2207.05608 (2022). [31] Hiroshi Iida, Dung Thai, Varun Manjunatha, and Mohit Iyyer. 2021. Tabbie: Pretrained representations of tabular data. In Proceedings of the 2021 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies . 3446–3456. Conference acronym ’XX, June 03–05, 2018, Woodstock, NY Panjing He, Mingyue Cheng, Yucong Luo,Li Li, Xiaohan Zhang 
+
+[32] Dietmar Jannach, Thomas Schmitz, Birgit Hofer, and Franz Wotawa. 2014. Avoid-ing, finding and fixing spreadsheet errors–a survey of automated approaches for spreadsheet QA. Journal of Systems and Software 94 (2014), 129–150. [33] Ziwei Ji, Nayeon Lee, Rita Frieske, Tiezheng Yu, Dan Su, Yan Xu, Etsuko Ishii, Ye Jin Bang, Andrea Madotto, and Pascale Fung. 2023. Survey of hallucination in natural language generation. ACM computing surveys 55, 12 (2023), 1–38. [34] Chuang Jiang, Mingyue Cheng, Xiaoyu Tao, Qingyang Mao, Jie Ouyang, and Qi Liu. 2026. Tablemind: An autonomous programmatic agent for tool-augmented table reasoning. In Proceedings of the Nineteenth ACM International Conference on Web Search and Data Mining . 260–270. [35] Zhengbao Jiang, Yi Mao, Pengcheng He, Graham Neubig, and Weizhu Chen. 2022. OmniTab: Pretraining with natural and synthetic data for few-shot table-based question answering. In Proceedings of the 2022 Conference of the North Ameri-can Chapter of the Association for Computational Linguistics: Human Language Technologies . 932–942. [36] Ashwin Kalyan, Abhishek Mohta, Oleksandr Polozov, Dhruv Batra, Prateek Jain, and Sumit Gulwani. 2018. Neural-guided deductive search for real-time program synthesis from examples. arXiv preprint arXiv:1804.01186 (2018). [37] Elvis Koci, Maik Thiele, Wolfgang Lehner, and Oscar Romero. 2018. Table recog-nition in spreadsheets via a graph representation. In 2018 13th IAPR International Workshop on Document Analysis Systems (DAS) . IEEE, 139–144. [38] Takeshi Kojima, Shixiang Shane Gu, Machel Reid, Yutaka Matsuo, and Yusuke Iwasawa. 2022. Large language models are zero-shot reasoners. Advances in neural information processing systems 35 (2022), 22199–22213. [39] Hongxin Li, Jingran Su, Yuntao Chen, Qing Li, and Zhao-Xiang Zhang. 2023. Sheetcopilot: Bringing software productivity to the next level through large language models. Advances in Neural Information Processing Systems 36 (2023), 4952–4984. [40] Yupian Lin, Guangya Yu, Cheng Yuan, Huan Du, Hui Luo, Yuang Bian, Jingping Liu, Zhidong He, Wen Du, and Tong Ruan. 2026. LogToP: Logic Tree-of-Program with Table Instruction-tuned LLMs for Controlled Logical Table-to-Text Gen-eration. In Findings of the Association for Computational Linguistics: EACL 2026 .5291–5303. [41] Qian Liu, Bei Chen, Jiaqi Guo, Morteza Ziyadi, Zeqi Lin, Weizhu Chen, and Jian-Guang Lou. 2021. TAPEX: Table pre-training via learning a neural SQL executor. 
+
+arXiv preprint arXiv:2107.07653 (2021). [42] Zhengyang Liu and Albert Young Choi. 2024. Research on Information Architec-ture Design of Short-Form Video Social Platforms Based on Cognitive Psychology. 
+
+Psychology 14, 1 (2024), 1–13. [43] Zeyao Ma, Bohan Zhang, Jing Zhang, Jifan Yu, Xiaokang Zhang, Xiaohan Zhang, Sijia Luo, Xi Wang, and Jie Tang. 2024. Spreadsheetbench: Towards challenging real world spreadsheet manipulation. Advances in Neural Information Processing Systems 37 (2024), 94871–94908. [44] Qingyang Mao, Qi Liu, Zhi Li, Mingyue Cheng, Zheng Zhang, and Rui Li. 2024. PoTable: Towards Systematic Thinking via Stage-oriented Plan-then-Execute Reasoning on Tables. arXiv preprint arXiv:2412.04272 (2024). [45] Ahmed Masry, Juan Rodriguez, Tianyu Zhang, Suyuchen Wang, Chao Wang, Aarash Feizi, Akshay Kalkunte Suresh, Abhay Puri, Xiangru Jian, Pierre-André Noël, et al. 2026. AlignVLM: Bridging Vision and Language Latent Spaces for Multimodal Document Understanding. Advances in Neural Information Processing Systems 38 (2026), 145684–145710. [46] Balog Matej, L Gaunt Alexander, Marc Brockschmidt, Sebastian Nowozin, and Daniel Tarlow. 2017. Deepcoder: Learning to write programs. In International Conference on Learning Representations .[47] Li Peng, He Yeye, Yashar Dror, Cui Weiwei, Ge Song, Zhang Haidong, Fain-man Danielle Rifinski, Zhang Dongmei, and Chaudhuri Surajit. 2023. Table-GPT: Table-tuned GPT for diverse table tasks. arXiv (Cornell University) (2023). [48] Oleksandr Polozov and Sumit Gulwani. 2015. Flashmeta: A framework for induc-tive program synthesis. In Proceedings of the 2015 ACM SIGPLAN International Conference on Object-Oriented Programming, Systems, Languages, and Applications .107–126. [49] Oleksandr Polozov and Sumit Gulwani. 2015. Flashmeta: A framework for induc-tive program synthesis. In Proceedings of the 2015 ACM SIGPLAN International Conference on Object-Oriented Programming, Systems, Languages, and Applications .107–126. [50] Shah Rukh Qasim, Hassan Mahmood, and Faisal Shafait. 2019. Rethinking table recognition using graph neural networks. In 2019 international conference on document analysis and recognition (ICDAR) . IEEE, 142–147. [51] Chen Qian, Wei Liu, Hongzhang Liu, Nuo Chen, Yufan Dang, Jiahao Li, Cheng Yang, Weize Chen, Yusheng Su, Xin Cong, et al. 2024. Chatdev: Communicative agents for software development. In Proceedings of the 62nd annual meeting of the association for computational linguistics (volume 1: Long papers) . 15174–15186. [52] Houxing Ren, Mingjie Zhan, Zimu Lu, Ke Wang, Yunqiao Yang, Haotian Hou, and Hongsheng Li. 2026. Towards Robust Real-World Spreadsheet Understand-ing with Multi-Agent Multi-Format Reasoning. arXiv preprint arXiv:2604.12282 
+
+(2026). [53] Noah Shinn, Federico Cassano, Edward Berman, Ashwin Gopinath, Karthik Narasimhan, and Shunyu Yao. 2024. Reflexion: Language agents with verbal reinforcement learning, 2023. URL https://arxiv. org/abs/2303.11366 8 (2024). [54] Yuan Sui, Mengyu Zhou, Mingjie Zhou, Shi Han, and Dongmei Zhang. 2023. Gpt4table: Can large language models understand structured table data? a bench-mark and empirical study. arXiv preprint ArXiv:2305.13062 (2023). [55] Zailong Tian, Zhuoheng Han, Houfeng Wang, and Lizi Liao. 2026. Sheetpedia: A 300K-Spreadsheet Corpus for Spreadsheet Intelligence and LLM Fine-Tuning. 
+
+Advances in Neural Information Processing Systems 38 (2026). [56] Thuy-Quynh Vuong, Kanel Tit, and Maxime Cordy. 2026. A Survey on LLMs for Spreadsheet Intelligence. arXiv preprint arXiv:2601.04567 (2026). [57] Tianwei Wang, Yuanzhi Zhu, Lianwen Jin, Dezhi Peng, Zhe Li, Mengchao He, Yongpan Wang, and Canjie Luo. 2021. Implicit feature alignment: learn to convert text recognizer to text spotter. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition . 5973–5982. [58] Xuezhi Wang, Jason Wei, Dale Schuurmans, Quoc Le, Ed Chi, Sharan Narang, Aakanksha Chowdhery, and Denny Zhou. 2022. Self-consistency improves chain of thought reasoning in language models. arXiv preprint arXiv:2203.11171 (2022). [59] Zhiruo Wang, Haoyu Dong, Ran Jia, Jia Li, Zhiyi Fu, Shi Han, and Dongmei Zhang. 2021. Tuta: Tree-based transformers for generally structured table pre-training. In Proceedings of the 27th ACM SIGKDD Conference on Knowledge Discovery & Data Mining . 1780–1790. [60] Ziwei Wang, Jiayuan Su, Mengyu Zhou, Huaxing Zeng, Mengni Jia, Xiao Lv, Haoyu Dong, Xiaojun Ma, Shi Han, and Dongmei Zhang. 2026. SheetBrain: A Neuro-Symbolic Agent for Accurate Reasoning over Complex and Large Spread-sheets. In Proceedings of the AAAI Conference on Artificial Intelligence , Vol. 40. 33800–33808. [61] Zilong Ryan Wang, Hao Zhang, Chun-Liang Li, Julian M Eisenschlos, Vincent Perot, Zifeng Wang, Lesly Miculicich, Yasuhisa Fujii, Jingbo Shang, Chen-Yu Lee, et al. 2024. Chain-of-table: Evolving tables in the reasoning chain for table understanding. In International Conference on Learning Representations , Vol. 2024. 55587–55610. [62] Qingyun Wu, Gagan Bansal, Jieyu Zhang, Yiran Wu, Beibin Li, Erkang Zhu, Li Jiang, Xiaoyun Zhang, Shaokun Zhang, Jiale Liu, et al. 2024. Autogen: Enabling next-gen LLM applications via multi-agent conversations. In First conference on language modeling .[63] Zhiheng Xi, Wenxiang Chen, Xin Guo, Wei He, Yiwen Ding, Boyang Hong, Ming Zhang, Junzhe Wang, Senjie Jin, Enyu Zhou, et al. 2025. The rise and potential of large language model based agents: A survey. Science China Information Sciences 
+
+68, 2 (2025), 121101. [64] Pengcheng Yin, Graham Neubig, Wen-tau Yih, and Sebastian Riedel. 2020. TaBERT: Pretraining for joint understanding of textual and tabular data. In Pro-ceedings of the 58th annual meeting of the association for computational linguistics .8413–8426. [65] Pengcheng Yin, Graham Neubig, Wen-tau Yih, and Sebastian Riedel. 2020. TaBERT: Pretraining for joint understanding of textual and tabular data. In Pro-ceedings of the 58th annual meeting of the association for computational linguistics .8413–8426. [66] Yifan Zhang, Jingqin Yang, Yang Yuan, and Andrew Chi-Chih Yao. 2023. Cumu-lative reasoning with large language models. arXiv preprint arXiv:2308.04371 
+
+(2023). [67] Xinyi Zheng, Douglas Burdick, Lucian Popa, Xu Zhong, and Nancy Xin Ru Wang. 2021. Global table extractor (gte): A framework for joint table identification and cell structure recognition using visual context. In Proceedings of the IEEE/CVF winter conference on applications of computer vision . 697–706.
