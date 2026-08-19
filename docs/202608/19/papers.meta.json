@@ -1,0 +1,39 @@
+{
+  "label": "2026-08-19",
+  "date": "2026-08-19",
+  "generated_at": "2026-08-19T20:59:22",
+  "count": 2,
+  "papers": [
+    {
+      "paper_id": "202608/19/2608.16114v1-hyperskill-self-evolving-llm-agents-via-hypergraph-structured-skill-memory",
+      "section": "deep",
+      "title_en": "HyperSkill: Self-Evolving LLM Agents via Hypergraph-Structured Skill Memory",
+      "authors": "Ruiyao Xu, Tiankai Yang, Wei-Chieh Huang",
+      "date": "2026-08-17",
+      "pdf": "https://arxiv.org/pdf/2608.16114v1",
+      "score": "8.0",
+      "evidence": "超图结构技能记忆实现LLM智能体自我进化，支持组合式技能复用",
+      "tldr": "随着智能体任务复杂化，LLM智能体需要复用程序性知识，而现有记忆系统只孤立存轨迹或工作流，忽略子任务与技能的组合关系，且检索不利用关系信号。HyperSkill提出超图记忆框架，用两类节点表示子任务步骤与可复用技能，联合优化存储、检索和演化。这使得技能记忆能够随经验自我进化，支持复杂任务的组合式复用。该方法为LLM智能体的长期记忆设计提供了更结构化的方案。",
+      "tags": "query:rl",
+      "abstract_en": "As agentic tasks grow in complexity, LLM agents increasingly rely on experiential memory to reuse procedural knowledge across tasks. Effective memory design must jointly address what to store, how memory is structured and retrieved, and how memory evolves. Existing systems tackle each only partially: they store trajectories, insights, or workflows as isolated entries, discarding compositional relationships among subtasks and reusable skills; retrieve by flat embedding similarity that ignores relational signals; and maintain memory without leveraging its relational structure. We propose HyperSkill, a hypergraph-based memory framework that jointly improves all three. HyperSkill represents memory as a hypergraph with two node types, subtask steps and reusable skills, where each hyperedge links the subtasks and skills from a single trajectory. Dual-path retrieval queries both subtask and trajectory levels, ranking skills by co-occurrence across retrieved trajectories. Periodic structure-informed maintenance prunes low-utility nodes and merges redundant skills via quality-weighted propagation. Across xBench, GAIA, and WebWalkerQA with GPT-4o and Qwen3-30B-A3B, HyperSkill outperforms ten memory baselines, yielding gains of up to +11.51 on GAIA and +11.18 on WebWalkerQA.",
+      "source": "arxiv",
+      "selection_source": "carryover_cache"
+    },
+    {
+      "paper_id": "202608/19/2608.16888v1-q-based-variational-inverse-reinforcement-learning",
+      "section": "deep",
+      "title_en": "Q-based Variational Inverse Reinforcement Learning",
+      "authors": "Ondrej Bajgar, Peter Tisnikar, Alessandro Abate, Konstantinos Gatsis, Maike Osborne",
+      "date": "2026-08-17",
+      "pdf": "https://arxiv.org/pdf/2608.16888v1",
+      "score": "8.0",
+      "evidence": "基于贝叶斯逆强化学习从专家行为中学习奖励函数后验",
+      "tldr": "安全关键AI需要从专家行为中推断人类偏好，但显式指定奖励函数往往不可行。本文提出QVIRL，一种贝叶斯逆强化学习方法，通过主要学习最优Q值的变分分布来恢复奖励后验。不同于以往方法，它同时具备可扩展性和不确定性量化，适用于安全关键系统及主动学习。在学徒学习等任务中表现出色，为奖励函数设计提供了有力工具。",
+      "tags": "query:rl",
+      "abstract_en": "The development of safe and beneficial AI requires that systems can learn and act in accordance with human preferences. However, explicitly specifying these preferences by hand is often infeasible. Inverse reinforcement learning (IRL) addresses this challenge by inferring preferences, represented as reward functions, from expert behaviour. We introduce Q-based Variational IRL (QVIRL), a novel Bayesian IRL method that recovers a posterior distribution over rewards from expert demonstrations via primarily learning a variational distribution over optimal Q-values. Unlike previous approaches, QVIRL combines scalability with uncertainty quantification, important for safety-critical applications as well as active learning. We demonstrate QVIRL's strong performance in apprenticeship learning across various tasks, including gridworlds, Lunar Lander, the Highway Environment, and two ATARI games both with static expert data and with active learning. It is the first method for Bayesian IRL that demonstrates training from raw pixel observations.",
+      "source": "arxiv",
+      "selection_source": "carryover_cache"
+    }
+  ],
+  "errors": []
+}
