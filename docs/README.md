@@ -6,26 +6,19 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-08-19
-- 运行时间：2026-08-19 20:59:22 UTC
+- 最新运行日期：2026-08-20
+- 运行时间：2026-08-20 20:47:09 UTC
 - 运行状态：成功
-- 本次总论文数：2
-- 精读区：2
+- 本次总论文数：0
+- 精读区：0
 - 速读区：0
 
 ### 今日简报（AI）
-- 今日共生成 2 篇推荐（精读 2 篇，速读 0 篇）
-- 精读：《HyperSkill: Self-Evolving LLM Agents via Hypergraph-Structured Skill Memory》（8.0/10）, 《Q-based Variational Inverse Reinforcement Learning》（8.0/10）
-- 这些结果覆盖了当下较热的方向，建议先看精读区论文的关键问题与方法。
-- 详情：[/202608/19/README](/202608/19/README)
+> 今日无新推荐，系统未产出可展示论文。
+- 详情：[/202608/20/README](/202608/20/README)
 
 ### 精读区论文标签
-1. [HyperSkill: Self-Evolving LLM Agents via Hypergraph-Structured Skill Memory](/202608/19/2608.16114v1-hyperskill-self-evolving-llm-agents-via-hypergraph-structured-skill-memory)  
-   标签：评分：8.0/10、query:rl
-   evidence：超图结构技能记忆实现LLM智能体自我进化，支持组合式技能复用
-2. [Q-based Variational Inverse Reinforcement Learning](/202608/19/2608.16888v1-q-based-variational-inverse-reinforcement-learning)  
-   标签：评分：8.0/10、query:rl
-   evidence：基于贝叶斯逆强化学习从专家行为中学习奖励函数后验
+- 本次无精读推荐。
 
 ### 速读区论文标签
 - 本次无速读推荐。
